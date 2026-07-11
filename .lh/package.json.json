@@ -1,0 +1,18 @@
+{
+    "sourceFile": "package.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1783773162835,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1783773162835,
+            "name": "Commit-0",
+            "content": "{\r\n  \"name\": \"presencecard-platform\",\r\n  \"version\": \"0.1.0\",\r\n  \"private\": true,\r\n  \"scripts\": {\r\n    \"dev\": \"next dev\",\r\n    \"build\": \"next build\",\r\n    \"start\": \"next start\",\r\n    \"lint\": \"next lint\",\r\n    \"type-check\": \"tsc --noEmit\",\r\n    \"db:generate\": \"prisma generate\",\r\n    \"db:push\": \"prisma db push\",\r\n    \"db:migrate\": \"prisma migrate dev\",\r\n    \"db:migrate:prod\": \"prisma migrate deploy\",\r\n    \"db:studio\": \"prisma studio\",\r\n    \"db:seed\": \"tsx prisma/seed.ts\",\r\n    \"format\": \"prettier --write .\",\r\n    \"test\": \"vitest run\",\r\n    \"test:watch\": \"vitest\"\r\n  },\r\n  \"dependencies\": {\r\n    \"@aws-sdk/client-s3\": \"^3.600.0\",\r\n    \"@aws-sdk/s3-request-presigner\": \"^3.600.0\",\r\n    \"@prisma/client\": \"^5.16.1\",\r\n    \"bcryptjs\": \"^2.4.3\",\r\n    \"clsx\": \"^2.1.1\",\r\n    \"lucide-react\": \"^0.417.0\",\r\n    \"next\": \"^16.3.0-canary.76\",\r\n    \"qrcode\": \"^1.5.4\",\r\n    \"react\": \"^19.0.0\",\r\n    \"react-dom\": \"^19.0.0\",\r\n    \"tailwind-merge\": \"^2.4.0\",\r\n    \"zod\": \"^3.23.8\"\r\n  },\r\n  \"devDependencies\": {\r\n    \"@types/bcryptjs\": \"^2.4.6\",\r\n    \"@types/node\": \"^22.0.0\",\r\n    \"@types/qrcode\": \"^1.5.6\",\r\n    \"@types/react\": \"^19.0.0\",\r\n    \"@types/react-dom\": \"^19.0.0\",\r\n    \"autoprefixer\": \"^10.4.19\",\r\n    \"postcss\": \"^8.4.38\",\r\n    \"prettier\": \"^3.3.3\",\r\n    \"prettier-plugin-tailwindcss\": \"^0.6.5\",\r\n    \"prisma\": \"^5.16.1\",\r\n    \"tailwindcss\": \"^3.4.6\",\r\n    \"tsx\": \"^4.16.2\",\r\n    \"typescript\": \"^5.5.3\",\r\n    \"vitest\": \"^2.0.3\"\r\n  }\r\n}\r\n"
+        }
+    ]
+}

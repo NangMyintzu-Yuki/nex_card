@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/theme/theme-context.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1783688909754,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1783688909754,
+            "name": "Commit-0",
+            "content": "// src/lib/theme/theme-context.tsx\r\n// NEX CARD Theme System\r\n// Light mode: white/navy blue (matches Image 1 — the blue logo)\r\n// Dark/Gold mode: black/gold (matches Image 2 — the gold logo)\r\n// Theme applies ONLY to admin + dashboard UI — never to public profile templates\r\n\r\n\"use client\";\r\n\r\nimport { createContext, useContext, useEffect, useState, useCallback } from \"react\";\r\n\r\ntype Theme = \"light\" | \"dark\";\r\n\r\ninterface ThemeContextValue {\r\n  theme: Theme;\r\n  setTheme: (t: Theme) => void;\r\n  toggleTheme: () => void;\r\n}\r\n\r\nconst ThemeContext = createContext<ThemeContextValue>({\r\n  theme: \"dark\",\r\n  setTheme: () => {},\r\n  toggleTheme: () => {},\r\n});\r\n\r\nexport function ThemeProvider({ children }: { children: React.ReactNode }) {\r\n  const [theme, setThemeState] = useState<Theme>(\"dark\");\r\n  const [mounted, setMounted] = useState(false);\r\n\r\n  useEffect(() => {\r\n    setMounted(true);\r\n    const stored = localStorage.getItem(\"nexcard-theme\") as Theme | null;\r\n    if (stored === \"light\" || stored === \"dark\") {\r\n      setThemeState(stored);\r\n    }\r\n  }, []);\r\n\r\n  useEffect(() => {\r\n    if (!mounted) return;\r\n    const root = document.documentElement;\r\n    if (theme === \"dark\") {\r\n      root.classList.add(\"nc-dark\");\r\n      root.classList.remove(\"nc-light\");\r\n    } else {\r\n      root.classList.add(\"nc-light\");\r\n      root.classList.remove(\"nc-dark\");\r\n    }\r\n    localStorage.setItem(\"nexcard-theme\", theme);\r\n  }, [theme, mounted]);\r\n\r\n  const setTheme = useCallback((t: Theme) => {\r\n    setThemeState(t);\r\n  }, []);\r\n\r\n  const toggleTheme = useCallback(() => {\r\n    setThemeState(prev => prev === \"dark\" ? \"light\" : \"dark\");\r\n  }, []);\r\n\r\n  // Prevent flash of wrong theme\r\n  if (!mounted) {\r\n    return (\r\n      <div style={{ visibility: \"hidden\" }}>\r\n        {children}\r\n      </div>\r\n    );\r\n  }\r\n\r\n  return (\r\n    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>\r\n      {children}\r\n    </ThemeContext.Provider>\r\n  );\r\n}\r\n\r\nexport function useTheme() {\r\n  return useContext(ThemeContext);\r\n}"
+        }
+    ]
+}

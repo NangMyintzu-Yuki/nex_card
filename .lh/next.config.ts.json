@@ -1,0 +1,34 @@
+{
+    "sourceFile": "next.config.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 4,
+            "patches": [
+                {
+                    "date": 1783153188907,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1783153424033,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -88,9 +88,9 @@\n   // ── Experimental ────────────────────────────────────────────────────────\r\n   experimental: {\r\n     // Enable partial prerendering for the public profile pages\r\n     // ppr: true,\r\n-    cacheComponents: true,\r\n+    // cacheComponents: true,\r\n     // Faster server actions\r\n     serverActions: {\r\n       bodySizeLimit: \"4mb\",\r\n     },\r\n"
+                },
+                {
+                    "date": 1783773267951,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -90,11 +90,11 @@\n     // Enable partial prerendering for the public profile pages\r\n     // ppr: true,\r\n     // cacheComponents: true,\r\n     // Faster server actions\r\n-    serverActions: {\r\n-      bodySizeLimit: \"4mb\",\r\n-    },\r\n+    // serverActions: {\r\n+    //   bodySizeLimit: \"4mb\",\r\n+    // },\r\n   },\r\n };\r\n \r\n export default nextConfig;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1783777508130,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -87,14 +87,14 @@\n \r\n   // ── Experimental ────────────────────────────────────────────────────────\r\n   experimental: {\r\n     // Enable partial prerendering for the public profile pages\r\n-    // ppr: true,\r\n+    ppr: true,\r\n     // cacheComponents: true,\r\n     // Faster server actions\r\n-    // serverActions: {\r\n-    //   bodySizeLimit: \"4mb\",\r\n-    // },\r\n+    serverActions: {\r\n+      bodySizeLimit: \"4mb\",\r\n+    },\r\n   },\r\n };\r\n \r\n export default nextConfig;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1783777526711,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -87,14 +87,14 @@\n \r\n   // ── Experimental ────────────────────────────────────────────────────────\r\n   experimental: {\r\n     // Enable partial prerendering for the public profile pages\r\n-    ppr: true,\r\n+    // ppr: true,\r\n     // cacheComponents: true,\r\n     // Faster server actions\r\n-    serverActions: {\r\n-      bodySizeLimit: \"4mb\",\r\n-    },\r\n+    // serverActions: {\r\n+    //   bodySizeLimit: \"4mb\",\r\n+    // },\r\n   },\r\n };\r\n \r\n export default nextConfig;\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1783153188907,
+            "name": "Commit-0",
+            "content": "// next.config.ts\r\nimport type { NextConfig } from \"next\";\r\n\r\nconst nextConfig: NextConfig = {\r\n  // ── Image optimization ──────────────────────────────────────────────────\r\n  images: {\r\n    remotePatterns: [\r\n      // User-uploaded content via your storage provider\r\n      {\r\n        protocol: \"https\",\r\n        hostname: \"**.r2.cloudflarestorage.com\",\r\n      },\r\n      // Placeholder / seed images\r\n      {\r\n        protocol: \"https\",\r\n        hostname: \"images.unsplash.com\",\r\n      },\r\n      {\r\n        protocol: \"https\",\r\n        hostname: \"placehold.co\",\r\n      },\r\n      {\r\n        protocol: \"https\",\r\n        hostname: \"via.placeholder.com\",\r\n      },\r\n      {\r\n        protocol: \"https\",\r\n        hostname: \"avatars.githubusercontent.com\",\r\n      },\r\n      {\r\n        protocol: \"https\",\r\n        hostname: \"lh3.googleusercontent.com\",\r\n      },\r\n      // Your own CDN domain in prod\r\n      {\r\n        protocol: \"https\",\r\n        hostname: \"cdn.presencecard.io\",\r\n      },\r\n    ],\r\n    formats: [\"image/avif\", \"image/webp\"],\r\n    minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days\r\n  },\r\n\r\n  // ── Performance ─────────────────────────────────────────────────────────\r\n  compress: true,\r\n  poweredByHeader: false,\r\n\r\n  // ── Security headers ────────────────────────────────────────────────────\r\n  async headers() {\r\n    return [\r\n      {\r\n        source: \"/(.*)\",\r\n        headers: [\r\n          { key: \"X-DNS-Prefetch-Control\", value: \"on\" },\r\n          { key: \"X-Content-Type-Options\", value: \"nosniff\" },\r\n          { key: \"X-Frame-Options\", value: \"SAMEORIGIN\" },\r\n          { key: \"Referrer-Policy\", value: \"strict-origin-when-cross-origin\" },\r\n          {\r\n            key: \"Permissions-Policy\",\r\n            value: \"camera=(), microphone=(), geolocation=()\",\r\n          },\r\n        ],\r\n      },\r\n      // Cache static assets aggressively\r\n      {\r\n        source: \"/_next/static/(.*)\",\r\n        headers: [\r\n          {\r\n            key: \"Cache-Control\",\r\n            value: \"public, max-age=31536000, immutable\",\r\n          },\r\n        ],\r\n      },\r\n    ];\r\n  },\r\n\r\n  // ── Redirects ───────────────────────────────────────────────────────────\r\n  async redirects() {\r\n    return [\r\n      {\r\n        source: \"/admin\",\r\n        destination: \"/admin\",\r\n        permanent: false,\r\n      },\r\n    ];\r\n  },\r\n\r\n  // ── Experimental ────────────────────────────────────────────────────────\r\n  experimental: {\r\n    // Enable partial prerendering for the public profile pages\r\n    // ppr: true,\r\n    cacheComponents: true,\r\n    // Faster server actions\r\n    serverActions: {\r\n      bodySizeLimit: \"4mb\",\r\n    },\r\n  },\r\n};\r\n\r\nexport default nextConfig;"
+        }
+    ]
+}

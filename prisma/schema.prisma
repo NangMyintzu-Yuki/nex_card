@@ -1,0 +1,173 @@
+// prisma/schema.prisma
+// Production-optimized schema for Multi-Template Multi-Tenant Platform
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ENUM DEFINITIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USERS TABLE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id                String      @id @default(cuid())
+  email             String      @unique
+  emailVerifiedAt   DateTime?
+  hashedPassword    String
+  name              String
+  avatarUrl         String?
+  role              UserRole    @default(USER)
+  status            UserStatus  @default(PENDING_VERIFICATION)
+  lastLoginAt       DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relations
+  profiles          UserProfile[]
+  sessions          Session[]
+
+  @@index([email])
+  @@index([status])
+  @@index([role])
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SESSIONS TABLE (NextAuth compatible)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  sessionToken String   @unique
+  expires      DateTime
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@map("sessions")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CATEGORIES TABLE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?    @db.Text
+  iconName    String?
+  sortOrder   Int        @default(0)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  templates   Template[]
+  profiles    UserProfile[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([sortOrder])
+  @@map("categories")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEMPLATES TABLE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Template {
+  id               String      @id @default(cuid())
+  categoryId       String
+  codeIdentifier   String      @unique  // e.g. "digital-card-aurora", "wedding-elegance"
+  name             String
+  description      String?     @db.Text
+  thumbnailUrl     String
+  previewUrl       String?
+  accentColor      String?     // Primary brand color hex for preview
+  isPremium        Boolean     @default(false)
+  isActive         Boolean     @default(true)
+  sortOrder        Int         @default(0)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  // Relations
+  category         Category    @relation(fields: [categoryId], references: [id])
+  profiles         UserProfile[]
+
+  @@index([categoryId])
+  @@index([codeIdentifier])
+  @@index([isActive])
+  @@index([sortOrder])
+  @@map("templates")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USER PROFILES TABLE — Core polymorphic entity
+// ─────────────────────────────────────────────────────────────────────────────
+
+model UserProfile {
+  id              String    @id @default(cuid())
+  userId          String
+  categoryId      String
+  templateId      String                        // LOCKED after first save
+  templateLocked  Boolean   @default(false)     // Flip to true on first save
+  slug            String    @unique             // Public-facing URL slug
+  isPublished     Boolean   @default(false)
+  viewCount       BigInt    @default(0)
+  
+  // The polymorphic data store — typed per template via TypeScript zod schemas
+  dynamicJsonData Json                          // MySQL JSON column
+
+  // QR Code — locked once generated
+  qrLocked        Boolean   @default(false)    // true after first QR generation
+  qrGeneratedAt   DateTime?                    // timestamp of first generation
+  qrScanCount     BigInt    @default(0)        // separate from viewCount
+
+  // SEO overrides (denormalized for fast generateMetadata)
+  metaTitle       String?   @db.VarChar(160)
+  metaDescription String?   @db.VarChar(320)
+  ogImageUrl      String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category        Category  @relation(fields: [categoryId], references: [id])
+  template        Template  @relation(fields: [templateId], references: [id])
+
+  @@unique([userId, categoryId])              // One profile per user per category
+  @@index([slug])
+  @@index([userId])
+  @@index([categoryId])
+  @@index([templateId])
+  @@index([isPublished])
+  @@index([createdAt])
+  @@index([qrLocked])
+  @@map("user_profiles")
+}
