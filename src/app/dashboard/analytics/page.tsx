@@ -1,15 +1,20 @@
-// src/app/dashboard/analytics/page.tsx
-// Per-user profile analytics — view counts, trend, traffic breakdown
-
+// src/app/dashboard/analytics/page.tsx — NEX CARD themed analytics page
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { Eye, TrendingUp, BarChart3, Globe } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { formatNumber, formatDate } from "@/lib/utils";
+import Link from "next/link";
 
-export const metadata: Metadata = { title: "Analytics — PresenceCard" };
+export const metadata: Metadata = { title: "Analytics — NEX CARD" };
 export const dynamic = "force-dynamic";
+
+const CAT_COLORS: Record<string, string> = {
+  "digital-name-card": "#6366f1",
+  "portfolio":          "#0ea5e9",
+  "business-ad":        "#f59e0b",
+  "wedding-invitation": "#ec4899",
+};
 
 export default async function AnalyticsPage() {
   const session = await getServerSession();
@@ -19,151 +24,114 @@ export default async function AnalyticsPage() {
     where: { userId: session.user.id },
     orderBy: { viewCount: "desc" },
     select: {
-      id: true,
-      slug: true,
-      isPublished: true,
-      viewCount: true,
-      createdAt: true,
-      updatedAt: true,
+      id: true, slug: true, isPublished: true, viewCount: true,
+      qrScanCount: true, nfcWriteCount: true,
+      createdAt: true, updatedAt: true,
       category: { select: { name: true, slug: true } },
-      template: { select: { name: true, accentColor: true } },
+      template:  { select: { name: true, accentColor: true } },
     },
   });
 
-  const totalViews = profiles.reduce(
-    (sum, p) => sum + Number(p.viewCount),
-    0
-  );
-  const publishedCount = profiles.filter((p) => p.isPublished).length;
-  const topProfile = profiles[0];
+  const totalViews  = profiles.reduce((s, p) => s + Number(p.viewCount), 0);
+  const totalScans  = profiles.reduce((s, p) => s + Number(p.qrScanCount), 0);
+  const totalNfc    = profiles.reduce((s, p) => s + (p.nfcWriteCount ?? 0), 0);
+  const published   = profiles.filter(p => p.isPublished).length;
 
-  const CATEGORY_COLORS: Record<string, string> = {
-    "digital-name-card": "#6366f1",
-    portfolio:            "#0ea5e9",
-    "business-ad":        "#f59e0b",
-    "wedding-invitation": "#ec4899",
-  };
+  const STATS = [
+    { label: "Total Views",       value: formatNumber(totalViews),  color: "#6366f1", emoji: "👁️"  },
+    { label: "QR Scans",          value: formatNumber(totalScans),  color: "#f59e0b", emoji: "📱" },
+    { label: "NFC Writes",        value: formatNumber(totalNfc),    color: "#22c55e", emoji: "📡" },
+    { label: "Live Profiles",     value: `${published}/${profiles.length}`, color: "#0ea5e9", emoji: "🌐" },
+  ];
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
+    <div className="mx-auto max-w-5xl px-6 py-10" style={{ color: "var(--nc-text)" }}>
+      {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-black text-white">Analytics</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          Track how your profiles are performing
+        <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Analytics</h1>
+        <p className="mt-1 text-sm" style={{ color: "var(--nc-text-2)" }}>
+          Track performance across all your profiles
         </p>
       </div>
 
-      {/* Summary cards */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        {[
-          {
-            icon: Eye,
-            label: "Total Views",
-            value: formatNumber(totalViews),
-            color: "#6366f1",
-          },
-          {
-            icon: Globe,
-            label: "Published Profiles",
-            value: `${publishedCount} / ${profiles.length}`,
-            color: "#22c55e",
-          },
-          {
-            icon: TrendingUp,
-            label: "Top Profile",
-            value: topProfile ? `/${topProfile.slug}` : "—",
-            color: "#f59e0b",
-          },
-        ].map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={stat.label}
-              className="rounded-2xl border border-white/5 bg-white/[0.03] p-5"
-            >
-              <div
-                className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl"
-                style={{ background: `${stat.color}15` }}
-              >
-                <Icon className="h-4 w-4" style={{ color: stat.color }} />
-              </div>
-              <p className="text-xl font-black text-white">{stat.value}</p>
-              <p className="mt-0.5 text-xs text-neutral-600">{stat.label}</p>
+      {/* Stat cards */}
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {STATS.map(s => (
+          <div key={s.label} className="rounded-2xl p-5"
+            style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl text-xl"
+              style={{ background: `${s.color}18` }}>
+              {s.emoji}
             </div>
-          );
-        })}
+            <p className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>{s.value}</p>
+            <p className="mt-0.5 text-xs" style={{ color: "var(--nc-text-3)" }}>{s.label}</p>
+            <div className="mt-2 h-0.5 w-10 rounded-full" style={{ background: s.color }} />
+          </div>
+        ))}
       </div>
 
-      {/* Profile breakdown table */}
-      <div className="rounded-2xl border border-white/5 bg-white/[0.03] overflow-hidden">
-        <div className="border-b border-white/5 px-6 py-4 flex items-center gap-2">
-          <BarChart3 className="h-4 w-4 text-neutral-600" />
-          <h2 className="font-bold text-white text-sm">Profile Performance</h2>
+      {/* Profile breakdown */}
+      <div className="overflow-hidden rounded-2xl"
+        style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
+        <div className="flex items-center justify-between border-b px-5 py-4"
+          style={{ borderColor: "var(--nc-border)" }}>
+          <h2 className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>Profile Performance</h2>
+          <span className="text-xs" style={{ color: "var(--nc-text-3)" }}>{profiles.length} profiles</span>
         </div>
 
         {profiles.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <p className="text-neutral-600 text-sm">
-              No profiles yet. Create one to start tracking views.
-            </p>
+          <div className="px-5 py-14 text-center">
+            <p className="text-sm" style={{ color: "var(--nc-text-3)" }}>No profiles yet.</p>
+            <Link href="/dashboard/onboarding"
+              className="mt-4 inline-block rounded-xl px-5 py-2.5 text-sm font-bold text-black"
+              style={{ background: "linear-gradient(135deg, var(--nc-brand-1,#d4af37), var(--nc-brand-3,#f0c050))" }}>
+              Create Profile →
+            </Link>
           </div>
         ) : (
-          <div className="divide-y divide-white/5">
-            {profiles.map((profile) => {
-              const maxViews = Number(profiles[0]?.viewCount ?? 1);
-              const pct = maxViews > 0
-                ? Math.round((Number(profile.viewCount) / maxViews) * 100)
-                : 0;
-              const color =
-                CATEGORY_COLORS[profile.category.slug] ?? "#6366f1";
+          <div className="divide-y" style={{ borderColor: "var(--nc-border)" }}>
+            {profiles.map(p => {
+              const maxViews  = Number(profiles[0]?.viewCount ?? 1);
+              const pct       = maxViews > 0 ? Math.round((Number(p.viewCount) / maxViews) * 100) : 0;
+              const color     = CAT_COLORS[p.category.slug] ?? "#6366f1";
 
               return (
-                <div key={profile.id} className="px-6 py-5">
+                <div key={p.id} className="px-5 py-5">
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono text-sm font-semibold text-white">
-                          /{profile.slug}
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <Link href={`/dashboard/edit/${p.slug}`}
+                          className="font-mono text-sm font-semibold hover:underline" style={{ color }}>
+                          /{p.slug}
+                        </Link>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                          style={{ background: `${color}18`, color }}>
+                          {p.category.name}
                         </span>
-                        <span
-                          className="rounded-full px-2 py-0.5 text-xs font-medium"
-                          style={{
-                            background: `${color}15`,
-                            color,
-                          }}
-                        >
-                          {profile.category.name}
-                        </span>
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                            profile.isPublished
-                              ? "bg-emerald-500/10 text-emerald-400"
-                              : "bg-neutral-800 text-neutral-500"
-                          }`}
-                        >
-                          {profile.isPublished ? "Published" : "Draft"}
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                          p.isPublished ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"
+                        }`}>
+                          {p.isPublished ? "Live" : "Draft"}
                         </span>
                       </div>
-                      <p className="mt-1 text-xs text-neutral-600">
-                        {profile.template.name} · Created{" "}
-                        {formatDate(profile.createdAt)} · Updated{" "}
-                        {formatDate(profile.updatedAt)}
+                      <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                        {p.template.name} · Updated {formatDate(p.updatedAt)}
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="text-lg font-black text-white">
-                        {formatNumber(profile.viewCount)}
+                      <p className="text-lg font-black" style={{ color: "var(--nc-text)" }}>
+                        {formatNumber(p.viewCount)}
                       </p>
-                      <p className="text-xs text-neutral-600">views</p>
+                      <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                        {formatNumber(Number(p.qrScanCount))} QR · {p.nfcWriteCount ?? 0} NFC
+                      </p>
                     </div>
                   </div>
-
-                  {/* View bar */}
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{ width: `${pct}%`, background: color }}
-                    />
+                  {/* Progress bar */}
+                  <div className="h-1.5 w-full overflow-hidden rounded-full"
+                    style={{ background: "var(--nc-border)" }}>
+                    <div className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${pct}%`, background: color }} />
                   </div>
                 </div>
               );
@@ -173,20 +141,21 @@ export default async function AnalyticsPage() {
       </div>
 
       {/* Tips */}
-      <div className="mt-6 rounded-2xl border border-white/5 bg-white/[0.02] px-6 py-5">
-        <h3 className="mb-3 text-sm font-bold text-white">
+      <div className="mt-6 rounded-2xl px-5 py-5"
+        style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
+        <h3 className="mb-3 text-sm font-bold" style={{ color: "var(--nc-text)" }}>
           Tips to increase views
         </h3>
-        <ul className="space-y-2 text-sm text-neutral-500">
+        <ul className="space-y-2 text-sm" style={{ color: "var(--nc-text-2)" }}>
           {[
-            "Add your PresenceCard link to your LinkedIn bio, Twitter/X, and email signature.",
-            "Share your page on LinkedIn when you start a new role or project.",
-            "Use a custom meta title and description for better click-through on social media.",
-            "Add a custom OG image for eye-catching social previews.",
-            "Enable the Wedding Invitation page and share it via WhatsApp broadcast.",
+            "Add your NEX CARD link to your LinkedIn bio and email signature.",
+            "Generate a QR code and print it on your business cards.",
+            "Program an NFC tag — place it on your desk or phone case.",
+            "Share your page on LinkedIn when you start a new role.",
+            "Add a custom OG image for better social preview click-through.",
           ].map((tip, i) => (
             <li key={i} className="flex items-start gap-2">
-              <span className="mt-0.5 shrink-0 text-indigo-400">→</span>
+              <span className="mt-0.5 shrink-0" style={{ color: "var(--nc-brand-2,#d4af37)" }}>→</span>
               {tip}
             </li>
           ))}

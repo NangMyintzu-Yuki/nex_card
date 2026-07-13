@@ -1,74 +1,55 @@
-
+// src/app/not-found.tsx — NEX CARD themed 404 page
 import Link from "next/link";
-import type { Metadata } from "next";
-import { Sparkles, ArrowLeft, Search } from "lucide-react";
-
-export const metadata: Metadata = {
-  title: "Page Not Found — PresenceCard",
-  description: "This profile doesn't exist or has been removed.",
-  robots: { index: false, follow: false },
-};
+import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
 
 export default function NotFound() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-neutral-950 px-6 text-center text-white">
-      {/* Background glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-      >
-        <div
-          className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10 blur-[100px]"
-          style={{
-            background:
-              "radial-gradient(circle, #6366f1, transparent 70%)",
-          }}
-        />
+    <main className="flex min-h-screen flex-col items-center justify-center px-6 text-center"
+      style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
+
+      {/* Logo */}
+      <div className="mb-8">
+        <NexCardLogoStatic size={48} isDark />
       </div>
 
-      <div className="relative z-10 max-w-md">
-        {/* Logo */}
-        <Link href="/" className="mb-10 inline-flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500">
-            <Sparkles className="h-4 w-4 text-white" />
-          </div>
-          <span className="text-lg font-bold">PresenceCard</span>
-        </Link>
-
-        {/* 404 visual */}
-        <div className="mb-6 text-8xl font-black leading-none tracking-tighter text-white/10">
+      {/* Big 404 */}
+      <div className="relative mb-6">
+        <p className="text-[120px] font-black leading-none tracking-tighter select-none"
+          style={{ color: "var(--nc-bg-3)", WebkitTextStroke: "2px var(--nc-border)" }}>
           404
-        </div>
-
-        <div
-          className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl"
-          style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)" }}
-        >
-          <Search className="h-6 w-6 text-indigo-400" />
-        </div>
-
-        <h1 className="mt-4 text-2xl font-black">Profile Not Found</h1>
-        <p className="mt-3 text-sm leading-relaxed text-neutral-500">
-          This PresenceCard page doesn&apos;t exist, has been removed, or
-          hasn&apos;t been published yet.
         </p>
-
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link
-            href="/"
-            className="flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-indigo-400"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Link>
-          <Link
-            href="/register"
-            className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:border-white/20"
-          >
-            Create Your Own Card
-          </Link>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl"
+            style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)", boxShadow: "var(--nc-shadow)" }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+              stroke="var(--nc-text-3)" strokeWidth="1.5" strokeLinecap="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </div>
         </div>
       </div>
+
+      <h1 className="text-2xl font-black mb-2" style={{ color: "var(--nc-text)" }}>
+        Profile Not Found
+      </h1>
+      <p className="max-w-sm text-sm leading-relaxed mb-8" style={{ color: "var(--nc-text-2)" }}>
+        This NEX CARD page doesn&apos;t exist, has been removed, or hasn&apos;t been published yet.
+      </p>
+
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <Link href="/"
+          className="flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-black text-black transition-all hover:opacity-90"
+          style={{ background: "linear-gradient(135deg, #d4af37, #f0c050)" }}>
+          ← Back to Home
+        </Link>
+        <Link href="/register"
+          className="flex items-center gap-2 rounded-xl border px-6 py-2.5 text-sm font-semibold transition-all hover:opacity-80"
+          style={{ borderColor: "var(--nc-border)", color: "var(--nc-text-2)" }}>
+          Create Your Own Card
+        </Link>
+      </div>
+
+      <p className="mt-12 text-xs" style={{ color: "var(--nc-text-3)" }}>NEX CARD</p>
     </main>
   );
 }

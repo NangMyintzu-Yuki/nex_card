@@ -31,7 +31,6 @@
 *::before,
 *::after {
   box-sizing: border-box;
-  min-width: 0; /* Prevents flex & grid overflow bugs */
 }
 
 html {
@@ -40,12 +39,10 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
+body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  max-width: 100vw;
-  overflow-x: hidden;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -86,7 +83,7 @@ html, body {
 .animate-marquee {
   animation: marquee 20s linear infinite;
   display: flex;
-  will-change: transform;
+  /* Width is doubled in JSX via duplicate content */
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -99,7 +96,6 @@ html, body {
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
-    transform: translateZ(0);
   }
 
   .glass-dark {
@@ -107,7 +103,6 @@ html, body {
     border: 1px solid rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    transform: translateZ(0);
   }
 
   /* Noise texture overlay (used in name cards) */
@@ -214,7 +209,6 @@ html, body {
 }
 .animate-spin-slow {
   animation: spinSlow 20s linear infinite;
-  will-change: transform;
 }
 
 /* Typewriter cursor blink — used by Forge terminal template */
@@ -225,3 +219,197 @@ html, body {
 .animate-blink {
   animation: blink 1s step-end infinite;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEX CARD DUAL THEME SYSTEM
+   Dark/Gold mode (default) — matches the gold logo on black background
+   Light/Navy mode          — matches the navy-blue logo on white background
+   IMPORTANT: These CSS variables apply ONLY to .nc-dark / .nc-light
+   They NEVER touch public template pages.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Dark / Gold Theme (default) ────────────────────────────────────────── */
+:root,
+.nc-dark {
+  /* Brand */
+  --nc-brand-1:       #c9973a;   /* deep gold */
+  --nc-brand-2:       #d4af37;   /* mid gold  */
+  --nc-brand-3:       #f0c050;   /* light gold */
+  --nc-brand-grad:    linear-gradient(135deg, #c9973a, #f0c050);
+
+  /* Backgrounds */
+  --nc-bg:            #08080a;
+  --nc-bg-2:          #0d0d0f;
+  --nc-bg-3:          #111114;
+  --nc-bg-card:       rgba(255,255,255,0.03);
+  --nc-bg-hover:      rgba(255,255,255,0.05);
+
+  /* Borders */
+  --nc-border:        rgba(255,255,255,0.08);
+  --nc-border-brand:  rgba(212,175,55,0.25);
+
+  /* Text */
+  --nc-text:          #f0ece5;
+  --nc-text-2:        #a09070;
+  --nc-text-3:        #5a4e38;
+  --nc-text-muted:    #3d3420;
+
+  /* Sidebar */
+  --nc-sidebar-bg:    #0a0a0c;
+  --nc-sidebar-border:rgba(212,175,55,0.12);
+  --nc-sidebar-item:  rgba(212,175,55,0.06);
+  --nc-sidebar-active:rgba(212,175,55,0.12);
+
+  /* Shadows */
+  --nc-shadow:        0 8px 32px rgba(0,0,0,0.6);
+  --nc-glow:          0 0 20px rgba(212,175,55,0.15);
+
+  /* Status */
+  --nc-success:       #22c55e;
+  --nc-warning:       #f59e0b;
+  --nc-danger:        #ef4444;
+  --nc-info:          #d4af37;
+}
+
+/* ── Light / Navy Blue Theme ─────────────────────────────────────────────── */
+.nc-light {
+  /* Brand */
+  --nc-brand-1:       #1a3a6b;   /* deep navy */
+  --nc-brand-2:       #2d6eb5;   /* mid blue  */
+  --nc-brand-3:       #4a9fd4;   /* light blue */
+  --nc-brand-grad:    linear-gradient(135deg, #1a3a6b, #4a9fd4);
+
+  /* Backgrounds */
+  --nc-bg:            #f5f7fb;
+  --nc-bg-2:          #edf0f7;
+  --nc-bg-3:          #e4e9f2;
+  --nc-bg-card:       #ffffff;
+  --nc-bg-hover:      rgba(26,58,107,0.04);
+
+  /* Borders */
+  --nc-border:        rgba(26,58,107,0.12);
+  --nc-border-brand:  rgba(26,58,107,0.25);
+
+  /* Text */
+  --nc-text:          #0f1a2e;
+  --nc-text-2:        #3d5a8a;
+  --nc-text-3:        #7a95bc;
+  --nc-text-muted:    #b0c0d8;
+
+  /* Sidebar */
+  --nc-sidebar-bg:    #ffffff;
+  --nc-sidebar-border:rgba(26,58,107,0.1);
+  --nc-sidebar-item:  rgba(26,58,107,0.04);
+  --nc-sidebar-active:rgba(26,58,107,0.1);
+
+  /* Shadows */
+  --nc-shadow:        0 4px 24px rgba(26,58,107,0.1);
+  --nc-glow:          0 0 20px rgba(26,58,107,0.1);
+
+  /* Status */
+  --nc-success:       #16a34a;
+  --nc-warning:       #d97706;
+  --nc-danger:        #dc2626;
+  --nc-info:          #2d6eb5;
+}
+
+/* ── Utility classes that consume CSS vars ───────────────────────────────── */
+
+.nc-bg        { background: var(--nc-bg); }
+.nc-bg-2      { background: var(--nc-bg-2); }
+.nc-bg-card   { background: var(--nc-bg-card); }
+.nc-border    { border-color: var(--nc-border); }
+.nc-text      { color: var(--nc-text); }
+.nc-text-2    { color: var(--nc-text-2); }
+.nc-text-3    { color: var(--nc-text-3); }
+
+.nc-brand-text {
+  background: var(--nc-brand-grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nc-brand-bg  { background: var(--nc-brand-grad); }
+.nc-brand-border { border-color: var(--nc-border-brand); }
+
+/* Card */
+.nc-card {
+  background: var(--nc-bg-card);
+  border: 1px solid var(--nc-border);
+  box-shadow: var(--nc-shadow);
+  border-radius: 1rem;
+}
+
+/* Sidebar nav item */
+.nc-nav-item {
+  color: var(--nc-text-2);
+  border-radius: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  transition: all 0.15s ease;
+}
+.nc-nav-item:hover {
+  background: var(--nc-bg-hover);
+  color: var(--nc-text);
+}
+.nc-nav-item.active {
+  background: var(--nc-sidebar-active);
+  color: var(--nc-text);
+  border: 1px solid var(--nc-border-brand);
+}
+
+/* Input */
+.nc-input {
+  background: var(--nc-bg-card);
+  border: 1px solid var(--nc-border);
+  color: var(--nc-text);
+  border-radius: 0.75rem;
+  transition: border-color 0.15s;
+}
+.nc-input:focus {
+  border-color: var(--nc-brand-2);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--nc-brand-2), 0.1);
+}
+.nc-input::placeholder { color: var(--nc-text-3); }
+
+/* Button variants */
+.nc-btn-brand {
+  background: var(--nc-brand-grad);
+  color: #000;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.nc-btn-brand:hover { opacity: 0.9; }
+.nc-btn-brand:active { transform: scale(0.98); }
+
+.nc-btn-ghost {
+  background: var(--nc-bg-hover);
+  color: var(--nc-text-2);
+  border: 1px solid var(--nc-border);
+  border-radius: 0.75rem;
+  transition: all 0.15s;
+}
+.nc-btn-ghost:hover {
+  color: var(--nc-text);
+  border-color: var(--nc-border-brand);
+}
+
+/* Table */
+.nc-table th { color: var(--nc-text-3); border-bottom: 1px solid var(--nc-border); }
+.nc-table td { border-bottom: 1px solid var(--nc-border); color: var(--nc-text-2); }
+.nc-table tr:hover td { background: var(--nc-bg-hover); }
+
+/* Badge variants */
+.nc-badge {
+  border-radius: 9999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 1px solid;
+}
+.nc-badge-brand { background: rgba(212,175,55,0.1); color: var(--nc-brand-2); border-color: var(--nc-border-brand); }
+.nc-badge-success { background: rgba(34,197,94,0.1); color: var(--nc-success); border-color: rgba(34,197,94,0.25); }
+.nc-badge-danger { background: rgba(239,68,68,0.1); color: var(--nc-danger); border-color: rgba(239,68,68,0.25); }
+.nc-badge-warning { background: rgba(245,158,11,0.1); color: var(--nc-warning); border-color: rgba(245,158,11,0.25); }

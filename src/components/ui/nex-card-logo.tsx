@@ -4,7 +4,6 @@
 // Dark/gold mode: black bg, gold gradient (Image 2)
 
 "use client";
-
 import { useTheme } from "@/lib/theme/theme-context";
 
 interface NexCardLogoProps {

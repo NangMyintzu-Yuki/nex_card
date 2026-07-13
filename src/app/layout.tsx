@@ -1,9 +1,10 @@
 // src/app/layout.tsx
-// Root layout — applies global fonts, metadata, and theme
+// Root layout — applies global fonts, ThemeProvider, metadata
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/lib/theme/theme-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,25 +12,31 @@ const inter = Inter({
   display: "swap",
 });
 
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://presencecard.io"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://nexcard.io"),
   title: {
-    default: "PresenceCard — Your Digital Identity, Elevated",
-    template: "%s — PresenceCard",
+    default: "NEX CARD — Your Digital Identity, Elevated",
+    template: "%s — NEX CARD",
   },
   description:
-    "Create stunning digital name cards, portfolios, business pages, and wedding invitations with 20 premium templates.",
-  keywords: ["digital name card", "portfolio", "wedding invitation", "business page", "digital presence"],
-  authors: [{ name: "PresenceCard" }],
-  creator: "PresenceCard",
+    "Create stunning digital name cards, portfolios, business pages, and wedding invitations with 20 premium templates. Share via QR code & NFC.",
+  keywords: ["digital name card", "NFC card", "QR card", "portfolio", "wedding invitation", "business page", "digital presence", "NEX CARD"],
+  authors: [{ name: "NEX CARD" }],
+  creator: "NEX CARD",
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "PresenceCard",
+    siteName: "NEX CARD",
   },
   twitter: {
     card: "summary_large_image",
-    creator: "@presencecard",
+    creator: "@nexcard",
   },
   icons: {
     icon: "/favicon.ico",
@@ -38,15 +45,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className={`${inter.className} antialiased`} suppressHydrationWarning>
-        {children}
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} nc-dark`}>
+      <body className={`${inter.className} antialiased`} style={{ background: "var(--nc-bg)" }}>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
