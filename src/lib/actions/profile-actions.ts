@@ -158,7 +158,8 @@ const UpdateProfileInput = z.object({
 export type UpdateProfileState =
   | { status: "idle" }
   | { status: "success" }
-  | { status: "error"; message: string; fieldErrors?: Record<string, string[]> };
+    | { status: "error"; message: string; fieldErrors?: Record<string, string[] | undefined> };
+
 
 export async function updateProfileAction(
   _prevState: UpdateProfileState,

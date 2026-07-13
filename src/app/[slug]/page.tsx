@@ -96,30 +96,28 @@ export async function generateMetadata({
   const { metaTitle, metaDescription, ogImageUrl, category, user } = profile;
 
   // Resolve display title: user override → generated → fallback
- const resolvedTitle =
-  metaTitle ||
-  (user?.name && category?.name 
-    ? `${user.name} · ${category.name}` 
-    : "My Digital Card");
+  const resolvedTitle =
+    metaTitle ||
+    (user?.name && category?.name ? `${user.name} · ${category.name}` : "My Digital Card");
 
   const resolvedDescription =
-  metaDescription ||
-  (user?.name && category?.name 
-    ? `View ${user.name}'s ${category.name} on PresenceCard.` 
-    : "A beautiful digital presence page.");
+    metaDescription ||
+    (user?.name && category?.name
+      ? `View ${user.name}'s ${category.name} on PresenceCard.`
+      : "A beautiful digital presence page.");
 
-const resolvedOgImage =
-  ogImageUrl ||
-  (slug 
-    ? `${process.env.NEXT_PUBLIC_APP_URL}/api/og?slug=${slug}` 
-    : `${process.env.NEXT_PUBLIC_APP_URL}/default-og.png`);
+  const resolvedOgImage =
+    ogImageUrl ||
+    (slug
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/api/og?slug=${slug}`
+      : `${process.env.NEXT_PUBLIC_APP_URL}/default-og.png`);
 
   const canonicalUrl = `${process.env.NEXT_PUBLIC_APP_URL}/${slug}`;
 
   return {
     title: resolvedTitle,
     description: resolvedDescription,
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL!),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://presencecard.io"),
     alternates: {
       canonical: canonicalUrl,
     },
@@ -178,22 +176,29 @@ export default async function PublicProfilePage({ params }: PageProps) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-neutral-950 px-6 text-center text-white">
         <div className="relative z-10 max-w-sm">
-          <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl mx-auto"
-            style={{background:"rgba(245,158,11,0.1)",border:"1px solid rgba(245,158,11,0.2)"}}>
+          <div
+            className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl"
+            style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}
+          >
             <span className="text-2xl">⚠️</span>
           </div>
           <h1 className="text-2xl font-black">Profile is a Draft</h1>
           <p className="mt-3 text-sm leading-relaxed text-neutral-500">
-            <strong className="text-white">/{slug}</strong> exists but hasn&apos;t been published yet.
-            Go to your editor, toggle <strong className="text-amber-400">Publish Now</strong>, then save.
+            <strong className="text-white">/{slug}</strong> exists but hasn&apos;t been published
+            yet. Go to your editor, toggle <strong className="text-amber-400">Publish Now</strong>,
+            then save.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <a href={`/dashboard/edit/${slug}`}
-              className="flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-all">
+            <a
+              href={`/dashboard/edit/${slug}`}
+              className="flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-bold text-black transition-all hover:bg-amber-400"
+            >
               Edit &amp; Publish →
             </a>
-            <a href="/dashboard"
-              className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white hover:border-white/20 transition-all">
+            <a
+              href="/dashboard"
+              className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:border-white/20"
+            >
               Dashboard
             </a>
           </div>
@@ -320,19 +325,19 @@ function BusinessAdSwitch({
 }: SwitchProps<ReturnType<typeof parseTemplateData<"business-ad">>>) {
   const props = { data, accentColor: accentColor ?? undefined };
 
-  switch (templateCode) {
+   switch (templateCode) {
     case TEMPLATE_IDS.BUSINESS_AD.MARQUEE:
-      return <MarqueeBusiness {...props} />;
+      return <MarqueeBusiness {...props as any} />;
     case TEMPLATE_IDS.BUSINESS_AD.DISTRICT:
-      return <DistrictBusiness {...props} />;
+      return <DistrictBusiness {...props as any} />;
     case TEMPLATE_IDS.BUSINESS_AD.EMPIRE:
-      return <EmpireBusiness {...props} />;
+      return <EmpireBusiness {...props as any} />;
     case TEMPLATE_IDS.BUSINESS_AD.NEON:
-      return <NeonBusiness {...props} />;
+      return <NeonBusiness {...props as any} />;
     case TEMPLATE_IDS.BUSINESS_AD.VAULT:
-      return <VaultBusiness {...props} />;
+      return <VaultBusiness {...props as any} />;
     default:
-      return <MarqueeBusiness {...props} />;
+      return <MarqueeBusiness {...props as any} />;
   }
 }
 
@@ -343,19 +348,19 @@ function WeddingSwitch({
 }: SwitchProps<ReturnType<typeof parseTemplateData<"wedding-invitation">>>) {
   const props = { data, accentColor: accentColor ?? undefined };
 
-  switch (templateCode) {
-    case TEMPLATE_IDS.WEDDING.ETERNAL:
-      return <EternalWedding {...props} />;
-    case TEMPLATE_IDS.WEDDING.BLOSSOM:
-      return <BlossomWedding {...props} />;
-    case TEMPLATE_IDS.WEDDING.NOIR:
-      return <NoirWedding {...props} />;
-    case TEMPLATE_IDS.WEDDING.CELESTIAL:
-      return <CelestialWedding {...props} />;
-    case TEMPLATE_IDS.WEDDING.RUSTIC:
-      return <RusticWedding {...props} />;
+ switch (templateCode) {
+    case TEMPLATE_IDS.BUSINESS_AD.MARQUEE:
+      return <MarqueeBusiness {...props as any} />;
+    case TEMPLATE_IDS.BUSINESS_AD.DISTRICT:
+      return <DistrictBusiness {...props as any} />;
+    case TEMPLATE_IDS.BUSINESS_AD.EMPIRE:
+      return <EmpireBusiness {...props as any} />;
+    case TEMPLATE_IDS.BUSINESS_AD.NEON:
+      return <NeonBusiness {...props as any} />;
+    case TEMPLATE_IDS.BUSINESS_AD.VAULT:
+      return <VaultBusiness {...props as any} />;
     default:
-      return <EternalWedding {...props} />;
+      return <MarqueeBusiness {...props as any} />;
   }
 }
 
@@ -365,11 +370,11 @@ function WeddingSwitch({
 
 function ProfileLoadingSkeleton() {
   return (
-    <div className="min-h-screen w-full animate-pulse bg-neutral-950 flex flex-col items-center justify-center gap-6 px-4">
+    <div className="flex min-h-screen w-full animate-pulse flex-col items-center justify-center gap-6 bg-neutral-950 px-4">
       <div className="h-28 w-28 rounded-full bg-neutral-800" />
       <div className="h-8 w-64 rounded-lg bg-neutral-800" />
       <div className="h-4 w-40 rounded bg-neutral-800" />
-      <div className="flex gap-3 mt-4">
+      <div className="mt-4 flex gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="h-10 w-10 rounded-full bg-neutral-800" />
         ))}

@@ -37,6 +37,7 @@ export default async function EditProfilePage({
       metaTitle: true,
       metaDescription: true,
       ogImageUrl: true,
+       qrLocked: true,
       updatedAt: true,
       category: { select: { id: true, name: true, slug: true } },
       template: {

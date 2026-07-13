@@ -203,13 +203,13 @@ function PortfolioSwitch({ templateCode, data, accentColor }: { templateCode: st
 
 function BusinessSwitch({ templateCode, data, accentColor }: { templateCode: string; data: ReturnType<typeof parseTemplateData<"business-ad">>; accentColor?: string }) {
   const p = { data, accentColor };
-  switch (templateCode) {
-    case TEMPLATE_IDS.BUSINESS_AD.MARQUEE:  return <MarqueeBusiness {...p} />;
-    case TEMPLATE_IDS.BUSINESS_AD.DISTRICT: return <DistrictBusiness {...p} />;
-    case TEMPLATE_IDS.BUSINESS_AD.EMPIRE:   return <EmpireBusiness {...p} />;
-    case TEMPLATE_IDS.BUSINESS_AD.NEON:     return <NeonBusiness {...p} />;
-    case TEMPLATE_IDS.BUSINESS_AD.VAULT:    return <VaultBusiness {...p} />;
-    default:                                return <MarqueeBusiness {...p} />;
+ switch (templateCode) {
+    case TEMPLATE_IDS.BUSINESS_AD.MARQUEE:  return <MarqueeBusiness {...p as any} />;
+    case TEMPLATE_IDS.BUSINESS_AD.DISTRICT: return <DistrictBusiness {...p as any} />;
+    case TEMPLATE_IDS.BUSINESS_AD.EMPIRE:   return <EmpireBusiness {...p as any} />;
+    case TEMPLATE_IDS.BUSINESS_AD.NEON:     return <NeonBusiness {...p as any} />;
+    case TEMPLATE_IDS.BUSINESS_AD.VAULT:    return <VaultBusiness {...p as any} />;
+    default:                                return <MarqueeBusiness {...p as any} />;
   }
 }
 

@@ -19,8 +19,9 @@ const CAT_COLORS: Record<string, string> = {
 export default async function AnalyticsPage() {
   const session = await getServerSession();
   if (!session?.user?.id) redirect("/login");
+  const profiles = await (prisma.userProfile as any).findMany({
 
-  const profiles = await prisma.userProfile.findMany({
+  // const profiles = await prisma.userProfile.findMany({
     where: { userId: session.user.id },
     orderBy: { viewCount: "desc" },
     select: {
@@ -32,10 +33,11 @@ export default async function AnalyticsPage() {
     },
   });
 
-  const totalViews  = profiles.reduce((s, p) => s + Number(p.viewCount), 0);
-  const totalScans  = profiles.reduce((s, p) => s + Number(p.qrScanCount), 0);
-  const totalNfc    = profiles.reduce((s, p) => s + (p.nfcWriteCount ?? 0), 0);
-  const published   = profiles.filter(p => p.isPublished).length;
+    const totalViews  = profiles.reduce((s: number, p: any) => s + Number(p.viewCount), 0);
+  const totalScans  = profiles.reduce((s: number, p: any) => s + Number(p.qrScanCount), 0);
+  const totalNfc    = profiles.reduce((s: number, p: any) => s + (p.nfcWriteCount ?? 0), 0);
+  const published   = profiles.filter((p: any) => p.isPublished).length;
+
 
   const STATS = [
     { label: "Total Views",       value: formatNumber(totalViews),  color: "#6366f1", emoji: "👁️"  },
@@ -90,7 +92,7 @@ export default async function AnalyticsPage() {
           </div>
         ) : (
           <div className="divide-y" style={{ borderColor: "var(--nc-border)" }}>
-            {profiles.map(p => {
+            {profiles.map((p:any) => {
               const maxViews  = Number(profiles[0]?.viewCount ?? 1);
               const pct       = maxViews > 0 ? Math.round((Number(p.viewCount) / maxViews) * 100) : 0;
               const color     = CAT_COLORS[p.category.slug] ?? "#6366f1";

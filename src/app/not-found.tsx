@@ -1,6 +1,6 @@
 // src/app/not-found.tsx — NEX CARD themed 404 page
 import Link from "next/link";
-import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
+import { NexCardLogo } from "@/components/ui/nex-card-logo";
 
 export default function NotFound() {
   return (
@@ -9,7 +9,7 @@ export default function NotFound() {
 
       {/* Logo */}
       <div className="mb-8">
-        <NexCardLogoStatic size={48} isDark />
+        <NexCardLogo size={48} />
       </div>
 
       {/* Big 404 */}

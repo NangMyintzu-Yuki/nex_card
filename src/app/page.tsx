@@ -2,7 +2,7 @@
 // Fully themed with CSS vars, supports both dark/gold and light/navy
 
 import Link from "next/link";
-import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
+import { NexCardLogo } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function LandingPage() {
@@ -40,7 +40,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 border-b"
         style={{ background: "var(--nc-bg)", borderColor: "var(--nc-border)", backdropFilter: "blur(20px)" }}>
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <NexCardLogoStatic size={36} isDark />
+          <NexCardLogo size={36} />
           <nav className="hidden items-center gap-8 md:flex">
             {["Features", "Templates", "How it Works"].map(l => (
               <a key={l} href={`#${l.toLowerCase().replace(/\s/g,"-")}`}
@@ -240,7 +240,7 @@ export default function LandingPage() {
       <section className="border-t px-6 py-24 text-center"
         style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg-2, var(--nc-bg))" }}>
         <div className="mx-auto max-w-2xl">
-          <NexCardLogoStatic size={56} isDark className="mb-6 mx-auto" />
+          <NexCardLogo size={56} className="mb-6 mx-auto" />
           <h2 className="text-4xl font-black mb-4" style={{ color: "var(--nc-text)" }}>
             Ready to stand out?
           </h2>
@@ -265,7 +265,7 @@ export default function LandingPage() {
       <footer className="border-t px-6 py-10"
         style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg)" }}>
         <div className="mx-auto max-w-6xl flex flex-wrap items-center justify-between gap-4">
-          <NexCardLogoStatic size={28} isDark />
+          <NexCardLogo size={28} />
           <div className="flex flex-wrap gap-6">
             {[["Login", "/login"], ["Register", "/register"], ["Demo", "/alex-rivera"]].map(([l, h]) => (
               <Link key={l} href={h} className="text-xs transition-colors hover:opacity-70"

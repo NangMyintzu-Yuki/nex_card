@@ -54,7 +54,7 @@ export async function GET(
         errorCorrectionLevel: "H", // Highest — allows logo overlay
       });
 
-      return new NextResponse(buffer, {
+      return new NextResponse(buffer as any, {
         status: 200,
         headers: {
           "Content-Type": "image/png",

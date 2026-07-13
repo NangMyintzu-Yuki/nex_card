@@ -6,7 +6,6 @@ import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
 import prisma from "@/lib/db/prisma";
 
-export const runtime = "edge";
 
 // Cache OG images at the CDN for 1 hour
 export const revalidate = 3600;

@@ -1,0 +1,6 @@
+{
+  "name": "NEX CARD",
+  "description": "A digital presence platform with customizable templates, QR codes, and NFC tag writing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

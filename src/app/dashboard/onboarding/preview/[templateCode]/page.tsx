@@ -232,11 +232,11 @@ function renderTemplatePreview(codeIdentifier: string, accentColor: string | nul
     case "portfolio-spectrum":    return <SpectrumPortfolio data={SAMPLE_PORTFOLIO_DATA} accentColor={accent} />;
     case "portfolio-blueprint":   return <BlueprintPortfolio data={SAMPLE_PORTFOLIO_DATA} accentColor={accent} />;
     // Business
-    case "business-marquee":      return <MarqueeBusiness  data={SAMPLE_BUSINESS_DATA} accentColor={accent} />;
-    case "business-district":     return <DistrictBusiness data={SAMPLE_BUSINESS_DATA} accentColor={accent} />;
-    case "business-empire":       return <EmpireBusiness   data={SAMPLE_BUSINESS_DATA} accentColor={accent} />;
-    case "business-neon":         return <NeonBusiness     data={SAMPLE_BUSINESS_DATA} accentColor={accent} />;
-    case "business-vault":        return <VaultBusiness    data={SAMPLE_BUSINESS_DATA} accentColor={accent} />;
+        case "business-marquee":      return <MarqueeBusiness  data={SAMPLE_BUSINESS_DATA as any} accentColor={accent} />;
+    case "business-district":     return <DistrictBusiness data={SAMPLE_BUSINESS_DATA as any} accentColor={accent} />;
+    case "business-empire":       return <EmpireBusiness   data={SAMPLE_BUSINESS_DATA as any} accentColor={accent} />;
+    case "business-neon":         return <NeonBusiness     data={SAMPLE_BUSINESS_DATA as any} accentColor={accent} />;
+    case "business-vault":        return <VaultBusiness    data={SAMPLE_BUSINESS_DATA as any} accentColor={accent} />;
     // Wedding
     case "wedding-eternal":       return <EternalWedding   data={SAMPLE_WEDDING_DATA} accentColor={accent} />;
     case "wedding-blossom":       return <BlossomWedding   data={SAMPLE_WEDDING_DATA} accentColor={accent} />;
