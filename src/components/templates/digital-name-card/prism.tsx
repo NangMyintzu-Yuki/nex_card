@@ -151,7 +151,7 @@ export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
           style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"}}>
           💾 Save to Contacts (.vcf)
         </button>
-        <p className="mt-6 text-center text-[10px] text-white/15">PresenceCard</p>
+        <p className="mt-6 text-center text-[10px] text-white/15">NEX CARD</p>
       </div>
     </main>
   );

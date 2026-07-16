@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.r2.cloudflarestorage.com",
       },
-      // Placeholder / seed images
+      // Placeholder / seed images (legacy placehold.co URLs may still exist in DB)
       {
         protocol: "https",
         hostname: "images.unsplash.com",
@@ -32,7 +32,22 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
       },
+      // Cloudinary
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      // Supabase Storage
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
       // Your own CDN domain in prod
+      {
+        protocol: "https",
+        hostname: "cdn.nexcard.io",
+      },
       {
         protocol: "https",
         hostname: "cdn.presencecard.io",
@@ -62,7 +77,15 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Cache static assets aggressively
+      {
+        source: "/uploads/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
       {
         source: "/_next/static/(.*)",
         headers: [

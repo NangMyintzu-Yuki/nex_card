@@ -137,7 +137,7 @@ export function CoralNameCard({ data, accentColor="#f97316" }: Props) {
             {ctaLabel}
           </a>
         )}
-        <p className="mt-8 text-center text-[10px] text-white/15">PresenceCard</p>
+        <p className="mt-8 text-center text-[10px] text-white/15">NEX CARD</p>
       </div>
     </main>
   );

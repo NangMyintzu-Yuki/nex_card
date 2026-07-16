@@ -313,7 +313,7 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
           </a>
         )}
         <p className="mt-8 text-center text-[10px] uppercase tracking-[0.3em] text-neutral-900">
-          PresenceCard
+          NEX CARD
         </p>
       </div>
     </main>

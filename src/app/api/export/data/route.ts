@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 
   const exportData = {
     exportedAt: new Date().toISOString(),
-    platform: "PresenceCard",
+    platform: "NEX CARD",
     version: "1.0",
     user,
     profiles: profiles.map((p) => ({
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Content-Disposition": `attachment; filename="presencecard-export-${new Date().toISOString().split("T")[0]}.json"`,
+      "Content-Disposition": `attachment; filename="nexcard-export-${new Date().toISOString().split("T")[0]}.json"`,
       "Cache-Control": "no-store",
     },
   });

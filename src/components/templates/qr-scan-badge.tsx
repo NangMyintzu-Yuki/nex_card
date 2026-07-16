@@ -62,7 +62,7 @@ export function QRScanBadge({ slug, accentColor = "#6366f1" }: QRScanBadgeProps)
             Opened via QR scan
           </p>
           <p className="text-xs text-neutral-500">
-            presencecard.io/p/{slug}
+            nexcard.io/p/{slug}
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 // src/app/login/page.tsx — themed NEX CARD login page
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
@@ -18,6 +18,18 @@ export default function LoginPage() {
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
+  // Redirect already-authenticated users (valid session in DB, not just stale cookie)
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.authenticated) {
+          router.replace(data.user?.role === "ADMIN" ? "/admin" : "/dashboard");
+        }
+      })
+      .catch(() => {});
+  }, [router]);
+
   const brand2 = isDark ? "#d4af37" : "#2d6eb5";
   const brand3 = isDark ? "#f0c050" : "#4a9fd4";
 
@@ -33,7 +45,8 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) { setError(data.message ?? "Login failed."); return; }
       const dest = data.user?.role === "ADMIN" ? "/admin" : "/dashboard";
-      router.push(dest);
+      router.replace(dest);
+      router.refresh();
     } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
@@ -53,7 +66,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-12"
+    <main className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12"
       style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
 
       {/* Theme toggle top-right */}
@@ -130,7 +143,8 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo credentials */}
+          {/* Demo credentials — development only */}
+          {process.env.NODE_ENV === "development" && (
           <div className="rounded-xl px-4 py-3" style={{ background: "var(--nc-bg-hover)", border: "1px solid var(--nc-border)" }}>
             <p className="text-xs font-semibold mb-1" style={{ color: "var(--nc-text-2)" }}>Demo credentials</p>
             <button onClick={() => { setEmail("demo@nexcard.io"); setPassword("demo-password-123"); }}
@@ -138,6 +152,7 @@ export default function LoginPage() {
               demo@nexcard.io / demo-password-123
             </button>
           </div>
+          )}
         </div>
 
         <p className="mt-6 text-center text-sm" style={{ color: "var(--nc-text-2)" }}>

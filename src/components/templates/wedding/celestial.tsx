@@ -200,7 +200,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa" }: WeddingProps
       )}
 
       <footer className="relative z-10 border-t border-white/5 px-6 py-8 text-center">
-        <p className="text-xs text-white/15">PresenceCard ✦</p>
+        <p className="text-xs text-white/15">NEX CARD ✦</p>
       </footer>
     </main>
   );

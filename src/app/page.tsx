@@ -2,6 +2,7 @@
 // Fully themed with CSS vars, supports both dark/gold and light/navy
 
 import Link from "next/link";
+import { ThemeProvider } from "@/lib/theme/theme-context";
 import { NexCardLogo } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
@@ -34,6 +35,7 @@ export default function LandingPage() {
   ];
 
   return (
+    <ThemeProvider>
     <main style={{ background: "var(--nc-bg)", color: "var(--nc-text)", minHeight: "100vh" }}>
 
       {/* Nav */}
@@ -51,15 +53,14 @@ export default function LandingPage() {
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <ThemeToggle size="sm" />
+            <ThemeToggle size="lg" />
             <Link href="/login"
               className="hidden rounded-xl border px-4 py-2 text-sm font-semibold transition-all hover:opacity-80 sm:block"
               style={{ borderColor: "var(--nc-border)", color: "var(--nc-text-2)" }}>
               Sign In
             </Link>
             <Link href="/register"
-              className="rounded-xl px-4 py-2 text-sm font-black text-black transition-all hover:opacity-90"
-              style={{ background: "linear-gradient(135deg, var(--nc-brand-1, #d4af37), var(--nc-brand-3, #f0c050))" }}>
+              className="nc-btn-brand rounded-xl px-4 py-2 text-sm font-black transition-all hover:opacity-90">
               Get Started Free
             </Link>
           </div>
@@ -76,7 +77,6 @@ export default function LandingPage() {
         <div className="relative z-10 mx-auto max-w-4xl">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2"
             style={{ borderColor: "var(--nc-border-brand)", background: "var(--nc-bg-card)" }}>
-            <span>✦</span>
             <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--nc-text-2)" }}>
               20 Premium Templates · QR · NFC
             </span>
@@ -86,10 +86,12 @@ export default function LandingPage() {
             style={{ color: "var(--nc-text)" }}>
             Your Digital{" "}
             <span style={{
-              background: "var(--nc-brand-grad, linear-gradient(135deg,#d4af37,#f0c050))",
+              backgroundImage: "var(--nc-brand-grad, linear-gradient(135deg,#d4af37,#f0c050))",
+              backgroundColor: "transparent",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
+              color: "transparent",
             }}>
               Identity
             </span>
@@ -103,12 +105,11 @@ export default function LandingPage() {
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link href="/register"
-              className="flex items-center gap-2 rounded-2xl px-8 py-4 text-base font-black text-black transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
+              className="nc-btn-brand flex items-center gap-2 rounded-2xl px-8 py-4 text-base font-black transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
               style={{
-                background: "linear-gradient(135deg, var(--nc-brand-1, #d4af37), var(--nc-brand-3, #f0c050))",
-                boxShadow: "0 8px 28px rgba(212,175,55,0.35)",
+                boxShadow: "var(--nc-glow)",
               }}>
-              Create Your Card Free →
+              Create Your Card →
             </Link>
             <Link href="/alex-rivera"
               className="flex items-center gap-2 rounded-2xl border px-8 py-4 text-base font-semibold transition-all hover:opacity-80"
@@ -122,10 +123,12 @@ export default function LandingPage() {
             {[["20+", "Templates"], ["QR", "Code Ready"], ["NFC", "Tag Support"], ["∞", "Customizable"]].map(([v, l]) => (
               <div key={l} className="text-center">
                 <p className="text-2xl font-black" style={{
-                  background: "var(--nc-brand-grad)",
+                  backgroundImage: "var(--nc-brand-grad)",
+                  backgroundColor: "transparent",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
+                  color: "transparent",
                 }}>{v}</p>
                 <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>{l}</p>
               </div>
@@ -197,8 +200,7 @@ export default function LandingPage() {
           </div>
           <div className="mt-8 text-center">
             <Link href="/register"
-              className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-black text-black"
-              style={{ background: "linear-gradient(135deg, var(--nc-brand-1,#d4af37), var(--nc-brand-3,#f0c050))" }}>
+              className="nc-btn-brand inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-black">
               Browse All Templates →
             </Link>
           </div>
@@ -221,10 +223,12 @@ export default function LandingPage() {
               <div key={s.n} className="flex gap-5 rounded-2xl p-6"
                 style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
                 <div className="shrink-0 text-3xl font-black leading-none" style={{
-                  background: "var(--nc-brand-grad)",
+                  backgroundImage: "var(--nc-brand-grad)",
+                  backgroundColor: "transparent",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
+                  color: "transparent",
                 }}>{s.n}</div>
                 <div>
                   <h3 className="font-black mb-1" style={{ color: "var(--nc-text)" }}>{s.title}</h3>
@@ -248,12 +252,11 @@ export default function LandingPage() {
             Join thousands using NEX CARD to share their digital presence.
           </p>
           <Link href="/register"
-            className="inline-flex items-center gap-2 rounded-2xl px-10 py-4 text-base font-black text-black hover:opacity-90 hover:scale-[1.02] transition-all"
+            className="nc-btn-brand inline-flex items-center gap-2 rounded-2xl px-10 py-4 text-base font-black hover:opacity-90 hover:scale-[1.02] transition-all"
             style={{
-              background: "linear-gradient(135deg, var(--nc-brand-1,#d4af37), var(--nc-brand-3,#f0c050))",
-              boxShadow: "0 8px 28px rgba(212,175,55,0.35)",
+              boxShadow: "var(--nc-glow)",
             }}>
-            Create Your Card — It&apos;s Free →
+            Create Your Card →
           </Link>
           <p className="mt-4 text-xs" style={{ color: "var(--nc-text-3)" }}>
             No credit card required · 20 premium templates · QR + NFC ready
@@ -278,5 +281,6 @@ export default function LandingPage() {
         </div>
       </footer>
     </main>
+    </ThemeProvider>
   );
 }

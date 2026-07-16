@@ -1,8 +1,6 @@
 // src/lib/theme/theme-context.tsx
 // NEX CARD Theme System
-// Light mode: white/navy blue (matches Image 1 — the blue logo)
-// Dark/Gold mode: black/gold (matches Image 2 — the gold logo)
-// Theme applies ONLY to admin + dashboard UI — never to public profile templates
+// Light mode: white/navy blue | Dark mode: black/gold
 
 "use client";
 
@@ -14,37 +12,60 @@ interface ThemeContextValue {
   theme: Theme;
   setTheme: (t: Theme) => void;
   toggleTheme: () => void;
+  mounted: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   theme: "dark",
   setTheme: () => {},
   toggleTheme: () => {},
+  mounted: false,
 });
+
+function applyThemeClass(theme: Theme) {
+  const root = document.documentElement;
+  if (theme === "dark") {
+    root.classList.add("nc-dark");
+    root.classList.remove("nc-light");
+  } else {
+    root.classList.add("nc-light");
+    root.classList.remove("nc-dark");
+  }
+}
+
+function readStoredTheme(): Theme {
+  if (typeof window === "undefined") return "dark";
+  try {
+    const stored = localStorage.getItem("nexcard-theme");
+    if (stored === "light" || stored === "dark") return stored;
+  } catch {
+    /* ignore */
+  }
+  // Prefer whatever class is already on <html> (survives provider remounts)
+  if (document.documentElement.classList.contains("nc-light")) return "light";
+  return "dark";
+}
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
   const [mounted, setMounted] = useState(false);
 
+  // Sync React state ↔ DOM ↔ localStorage on mount (fixes remount mismatch)
   useEffect(() => {
+    const initial = readStoredTheme();
+    setThemeState(initial);
+    applyThemeClass(initial);
     setMounted(true);
-    const stored = localStorage.getItem("nexcard-theme") as Theme | null;
-    if (stored === "light" || stored === "dark") {
-      setThemeState(stored);
-    }
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("nc-dark");
-      root.classList.remove("nc-light");
-    } else {
-      root.classList.add("nc-light");
-      root.classList.remove("nc-dark");
+    applyThemeClass(theme);
+    try {
+      localStorage.setItem("nexcard-theme", theme);
+    } catch {
+      /* ignore */
     }
-    localStorage.setItem("nexcard-theme", theme);
   }, [theme, mounted]);
 
   const setTheme = useCallback((t: Theme) => {
@@ -52,20 +73,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setThemeState(prev => prev === "dark" ? "light" : "dark");
+    setThemeState((prev) => (prev === "dark" ? "light" : "dark"));
   }, []);
 
-  // Prevent flash of wrong theme
-  if (!mounted) {
-    return (
-      <div style={{ visibility: "hidden" }}>
-        {children}
-      </div>
-    );
-  }
-
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, mounted }}>
       {children}
     </ThemeContext.Provider>
   );

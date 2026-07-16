@@ -264,8 +264,8 @@ export async function generateMetadata({
 
   return {
     title: template
-      ? `Preview: ${template.name} — ${template.category.name} — PresenceCard`
-      : "Template Preview — PresenceCard",
+      ? `Preview: ${template.name} — ${template.category.name} — NEX CARD`
+      : "Template Preview — NEX CARD",
   };
 }
 

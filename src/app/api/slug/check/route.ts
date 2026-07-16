@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     "admin", "dashboard", "login", "register", "logout",
     "api", "settings", "onboarding", "help", "about",
     "pricing", "contact", "terms", "privacy", "blog",
-    "presencecard", "support", "404", "500", "sitemap",
+    "presencecard", "nexcard", "support", "404", "500", "sitemap",
   ]);
 
   if (RESERVED.has(slug)) {

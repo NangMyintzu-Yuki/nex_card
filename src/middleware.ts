@@ -7,9 +7,6 @@ import type { NextRequest } from "next/server";
 // Routes that require authentication
 const PROTECTED_PREFIXES = ["/dashboard", "/admin"];
 
-// Routes that logged-in users should be redirected away from
-const AUTH_ROUTES = ["/login", "/register"];
-
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionToken = request.cookies.get("session_token")?.value;
@@ -17,23 +14,18 @@ export function middleware(request: NextRequest) {
   const isProtected = PROTECTED_PREFIXES.some((prefix) =>
     pathname.startsWith(prefix)
   );
-  const isAuthRoute = AUTH_ROUTES.some((route) => pathname === route);
 
-  // ── Redirect unauthenticated users to login ─────────────────────────────
+  // ── Protected routes require a session cookie (full validation in layouts) ─
   if (isProtected && !sessionToken) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // ── Redirect authenticated users away from login/register ───────────────
-  if (isAuthRoute && sessionToken) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
-  // ── Admin route — secondary role check happens in page.tsx ──────────────
-  // We can't check role in middleware without a DB call (edge runtime).
-  // The admin page.tsx does a full role check via getServerSession().
+  // Do NOT redirect /login → /dashboard based on cookie alone.
+  // A stale cookie after DB reset causes an infinite redirect loop:
+  //   middleware sends login → dashboard, layout sends dashboard → login.
+  // Logged-in users are redirected client-side via /api/auth/me on auth pages.
 
   return NextResponse.next();
 }

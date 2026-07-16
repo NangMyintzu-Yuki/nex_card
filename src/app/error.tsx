@@ -33,7 +33,9 @@ export default function GlobalError({
 
       <h1 className="text-2xl font-black">Something went wrong</h1>
       <p className="mt-2 max-w-sm text-sm leading-relaxed text-neutral-500">
-        An unexpected error occurred. Our team has been notified.
+        {process.env.NODE_ENV === "development" && error.message
+          ? error.message
+          : "An unexpected error occurred. Our team has been notified."}
         {error.digest && (
           <span className="mt-1 block font-mono text-xs text-neutral-700">
             Error ID: {error.digest}

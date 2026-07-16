@@ -16,9 +16,15 @@ export interface Session {
   user: SessionUser;
 }
 
+/** Remove stale session cookie (e.g. after DB reset or expired session). */
+export async function clearSessionCookie(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete("session_token");
+}
+
 /**
  * Gets the current user session from the session cookie.
- * In production, wire this to NextAuth's getServerSession() or Lucia's auth().
+ * Clears the cookie when the token is missing, expired, or no longer in the DB.
  */
 export async function getServerSession(): Promise<Session | null> {
   const cookieStore = await cookies();
@@ -43,9 +49,10 @@ export async function getServerSession(): Promise<Session | null> {
     },
   });
 
-  if (!session) return null;
-  if (new Date(session.expires) < new Date()) return null;
-  if (session.user.status !== "ACTIVE") return null;
+  if (!session || new Date(session.expires) < new Date() || session.user.status !== "ACTIVE") {
+    await clearSessionCookie();
+    return null;
+  }
 
   return {
     user: {

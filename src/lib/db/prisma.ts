@@ -77,8 +77,9 @@ const initialCategories = [
   },
 ];
 
-const PH = (w: number, h: number, text: string, bg: string) =>
-  `https://placehold.co/${w}x${h}/${bg}/ffffff?text=${encodeURIComponent(text)}&font=montserrat`;
+// Local SVG thumbnails in /public/thumbnails (no external CDN)
+const PH = (_w: number, _h: number, text: string, _bg: string) =>
+  `/thumbnails/${text.toLowerCase()}.svg`;
 
 const initialTemplates = [
   // Digital Name Card
@@ -175,7 +176,7 @@ function loadDB(): DBData {
     users: [
       {
         id: "user-admin",
-        email: "admin@presencecard.io",
+        email: "admin@nexcard.io",
         name: "Admin",
         hashedPassword: sha256("admin-change-me-in-prod"),
         role: "ADMIN",
@@ -185,7 +186,7 @@ function loadDB(): DBData {
       },
       {
         id: "user-demo",
-        email: "demo@presencecard.io",
+        email: "demo@nexcard.io",
         name: "Alex Rivera",
         hashedPassword: sha256("demo-password-123"),
         role: "USER",
@@ -502,6 +503,18 @@ const mockPrisma = new Proxy({}, {
     return makeMockModel(prop as string);
   }
 }) as unknown as PrismaClient;
+
+if (process.env.NODE_ENV === "production" && !process.env.DATABASE_URL) {
+  throw new Error(
+    "[NEX CARD] DATABASE_URL is required in production. Refusing to start with mock database."
+  );
+}
+
+if (process.env.NODE_ENV === "production" && !realPrisma) {
+  throw new Error(
+    "[NEX CARD] Prisma Client failed to initialize in production. Check DATABASE_URL and run prisma generate."
+  );
+}
 
 export const prisma = realPrisma || mockPrisma;
 

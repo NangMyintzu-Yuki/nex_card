@@ -5,6 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
+import { APP_URL } from "@/lib/env";
 import { QRManager } from "./_components/qr-manager";
 
 export async function generateMetadata({
@@ -13,7 +14,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  return { title: `QR Code — /${slug} — PresenceCard` };
+  return { title: `QR Code — /${slug} — NEX CARD` };
 }
 
 export default async function QRPage({
@@ -59,7 +60,7 @@ export default async function QRPage({
         qrScanCount: Number(profile.qrScanCount),
         qrGeneratedAt: profile.qrGeneratedAt?.toISOString() ?? null,
       }}
-      appUrl={process.env.NEXT_PUBLIC_APP_URL ?? "https://presencecard.io"}
+      appUrl={APP_URL}
     />
   );
 }

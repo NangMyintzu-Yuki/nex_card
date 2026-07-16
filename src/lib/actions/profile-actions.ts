@@ -174,9 +174,9 @@ export async function updateProfileAction(
   const parsed = UpdateProfileInput.safeParse({
     profileId: formData.get("profileId"),
     dynamicJsonData: formData.get("dynamicJsonData"),
-    metaTitle: formData.get("metaTitle"),
-    metaDescription: formData.get("metaDescription"),
-    ogImageUrl: formData.get("ogImageUrl"),
+    metaTitle: formData.get("metaTitle") || undefined,
+    metaDescription: formData.get("metaDescription") || undefined,
+    ogImageUrl: formData.get("ogImageUrl") || undefined,
     isPublished: formData.get("isPublished"),
   });
 
@@ -197,12 +197,27 @@ export async function updateProfileAction(
     select: {
       id: true,
       slug: true,
+      paymentStatus: true,
       category: { select: { slug: true } },
+      template: { select: { isPremium: true } },
     },
   });
 
   if (!profile) {
     return { status: "error", message: "Profile not found." };
+  }
+
+  if (parsed.data.isPublished) {
+    const requiresPayment =
+      profile.template.isPremium && profile.paymentStatus !== "APPROVED";
+
+    if (requiresPayment) {
+      return {
+        status: "error",
+        message:
+          "Payment must be approved before publishing a premium template. Complete payment in onboarding or resubmit your screenshot.",
+      };
+    }
   }
 
   // Parse and validate the JSON against the category's schema

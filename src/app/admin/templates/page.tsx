@@ -1,16 +1,26 @@
 // src/app/admin/templates/page.tsx
-// Admin template catalogue — view all templates, toggle active/premium, set prices
+// Fully server-rendered — no client components (avoids RSC Lazy / originalFactory bugs)
 
 import { redirect } from "next/navigation";
-import Image from "next/image";
 import type { Metadata } from "next";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
-import { PriceEditor } from "./_components/price-editor";
-import { TemplateToggle } from "./_components/template-toggle";
+import { resolveThumbnailUrl } from "@/lib/thumbnails";
+import {
+  ActiveToggle,
+  PremiumBadge,
+  PriceForm,
+} from "./_components/template-actions";
 
 export const metadata: Metadata = { title: "Templates — Admin · NEX CARD" };
 export const dynamic = "force-dynamic";
+
+const CATEGORY_COLORS: Record<string, string> = {
+  "digital-name-card": "#6366f1",
+  portfolio: "#0ea5e9",
+  "business-ad": "#f59e0b",
+  "wedding-invitation": "#ec4899",
+};
 
 export default async function AdminTemplatesPage() {
   const session = await getServerSession();
@@ -22,129 +32,132 @@ export default async function AdminTemplatesPage() {
     include: {
       templates: {
         orderBy: { sortOrder: "asc" },
-        include: {
-          _count: { select: { profiles: true } },
-        },
+        include: { _count: { select: { profiles: true } } },
       },
       _count: { select: { profiles: true } },
     },
   });
 
-  const CATEGORY_COLORS: Record<string, string> = {
-    "digital-name-card": "#6366f1",
-    portfolio:            "#0ea5e9",
-    "business-ad":        "#f59e0b",
-    "wedding-invitation": "#ec4899",
-  };
+  const totalTemplates = categories.reduce((acc, c) => acc + c.templates.length, 0);
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto max-w-5xl px-6 py-10">
       <div className="mb-8">
-        <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Template Catalogue</h1>
+        <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>
+          Templates
+        </h1>
         <p className="mt-1 text-sm" style={{ color: "var(--nc-text-3)" }}>
-          {categories.reduce((acc, c) => acc + c.templates.length, 0)} templates across{" "}
-          {categories.length} categories
+          {totalTemplates} templates · prices in MMK · toggle Active / PRO inline
         </p>
       </div>
 
-      <div className="space-y-12">
+      <div className="space-y-8">
         {categories.map((category) => {
           const color = CATEGORY_COLORS[category.slug] ?? "#6366f1";
           return (
-            <div key={category.id}>
-              {/* Category header */}
-              <div className="mb-5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className="h-3 w-3 rounded-full"
-                    style={{ background: color }}
-                  />
-                  <h2 className="text-lg font-black" style={{ color: "var(--nc-text)" }}>
-                    {category.name}
-                  </h2>
-                  <span className="nc-badge" style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text-3)", borderColor: "var(--nc-border)" }}>
-                    {category._count.profiles} profiles
-                  </span>
-                </div>
-                <span className="font-mono text-xs" style={{ color: "var(--nc-text-3)" }}>
-                  {category.slug}
+            <section key={category.id}>
+              <div className="mb-3 flex items-center gap-2.5">
+                <span className="h-2 w-2 rounded-full" style={{ background: color }} />
+                <h2 className="text-sm font-bold" style={{ color: "var(--nc-text)" }}>
+                  {category.name}
+                </h2>
+                <span className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                  {category.templates.length} templates
+                  {category._count.profiles > 0 && ` · ${category._count.profiles} profiles`}
                 </span>
               </div>
 
-              {/* Templates grid */}
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-                {category.templates.map((template) => (
-                  <div
-                    key={template.id}
-                    className="nc-card overflow-hidden rounded-2xl transition-all"
-                  >
-                    {/* Thumbnail */}
-                    <div className="relative aspect-video w-full overflow-hidden" style={{ background: "var(--nc-bg-2)" }}>
-                      <Image
-                        src={template.thumbnailUrl}
-                        alt={template.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 50vw, 20vw"
-                      />
-                      <div className="absolute inset-0 flex items-end p-2 gap-1">
-                        {!template.isActive && (
-                          <span className="rounded-full bg-red-500/80 px-2 py-0.5 text-xs font-bold text-white">
-                            Inactive
-                          </span>
-                        )}
-                        {template.isPremium && (
-                          <span className="rounded-full bg-amber-500/80 px-2 py-0.5 text-xs font-bold text-black">
-                            PRO
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="p-4">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <h3 className="font-bold" style={{ color: "var(--nc-text)" }}>{template.name}</h3>
-                          <p className="font-mono text-xs truncate" style={{ color: "var(--nc-text-3)" }}>
-                            {template.codeIdentifier}
-                          </p>
-                        </div>
-                        <div
-                          className="h-4 w-4 shrink-0 rounded-full mt-0.5"
-                          style={{ background: template.accentColor ?? color }}
-                          title={template.accentColor ?? "No accent color"}
-                        />
-                      </div>
-
-                      <div className="mt-3 flex items-center justify-between text-xs">
-                        <span style={{ color: "var(--nc-text-3)" }}>
-                          {template._count.profiles} uses
-                        </span>
-                        <span style={{ color: "var(--nc-text-3)" }}>
-                          Sort: {template.sortOrder}
-                        </span>
-                      </div>
-
-                      {/* Toggle buttons */}
-                      <TemplateToggle
-                        templateId={template.id}
-                        isActive={template.isActive}
-                        isPremium={template.isPremium}
-                      />
-
-                      {/* Price editor */}
-                      <PriceEditor
-                        templateId={template.id}
-                        templateName={template.name}
-                        priceQrOnly={template.priceQrOnly}
-                        priceNfcCard={template.priceNfcCard}
-                        priceNfcQr={template.priceNfcQr}
-                      />
-                    </div>
-                  </div>
-                ))}
+              <div
+                className="overflow-x-auto rounded-2xl"
+                style={{
+                  background: "var(--nc-bg-card)",
+                  border: "1px solid var(--nc-border)",
+                }}
+              >
+                <table className="w-full min-w-[640px] text-left">
+                  <thead>
+                    <tr
+                      className="border-b text-[10px] font-semibold uppercase tracking-wider"
+                      style={{ borderColor: "var(--nc-border)", color: "var(--nc-text-3)" }}
+                    >
+                      <th className="py-2.5 pl-4 pr-4 font-semibold">Template</th>
+                      <th className="px-2 py-2.5 text-center font-semibold w-16">Active</th>
+                      <th className="px-2 py-2.5 text-center font-semibold w-16">Tier</th>
+                      <th className="py-2.5 pl-2 pr-4 font-semibold">Prices (MMK)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {category.templates.map((template) => {
+                      const thumb = resolveThumbnailUrl(template.thumbnailUrl, template.name);
+                      return (
+                        <tr
+                          key={template.id}
+                          className="border-b last:border-b-0"
+                          style={{ borderColor: "var(--nc-border)" }}
+                        >
+                          <td className="py-3 pr-4 pl-4">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div
+                                className="relative h-10 w-16 shrink-0 overflow-hidden rounded-lg"
+                                style={{ background: "var(--nc-bg-2)" }}
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={thumb}
+                                  alt={template.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="font-semibold truncate"
+                                    style={{ color: "var(--nc-text)" }}
+                                  >
+                                    {template.name}
+                                  </span>
+                                  {template.accentColor && (
+                                    <span
+                                      className="h-2 w-2 shrink-0 rounded-full"
+                                      style={{ background: template.accentColor }}
+                                    />
+                                  )}
+                                </div>
+                                <p
+                                  className="text-xs truncate"
+                                  style={{ color: "var(--nc-text-3)" }}
+                                >
+                                  {template.codeIdentifier}
+                                  {template._count.profiles > 0 &&
+                                    ` · ${template._count.profiles} uses`}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-2 py-3 text-center">
+                            <ActiveToggle
+                              templateId={template.id}
+                              isActive={template.isActive}
+                            />
+                          </td>
+                          <td className="px-2 py-3 text-center">
+                            <PremiumBadge />
+                          </td>
+                          <td className="py-3 pl-2 pr-4">
+                            <PriceForm
+                              templateId={template.id}
+                              priceQrOnly={template.priceQrOnly}
+                              priceNfcCard={template.priceNfcCard}
+                              priceNfcQr={template.priceNfcQr}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-            </div>
+            </section>
           );
         })}
       </div>

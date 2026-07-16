@@ -333,7 +333,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e" }: WeddingProps) 
         </div>
         <p className="text-sm" style={{ color: "#7a5c3a" }}>{partner1.name} &amp; {partner2.name}</p>
         {hashtag && <p className="mt-1 text-xs" style={{ color: gold }}>#{hashtag}</p>}
-        <p className="mt-8 text-xs" style={{ color: `${gold}30` }}>Made with PresenceCard</p>
+        <p className="mt-8 text-xs" style={{ color: `${gold}30` }}>Made with NEX CARD</p>
       </footer>
     </main>
   );

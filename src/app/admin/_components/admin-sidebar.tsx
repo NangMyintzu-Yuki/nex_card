@@ -46,7 +46,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
             <NexCardLogoStatic size={28} showText={false} isDark={isDark} />
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-sm font-black" style={{ color: "var(--nc-text)" }}>NEX CARD</span>
+                <span className="text-sm font-black" style={{ color: "#d4af37" }}>NEX CARD</span>
                 <span className="rounded-full px-1.5 py-0.5 text-[9px] font-black text-white"
                   style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
                   ADMIN

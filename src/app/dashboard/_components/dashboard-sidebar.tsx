@@ -47,7 +47,7 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
         {/* Logo */}
         <div className="flex items-center justify-between px-4 py-3 border-b"
           style={{ borderColor: "var(--nc-sidebar-border)" }}>
-          <NexCardLogoStatic size={32} showText isDark={isDark} />
+          <NexCardLogoStatic size={32} isDark={isDark} />
           <button onClick={() => setMobileOpen(false)}
             className="flex h-8 w-8 items-center justify-center rounded-lg lg:hidden"
             style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text-2)" }}>
@@ -86,7 +86,13 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all nc-nav-item"
               onClick={() => setMobileOpen(false)}>
               <QrCode className="h-4 w-4 shrink-0" style={{ color: "var(--nc-text-2)" }} />
-              <span style={{ color: "var(--nc-text-2)" }}>QR & NFC</span>
+              <span style={{ color: "var(--nc-text-2)" }}>QR Codes</span>
+            </Link>
+            <Link href="/dashboard/nfc"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all nc-nav-item"
+              onClick={() => setMobileOpen(false)}>
+              <Smartphone className="h-4 w-4 shrink-0" style={{ color: "var(--nc-text-2)" }} />
+              <span style={{ color: "var(--nc-text-2)" }}>NFC Setup</span>
             </Link>
           </div>
 

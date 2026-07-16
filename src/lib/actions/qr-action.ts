@@ -109,18 +109,3 @@ export async function generateQRAction(
     alreadyLocked: false,
   };
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ACTION: Increment QR scan count (fire-and-forget from /p/[slug])
-// ─────────────────────────────────────────────────────────────────────────────
-
-export async function incrementQRScanCount(profileId: string): Promise<void> {
-  await prisma.userProfile
-    .update({
-      where: { id: profileId },
-      data: { qrScanCount: { increment: 1 } },
-    })
-    .catch((err) => {
-      console.error("[QR ScanCount] Failed for profile:", profileId, err);
-    });
-}

@@ -363,6 +363,7 @@ export interface ResolvedProfile {
   metaDescription: string | null;
   ogImageUrl: string | null;
   templateLocked: boolean;
+  qrLocked: boolean;
   dynamicJsonData: unknown;
   createdAt: Date;
   updatedAt: Date;

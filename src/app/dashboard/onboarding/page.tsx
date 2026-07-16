@@ -6,9 +6,10 @@ import type { Metadata } from "next";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { OnboardingClient } from "./_components/onboarding-client";
+import { resolveThumbnailUrl } from "@/lib/thumbnails";
 
 export const metadata: Metadata = {
-  title: "Choose Your Template — PresenceCard",
+  title: "Choose Your Template — NEX CARD",
   description: "Select your category and template. This is a one-time choice.",
 };
 
@@ -75,7 +76,13 @@ export default async function OnboardingPage({
 
   return (
     <OnboardingClient
-      categories={categories}
+      categories={categories.map((cat) => ({
+        ...cat,
+        templates: cat.templates.map((t) => ({
+          ...t,
+          thumbnailUrl: resolveThumbnailUrl(t.thumbnailUrl, t.name),
+        })),
+      }))}
       lockedCategoryIds={Array.from(lockedCategoryIds)}
       existingProfiles={existingProfiles}
       userId={session.user.id}

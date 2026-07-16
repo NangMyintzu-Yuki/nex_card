@@ -130,7 +130,7 @@ export function BlueprintPortfolio({ data, accentColor="#3b82f6" }: PP) {
           <div className="flex flex-wrap gap-3">
             {socialLinks.map((s,i)=><a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-slate-600 hover:text-white transition-colors">{SP_EMOJI[s.platform]} {s.label??s.platform}</a>)}
           </div>
-          <p className="text-xs font-mono text-slate-800">// PresenceCard</p>
+          <p className="text-xs font-mono text-slate-800">{"// NEX CARD"}</p>
         </footer>
       </div>
     </main>

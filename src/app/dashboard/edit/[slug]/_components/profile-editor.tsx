@@ -333,31 +333,23 @@ function ImageUploadField({
     setUploadError("");
 
     try {
-      // 1. Get presigned URL from our API
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", folder);
+
       const res = await fetch("/api/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: file.type, folder, fileSize: file.size }),
+        body: formData,
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ message: "Upload failed" }));
-        throw new Error(err.message ?? "Upload failed");
+        const err = await res.json().catch(() => ({ error: "Upload failed" }));
+        throw new Error(err.error ?? err.message ?? "Upload failed");
       }
 
-      const { uploadUrl, publicUrl } = await res.json();
-
-      // 2. PUT the raw file directly to R2
-      const upload = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
-
-      if (!upload.ok) throw new Error("Upload to storage failed.");
-
-      // 3. Store the public URL in the field
-      onChange(publicUrl);
+      const data = await res.json();
+      // Local storage returns publicUrl; payment flow returns url — accept both
+      onChange(data.publicUrl ?? data.url);
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed. Please try again.");
     } finally {
@@ -845,7 +837,7 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
             </div>
             <p className="text-xs ml-4" style={{ color: "var(--nc-text-2)" }}>
               {isPublished
-                ? <>presencecard.io/<strong className="text-indigo-400">{profile.slug}</strong> is accessible</>
+                ? <>nexcard.io/<strong className="text-indigo-400">{profile.slug}</strong> is accessible</>
                 : <>Toggle to <strong>Publish</strong> so your URL goes live</>
               }
             </p>

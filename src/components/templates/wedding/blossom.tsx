@@ -181,7 +181,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6" }: WeddingProps) 
       )}
 
       <footer className="border-t px-6 py-8 text-center" style={{ borderColor: `${accentColor}20` }}>
-        <p className="text-sm" style={{ color: "#8b3254" }}>🌸 Made with PresenceCard 🌸</p>
+        <p className="text-sm" style={{ color: "#8b3254" }}>🌸 Made with NEX CARD 🌸</p>
       </footer>
     </main>
   );

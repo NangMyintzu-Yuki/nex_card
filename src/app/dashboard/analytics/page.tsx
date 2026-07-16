@@ -25,20 +25,40 @@ export default async function AnalyticsPage() {
   }
   if (!session?.user?.id) redirect("/login");
 
-  let profiles: any[] = [];
+  let profiles: Array<{
+    id: string;
+    slug: string;
+    isPublished: boolean;
+    viewCount: bigint | number;
+    qrScanCount: bigint | number;
+    nfcWriteCount: bigint | number;
+    category?: { slug: string; name: string };
+    template?: { name: string };
+  }> = [];
   try {
     profiles = await prisma.userProfile.findMany({
       where: { userId: session.user.id },
       orderBy: { viewCount: "desc" },
-    } as any);
+      select: {
+        id: true,
+        slug: true,
+        isPublished: true,
+        viewCount: true,
+        qrScanCount: true,
+        nfcWriteCount: true,
+        updatedAt: true,
+        category: { select: { slug: true, name: true } },
+        template: { select: { name: true } },
+      },
+    });
   } catch {
     profiles = [];
   }
 
-  const totalViews  = profiles.reduce((s: number, p: any) => s + Number(p.viewCount ?? 0), 0);
-  const totalScans  = profiles.reduce((s: number, p: any) => s + Number(p.qrScanCount ?? 0), 0);
-  const totalNfc    = profiles.reduce((s: number, p: any) => s + Number(p.nfcWriteCount ?? 0), 0);
-  const published   = profiles.filter((p: any) => p.isPublished).length;
+  const totalViews  = profiles.reduce((s, p) => s + Number(p.viewCount ?? 0), 0);
+  const totalScans  = profiles.reduce((s, p) => s + Number(p.qrScanCount ?? 0), 0);
+  const totalNfc    = profiles.reduce((s, p) => s + Number(p.nfcWriteCount ?? 0), 0);
+  const published   = profiles.filter((p) => p.isPublished).length;
 
   const STATS = [
     { label: "Total Views",       value: formatNumber(totalViews),  color: "#6366f1", emoji: "👁️"  },

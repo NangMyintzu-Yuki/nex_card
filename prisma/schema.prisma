@@ -167,6 +167,10 @@ model UserProfile {
   qrGeneratedAt   DateTime?                    // timestamp of first generation
   qrScanCount     BigInt    @default(0)        // separate from viewCount
 
+  // NFC tag programming — incremented when user marks tag as programmed
+  nfcWriteCount   BigInt    @default(0)
+  nfcProgrammedAt DateTime?
+
   // Payment status — null = not yet submitted, PENDING = awaiting admin, APPROVED = can edit, REJECTED = resubmit
   paymentStatus   PaymentStatus?
 

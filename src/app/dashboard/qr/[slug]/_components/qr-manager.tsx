@@ -10,6 +10,7 @@ import {
   ArrowLeft, RefreshCw, Scan,
 } from "lucide-react";
 import { generateQRAction, GenerateQRState } from "@/lib/actions/qr-action";
+import { resolveThumbnailUrl } from "@/lib/thumbnails";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -102,7 +103,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
   async function handleShare() {
     if (navigator.share) {
       await navigator.share({
-        title: `My PresenceCard — /${profile.slug}`,
+        title: `My NEX CARD — /${profile.slug}`,
         text: `Scan this QR or visit: ${qrScanUrl}`,
         url: qrScanUrl,
       });
@@ -166,7 +167,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                       height={220}
                       className="block"
                     />
-                    {/* PresenceCard logo overlay in center */}
+                    {/* NEX CARD logo overlay in center */}
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-md">
                       <div className="h-6 w-6 rounded-md flex items-center justify-center"
                         style={{ background: accentColor }}>
@@ -452,7 +453,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
           <div className="nc-card overflow-hidden rounded-2xl">
             <div className="relative aspect-video overflow-hidden">
               <img
-                src={profile.template.thumbnailUrl}
+                src={resolveThumbnailUrl(profile.template.thumbnailUrl, profile.template.name)}
                 alt={profile.template.name}
                 className="h-full w-full object-cover opacity-70"
               />

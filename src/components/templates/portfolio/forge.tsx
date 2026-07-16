@@ -146,7 +146,7 @@ export function ForgePortfolio({ data, accentColor="#22c55e" }: PP) {
 
         <div className="flex items-center gap-2 text-xs text-neutral-800">
           <span style={{color:accentColor}}>✓</span>
-          <span>powered by PresenceCard</span>
+          <span>powered by NEX CARD</span>
         </div>
       </div>
     </main>

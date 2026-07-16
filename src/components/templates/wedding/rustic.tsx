@@ -196,7 +196,7 @@ export function RusticWedding({ data, accentColor = "#65a30d" }: WeddingProps) {
       )}
 
       <footer className="border-t-2 border-dashed px-6 py-8 text-center" style={{ borderColor: "#c9a96e" }}>
-        <p className="text-sm" style={{ color: "#a08060" }}>🌿 Made with PresenceCard 🌿</p>
+        <p className="text-sm" style={{ color: "#a08060" }}>🌿 Made with NEX CARD 🌿</p>
       </footer>
     </main>
   );

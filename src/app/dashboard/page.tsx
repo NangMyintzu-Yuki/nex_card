@@ -4,10 +4,11 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Plus, ExternalLink, Eye, Pencil, Lock, QrCode, Clock, XCircle, CheckCircle, Upload } from "lucide-react";
+import { Plus, ExternalLink, Eye, Pencil, Lock, QrCode, Clock, XCircle, CheckCircle, Upload, Radio } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";
 import { getCachedUserProfiles } from "@/lib/cache/profile-cache";
 import { ResubmitPayment } from "./_components/resubmit-payment";
+import { resolveThumbnailUrl } from "@/lib/thumbnails";
 
 export const metadata: Metadata = {
   title: "Dashboard — NEX CARD",
@@ -99,7 +100,7 @@ export default async function DashboardPage({
               {/* Template preview strip */}
               <div className="relative h-32 w-full overflow-hidden" style={{ background: "var(--nc-bg-2)" }}>
                 <img
-                  src={profile.template.thumbnailUrl}
+                  src={resolveThumbnailUrl(profile.template.thumbnailUrl, profile.template.name)}
                   alt={profile.template.name}
                   className="h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-105"
                 />
@@ -213,6 +214,14 @@ export default async function DashboardPage({
                       style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text-3)" }}>
                       <QrCode className="h-3.5 w-3.5" />
                     </div>
+                  )}
+                  {(profile.payment?.tier === "NFC_CARD" || profile.payment?.tier === "PHYSICAL_CARD") && paymentApproved && (
+                    <Link href={`/dashboard/nfc/${profile.slug}`}
+                      className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all"
+                      style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}
+                      title="Program NFC tag">
+                      <Radio className="h-3.5 w-3.5" />
+                    </Link>
                   )}
                   <Link href={`/${profile.slug}`} target="_blank" rel="noopener noreferrer"
                     className="nc-btn-ghost flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs">

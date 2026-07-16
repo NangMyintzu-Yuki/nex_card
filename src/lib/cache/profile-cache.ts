@@ -34,6 +34,7 @@ const PROFILE_SELECT = {
   metaDescription: true,
   ogImageUrl: true,
   templateLocked: true,
+  qrLocked: true,
   dynamicJsonData: true,
   createdAt: true,
   updatedAt: true,
@@ -102,44 +103,51 @@ export async function getProfileBySlug(slug: string): Promise<ResolvedProfile | 
 /**
  * Fetches all profiles for a specific user (dashboard listing).
  * Short revalidation — user sees their own updates quickly.
+ * Cache key MUST include userId to prevent cross-user data leaks.
  */
-export const getCachedUserProfiles = unstable_cache(
-  async (userId: string) => {
-    const profiles = await prisma.userProfile.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        slug: true,
-        isPublished: true,
-        viewCount: true,
-        templateLocked: true,
-        paymentStatus: true,
-        updatedAt: true,
-        category: { select: { id: true, name: true, slug: true } },
-        template: {
-          select: {
-            id: true,
-            codeIdentifier: true,
-            name: true,
-            thumbnailUrl: true,
-            isPremium: true,
-            priceQrOnly: true,
-            priceNfcCard: true,
-            priceNfcQr: true,
+export async function getCachedUserProfiles(userId: string) {
+  const getCached = unstable_cache(
+    async () => {
+      const profiles = await prisma.userProfile.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          slug: true,
+          isPublished: true,
+          viewCount: true,
+          templateLocked: true,
+          paymentStatus: true,
+          updatedAt: true,
+          category: { select: { id: true, name: true, slug: true } },
+          template: {
+            select: {
+              id: true,
+              codeIdentifier: true,
+              name: true,
+              thumbnailUrl: true,
+              isPremium: true,
+              priceQrOnly: true,
+              priceNfcCard: true,
+              priceNfcQr: true,
+            },
+          },
+          payment: {
+            select: { tier: true, status: true, screenshotUrl: true },
           },
         },
-        payment: {
-          select: { tier: true, status: true, screenshotUrl: true },
-        },
-      },
-    });
-    // BigInt fields can't be JSON-serialized by the cache layer — convert to Number.
-    return profiles.map((p) => ({ ...p, viewCount: Number(p.viewCount) }));
-  },
-  ["user-profiles"],
-  { revalidate: 60 }
-);
+      });
+      return profiles.map((p) => ({ ...p, viewCount: Number(p.viewCount) }));
+    },
+    ["user-profiles", userId],
+    {
+      revalidate: 60,
+      tags: [CACHE_TAGS.userProfiles(userId)],
+    }
+  );
+
+  return getCached();
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // REVALIDATION HELPERS — Called from Server Actions after mutations
@@ -179,5 +187,20 @@ export function incrementProfileViewCount(profileId: string): void {
     })
     .catch((err) => {
       console.error("[ViewCount] Failed to increment for profile:", profileId, err);
+    });
+}
+
+/**
+ * Increments QR scan count atomically in the background.
+ * Not a server action — avoids unauthenticated RPC abuse.
+ */
+export function incrementQRScanCount(profileId: string): void {
+  prisma.userProfile
+    .update({
+      where: { id: profileId },
+      data: { qrScanCount: { increment: 1 } },
+    })
+    .catch((err) => {
+      console.error("[QR ScanCount] Failed for profile:", profileId, err);
     });
 }

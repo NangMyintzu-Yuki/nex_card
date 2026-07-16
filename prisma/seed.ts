@@ -53,12 +53,9 @@ const CATEGORIES = [
   },
 ] as const;
 
-// Placeholder thumbnail — in production point to your CDN
-// const PH = (w: number, h: number, text: string, bg: string) =>
-//   `https://placehold.co/${w}x${h}/${bg.replace("#", "")}/ffffff?text=${encodeURIComponent(text)}&font=montserrat`;
-
-const PH = (w: number, h: number, text: string, bg: string) =>
-  `https://placehold.co/${w}x${h}/${bg.replace("#", "")}/ffffff?text=${encodeURIComponent(text)}&font=montserrat`;
+// Local SVG thumbnails in /public/thumbnails (no external CDN)
+const PH = (_w: number, _h: number, text: string, _bg: string) =>
+  `/thumbnails/${text.toLowerCase()}.svg`;
 
 const TEMPLATES_BY_CATEGORY: Record<
   string,
@@ -80,7 +77,7 @@ const TEMPLATES_BY_CATEGORY: Record<
         "Glassmorphism floating card with aurora gradient orbs. Ethereal and modern.",
       thumbnailUrl: PH(600, 340, "Aurora", "6366f1"),
       accentColor: "#6366f1",
-      isPremium: false,
+      isPremium: true,
       sortOrder: 1,
     },
     {
@@ -90,7 +87,7 @@ const TEMPLATES_BY_CATEGORY: Record<
         "Pure black brutalist precision with editorial typography. Bold and striking.",
       thumbnailUrl: PH(600, 340, "Obsidian", "18181b"),
       accentColor: "#f59e0b",
-      isPremium: false,
+      isPremium: true,
       sortOrder: 2,
     },
     {
@@ -133,7 +130,7 @@ const TEMPLATES_BY_CATEGORY: Record<
         "Light creative studio layout, project-grid-first with warm whites and clean typography.",
       thumbnailUrl: PH(600, 340, "Canvas", "0ea5e9"),
       accentColor: "#0ea5e9",
-      isPremium: false,
+      isPremium: true,
       sortOrder: 1,
     },
     {
@@ -143,7 +140,7 @@ const TEMPLATES_BY_CATEGORY: Record<
         "Dark creative agency aesthetic with large type and dramatic full-bleed sections.",
       thumbnailUrl: PH(600, 340, "Studio", "ec4899"),
       accentColor: "#ec4899",
-      isPremium: false,
+      isPremium: true,
       sortOrder: 2,
     },
     {
@@ -186,7 +183,7 @@ const TEMPLATES_BY_CATEGORY: Record<
         "Bold headline-first with scrolling ticker, hero image, and high-energy dark layout.",
       thumbnailUrl: PH(600, 340, "Marquee", "ef4444"),
       accentColor: "#ef4444",
-      isPremium: false,
+      isPremium: true,
       sortOrder: 1,
     },
     {
@@ -196,7 +193,7 @@ const TEMPLATES_BY_CATEGORY: Record<
         "Warm and trustworthy local-business layout with hours, FAQ, and review sections.",
       thumbnailUrl: PH(600, 340, "District", "0284c7"),
       accentColor: "#0284c7",
-      isPremium: false,
+      isPremium: true,
       sortOrder: 2,
     },
     {
@@ -239,7 +236,7 @@ const TEMPLATES_BY_CATEGORY: Record<
         "Timeless elegance with serif typography and soft golds. Full love-history timeline.",
       thumbnailUrl: PH(600, 340, "Eternal", "c9a96e"),
       accentColor: "#c9a96e",
-      isPremium: false,
+      isPremium: true,
       sortOrder: 1,
     },
     {
@@ -249,7 +246,7 @@ const TEMPLATES_BY_CATEGORY: Record<
         "Soft floral pastel pinks with organic shapes and a romantic spring aesthetic.",
       thumbnailUrl: PH(600, 340, "Blossom", "f472b6"),
       accentColor: "#f472b6",
-      isPremium: false,
+      isPremium: true,
       sortOrder: 2,
     },
     {
@@ -387,9 +384,9 @@ async function main() {
   // ── 3. Admin user ───────────────────────────────────────────────────────
   console.log("\n👤 Seeding admin user…");
   const adminUser = await prisma.user.upsert({
-    where: { email: "admin@presencecard.io" },
+    where: { email: "admin@nexcard.io" },
     create: {
-      email: "admin@presencecard.io",
+      email: "admin@nexcard.io",
       name: "Admin",
       hashedPassword: hashPassword("admin-change-me-in-prod"),
       role: "ADMIN",
@@ -399,14 +396,14 @@ async function main() {
     update: { hashedPassword: hashPassword("admin-change-me-in-prod") },
     select: { id: true },
   });
-  console.log(`  ✓ admin@presencecard.io (${adminUser.id})`);
+  console.log(`  ✓ admin@nexcard.io (${adminUser.id})`);
 
   // ── 4. Demo user ────────────────────────────────────────────────────────
   console.log("\n👤 Seeding demo user…");
   const demoUser = await prisma.user.upsert({
-    where: { email: "demo@presencecard.io" },
+    where: { email: "demo@nexcard.io" },
     create: {
-      email: "demo@presencecard.io",
+      email: "demo@nexcard.io",
       name: "Alex Rivera",
       hashedPassword: hashPassword("demo-password-123"),
       role: "USER",
@@ -418,7 +415,7 @@ async function main() {
     update: { hashedPassword: hashPassword("demo-password-123") },
     select: { id: true },
   });
-  console.log(`  ✓ demo@presencecard.io (${demoUser.id})`);
+  console.log(`  ✓ demo@nexcard.io (${demoUser.id})`);
 
   // ── 5. Demo profile (Aurora Name Card) ─────────────────────────────────
   console.log("\n📄 Seeding demo profile…");
@@ -460,8 +457,8 @@ async function main() {
   console.log("\n✅ Seed complete!\n");
   console.log("  Categories:  ", Object.keys(categoryRecords).length);
   console.log("  Templates:   ", Object.keys(templateRecords).length);
-  console.log("  Admin login: admin@presencecard.io / admin-change-me-in-prod");
-  console.log("  Demo login:  demo@presencecard.io  / demo-password-123");
+  console.log("  Admin login: admin@nexcard.io / admin-change-me-in-prod");
+  console.log("  Demo login:  demo@nexcard.io  / demo-password-123");
   console.log("  Demo page:   http://localhost:3000/alex-rivera\n");
 }
 

@@ -473,7 +473,7 @@ export function VaultBusiness({ data, accentColor = "#6366f1" }: BP) {
               © {new Date().getFullYear()} {businessName}. All rights reserved.
             </span>
           </div>
-          <span className="font-mono text-xs text-slate-600">PresenceCard Vault</span>
+          <span className="font-mono text-xs text-slate-600">NEX CARD Vault</span>
         </div>
       </footer>
     </main>

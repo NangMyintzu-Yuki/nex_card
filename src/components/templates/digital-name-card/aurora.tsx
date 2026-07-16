@@ -276,7 +276,7 @@ export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
           )}
 
           <div className="mt-5 flex items-center justify-between border-t border-white/5 px-5 py-3.5">
-            <span className="text-[10px] text-white/20">PresenceCard</span>
+            <span className="text-[10px] text-white/20">NEX CARD</span>
             <div className="flex items-center gap-1.5">
               <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               <span className="text-[10px] text-white/30">Active</span>

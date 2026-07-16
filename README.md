@@ -19,7 +19,7 @@ npm install
 
 # 2. Environment
 cp .env.example .env.local
-# Fill in DATABASE_URL, NEXT_PUBLIC_APP_URL, REVALIDATION_SECRET, R2_* keys
+# Fill in DATABASE_URL, NEXT_PUBLIC_APP_URL, REVALIDATION_SECRET, STORAGE_DRIVER (see .env.example)
 
 # 3. Database
 npm run db:generate     # generate Prisma client
@@ -31,10 +31,12 @@ npm run dev             # → http://localhost:3000
 ```
 
 **Demo credentials** (after `npm run db:seed`)
-- Admin: `admin@presencecard.io` / `admin-change-me-in-prod`
-- User:  `demo@presencecard.io`  / `demo-password-123`
+- Admin: `admin@nexcard.io` / `admin-change-me-in-prod`
+- User:  `demo@nexcard.io`  / `demo-password-123`
 
 > Change all passwords before production deployment.
+
+**Full setup guide:** see [DEPLOYMENT_AND_OPERATIONS.md](./DEPLOYMENT_AND_OPERATIONS.md) for local dev, server deploy, CI/CD, file storage, NFC, and production checklist.
 
 ---
 
@@ -139,12 +141,13 @@ Six models: `User`, `Session`, `Category`, `Template`, `UserProfile`, `Payment`.
 | `/dashboard/onboarding` | Protected | Category → template → tier → payment → slug |
 | `/dashboard/edit/{slug}` | Protected | Profile content editor |
 | `/dashboard/qr/{slug}` | Protected | QR code manager |
-| `/dashboard/analytics` | Protected | Profile analytics |
+| `/dashboard/nfc` | Protected | NFC tag programming hub |
+| `/dashboard/nfc/{slug}` | Protected | NFC programming guide per profile |
 | `/admin` | Admin | Overview |
 | `/admin/payments` | Admin | Payment approvals |
 | `/admin/users` | Admin | User management |
 | `/admin/templates` | Admin | Template catalogue + pricing |
-| `/api/upload` | Session | Payment screenshot upload (returns local path) |
+| `/api/upload` | Session | Image uploads via FormData (all storage drivers) |
 | `/api/slug/check` | Public | Slug availability |
 | `/api/revalidate` | Secret | ISR cache purge (`REVALIDATION_SECRET`) |
 
@@ -158,7 +161,9 @@ npm run build           # production build (prisma generate + next build)
 npm run start           # start production server
 npm run type-check      # tsc --noEmit
 npm run lint            # eslint
-npm run test            # vitest
+npm run test            # vitest (unit + API)
+npm run test:e2e        # playwright E2E smoke tests
+npm run ci              # type-check + lint + test
 npm run db:generate     # prisma generate
 npm run db:migrate      # create + apply migration (dev)
 npm run db:migrate:prod # apply migrations (production)

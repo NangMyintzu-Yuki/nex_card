@@ -133,7 +133,7 @@ export function StudioPortfolio({ data, accentColor="#ec4899" }: PP) {
         <div className="flex gap-4 flex-wrap">
           {socialLinks.map((s,i)=><a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-600 hover:text-white transition-colors">{SP_EMOJI[s.platform]} {s.label??s.platform}</a>)}
         </div>
-        <p className="text-xs text-zinc-800">PresenceCard</p>
+        <p className="text-xs text-zinc-800">NEX CARD</p>
       </footer>
     </main>
   );

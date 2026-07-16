@@ -32,12 +32,12 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  const title = profile?.metaTitle ?? profile?.user.name ?? "PresenceCard";
+  const title = profile?.metaTitle ?? profile?.user.name ?? "NEX CARD";
   const subtitle =
     profile?.metaDescription ??
     `${profile?.category.name ?? "Digital Profile"} · ${profile?.template.name ?? ""}`;
   const accentColor = profile?.template.accentColor ?? "#6366f1";
-  const categoryName = profile?.category.name ?? "PresenceCard";
+  const categoryName = profile?.category.name ?? "NEX CARD";
 
   return new ImageResponse(
     (
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
           <span
             style={{ color: "rgba(255,255,255,0.6)", fontSize: "18px", fontWeight: 600 }}
           >
-            PresenceCard
+            NEX CARD
           </span>
         </div>
 
@@ -190,7 +190,7 @@ export async function GET(request: NextRequest) {
             fontFamily: "monospace",
           }}
         >
-          presencecard.io/{slug}
+          nexcard.io/{slug}
         </div>
 
         {/* Accent line */}

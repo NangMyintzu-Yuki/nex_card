@@ -1,7 +1,7 @@
 // src/app/register/page.tsx — themed NEX CARD register page
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
@@ -41,6 +41,17 @@ export default function RegisterPage() {
   const brand2 = isDark ? "#d4af37" : "#2d6eb5";
   const brand3 = isDark ? "#f0c050" : "#4a9fd4";
 
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.authenticated) {
+          router.replace(data.user?.role === "ADMIN" ? "/admin" : "/dashboard");
+        }
+      })
+      .catch(() => {});
+  }, [router]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(""); setLoading(true);
@@ -52,7 +63,8 @@ export default function RegisterPage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message ?? "Registration failed."); return; }
-      router.push("/dashboard/onboarding");
+      router.replace("/dashboard/onboarding");
+      router.refresh();
     } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
@@ -72,7 +84,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-12"
+    <main className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12"
       style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
 
       <div className="absolute top-4 right-4">

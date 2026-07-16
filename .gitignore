@@ -48,7 +48,14 @@ Thumbs.db
 # Testing
 coverage/
 .vitest/
+test-results/
+playwright-report/
+playwright/.cache/
 
 # Misc
 *.pem
 .vercel
+
+# User uploads (stored on server when STORAGE_DRIVER=local)
+public/uploads/**
+!public/uploads/.gitkeep

@@ -511,7 +511,10 @@ export function OnboardingClient({
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        unoptimized={template.thumbnailUrl.includes("placehold.co")}
+                        unoptimized={
+                          template.thumbnailUrl.endsWith(".svg") ||
+                          template.thumbnailUrl.includes("placehold.co")
+                        }
                       />
 
                       {isSelected && (
@@ -865,7 +868,10 @@ export function OnboardingClient({
                     fill
                     className="object-cover"
                     sizes="112px"
-                    unoptimized={selectedTemplate.thumbnailUrl.includes("placehold.co")}
+                    unoptimized={
+                      selectedTemplate.thumbnailUrl.endsWith(".svg") ||
+                      selectedTemplate.thumbnailUrl.includes("placehold.co")
+                    }
                   />
                 </div>
                 <div>

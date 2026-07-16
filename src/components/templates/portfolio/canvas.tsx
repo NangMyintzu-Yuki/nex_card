@@ -238,7 +238,7 @@ export function CanvasPortfolio({ data, accentColor="#0ea5e9" }: PP) {
             {socialLinks.map((s,i)=><a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm text-neutral-400 hover:text-neutral-900 transition-colors">{SP_EMOJI[s.platform]} {s.label??s.platform}</a>)}
           </div>
         </div>
-        <p className="mx-auto max-w-5xl mt-8 text-xs text-neutral-300">PresenceCard</p>
+        <p className="mx-auto max-w-5xl mt-8 text-xs text-neutral-300">NEX CARD</p>
       </footer>
     </main>
   );

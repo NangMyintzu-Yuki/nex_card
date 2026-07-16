@@ -1,10 +1,9 @@
 // src/app/layout.tsx
 // Root layout — applies global fonts, ThemeProvider, metadata
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/lib/theme/theme-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,6 +17,12 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#1e3a8a",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://nexcard.io"),
   title: {
@@ -25,8 +30,8 @@ export const metadata: Metadata = {
     template: "%s — NEX CARD",
   },
   description:
-    "Create stunning digital name cards, portfolios, business pages, and wedding invitations with 20 premium templates. Share via QR code & NFC.",
-  keywords: ["digital name card", "NFC card", "QR card", "portfolio", "wedding invitation", "business page", "digital presence", "NEX CARD"],
+    "Create stunning digital name cards, portfolios, business pages, and wedding invitations with 20 premium templates. Share via QR code.",
+  keywords: ["digital name card", "QR card", "portfolio", "wedding invitation", "business page", "digital presence", "NEX CARD"],
   authors: [{ name: "NEX CARD" }],
   creator: "NEX CARD",
   openGraph: {
@@ -38,20 +43,27 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     creator: "@nexcard",
   },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
-  },
 };
+
+const themeBootScript = `
+(function(){
+  try {
+    var t = localStorage.getItem('nexcard-theme');
+    var root = document.documentElement;
+    if (t === 'light') { root.classList.add('nc-light'); root.classList.remove('nc-dark'); }
+    else { root.classList.add('nc-dark'); root.classList.remove('nc-light'); }
+  } catch (e) {}
+})();
+`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} nc-dark`}>
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} nc-dark`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body className={`${inter.className} antialiased`} style={{ background: "var(--nc-bg)" }}>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );

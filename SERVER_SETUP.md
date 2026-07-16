@@ -1,5 +1,7 @@
 # NEX CARD — Server-Side Process & Deployment Guide
 
+> **Full operations guide:** See [DEPLOYMENT_AND_OPERATIONS.md](./DEPLOYMENT_AND_OPERATIONS.md) for complete local + server setup, CI/CD, NFC, R2, testing, and production checklist.
+
 This document covers everything required to run, deploy, and operate NEX CARD on the server side: environment, database, the payment approval process, and operations.
 
 ---

@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  return { title: `Edit /${slug} — PresenceCard` };
+  return { title: `Edit /${slug} — NEX CARD` };
 }
 
 export default async function EditProfilePage({

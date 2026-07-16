@@ -807,7 +807,7 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
           </div>
 
           <p className="text-xs text-zinc-500">
-            © PresenceCard. All rights reserved.
+            © NEX CARD. All rights reserved.
           </p>
         </div>
       </footer>

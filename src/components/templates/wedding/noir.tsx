@@ -140,7 +140,7 @@ export function NoirWedding({ data, accentColor = "#ffffff" }: WeddingProps) {
       )}
 
       <footer className="border-t border-white/5 px-6 py-8 text-center">
-        <p className="text-xs text-white/15 uppercase tracking-widest">PresenceCard</p>
+        <p className="text-xs text-white/15 uppercase tracking-widest">NEX CARD</p>
       </footer>
     </main>
   );

@@ -89,8 +89,15 @@ export default async function AdminOverviewPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   {u.role === "ADMIN" && (
-                    <span className="rounded-full px-2 py-0.5 text-[10px] font-black text-black"
-                      style={{ background: "var(--nc-brand-grad)" }}>ADMIN</span>
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[10px] font-black"
+                      style={{
+                        background: "var(--nc-brand-grad)",
+                        color: "var(--nc-brand-text)",
+                      }}
+                    >
+                      ADMIN
+                    </span>
                   )}
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                     u.status === "ACTIVE"

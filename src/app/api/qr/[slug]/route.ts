@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import QRCode from "qrcode";
 import prisma from "@/lib/db/prisma";
+import { APP_URL } from "@/lib/env";
 
 // Cache QR codes for 1 hour (they point to a stable URL)
 export const revalidate = 3600;
@@ -37,7 +38,7 @@ export async function GET(
   }
 
   // The QR points to the /p/[slug] route (QR-optimised public profile)
-  const profileUrl = `${process.env.NEXT_PUBLIC_APP_URL}/p/${slug}`;
+  const profileUrl = `${APP_URL}/p/${slug}`;
   const accentColor = profile.template.accentColor ?? "#6366f1";
 
   try {
@@ -59,7 +60,7 @@ export async function GET(
         headers: {
           "Content-Type": "image/png",
           "Cache-Control": "public, max-age=3600, s-maxage=3600",
-          "Content-Disposition": `inline; filename="presencecard-qr-${slug}.png"`,
+          "Content-Disposition": `inline; filename="nexcard-qr-${slug}.png"`,
         },
       });
     } else {
