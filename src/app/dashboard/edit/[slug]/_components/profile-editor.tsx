@@ -268,22 +268,26 @@ function ContactsEditor({ value, onChange }: { value: unknown[]; onChange: (v: u
   return (
     <div className="space-y-2">
       {contacts.map((c, i) => (
-        <div key={i} className="flex gap-2 items-start">
-          <select value={c.type ?? "email"} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], type: e.target.value }; onChange(n); }}
-            className="rounded-lg border border-white/10 bg-white/5 px-2 py-2 text-xs text-white w-24 shrink-0">
-            {TYPES.map((t) => <option key={t} value={t} className="bg-neutral-900">{t}</option>)}
-          </select>
-          <input value={c.value ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], value: e.target.value }; onChange(n); }}
-            placeholder="Value" className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
-          <input value={c.label ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
-            placeholder="Label (optional)" className="w-28 shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
-          <button onClick={() => onChange(contacts.filter((_, j) => j !== i))} className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 text-neutral-500 hover:border-red-500/30 hover:text-red-400 transition-colors">
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+        <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-start">
+          <div className="flex gap-2 sm:flex-1">
+            <select value={c.type ?? "email"} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], type: e.target.value }; onChange(n); }}
+              className="rounded-lg px-2 py-2 text-xs w-24 shrink-0 nc-input">
+              {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <input value={c.value ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], value: e.target.value }; onChange(n); }}
+              placeholder="Value" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+          </div>
+          <div className="flex gap-2 items-center">
+            <input value={c.label ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
+              placeholder="Label (optional)" className="flex-1 sm:w-28 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
+            <button onClick={() => onChange(contacts.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       ))}
       <button onClick={() => onChange([...contacts, { type: "email", value: "", label: "" }])}
-        className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+        className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Contact
       </button>
     </div>
@@ -362,18 +366,18 @@ function ImageUploadField({
     }
   }
 
-  const inputCls = "w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none";
+  const inputCls = "nc-input w-full px-3 py-2.5 text-sm";
 
   return (
     <div className="space-y-2">
       {/* Tab switcher */}
-      <div className="flex gap-1 rounded-xl border border-white/5 bg-white/[0.02] p-1">
+      <div className="flex gap-1 nc-card rounded-xl p-1">
         {(["upload", "url"] as const).map((t) => (
           <button key={t} type="button" onClick={() => setTab(t)}
             className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
               tab === t
                 ? "bg-indigo-500 text-white shadow"
-                : "text-neutral-500 hover:text-white"
+                : "nc-btn-ghost"
             }`}>
             {t === "upload" ? "📁 Upload File" : "🔗 Paste URL"}
           </button>
@@ -388,7 +392,7 @@ function ImageUploadField({
             className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-5 text-sm transition-all cursor-pointer ${
               uploading
                 ? "border-indigo-500/30 bg-indigo-500/5 text-indigo-400"
-                : "border-white/10 text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400"
+                : "nc-btn-ghost border-dashed hover:border-indigo-500/30 hover:text-indigo-400"
             }`}>
             {uploading ? (
               <>
@@ -412,16 +416,16 @@ function ImageUploadField({
 
       {/* Preview + clear */}
       {value && (
-        <div className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3">
-          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-white/10">
+        <div className="nc-card flex items-center gap-3 rounded-xl p-3">
+          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg" style={{ border: "1px solid var(--nc-border)" }}>
             <img src={value} alt="Preview" className="h-full w-full object-cover" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-xs text-white/60">{value}</p>
+            <p className="truncate text-xs" style={{ color: "var(--nc-text-2)" }}>{value}</p>
             <p className="text-xs text-emerald-400 mt-0.5">✓ Image set</p>
           </div>
           <button type="button" onClick={() => onChange("")}
-            className="shrink-0 rounded-lg border border-white/10 px-2 py-1 text-xs text-neutral-500 hover:border-red-500/30 hover:text-red-400 transition-colors">
+            className="nc-btn-ghost shrink-0 rounded-lg px-2 py-1 text-xs hover:border-red-500/30 hover:text-red-400 transition-colors">
             Clear
           </button>
         </div>
@@ -440,29 +444,32 @@ function SocialLinksEditor({ value, onChange }: { value: unknown[]; onChange: (v
   return (
     <div className="space-y-2">
       {links.map((l, i) => (
-        <div key={i} className="flex gap-2 items-center">
-          <select value={l.platform ?? "website"} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], platform: e.target.value }; onChange(n); }}
-            className="rounded-lg border border-white/10 bg-white/5 px-2 py-2 text-xs text-white w-28 shrink-0">
-            {PLATFORMS.map((p) => <option key={p} value={p} className="bg-neutral-900">{p}</option>)}
-          </select>
-          <input value={l.url ?? ""} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], url: e.target.value }; onChange(n); }}
-            onBlur={(e) => {
-              // Auto-prepend https:// when user leaves the field
-              const v = e.target.value.trim();
-              if (v && !v.startsWith("http://") && !v.startsWith("https://")) {
-                const n = [...links]; n[i] = { ...n[i], url: `https://${v}` }; onChange(n);
-              }
-            }}
-            placeholder="https://linkedin.com/in/yourname" className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
-          <input value={l.label ?? ""} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
-            placeholder="Label" className="w-24 shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
-          <button onClick={() => onChange(links.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 text-neutral-500 hover:border-red-500/30 hover:text-red-400 transition-colors">
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+        <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex gap-2 sm:flex-1">
+            <select value={l.platform ?? "website"} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], platform: e.target.value }; onChange(n); }}
+              className="nc-input rounded-lg px-2 py-2 text-xs w-28 shrink-0">
+              {PLATFORMS.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+            <input value={l.url ?? ""} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], url: e.target.value }; onChange(n); }}
+              onBlur={(e) => {
+                const v = e.target.value.trim();
+                if (v && !v.startsWith("http://") && !v.startsWith("https://")) {
+                  const n = [...links]; n[i] = { ...n[i], url: `https://${v}` }; onChange(n);
+                }
+              }}
+              placeholder="https://linkedin.com/in/yourname" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+          </div>
+          <div className="flex gap-2 items-center">
+            <input value={l.label ?? ""} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
+              placeholder="Label" className="flex-1 sm:w-24 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
+            <button onClick={() => onChange(links.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       ))}
       <button onClick={() => onChange([...links, { platform: "website", url: "", label: "" }])}
-        className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+        className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Social Link
       </button>
     </div>
@@ -474,19 +481,21 @@ function SkillsEditor({ value, onChange }: { value: unknown[]; onChange: (v: unk
   return (
     <div className="space-y-2">
       {skills.map((s, i) => (
-        <div key={i} className="flex gap-2 items-center">
+        <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <input value={String(s.name ?? "")} onChange={(e) => { const n = [...skills]; n[i] = { ...n[i], name: e.target.value }; onChange(n); }}
-            placeholder="Skill name" className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
-          <input type="number" min={1} max={100} value={Number(s.level ?? 80)} onChange={(e) => { const n = [...skills]; n[i] = { ...n[i], level: parseInt(e.target.value) }; onChange(n); }}
-            className="w-16 rounded-lg border border-white/10 bg-white/5 px-2 py-2 text-sm text-white text-center focus:border-indigo-500/50 focus:outline-none" />
-          <span className="text-xs text-neutral-600 w-6">%</span>
-          <button onClick={() => onChange(skills.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 text-neutral-500 hover:border-red-500/30 hover:text-red-400 transition-colors">
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+            placeholder="Skill name" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm" />
+          <div className="flex items-center gap-2">
+            <input type="number" min={1} max={100} value={Number(s.level ?? 80)} onChange={(e) => { const n = [...skills]; n[i] = { ...n[i], level: parseInt(e.target.value) }; onChange(n); }}
+              className="nc-input w-16 rounded-lg px-2 py-2 text-sm text-center" />
+            <span className="text-xs w-6" style={{ color: "var(--nc-text-3)" }}>%</span>
+            <button onClick={() => onChange(skills.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       ))}
       <button onClick={() => onChange([...skills, { name: "", level: 80 }])}
-        className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+        className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Skill
       </button>
     </div>
@@ -498,18 +507,20 @@ function GalleryEditor({ value, onChange }: { value: unknown[]; onChange: (v: un
   return (
     <div className="space-y-2">
       {images.map((img, i) => (
-        <div key={i} className="flex gap-2 items-center">
+        <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <input value={img.url ?? ""} onChange={(e) => { const n = [...images]; n[i] = { ...n[i], url: e.target.value }; onChange(n); }}
-            placeholder="Image URL (https://...)" className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
-          <input value={img.alt ?? ""} onChange={(e) => { const n = [...images]; n[i] = { ...n[i], alt: e.target.value }; onChange(n); }}
-            placeholder="Alt text" className="w-36 shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
-          <button onClick={() => onChange(images.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 text-neutral-500 hover:border-red-500/30 hover:text-red-400 transition-colors">
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+            placeholder="Image URL (https://...)" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+          <div className="flex gap-2 items-center">
+            <input value={img.alt ?? ""} onChange={(e) => { const n = [...images]; n[i] = { ...n[i], alt: e.target.value }; onChange(n); }}
+              placeholder="Alt text" className="flex-1 sm:w-36 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
+            <button onClick={() => onChange(images.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       ))}
       <button onClick={() => onChange([...images, { url: "", alt: "" }])}
-        className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+        className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Image
       </button>
     </div>
@@ -521,10 +532,10 @@ function MilestonesEditor({ value, onChange }: { value: unknown[]; onChange: (v:
   return (
     <div className="space-y-3">
       {milestones.map((m, i) => (
-        <div key={i} className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
+        <div key={i} className="nc-card rounded-xl p-4 space-y-2">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-semibold text-neutral-400">Milestone {i + 1}</span>
-            <button onClick={() => onChange(milestones.filter((_, j) => j !== i))} className="text-neutral-600 hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+            <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Milestone {i + 1}</span>
+            <button onClick={() => onChange(milestones.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
           {[
             { key: "date", placeholder: "Spring 2019 / 2019-04-12" },
@@ -534,17 +545,17 @@ function MilestonesEditor({ value, onChange }: { value: unknown[]; onChange: (v:
           ].map(({ key, placeholder }) => (
             <input key={key} value={m[key] ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], [key]: e.target.value }; onChange(n); }}
               placeholder={`${key.charAt(0).toUpperCase() + key.slice(1)} (${placeholder})`}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
+              className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
           ))}
           <textarea value={m.story ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], story: e.target.value }; onChange(n); }}
             placeholder="Tell the story of this milestone…" rows={3}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none resize-none" />
+            className="w-full nc-input rounded-lg px-3 py-2 text-sm resize-none" />
           <input value={m.imageUrl ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], imageUrl: e.target.value }; onChange(n); }}
-            placeholder="Photo URL (optional)" className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
+            placeholder="Photo URL (optional)" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
         </div>
       ))}
       <button onClick={() => onChange([...milestones, { date: "", title: "", story: "" }])}
-        className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+        className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Milestone
       </button>
     </div>
@@ -556,10 +567,10 @@ function EventsEditor({ value, onChange }: { value: unknown[]; onChange: (v: unk
   return (
     <div className="space-y-3">
       {events.map((e, i) => (
-        <div key={i} className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
+        <div key={i} className="nc-card rounded-xl p-4 space-y-2">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-semibold text-neutral-400">Event {i + 1}</span>
-            <button onClick={() => onChange(events.filter((_, j) => j !== i))} className="text-neutral-600 hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+            <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Event {i + 1}</span>
+            <button onClick={() => onChange(events.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
           {[
             { key: "name",    placeholder: "Ceremony / Reception" },
@@ -572,12 +583,12 @@ function EventsEditor({ value, onChange }: { value: unknown[]; onChange: (v: unk
           ].map(({ key, placeholder }) => (
             <input key={key} value={e[key] ?? ""} onChange={(ev) => { const n = [...events]; n[i] = { ...n[i], [key]: ev.target.value }; onChange(n); }}
               placeholder={`${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')} (${placeholder})`}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
+              className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
           ))}
         </div>
       ))}
       <button onClick={() => onChange([...events, { name: "", date: "", venue: "", address: "" }])}
-        className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+        className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Event
       </button>
     </div>
@@ -589,27 +600,27 @@ function ServicesEditor({ value, onChange }: { value: unknown[]; onChange: (v: u
   return (
     <div className="space-y-3">
       {services.map((s, i) => (
-        <div key={i} className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
+        <div key={i} className="nc-card rounded-xl p-4 space-y-2">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-semibold text-neutral-400">Service {i + 1}</span>
-            <button onClick={() => onChange(services.filter((_, j) => j !== i))} className="text-neutral-600 hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+            <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Service {i + 1}</span>
+            <button onClick={() => onChange(services.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
           <input value={String(s.title ?? "")} onChange={(e) => { const n = [...services]; n[i] = { ...n[i], title: e.target.value }; onChange(n); }}
-            placeholder="Service title" className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
+            placeholder="Service title" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
           <textarea value={String(s.description ?? "")} onChange={(e) => { const n = [...services]; n[i] = { ...n[i], description: e.target.value }; onChange(n); }}
-            placeholder="Description" rows={2} className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none resize-none" />
+            placeholder="Description" rows={2} className="w-full nc-input rounded-lg px-3 py-2 text-sm resize-none" />
           <div className="flex gap-2">
             <input value={String(s.price ?? "")} onChange={(e) => { const n = [...services]; n[i] = { ...n[i], price: e.target.value }; onChange(n); }}
-              placeholder="Price (e.g. $99)" className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
+              placeholder="Price (e.g. $99)" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm" />
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={Boolean(s.highlighted)} onChange={(e) => { const n = [...services]; n[i] = { ...n[i], highlighted: e.target.checked }; onChange(n); }} className="rounded" />
-              <span className="text-xs text-neutral-500">Featured</span>
+              <span className="text-xs" style={{ color: "var(--nc-text-2)" }}>Featured</span>
             </label>
           </div>
         </div>
       ))}
       <button onClick={() => onChange([...services, { title: "", description: "", highlighted: false }])}
-        className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+        className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Service
       </button>
     </div>
@@ -621,24 +632,24 @@ function ProjectsEditor({ value, onChange }: { value: unknown[]; onChange: (v: u
   return (
     <div className="space-y-3">
       {projects.map((p, i) => (
-        <div key={i} className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
+        <div key={i} className="nc-card rounded-xl p-4 space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-xs font-semibold text-neutral-400">Project {i + 1}</span>
-            <button onClick={() => onChange(projects.filter((_, j) => j !== i))} className="text-neutral-600 hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+            <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Project {i + 1}</span>
+            <button onClick={() => onChange(projects.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
           {["title","description","coverImageUrl","liveUrl","repoUrl"].map((key) => (
             <input key={key} value={String(p[key] ?? "")} onChange={(e) => { const n = [...projects]; n[i] = { ...n[i], [key]: e.target.value, id: (p.id as string) || `proj-${Date.now()}-${i}` }; onChange(n); }}
               placeholder={key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
+              className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
           ))}
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={Boolean(p.featured)} onChange={(e) => { const n = [...projects]; n[i] = { ...n[i], featured: e.target.checked }; onChange(n); }} className="rounded" />
-            <span className="text-xs text-neutral-500">Featured project</span>
+            <span className="text-xs" style={{ color: "var(--nc-text-2)" }}>Featured project</span>
           </label>
         </div>
       ))}
       <button onClick={() => onChange([...projects, { id: `proj-${Date.now()}`, title: "", description: "", coverImageUrl: "", tags: [] }])}
-        className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+        className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Project
       </button>
     </div>
@@ -650,10 +661,10 @@ function ExperienceEditor({ value, onChange }: { value: unknown[]; onChange: (v:
   return (
     <div className="space-y-3">
       {experience.map((e, i) => (
-        <div key={i} className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
+        <div key={i} className="nc-card rounded-xl p-4 space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-xs font-semibold text-neutral-400">Role {i + 1}</span>
-            <button onClick={() => onChange(experience.filter((_, j) => j !== i))} className="text-neutral-600 hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+            <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Role {i + 1}</span>
+            <button onClick={() => onChange(experience.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
           {[
             { key: "role",        placeholder: "Senior Engineer" },
@@ -666,14 +677,14 @@ function ExperienceEditor({ value, onChange }: { value: unknown[]; onChange: (v:
             key === "description"
               ? <textarea key={key} value={e[key] ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], [key]: ev.target.value }; onChange(n); }}
                   placeholder={placeholder} rows={3}
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none resize-none" />
+                  className="w-full nc-input rounded-lg px-3 py-2 text-sm resize-none" />
               : <input key={key} value={e[key] ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], [key]: ev.target.value }; onChange(n); }}
-                  placeholder={placeholder} className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
+                  placeholder={placeholder} className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
           ))}
         </div>
       ))}
       <button onClick={() => onChange([...experience, { role: "", company: "", startDate: "", description: "" }])}
-        className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-neutral-500 hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+        className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Experience
       </button>
     </div>
@@ -717,7 +728,7 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
 
   const renderField = (field: FieldDef) => {
     const val = getFieldValue(field.key);
-    const base = "w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none transition-colors";
+    const base = "nc-input w-full px-3 py-2.5 text-sm transition-colors";
 
     switch (field.type) {
       case "textarea":
@@ -730,9 +741,9 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
         return (
           <div className="flex items-center gap-3">
             <input type="color" value={String(val ?? "#6366f1")} onChange={(e) => setFieldValue(field.key, e.target.value)}
-              className="h-10 w-16 cursor-pointer rounded-lg border border-white/10 bg-white/5 p-1" />
+              className="nc-input h-10 w-16 cursor-pointer rounded-lg p-1" />
             <input type="text" value={String(val ?? "#6366f1")} onChange={(e) => setFieldValue(field.key, e.target.value)}
-              placeholder="#6366f1" className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white font-mono focus:border-indigo-500/50 focus:outline-none" />
+              placeholder="#6366f1" className="nc-input flex-1 rounded-xl px-3 py-2.5 text-sm font-mono" />
           </div>
         );
       case "array-contacts":
@@ -765,17 +776,17 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       {/* Header */}
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <Link href="/dashboard" className="mb-2 inline-block text-xs text-neutral-500 hover:text-white transition-colors">
+        <div className="min-w-0">
+          <Link href="/dashboard" className="nc-btn-ghost mb-2 inline-block text-xs transition-colors">
             ← Back to Profiles
           </Link>
-          <h1 className="text-2xl font-black">
+          <h1 className="text-xl font-black sm:text-2xl">
             Edit <span className="text-indigo-400">/{profile.slug}</span>
           </h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm" style={{ color: "var(--nc-text-2)" }}>
             {profile.category.name} · {profile.template.name}
             {profile.templateLocked && (
               <span className="ml-2 inline-flex items-center gap-1 text-xs text-amber-400">
@@ -785,20 +796,20 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Link
             href={`/dashboard/qr/${profile.slug}`}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all sm:px-4 sm:py-2.5 sm:text-sm ${
               profile.qrLocked
                 ? "border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
-                : "border border-white/10 bg-white/5 text-neutral-400 hover:border-white/20 hover:text-white"
+                : "nc-btn-ghost"
             }`}
           >
             <QrCode className="h-3.5 w-3.5" />
-            {profile.qrLocked ? "QR Locked" : "Generate QR"}
+            {profile.qrLocked ? "QR Locked" : "QR"}
           </Link>
           <Link href={`/${profile.slug}`} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white hover:border-white/20 transition-colors">
+            className="nc-btn-ghost flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs sm:px-4 sm:text-sm">
             <ExternalLink className="h-3.5 w-3.5" /> Preview
           </Link>
         </div>
@@ -819,28 +830,28 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
       )}
 
       {/* Publish toggle — prominent card */}
-      <div className={`mb-6 rounded-2xl border px-5 py-4 transition-all ${
+      <div className={`mb-6 rounded-2xl border px-4 py-3 transition-all sm:px-5 sm:py-4 ${
         isPublished
           ? "border-emerald-500/20 bg-emerald-500/5"
           : "border-amber-500/20 bg-amber-500/5"
       }`}>
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
               <div className={`h-2 w-2 rounded-full ${isPublished ? "bg-emerald-400" : "bg-amber-400"}`} />
-              <p className="font-bold text-white text-sm">
+              <p className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>
                 {isPublished ? "Live — anyone with the link can view this" : "Draft — your profile is hidden from the public"}
               </p>
             </div>
-            <p className="text-xs text-neutral-500 ml-4">
+            <p className="text-xs ml-4" style={{ color: "var(--nc-text-2)" }}>
               {isPublished
                 ? <>presencecard.io/<strong className="text-indigo-400">{profile.slug}</strong> is accessible</>
-                : <>Toggle to <strong>Publish</strong> so your URL goes live — required before generating a QR code</>
+                : <>Toggle to <strong>Publish</strong> so your URL goes live</>
               }
             </p>
           </div>
           <button type="button" onClick={() => setIsPublished((p) => !p)}
-            className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all ${
+            className={`shrink-0 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all ${
               isPublished
                 ? "bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 hover:bg-emerald-500/25"
                 : "bg-amber-500/15 border border-amber-500/25 text-amber-300 hover:bg-amber-500/25"
@@ -858,29 +869,29 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
         {sections.map((section) => {
           const isOpen = openSections.has(section.id);
           return (
-            <div key={section.id} className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02]">
+            <div key={section.id} className="nc-card overflow-hidden rounded-2xl">
               <button onClick={() => toggleSection(section.id)}
                 className="flex w-full items-center justify-between px-5 py-4 text-left">
                 <div>
-                  <p className="font-semibold text-white text-sm">{section.title}</p>
+                  <p className="font-semibold text-sm" style={{ color: "var(--nc-text)" }}>{section.title}</p>
                   {section.description && (
-                    <p className="mt-0.5 text-xs text-neutral-600">{section.description}</p>
+                    <p className="mt-0.5 text-xs" style={{ color: "var(--nc-text-3)" }}>{section.description}</p>
                   )}
                 </div>
-                {isOpen ? <ChevronUp className="h-4 w-4 text-neutral-500" /> : <ChevronDown className="h-4 w-4 text-neutral-500" />}
+                {isOpen ? <ChevronUp className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} /> : <ChevronDown className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />}
               </button>
 
               {isOpen && (
-                <div className="border-t border-white/5 px-5 py-5 space-y-5">
+                <div className="px-5 py-5 space-y-5">
                   {section.fields.map((field) => (
                     <div key={field.key}>
-                      <label className="mb-1.5 block text-xs font-semibold text-neutral-400">
+                      <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>
                         {field.label}
                         {field.required && <span className="ml-1 text-red-400">*</span>}
                       </label>
                       {renderField(field)}
                       {field.hint && (
-                        <p className="mt-1 text-xs text-neutral-600">{field.hint}</p>
+                        <p className="mt-1 text-xs" style={{ color: "var(--nc-text-3)" }}>{field.hint}</p>
                       )}
                     </div>
                   ))}
@@ -891,31 +902,31 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
         })}
 
         {/* SEO section */}
-        <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02]">
+        <div className="nc-card overflow-hidden rounded-2xl">
           <button onClick={() => toggleSection("seo")}
             className="flex w-full items-center justify-between px-5 py-4 text-left">
             <div>
-              <p className="font-semibold text-white text-sm">SEO & Social Sharing</p>
-              <p className="mt-0.5 text-xs text-neutral-600">Override meta title, description, and OG image</p>
+              <p className="font-semibold text-sm">SEO & Social Sharing</p>
+              <p className="mt-0.5 text-xs" style={{ color: "var(--nc-text-3)" }}>Override meta title, description, and OG image</p>
             </div>
-            {openSections.has("seo") ? <ChevronUp className="h-4 w-4 text-neutral-500" /> : <ChevronDown className="h-4 w-4 text-neutral-500" />}
+            {openSections.has("seo") ? <ChevronUp className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} /> : <ChevronDown className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />}
           </button>
           {openSections.has("seo") && (
-            <div className="border-t border-white/5 px-5 py-5 space-y-4">
+            <div className="px-5 py-5 space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-400">Meta Title <span className="text-neutral-600">(max 160 chars)</span></label>
+                <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Meta Title <span style={{ color: "var(--nc-text-3)" }}>(max 160 chars)</span></label>
                 <input value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} maxLength={160} placeholder="Your Name · Job Title"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none" />
+                  className="nc-input w-full px-3 py-2.5 text-sm" />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-400">Meta Description <span className="text-neutral-600">(max 320 chars)</span></label>
+                <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Meta Description <span style={{ color: "var(--nc-text-3)" }}>(max 320 chars)</span></label>
                 <textarea value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} maxLength={320} rows={3} placeholder="A short description for search engines and social sharing…"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:border-indigo-500/50 focus:outline-none resize-none" />
+                  className="nc-input w-full px-3 py-2.5 text-sm resize-none" />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-400">OG / Social Preview Image <span className="text-neutral-600">(1200×630 recommended)</span></label>
+                <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>OG / Social Preview Image <span style={{ color: "var(--nc-text-3)" }}>(1200×630 recommended)</span></label>
                 <ImageUploadField value={ogImageUrl} onChange={setOgImageUrl} placeholder="https://…/og-image.jpg" folder="og-images" />
-                <p className="mt-1 text-xs text-neutral-600">Leave blank to use the auto-generated branded OG image.</p>
+                <p className="mt-1 text-xs" style={{ color: "var(--nc-text-3)" }}>Leave blank to use the auto-generated branded OG image.</p>
               </div>
             </div>
           )}
@@ -928,8 +939,8 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
           <div className="flex items-start gap-3">
             <QrCode className="h-5 w-5 shrink-0 text-indigo-400 mt-0.5" />
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-white text-sm">Ready to generate your QR code?</p>
-              <p className="mt-0.5 text-xs text-neutral-500">
+              <p className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>Ready to generate your QR code?</p>
+              <p className="mt-0.5 text-xs" style={{ color: "var(--nc-text-2)" }}>
                 Your profile is live. Generate a QR code for events, business cards, or your email signature.
                 This will permanently lock your template and category.
               </p>
@@ -948,7 +959,7 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
             <QrCode className="h-5 w-5 shrink-0 text-amber-400" />
             <div className="flex-1">
               <p className="font-bold text-amber-300 text-sm">QR Code Active & Locked</p>
-              <p className="mt-0.5 text-xs text-neutral-500">
+              <p className="mt-0.5 text-xs" style={{ color: "var(--nc-text-2)" }}>
                 Your QR code is live and permanently set. Content edits are still saved normally.
               </p>
             </div>
@@ -979,7 +990,7 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
         </button>
       </form>
 
-      <p className="mt-4 text-center text-xs text-neutral-700">
+      <p className="mt-4 text-center text-xs" style={{ color: "var(--nc-text-3)" }}>
         Last saved: {new Date(profile.updatedAt).toLocaleString()}
       </p>
     </div>

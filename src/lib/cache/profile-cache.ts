@@ -25,116 +25,78 @@ export const CACHE_TAGS = {
   adminStats: "admin-stats",
 } as const;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CACHED DATA FETCHERS
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Fetches a public profile by slug with a 1-hour ISR revalidation window.
- * Tagged so dashboard saves can purge it instantly via revalidateTag().
- */
-export const getCachedProfileBySlug = unstable_cache(
-  async (slug: string): Promise<ResolvedProfile | null> => {
-    const profile = await prisma.userProfile.findUnique({
-      where: { slug, isPublished: true },
-      select: {
-        id: true,
-        slug: true,
-        isPublished: true,
-        viewCount: true,
-        metaTitle: true,
-        metaDescription: true,
-        ogImageUrl: true,
-        templateLocked: true,
-        dynamicJsonData: true,
-        createdAt: true,
-        updatedAt: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatarUrl: true,
-          },
-        },
-        category: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-        template: {
-          select: {
-            id: true,
-            codeIdentifier: true,
-            name: true,
-            thumbnailUrl: true,
-            accentColor: true,
-          },
-        },
-      },
-    });
-
-    return profile as ResolvedProfile | null;
-  },
-  // Cache key segments — Next.js hashes these into a stable key
-  ["profile-by-slug"],
-  {
-    revalidate: 3600, // ISR: revalidate at most every 1 hour
-    tags: [], // Dynamic tags are set per-call via the wrapper below
-  }
-);
-
-/**
- * Wrapper that injects per-slug cache tags for surgical revalidation.
- * Call this everywhere instead of the raw unstable_cache directly.
- */
-export async function getProfileBySlug(slug: string): Promise<ResolvedProfile | null> {
-  // unstable_cache doesn't support dynamic tags at call-time in Next.js 14.
-  // Use the lower-level `cache` + fetch with `next: { tags }` pattern for RSC.
-  const profile = await prisma.userProfile.findUnique({
-    where: { slug, isPublished: true },
+const PROFILE_SELECT = {
+  id: true,
+  slug: true,
+  isPublished: true,
+  viewCount: true,
+  metaTitle: true,
+  metaDescription: true,
+  ogImageUrl: true,
+  templateLocked: true,
+  dynamicJsonData: true,
+  createdAt: true,
+  updatedAt: true,
+  user: {
     select: {
       id: true,
-      slug: true,
-      isPublished: true,
-      viewCount: true,
-      metaTitle: true,
-      metaDescription: true,
-      ogImageUrl: true,
-      templateLocked: true,
-      dynamicJsonData: true,
-      createdAt: true,
-      updatedAt: true,
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          avatarUrl: true,
-        },
-      },
-      category: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-        },
-      },
-      template: {
-        select: {
-          id: true,
-          codeIdentifier: true,
-          name: true,
-          thumbnailUrl: true,
-          accentColor: true,
-        },
-      },
+      name: true,
+      email: true,
+      avatarUrl: true,
     },
+  },
+  category: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+    },
+  },
+  template: {
+    select: {
+      id: true,
+      codeIdentifier: true,
+      name: true,
+      thumbnailUrl: true,
+      accentColor: true,
+    },
+  },
+} as const;
+
+async function fetchProfileBySlug(slug: string): Promise<ResolvedProfile | null> {
+  const profile = await prisma.userProfile.findUnique({
+    where: { slug },
+    select: PROFILE_SELECT,
   });
 
-  return profile as ResolvedProfile | null;
+  if (!profile) return null;
+  // BigInt can't be JSON-serialized by the cache layer — convert to Number.
+  return { ...profile, viewCount: Number(profile.viewCount) } as ResolvedProfile;
+}
+
+/**
+ * Fetches a profile by slug (published or draft).
+ * Published profiles are ISR-cached with per-slug tags for surgical revalidation.
+ * Draft profiles bypass cache so owners see live edits immediately.
+ */
+export async function getProfileBySlug(slug: string): Promise<ResolvedProfile | null> {
+  const getCachedPublishedProfile = unstable_cache(
+    async (cachedSlug: string) => {
+      const profile = await fetchProfileBySlug(cachedSlug);
+      if (!profile?.isPublished) return null;
+      return profile;
+    },
+    ["profile-by-slug", slug],
+    {
+      revalidate: 3600,
+      tags: [CACHE_TAGS.profile(slug)],
+    }
+  );
+
+  const cached = await getCachedPublishedProfile(slug);
+  if (cached) return cached;
+
+  return fetchProfileBySlug(slug);
 }
 
 /**
@@ -143,7 +105,7 @@ export async function getProfileBySlug(slug: string): Promise<ResolvedProfile | 
  */
 export const getCachedUserProfiles = unstable_cache(
   async (userId: string) => {
-    return prisma.userProfile.findMany({
+    const profiles = await prisma.userProfile.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
       select: {
@@ -152,6 +114,7 @@ export const getCachedUserProfiles = unstable_cache(
         isPublished: true,
         viewCount: true,
         templateLocked: true,
+        paymentStatus: true,
         updatedAt: true,
         category: { select: { id: true, name: true, slug: true } },
         template: {
@@ -160,13 +123,22 @@ export const getCachedUserProfiles = unstable_cache(
             codeIdentifier: true,
             name: true,
             thumbnailUrl: true,
+            isPremium: true,
+            priceQrOnly: true,
+            priceNfcCard: true,
+            priceNfcQr: true,
           },
+        },
+        payment: {
+          select: { tier: true, status: true, screenshotUrl: true },
         },
       },
     });
+    // BigInt fields can't be JSON-serialized by the cache layer — convert to Number.
+    return profiles.map((p) => ({ ...p, viewCount: Number(p.viewCount) }));
   },
   ["user-profiles"],
-  { revalidate: 60 } // 60-second cache for dashboard listing
+  { revalidate: 60 }
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -197,11 +169,9 @@ export async function purgeTemplateCache(): Promise<void> {
 
 /**
  * Increments the viewCount atomically in the background.
- * Uses a raw SQL increment to avoid race conditions.
  * Never awaited in the render path — keeps TTFB low.
  */
 export function incrementProfileViewCount(profileId: string): void {
-  // Intentionally not awaited — background fire-and-forget
   prisma.userProfile
     .update({
       where: { id: profileId },

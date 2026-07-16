@@ -236,6 +236,7 @@ body {
   --nc-brand-2:       #d4af37;   /* mid gold  */
   --nc-brand-3:       #f0c050;   /* light gold */
   --nc-brand-grad:    linear-gradient(135deg, #c9973a, #f0c050);
+  --nc-brand-text:    #000;
 
   /* Backgrounds */
   --nc-bg:            #08080a;
@@ -278,6 +279,7 @@ body {
   --nc-brand-2:       #2d6eb5;   /* mid blue  */
   --nc-brand-3:       #4a9fd4;   /* light blue */
   --nc-brand-grad:    linear-gradient(135deg, #1a3a6b, #4a9fd4);
+  --nc-brand-text:    #fff;
 
   /* Backgrounds */
   --nc-bg:            #f5f7fb;
@@ -369,14 +371,14 @@ body {
 .nc-input:focus {
   border-color: var(--nc-brand-2);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(var(--nc-brand-2), 0.1);
+  box-shadow: 0 0 0 3px var(--nc-border-brand);
 }
 .nc-input::placeholder { color: var(--nc-text-3); }
 
 /* Button variants */
 .nc-btn-brand {
   background: var(--nc-brand-grad);
-  color: #000;
+  color: var(--nc-brand-text);
   font-weight: 700;
   border-radius: 0.75rem;
   transition: opacity 0.15s, transform 0.1s;

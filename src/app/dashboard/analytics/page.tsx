@@ -17,27 +17,28 @@ const CAT_COLORS: Record<string, string> = {
 };
 
 export default async function AnalyticsPage() {
-  const session = await getServerSession();
+  let session;
+  try {
+    session = await getServerSession();
+  } catch {
+    redirect("/login");
+  }
   if (!session?.user?.id) redirect("/login");
-  const profiles = await (prisma.userProfile as any).findMany({
 
-  // const profiles = await prisma.userProfile.findMany({
-    where: { userId: session.user.id },
-    orderBy: { viewCount: "desc" },
-    select: {
-      id: true, slug: true, isPublished: true, viewCount: true,
-      qrScanCount: true, nfcWriteCount: true,
-      createdAt: true, updatedAt: true,
-      category: { select: { name: true, slug: true } },
-      template:  { select: { name: true, accentColor: true } },
-    },
-  });
+  let profiles: any[] = [];
+  try {
+    profiles = await prisma.userProfile.findMany({
+      where: { userId: session.user.id },
+      orderBy: { viewCount: "desc" },
+    } as any);
+  } catch {
+    profiles = [];
+  }
 
-    const totalViews  = profiles.reduce((s: number, p: any) => s + Number(p.viewCount), 0);
-  const totalScans  = profiles.reduce((s: number, p: any) => s + Number(p.qrScanCount), 0);
-  const totalNfc    = profiles.reduce((s: number, p: any) => s + (p.nfcWriteCount ?? 0), 0);
+  const totalViews  = profiles.reduce((s: number, p: any) => s + Number(p.viewCount ?? 0), 0);
+  const totalScans  = profiles.reduce((s: number, p: any) => s + Number(p.qrScanCount ?? 0), 0);
+  const totalNfc    = profiles.reduce((s: number, p: any) => s + Number(p.nfcWriteCount ?? 0), 0);
   const published   = profiles.filter((p: any) => p.isPublished).length;
-
 
   const STATS = [
     { label: "Total Views",       value: formatNumber(totalViews),  color: "#6366f1", emoji: "👁️"  },
@@ -85,8 +86,8 @@ export default async function AnalyticsPage() {
           <div className="px-5 py-14 text-center">
             <p className="text-sm" style={{ color: "var(--nc-text-3)" }}>No profiles yet.</p>
             <Link href="/dashboard/onboarding"
-              className="mt-4 inline-block rounded-xl px-5 py-2.5 text-sm font-bold text-black"
-              style={{ background: "linear-gradient(135deg, var(--nc-brand-1,#d4af37), var(--nc-brand-3,#f0c050))" }}>
+              className="mt-4 inline-block rounded-xl px-5 py-2.5 text-sm font-bold"
+              style={{ color: "var(--nc-text)", background: "linear-gradient(135deg, var(--nc-brand-1,#d4af37), var(--nc-brand-3,#f0c050))" }}>
               Create Profile →
             </Link>
           </div>
@@ -94,8 +95,9 @@ export default async function AnalyticsPage() {
           <div className="divide-y" style={{ borderColor: "var(--nc-border)" }}>
             {profiles.map((p:any) => {
               const maxViews  = Number(profiles[0]?.viewCount ?? 1);
-              const pct       = maxViews > 0 ? Math.round((Number(p.viewCount) / maxViews) * 100) : 0;
-              const color     = CAT_COLORS[p.category.slug] ?? "#6366f1";
+              const viewCount = Number(p.viewCount ?? 0);
+              const pct       = maxViews > 0 ? Math.round((viewCount / maxViews) * 100) : 0;
+              const color     = CAT_COLORS[p.category?.slug] ?? "#6366f1";
 
               return (
                 <div key={p.id} className="px-5 py-5">
@@ -108,7 +110,7 @@ export default async function AnalyticsPage() {
                         </Link>
                         <span className="rounded-full px-2 py-0.5 text-[10px] font-medium"
                           style={{ background: `${color}18`, color }}>
-                          {p.category.name}
+                          {p.category?.name ?? "Unknown"}
                         </span>
                         <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                           p.isPublished ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"
@@ -117,15 +119,15 @@ export default async function AnalyticsPage() {
                         </span>
                       </div>
                       <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
-                        {p.template.name} · Updated {formatDate(p.updatedAt)}
+                        {p.template?.name ?? "Unknown"} · Updated {formatDate(p.updatedAt)}
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="text-lg font-black" style={{ color: "var(--nc-text)" }}>
-                        {formatNumber(p.viewCount)}
+                        {formatNumber(viewCount)}
                       </p>
                       <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
-                        {formatNumber(Number(p.qrScanCount))} QR · {p.nfcWriteCount ?? 0} NFC
+                        {formatNumber(Number(p.qrScanCount ?? 0))} QR · {Number(p.nfcWriteCount ?? 0)} NFC
                       </p>
                     </div>
                   </div>

@@ -45,7 +45,7 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
     return (
       <>
         {/* Logo */}
-        <div className="flex items-center justify-between px-4 py-5 border-b"
+        <div className="flex items-center justify-between px-4 py-3 border-b"
           style={{ borderColor: "var(--nc-sidebar-border)" }}>
           <NexCardLogoStatic size={32} showText isDark={isDark} />
           <button onClick={() => setMobileOpen(false)}
@@ -55,26 +55,7 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
           </button>
         </div>
 
-        {/* User card */}
-        <div className="mx-3 mt-4 rounded-xl p-3"
-          style={{ background: "var(--nc-sidebar-item)", border: "1px solid var(--nc-border)" }}>
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-black text-black"
-              style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
-              {getInitials(user.name)}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold" style={{ color: "var(--nc-text)" }}>{user.name}</p>
-              <p className="truncate text-xs" style={{ color: "var(--nc-text-3)" }}>{user.email}</p>
-            </div>
-            {user.role === "ADMIN" && (
-              <span className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-black text-black"
-                style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
-                ADMIN
-              </span>
-            )}
-          </div>
-        </div>
+    
 
         {/* Nav */}
         <nav className="flex-1 space-y-1 px-3 pt-5">
@@ -141,14 +122,34 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
             <ThemeToggle size="sm" />
           </div>
 
-          {/* Logout */}
+            {/* User card */}
+        <div className=" mt-4 rounded-xl p-3"
+          style={{ background: "var(--nc-sidebar-item)", border: "1px solid var(--nc-border)" }}>
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-black text-black"
+              style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
+              {getInitials(user.name)}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-bold" style={{ color: "var(--nc-text)" }}>{user.name}</p>
+              <p className="truncate text-xs" style={{ color: "var(--nc-text-3)" }}>{user.email}</p>
+            </div>
+            {user.role === "ADMIN" && (
+              <span className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-black text-black"
+                style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
+                ADMIN
+              </span>
+            )}
+
           <form action="/api/auth/logout" method="GET">
             <button type="submit"
               className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all nc-nav-item">
               <LogOut className="h-4 w-4 shrink-0" style={{ color: "var(--nc-text-3)" }} />
-              <span style={{ color: "var(--nc-text-3)" }}>Sign Out</span>
+              {/* <span style={{ color: "var(--nc-text-3)" }}>Sign Out</span> */}
             </button>
           </form>
+          </div>
+        </div>
         </div>
       </>
     );

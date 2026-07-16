@@ -317,7 +317,7 @@ export default async function TemplatePreviewPage({
           </div>
           {template.isPremium && (
             <span className="shrink-0 rounded-full bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 text-xs font-bold text-amber-400">
-              PRO
+              Paid
             </span>
           )}
         </div>

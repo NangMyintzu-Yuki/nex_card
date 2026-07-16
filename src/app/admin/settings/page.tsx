@@ -6,19 +6,18 @@ import type { Metadata } from "next";
 import { Settings, Globe, Zap, Shield, Bell } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";
 
-export const metadata: Metadata = { title: "Settings — Admin · PresenceCard" };
+export const metadata: Metadata = { title: "Settings — Admin · NEX CARD" };
 export const dynamic = "force-dynamic";
 
-// In a real app these would be stored in a DB settings table
 const PLATFORM_SETTINGS = [
   {
     section: "Platform",
     icon: Globe,
     items: [
-      { key: "site_name",        label: "Site Name",        value: "PresenceCard",          type: "text" },
-      { key: "site_url",         label: "Site URL",          value: "https://presencecard.io", type: "url" },
-      { key: "support_email",    label: "Support Email",     value: "support@presencecard.io", type: "email" },
-      { key: "maintenance_mode", label: "Maintenance Mode",  value: "false",                 type: "toggle" },
+      { key: "site_name",        label: "Site Name",        value: "NEX CARD",                   type: "text" },
+      { key: "site_url",         label: "Site URL",          value: "https://nexcard.io",          type: "url" },
+      { key: "support_email",    label: "Support Email",     value: "support@nexcard.io",          type: "email" },
+      { key: "maintenance_mode", label: "Maintenance Mode",  value: "false",                       type: "toggle" },
     ],
   },
   {
@@ -45,7 +44,7 @@ const PLATFORM_SETTINGS = [
     icon: Bell,
     items: [
       { key: "notify_new_user",     label: "Email on New Registration", value: "true",  type: "toggle" },
-      { key: "notify_email",        label: "Admin Notification Email",  value: "admin@presencecard.io", type: "email" },
+      { key: "notify_email",        label: "Admin Notification Email",  value: "admin@nexcard.io", type: "email" },
     ],
   },
 ];
@@ -58,11 +57,11 @@ export default async function AdminSettingsPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
       <div className="mb-8 flex items-center gap-3">
-        <Settings className="h-6 w-6 text-neutral-500" />
+        <Settings className="h-6 w-6" style={{ color: "var(--nc-text-3)" }} />
         <div>
-          <h1 className="text-2xl font-black text-white">Platform Settings</h1>
-          <p className="mt-0.5 text-sm text-neutral-500">
-            Global configuration for the PresenceCard platform
+          <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Platform Settings</h1>
+          <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-3)" }}>
+            Global configuration for the NEX CARD platform
           </p>
         </div>
       </div>
@@ -73,24 +72,25 @@ export default async function AdminSettingsPage() {
           return (
             <div
               key={section.section}
-              className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02]"
+              className="nc-card overflow-hidden rounded-2xl"
             >
               {/* Section header */}
-              <div className="flex items-center gap-2.5 border-b border-white/5 px-6 py-4">
-                <Icon className="h-4 w-4 text-neutral-500" />
-                <h2 className="font-bold text-white text-sm">{section.section}</h2>
+              <div className="flex items-center gap-2.5 px-6 py-4" style={{ borderBottom: "1px solid var(--nc-border)" }}>
+                <Icon className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />
+                <h2 className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>{section.section}</h2>
               </div>
 
               {/* Settings rows */}
-              <div className="divide-y divide-white/5">
-                {section.items.map((item) => (
+              <div>
+                {section.items.map((item, idx) => (
                   <div
                     key={item.key}
                     className="flex items-center justify-between gap-4 px-6 py-4"
+                    style={{ borderBottom: idx < section.items.length - 1 ? "1px solid var(--nc-border)" : undefined }}
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-white">{item.label}</p>
-                      <p className="mt-0.5 font-mono text-xs text-neutral-600">{item.key}</p>
+                      <p className="text-sm font-medium" style={{ color: "var(--nc-text)" }}>{item.label}</p>
+                      <p className="mt-0.5 font-mono text-xs" style={{ color: "var(--nc-text-3)" }}>{item.key}</p>
                     </div>
 
                     <div className="shrink-0">
@@ -98,9 +98,12 @@ export default async function AdminSettingsPage() {
                         <div
                           className={`flex h-6 w-11 cursor-pointer items-center rounded-full px-0.5 transition-colors ${
                             item.value === "true"
-                              ? "bg-indigo-500"
-                              : "bg-neutral-700"
+                              ? ""
+                              : ""
                           }`}
+                          style={{
+                            background: item.value === "true" ? "var(--nc-brand-2)" : "var(--nc-bg-3)",
+                          }}
                           title="Click to toggle (wire to Server Action)"
                         >
                           <div
@@ -113,7 +116,7 @@ export default async function AdminSettingsPage() {
                         <input
                           type={item.type}
                           defaultValue={item.value}
-                          className="w-56 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white focus:border-indigo-500/50 focus:outline-none"
+                          className="nc-input w-56 rounded-xl px-3 py-1.5 text-sm focus:outline-none"
                           readOnly
                           title="Wire to a Server Action to enable editing"
                         />
@@ -127,12 +130,13 @@ export default async function AdminSettingsPage() {
         })}
       </div>
 
-      <div className="mt-6 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-4 text-sm text-amber-400/80">
-        <p className="font-semibold text-amber-300 mb-1">Note on Settings Persistence</p>
+      <div className="mt-6 rounded-2xl px-5 py-4 text-sm"
+        style={{ border: "1px solid rgba(245,158,11,0.2)", background: "rgba(245,158,11,0.05)", color: "var(--nc-warning)" }}>
+        <p className="font-semibold mb-1" style={{ color: "var(--nc-warning)" }}>Note on Settings Persistence</p>
         These settings are currently static UI. To make them editable and persistent, create a{" "}
-        <code className="rounded bg-amber-500/20 px-1 font-mono text-xs">platform_settings</code>{" "}
+        <code className="rounded px-1 font-mono text-xs" style={{ background: "rgba(245,158,11,0.15)" }}>platform_settings</code>{" "}
         table in your DB and wire each toggle/input to a Server Action that calls{" "}
-        <code className="rounded bg-amber-500/20 px-1 font-mono text-xs">revalidateTag("admin-settings")</code>{" "}
+        <code className="rounded px-1 font-mono text-xs" style={{ background: "rgba(245,158,11,0.15)" }}>revalidateTag(&quot;admin-settings&quot;)</code>{" "}
         after saving.
       </div>
     </div>

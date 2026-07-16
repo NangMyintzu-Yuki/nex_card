@@ -7,12 +7,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Lock, Check, ArrowRight, ChevronRight, Sparkles,
-  AlertTriangle, ExternalLink,
+  AlertTriangle, ExternalLink, CreditCard, Upload, QrCode, Smartphone,
+  Package, Clock, CheckCircle, XCircle,
 } from "lucide-react";
 import {
   selectTemplateAction,
   type SelectTemplateState,
 } from "@/lib/actions/profile-actions";
+import {
+  submitPaymentAction,
+  type SubmitPaymentState,
+} from "@/lib/actions/payment-actions";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -26,6 +31,9 @@ interface CategoryTemplate {
   thumbnailUrl: string;
   accentColor: string | null;
   isPremium: boolean;
+  priceQrOnly: number | null;
+  priceNfcCard: number | null;
+  priceNfcQr: number | null;
 }
 
 interface Category {
@@ -70,6 +78,53 @@ const CATEGORY_COLOR: Record<string, string> = {
   "wedding-invitation": "#ec4899",
 };
 
+const TIER_INFO = {
+  QR_ONLY: {
+    label: "QR Only",
+    icon: QrCode,
+    description:
+      "Digital QR code only — no physical card needed. Share your profile anywhere, instantly.",
+    features: [
+      "Pure digital QR code",
+      "No physical card required",
+      "Instant activation",
+      "Share anywhere, anytime",
+    ],
+  },
+  NFC_CARD: {
+    label: "NFC Only",
+    icon: Smartphone,
+    description:
+      "Physical NFC card — just tap to share. Note: some phones don't support NFC, so it won't work on those devices.",
+    features: [
+      "NFC tap-to-share",
+      "Premium physical card",
+      "Custom design",
+      "Requires an NFC-enabled phone",
+    ],
+  },
+  PHYSICAL_CARD: {
+    label: "NFC + QR",
+    icon: Package,
+    description:
+      "Physical card with both NFC and QR. If a device has no NFC, they can simply scan the QR code instead.",
+    features: [
+      "Physical card",
+      "NFC tap-to-share",
+      "QR code printed on card",
+      "Works on any phone via QR scan",
+    ],
+  },
+};
+
+const STEP_LABELS = {
+  category: "Category",
+  template: "Template",
+  pricing: "Pricing",
+  payment: "Payment",
+  confirm: "Confirm",
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // SLUG SUGGESTION
 // ─────────────────────────────────────────────────────────────────────────────
@@ -77,6 +132,10 @@ const CATEGORY_COLOR: Record<string, string> = {
 function generateSlugSuggestion(userId: string, categorySuffix: string): string {
   const base = userId.slice(0, 6).toLowerCase().replace(/[^a-z0-9]/g, "");
   return `${base}-${categorySuffix}`;
+}
+
+function formatMMK(amount: number): string {
+  return new Intl.NumberFormat("en-US").format(amount) + " MMK";
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,32 +155,70 @@ export function OnboardingClient({
     initialCategoryId ?? ""
   );
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
-  const [slug, setSlug]                 = useState<string>("");
-  const [slugError, setSlugError]       = useState<string>("");
+  const [selectedTier, setSelectedTier] = useState<string>("");
+  const [paymentScreenshotUrl, setPaymentScreenshotUrl] = useState<string>("");
+  const [paymentUploading, setPaymentUploading] = useState(false);
+  const [slug, setSlug] = useState<string>("");
+  const [slugError, setSlugError] = useState<string>("");
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [slugChecking, setSlugChecking] = useState(false);
-  const [step, setStep] = useState<"category" | "template" | "confirm">(
+  const [step, setStep] = useState<"category" | "template" | "pricing" | "payment" | "confirm">(
     initialCategoryId ? "template" : "category"
   );
 
   const slugTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formState, submitAction, isPending] = useActionState<
     SelectTemplateState,
     FormData
   >(selectTemplateAction, { status: "idle" });
 
-  // Redirect after successful creation — must be in useEffect, not render
-  useEffect(() => {
-    if (formState.status === "success") {
-      router.push(`/dashboard?new=${formState.slug}`);
-    }
-  }, [formState, router]);
+  const [paymentFormState, submitPayment, paymentPending] = useActionState<
+    SubmitPaymentState,
+    FormData
+  >(submitPaymentAction, { status: "idle" });
 
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
   const selectedTemplate = selectedCategory?.templates.find(
     (t) => t.id === selectedTemplateId
   );
+  const isPremium = selectedTemplate?.isPremium ?? false;
+
+  // Redirect after successful creation — also auto-submit payment for premium templates
+  const [profileCreated, setProfileCreated] = useState(false);
+  useEffect(() => {
+    if (formState.status === "success" && !profileCreated) {
+      setProfileCreated(true);
+      if (isPremium && selectedTier && paymentScreenshotUrl) {
+        // Auto-submit payment with the new profile ID
+        const paymentFormData = new FormData();
+        paymentFormData.append("profileId", formState.profileId);
+        paymentFormData.append("tier", selectedTier);
+        paymentFormData.append("amount",
+          selectedTier === "QR_ONLY" ? String(selectedTemplate?.priceQrOnly)
+            : selectedTier === "NFC_CARD" ? String(selectedTemplate?.priceNfcCard)
+            : String(selectedTemplate?.priceNfcQr)
+        );
+        paymentFormData.append("screenshotUrl", paymentScreenshotUrl);
+        submitPayment(paymentFormData);
+      } else {
+        router.push(`/dashboard?new=${formState.slug}`);
+      }
+    }
+  }, [formState, router, isPremium, selectedTier, paymentScreenshotUrl, selectedTemplate, profileCreated, submitPayment]);
+
+  // After payment submitted successfully, redirect
+  useEffect(() => {
+    if (profileCreated && paymentFormState.status === "success") {
+      router.push(`/dashboard?pending=true`);
+    }
+  }, [profileCreated, paymentFormState, router]);
+
+  // Determine which steps to show
+  const steps: Array<"category" | "template" | "pricing" | "payment" | "confirm"> = [
+    "category", "template", "pricing", "payment", "confirm"
+  ];
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
@@ -130,6 +227,8 @@ export function OnboardingClient({
       if (lockedCategoryIds.includes(categoryId)) return;
       setSelectedCategoryId(categoryId);
       setSelectedTemplateId("");
+      setSelectedTier("");
+      setPaymentScreenshotUrl("");
       setStep("template");
     },
     [lockedCategoryIds]
@@ -138,6 +237,40 @@ export function OnboardingClient({
   const handleTemplateSelect = useCallback((templateId: string) => {
     setSelectedTemplateId((prev) => (prev === templateId ? prev : templateId));
   }, []);
+
+  const handleProceedToPricing = () => {
+    if (!selectedTemplateId) return;
+    setStep("pricing");
+  };
+
+  const handleProceedToPayment = () => {
+    if (!selectedTier) return;
+    setStep("payment");
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setPaymentUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (res.ok && data.url) {
+        setPaymentScreenshotUrl(data.url);
+      } else {
+        alert(data.error || "Upload failed");
+      }
+    } catch {
+      alert("Upload failed. Please try again.");
+    } finally {
+      setPaymentUploading(false);
+    }
+  };
 
   const handleSlugChange = (value: string) => {
     const clean = value.toLowerCase().replace(/[^a-z0-9-]/g, "");
@@ -159,7 +292,7 @@ export function OnboardingClient({
       setSlugChecking(true);
       slugTimerRef.current = setTimeout(async () => {
         try {
-          const res  = await fetch(`/api/slug/check?slug=${encodeURIComponent(clean)}`);
+          const res = await fetch(`/api/slug/check?slug=${encodeURIComponent(clean)}`);
           const data = await res.json() as { available: boolean; message: string };
           setSlugAvailable(data.available);
           if (!data.available) setSlugError(data.message);
@@ -181,28 +314,34 @@ export function OnboardingClient({
     setStep("confirm");
   };
 
+  const getBackStep = (): typeof step => {
+    const idx = steps.indexOf(step);
+    return idx > 0 ? steps[idx - 1] : "category";
+  };
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
+    <div className="min-h-screen" style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className="border-b border-white/5 px-6 py-4">
+      <div className="px-4 py-5 sm:px-6" style={{ borderBottom: "1px solid var(--nc-border)" }}>
         <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500">
-              <Sparkles className="h-3.5 w-3.5 text-white" />
-            </div>
-            <span className="font-bold">PresenceCard</span>
-          </Link>
+          <div></div>
+          {/* <Link href="/dashboard" className="flex items-center gap-2">
+            <span className="font-bold" style={{ color: "var(--nc-text)" }}>NEX CARD</span>
+          </Link> */}
 
           {/* Step indicator */}
-          <div className="flex items-center gap-2 text-xs text-neutral-500">
-            {(["category", "template", "confirm"] as const).map((s, i) => (
-              <span key={s} className="flex items-center gap-2">
-                {i > 0 && <ChevronRight className="h-3 w-3" />}
-                <span className={step === s ? "font-semibold text-white" : ""}>
-                  {i + 1}. {s.charAt(0).toUpperCase() + s.slice(1)}
+          <div className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs" style={{ color: "var(--nc-text-3)" }}>
+            {steps.map((s, i) => (
+              <span key={s} className="flex items-center gap-1 sm:gap-2">
+                {i > 0 && <ChevronRight className="h-3 w-3 hidden sm:block" />}
+                <span
+                  className={step === s ? "font-semibold" : ""}
+                  style={{ color: step === s ? "var(--nc-text)" : undefined }}
+                >
+                  {i + 1}. {STEP_LABELS[s]}
                 </span>
               </span>
             ))}
@@ -210,25 +349,25 @@ export function OnboardingClient({
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-6 py-12">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-6">
 
         {/* ══════════════════════════════════════════════════════════════
             STEP 1 — Category selection
         ══════════════════════════════════════════════════════════════ */}
         {step === "category" && (
           <div>
-            <div className="mb-10 text-center">
-              <h1 className="text-3xl font-black md:text-4xl">
+            <div className="mb-8 sm:mb-10 text-center">
+              <h1 className="text-2xl font-black sm:text-3xl md:text-4xl">
                 Choose Your Profile Category
               </h1>
-              <p className="mt-3 text-neutral-400">
-                Each category gives you access to 5 exclusive premium templates.
+              <p className="mt-3" style={{ color: "var(--nc-text-2)" }}>
+                Each category gives you access to exclusive premium templates.
               </p>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
               {categories.map((category) => {
-                const isLocked       = lockedCategoryIds.includes(category.id);
+                const isLocked = lockedCategoryIds.includes(category.id);
                 const existingProfile = existingProfiles.find(
                   (p) => p.categoryId === category.id
                 );
@@ -236,7 +375,6 @@ export function OnboardingClient({
                 const emoji = CATEGORY_EMOJI[category.slug] ?? "📄";
 
                 return (
-                  /* ── Use <div role="button"> so we can safely nest a <Link> ── */
                   <div
                     key={category.id}
                     role={isLocked ? undefined : "button"}
@@ -248,7 +386,7 @@ export function OnboardingClient({
                         handleCategorySelect(category.id);
                       }
                     }}
-                    className={`group relative rounded-2xl border p-6 transition-all select-none ${
+                    className={`group relative rounded-2xl border p-5 sm:p-6 transition-all select-none ${
                       isLocked
                         ? "cursor-not-allowed opacity-50"
                         : "cursor-pointer hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
@@ -258,18 +396,17 @@ export function OnboardingClient({
                       background: isLocked ? "rgba(255,255,255,0.02)" : `${color}08`,
                     }}
                   >
-                    {/* Active badge */}
                     {isLocked && (
-                      <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-neutral-500">
+                      <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full nc-card px-2.5 py-1 text-xs" style={{ color: "var(--nc-text-2)" }}>
                         <Lock className="h-3 w-3" />
                         Active
                       </div>
                     )}
 
-                    <div className="mb-3 text-4xl">{emoji}</div>
-                    <h3 className="text-xl font-black text-white">{category.name}</h3>
+                    <div className="mb-3 text-3xl sm:text-4xl">{emoji}</div>
+                    <h3 className="text-lg font-black sm:text-xl" style={{ color: "var(--nc-text)" }}>{category.name}</h3>
                     {category.description && (
-                      <p className="mt-1.5 text-sm text-neutral-400">
+                      <p className="mt-1.5 text-xs sm:text-sm" style={{ color: "var(--nc-text-2)" }}>
                         {category.description}
                       </p>
                     )}
@@ -279,21 +416,17 @@ export function OnboardingClient({
                         {category.templates.length} Templates
                       </span>
 
-                      {/* 
-                        ── FIX: Link is a sibling of the card div, NOT nested inside a button.
-                           We stop propagation so clicking "Manage" doesn't also fire handleCategorySelect.
-                      */}
                       {isLocked && existingProfile ? (
                         <Link
                           href="/dashboard"
                           onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1 rounded-lg border border-white/10 px-3 py-1 text-xs text-neutral-400 hover:border-white/20 hover:text-white transition-all"
+                          className="nc-btn-ghost flex items-center gap-1 rounded-lg px-3 py-1 text-xs"
                         >
                           <Check className="h-3 w-3 text-emerald-400" />
                           Manage
                         </Link>
                       ) : (
-                        <ArrowRight className="h-4 w-4 text-neutral-600 transition-colors group-hover:text-white" />
+                        <ArrowRight className="h-4 w-4 transition-colors" style={{ color: "var(--nc-text-3)" }} />
                       )}
                     </div>
                   </div>
@@ -308,32 +441,31 @@ export function OnboardingClient({
         ══════════════════════════════════════════════════════════════ */}
         {step === "template" && selectedCategory && (
           <div>
-            <div className="mb-8 flex items-center gap-3">
+            <div className="mb-6 sm:mb-8 flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setStep("category")}
-                className="text-sm text-neutral-500 hover:text-white transition-colors"
+                className="nc-btn-ghost text-sm transition-colors px-2 py-1"
               >
                 ← Back
               </button>
-              <div className="h-4 w-px bg-white/10" />
-              <h1 className="text-2xl font-black">
+              <div className="h-4 w-px hidden sm:block" style={{ background: "var(--nc-border)" }} />
+              <h1 className="text-xl font-black sm:text-2xl">
                 {CATEGORY_EMOJI[selectedCategory.slug]}{" "}
-                {selectedCategory.name} Templates
+                {selectedCategory.name}
               </h1>
             </div>
 
             {/* Lock-in warning */}
-            <div className="mb-8 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+            <div className="mb-6 sm:mb-8 flex items-start gap-3 rounded-xl border px-4 py-3"
+              style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg-card)" }}>
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--nc-text-2)" }} />
               <div>
-                <p className="text-sm font-semibold text-amber-300">
+                <p className="text-sm font-semibold" style={{ color: "var(--nc-text)" }}>
                   This choice is permanent
                 </p>
-                <p className="mt-0.5 text-xs text-amber-400/70">
-                  Your template selection is locked once confirmed to maintain brand
-                  consistency. You can always update your content, photos, and links
-                  — but not the template.
+                <p className="mt-0.5 text-xs" style={{ color: "var(--nc-text-3)" }}>
+                  Your template selection is locked once confirmed. Content can be updated anytime.
                 </p>
               </div>
             </div>
@@ -342,21 +474,14 @@ export function OnboardingClient({
             <div
               role="radiogroup"
               aria-label="Select a template"
-              className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+              className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3"
             >
               {selectedCategory.templates.map((template) => {
-                const isSelected  = selectedTemplateId === template.id;
-                const accent      = template.accentColor ?? CATEGORY_COLOR[selectedCategory.slug] ?? "#6366f1";
+                const isSelected = selectedTemplateId === template.id;
+                const accent = template.accentColor ?? CATEGORY_COLOR[selectedCategory.slug] ?? "#6366f1";
                 const previewHref = `/dashboard/onboarding/preview/${template.codeIdentifier}?from=onboarding&categoryId=${selectedCategoryId}`;
 
                 return (
-                  /*
-                    ── FIX: The card is a <div role="radio"> — NOT a <button>.
-                       This allows the Preview <Link> to live INSIDE it without
-                       violating HTML's "interactive content inside button" rule.
-                       Accessibility is preserved via role, aria-checked, tabIndex,
-                       and keyboard handler.
-                  */
                   <div
                     key={template.id}
                     role="radio"
@@ -370,18 +495,16 @@ export function OnboardingClient({
                       }
                     }}
                     className={`group relative overflow-hidden rounded-2xl border transition-all hover:-translate-y-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-                      isSelected
-                        ? "shadow-xl"
-                        : "border-white/5 bg-white/[0.03] hover:border-white/10"
+                      isSelected ? "shadow-xl" : ""
                     }`}
                     style={
                       isSelected
                         ? { borderColor: `${accent}60`, background: `${accent}10` }
-                        : {}
+                        : { borderColor: "var(--nc-border)", background: "var(--nc-bg-card)" }
                     }
                   >
                     {/* Thumbnail */}
-                    <div className="relative aspect-video w-full overflow-hidden bg-neutral-900">
+                    <div className="relative aspect-video w-full overflow-hidden" style={{ background: "var(--nc-bg-2)" }}>
                       <Image
                         src={template.thumbnailUrl}
                         alt={template.name}
@@ -391,14 +514,6 @@ export function OnboardingClient({
                         unoptimized={template.thumbnailUrl.includes("placehold.co")}
                       />
 
-                      {/* PRO badge */}
-                      {template.isPremium && (
-                        <div className="absolute right-2 top-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-black">
-                          PRO
-                        </div>
-                      )}
-
-                      {/* Selected overlay */}
                       {isSelected && (
                         <div
                           className="absolute inset-0 flex items-center justify-center"
@@ -414,7 +529,7 @@ export function OnboardingClient({
                     {/* Card body */}
                     <div className="p-4">
                       <div className="mb-1 flex items-start justify-between gap-2">
-                        <h3 className="font-bold text-white">{template.name}</h3>
+                        <h3 className="font-bold" style={{ color: "var(--nc-text)" }}>{template.name}</h3>
                         {isSelected && (
                           <div
                             className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
@@ -426,33 +541,29 @@ export function OnboardingClient({
                       </div>
 
                       {template.description && (
-                        <p className="mb-3 text-xs leading-relaxed text-neutral-500 line-clamp-2">
+                        <p className="mb-3 text-xs leading-relaxed line-clamp-2" style={{ color: "var(--nc-text-2)" }}>
                           {template.description}
                         </p>
                       )}
 
-                      {/* Footer row: accent dot + code + preview link */}
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <div
                             className="h-2.5 w-2.5 shrink-0 rounded-full"
                             style={{ background: accent }}
                           />
-                          <span className="truncate text-xs font-mono text-neutral-600">
+                          <span className="truncate text-xs font-mono" style={{ color: "var(--nc-text-3)" }}>
                             {template.codeIdentifier}
                           </span>
                         </div>
 
-                        {/*
-                          ── Preview link — valid because parent is <div>, not <button>.
-                             stopPropagation prevents the card's onClick from also firing.
-                        */}
                         <Link
                           href={previewHref}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="flex shrink-0 items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                          className="flex shrink-0 items-center gap-1 text-xs transition-colors"
+                          style={{ color: "var(--nc-brand-2)" }}
                           aria-label={`Preview ${template.name} template`}
                         >
                           <ExternalLink className="h-3 w-3" />
@@ -467,13 +578,13 @@ export function OnboardingClient({
 
             {/* Continue CTA */}
             {selectedTemplateId && (
-              <div className="mt-8 flex justify-end">
+              <div className="mt-6 sm:mt-8 flex justify-end">
                 <button
                   type="button"
-                  onClick={handleProceedToConfirm}
-                  className="flex items-center gap-2 rounded-xl bg-indigo-500 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-indigo-400 hover:shadow-lg hover:shadow-indigo-500/25"
+                  onClick={handleProceedToPricing}
+                  className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
                 >
-                  Continue with {selectedTemplate?.name}
+                  Choose Pricing
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -482,29 +593,272 @@ export function OnboardingClient({
         )}
 
         {/* ══════════════════════════════════════════════════════════════
-            STEP 3 — Confirm & claim slug
+            STEP 3 — Pricing tier selection (premium only)
         ══════════════════════════════════════════════════════════════ */}
-        {step === "confirm" && selectedCategory && selectedTemplate && (
-          <div className="mx-auto max-w-xl">
-            <div className="mb-8">
+        {step === "pricing" && selectedTemplate && (
+          <div>
+            <div className="mb-6 sm:mb-8 flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setStep("template")}
-                className="text-sm text-neutral-500 hover:text-white transition-colors"
+                className="nc-btn-ghost text-sm transition-colors px-2 py-1"
+              >
+                ← Back
+              </button>
+              <div className="h-4 w-px hidden sm:block" style={{ background: "var(--nc-border)" }} />
+              <h1 className="text-xl font-black sm:text-2xl">
+                Choose Your Plan
+              </h1>
+            </div>
+
+            <p className="mb-6 sm:mb-8 text-sm" style={{ color: "var(--nc-text-2)" }}>
+              Select how you&apos;d like to use the <strong style={{ color: "var(--nc-text)" }}>{selectedTemplate.name}</strong> template.
+            </p>
+
+            <div className="grid gap-4 sm:grid-cols-3 sm:gap-5">
+              {(["QR_ONLY", "NFC_CARD", "PHYSICAL_CARD"] as const).map((tier) => {
+                const info = TIER_INFO[tier];
+                const Icon = info.icon;
+                const price = tier === "QR_ONLY" ? selectedTemplate.priceQrOnly
+                  : tier === "NFC_CARD" ? selectedTemplate.priceNfcCard
+                  : selectedTemplate.priceNfcQr;
+
+                const isSelected = selectedTier === tier;
+
+                return (
+                  <div
+                    key={tier}
+                    role="radio"
+                    aria-checked={isSelected}
+                    tabIndex={0}
+                    onClick={() => setSelectedTier(tier)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedTier(tier);
+                      }
+                    }}
+                    className={`relative rounded-2xl border p-5 sm:p-6 transition-all cursor-pointer hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                      isSelected ? "shadow-xl" : ""
+                    }`}
+                    style={
+                      isSelected
+                        ? { borderColor: "var(--nc-brand-1)60", background: "var(--nc-brand-1)10" }
+                        : { borderColor: "var(--nc-border)", background: "var(--nc-bg-card)" }
+                    }
+                  >
+                    {isSelected && (
+                      <div className="absolute right-3 top-3">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "var(--nc-brand-1)" }}>
+                          <Check className="h-3.5 w-3.5 text-white" />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "var(--nc-bg-2)" }}>
+                      <Icon className="h-6 w-6" style={{ color: "var(--nc-brand-1)" }} />
+                    </div>
+
+                    <h3 className="text-lg font-bold" style={{ color: "var(--nc-text)" }}>{info.label}</h3>
+                    <p className="mt-1 text-xs" style={{ color: "var(--nc-text-2)" }}>{info.description}</p>
+
+                    <div className="mt-4 mb-4">
+                      <span className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>
+                        {formatMMK(price ?? 0)}
+                      </span>
+                    </div>
+
+                    <ul className="space-y-2">
+                      {info.features.map((f) => (
+                        <li key={f} className="flex items-center gap-2 text-xs" style={{ color: "var(--nc-text-2)" }}>
+                          <Check className="h-3 w-3 shrink-0" style={{ color: "var(--nc-brand-1)" }} />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+
+            {selectedTier && (
+              <div className="mt-6 sm:mt-8 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleProceedToPayment}
+                  className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
+                >
+                  Continue to Payment
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════
+            STEP 4 — Payment screenshot upload (premium only)
+        ══════════════════════════════════════════════════════════════ */}
+        {step === "payment" && selectedTemplate && selectedTier && (
+          <div className="mx-auto max-w-xl">
+            <div className="mb-6 sm:mb-8 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setStep("pricing")}
+                className="nc-btn-ghost text-sm transition-colors px-2 py-1"
+              >
+                ← Back
+              </button>
+              <div className="h-4 w-px hidden sm:block" style={{ background: "var(--nc-border)" }} />
+              <h1 className="text-xl font-black sm:text-2xl">
+                Upload Payment Proof
+              </h1>
+            </div>
+
+            {/* Order summary */}
+            <div className="mb-6 rounded-2xl nc-card p-5">
+              <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--nc-text)" }}>Order Summary</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span style={{ color: "var(--nc-text-2)" }}>Template</span>
+                  <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{selectedTemplate.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: "var(--nc-text-2)" }}>Plan</span>
+                  <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{TIER_INFO[selectedTier as keyof typeof TIER_INFO]?.label}</span>
+                </div>
+                <div className="my-2 h-px" style={{ background: "var(--nc-border)" }} />
+                <div className="flex justify-between">
+                  <span className="font-bold" style={{ color: "var(--nc-text)" }}>Total</span>
+                  <span className="font-bold" style={{ color: "var(--nc-brand-1)" }}>
+                    {formatMMK(
+                      selectedTier === "QR_ONLY" ? selectedTemplate.priceQrOnly!
+                        : selectedTier === "NFC_CARD" ? selectedTemplate.priceNfcCard!
+                        : selectedTemplate.priceNfcQr!
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment instructions */}
+            <div className="mb-6 rounded-xl border px-4 py-3" style={{ borderColor: "var(--nc-brand-2)30", background: "var(--nc-brand-2)08" }}>
+              <p className="text-sm font-semibold" style={{ color: "var(--nc-brand-2)" }}>Payment Instructions</p>
+              <p className="mt-1 text-xs" style={{ color: "var(--nc-text-2)" }}>
+                Transfer the amount to our Viber Pay account, then upload a screenshot of the successful transaction below.
+              </p>
+            </div>
+
+            {/* Screenshot upload */}
+            <div className="mb-6">
+              <label className="mb-2 block text-sm font-semibold" style={{ color: "var(--nc-text)" }}>
+                Payment Screenshot
+              </label>
+
+              {paymentScreenshotUrl ? (
+                <div className="relative overflow-hidden rounded-xl border" style={{ borderColor: "var(--nc-brand-1)40" }}>
+                  <div className="flex items-center gap-3 p-4" style={{ background: "var(--nc-bg-card)" }}>
+                    <CheckCircle className="h-8 w-8 shrink-0 text-emerald-400" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold" style={{ color: "var(--nc-text)" }}>Screenshot uploaded</p>
+                      <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>Ready to submit</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentScreenshotUrl("")}
+                      className="shrink-0 rounded-lg p-2 transition-colors hover:bg-white/5"
+                    >
+                      <XCircle className="h-5 w-5" style={{ color: "var(--nc-text-3)" }} />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-colors cursor-pointer hover:border-indigo-500/50"
+                  style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg-card)" }}
+                >
+                  {paymentUploading ? (
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                  ) : (
+                    <>
+                      <Upload className="mb-3 h-8 w-8" style={{ color: "var(--nc-text-3)" }} />
+                      <p className="text-sm font-semibold" style={{ color: "var(--nc-text)" }}>
+                        Click to upload screenshot
+                      </p>
+                      <p className="mt-1 text-xs" style={{ color: "var(--nc-text-3)" }}>
+                        JPG, PNG, or WebP. Max 5MB.
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </div>
+
+            {/* Pending state from server action */}
+            {paymentFormState.status === "success" && (
+              <div className="mb-4 flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
+                <Clock className="h-5 w-5 shrink-0 text-emerald-400" />
+                <div>
+                  <p className="text-sm font-semibold text-emerald-300">Payment Submitted!</p>
+                  <p className="text-xs text-emerald-400/70">Your submission is pending admin approval. You&apos;ll be able to edit your profile once approved.</p>
+                </div>
+              </div>
+            )}
+
+            {paymentFormState.status === "error" && (
+              <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                {paymentFormState.message}
+              </div>
+            )}
+
+            {/* Continue to confirm */}
+            {paymentFormState.status !== "success" && (
+              <button
+                type="button"
+                onClick={handleProceedToConfirm}
+                disabled={!paymentScreenshotUrl}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-500 px-6 py-4 text-base font-bold text-white shadow-xl shadow-indigo-500/20 transition-all hover:bg-indigo-400 hover:shadow-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Continue to Confirm
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════
+            STEP 5/3 — Confirm & claim slug
+        ══════════════════════════════════════════════════════════════ */}
+        {step === "confirm" && selectedCategory && selectedTemplate && (
+          <div className="mx-auto max-w-xl">
+            <div className="mb-6 sm:mb-8">
+              <button
+                type="button"
+                onClick={() => setStep("payment")}
+                className="nc-btn-ghost text-sm transition-colors px-2 py-1"
               >
                 ← Back
               </button>
             </div>
 
-            <h1 className="mb-2 text-3xl font-black">Almost there!</h1>
-            <p className="mb-8 text-neutral-400">
+            <h1 className="mb-2 text-2xl font-black sm:text-3xl">Almost there!</h1>
+            <p className="mb-6 sm:mb-8" style={{ color: "var(--nc-text-2)" }}>
               Claim your public URL slug, then confirm your template.
             </p>
 
             {/* Summary card */}
-            <div className="mb-6 overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] p-5">
+            <div className="mb-6 overflow-hidden rounded-2xl nc-card p-4 sm:p-5">
               <div className="flex items-center gap-4">
-                <div className="relative h-16 w-28 overflow-hidden rounded-xl bg-neutral-800">
+                <div className="relative h-14 w-24 overflow-hidden rounded-xl sm:h-16 sm:w-28" style={{ background: "var(--nc-bg-2)" }}>
                   <Image
                     src={selectedTemplate.thumbnailUrl}
                     alt={selectedTemplate.name}
@@ -515,23 +869,28 @@ export function OnboardingClient({
                   />
                 </div>
                 <div>
-                  <p className="text-xs text-neutral-500">{selectedCategory.name}</p>
-                  <p className="font-bold text-white">{selectedTemplate.name}</p>
-                  <p className="mt-0.5 font-mono text-xs text-neutral-600">
+                  <p className="text-xs" style={{ color: "var(--nc-text-2)" }}>{selectedCategory.name}</p>
+                  <p className="font-bold" style={{ color: "var(--nc-text)" }}>{selectedTemplate.name}</p>
+                  <p className="mt-0.5 font-mono text-xs" style={{ color: "var(--nc-text-3)" }}>
                     {selectedTemplate.codeIdentifier}
                   </p>
+                  {isPremium && selectedTier && (
+                    <p className="mt-1 text-xs font-semibold" style={{ color: "var(--nc-brand-1)" }}>
+                      {TIER_INFO[selectedTier as keyof typeof TIER_INFO]?.label}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Slug input */}
             <div className="mb-6">
-              <label htmlFor="slug-input" className="mb-2 block text-sm font-semibold text-neutral-300">
+              <label htmlFor="slug-input" className="mb-2 block text-sm font-semibold" style={{ color: "var(--nc-text)" }}>
                 Choose your public URL
               </label>
-              <div className="flex overflow-hidden rounded-xl border border-white/10 bg-white/5 focus-within:border-indigo-500/50 transition-colors">
-                <span className="flex items-center border-r border-white/10 px-3 text-sm text-neutral-600 whitespace-nowrap">
-                  presencecard.io/
+              <div className="nc-input flex overflow-hidden rounded-xl focus-within:border-indigo-500/50 transition-colors">
+                <span className="flex items-center px-3 text-xs whitespace-nowrap sm:text-sm" style={{ borderRight: "1px solid var(--nc-border)", color: "var(--nc-text-3)" }}>
+                  nexcard.io/
                 </span>
                 <input
                   id="slug-input"
@@ -539,39 +898,40 @@ export function OnboardingClient({
                   value={slug}
                   onChange={(e) => handleSlugChange(e.target.value)}
                   placeholder="your-name"
-                  className="flex-1 bg-transparent px-3 py-3 text-sm text-white placeholder-neutral-700 outline-none min-w-0"
+                  className="flex-1 bg-transparent px-3 py-3 text-sm outline-none min-w-0"
+                  style={{ color: "var(--nc-text)" }}
                   maxLength={60}
                   autoComplete="off"
                   spellCheck={false}
                 />
               </div>
 
-              {/* Slug status messages — only show one at a time */}
               <div className="mt-1.5 min-h-[1.25rem]">
                 {slugError ? (
                   <p className="text-xs text-red-400">{slugError}</p>
                 ) : slugChecking ? (
-                  <p className="text-xs text-neutral-500">Checking availability…</p>
+                  <p className="text-xs" style={{ color: "var(--nc-text-2)" }}>Checking availability…</p>
                 ) : slugAvailable === true ? (
                   <p className="text-xs text-emerald-400">
-                    ✓ presencecard.io/{slug} is available
+                    ✓ nexcard.io/{slug} is available
                   </p>
                 ) : slugAvailable === false ? (
                   <p className="text-xs text-red-400">✗ That slug is already taken</p>
                 ) : null}
               </div>
 
-              <p className="mt-1 text-xs text-neutral-600">
+              <p className="mt-1 text-xs" style={{ color: "var(--nc-text-3)" }}>
                 Lowercase letters, numbers, and hyphens only. 3–60 characters.
               </p>
             </div>
 
             {/* Final lock warning */}
-            <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
-              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-              <p className="text-xs text-amber-400/80">
+            <div className="mb-6 flex items-start gap-3 rounded-xl border px-4 py-3"
+              style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg-card)" }}>
+              <Lock className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--nc-text-2)" }} />
+              <p className="text-xs" style={{ color: "var(--nc-text-2)" }}>
                 By confirming,{" "}
-                <strong className="text-amber-300">{selectedTemplate.name}</strong>{" "}
+                <strong style={{ color: "var(--nc-text)" }}>{selectedTemplate.name}</strong>{" "}
                 will be permanently locked to this profile. Your content, links, and
                 photos can still be edited anytime.
               </p>
@@ -588,7 +948,7 @@ export function OnboardingClient({
             <form action={submitAction}>
               <input type="hidden" name="categoryId" value={selectedCategoryId} />
               <input type="hidden" name="templateId" value={selectedTemplateId} />
-              <input type="hidden" name="slug"       value={slug} />
+              <input type="hidden" name="slug" value={slug} />
 
               <button
                 type="submit"

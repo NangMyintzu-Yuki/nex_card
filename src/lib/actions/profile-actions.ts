@@ -30,7 +30,7 @@ const SelectTemplateInput = z.object({
 
 export type SelectTemplateState =
   | { status: "idle" }
-  | { status: "success"; slug: string }
+  | { status: "success"; slug: string; profileId: string }
   | { status: "error"; message: string };
 
 export async function selectTemplateAction(
@@ -113,7 +113,7 @@ export async function selectTemplateAction(
   }
 
   // Create or update the profile — lock template immediately on creation
-  await prisma.userProfile.upsert({
+  const profile = await prisma.userProfile.upsert({
     where: {
       userId_categoryId: {
         userId: session.user.id,
@@ -134,12 +134,13 @@ export async function selectTemplateAction(
       templateId,
       templateLocked: true,
     },
+    select: { id: true },
   });
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/onboarding");
 
-  return { status: "success", slug };
+  return { status: "success", slug, profileId: profile.id };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

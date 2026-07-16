@@ -75,17 +75,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // ── Redirects ───────────────────────────────────────────────────────────
-  async redirects() {
-    return [
-      {
-        source: "/admin",
-        destination: "/admin",
-        permanent: false,
-      },
-    ];
-  },
-
   // ── Experimental ────────────────────────────────────────────────────────
   experimental: {
     // Enable partial prerendering for the public profile pages

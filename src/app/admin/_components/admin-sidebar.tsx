@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3, Users, Layers, Settings, ArrowLeft, Menu, X, ChevronRight,
+  BarChart3, Users, Layers, Settings, ArrowLeft, Menu, X, ChevronRight, CreditCard,
+  LogOut,
 } from "lucide-react";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -14,10 +15,11 @@ import { useTheme } from "@/lib/theme/theme-context";
 interface AdminUser { id: string; name: string; email: string; role: string; }
 
 const NAV = [
-  { href: "/admin",            icon: BarChart3, label: "Overview"  },
-  { href: "/admin/users",      icon: Users,     label: "Users"     },
-  { href: "/admin/templates",  icon: Layers,    label: "Templates" },
-  { href: "/admin/settings",   icon: Settings,  label: "Settings"  },
+  { href: "/admin",            icon: BarChart3,  label: "Overview"  },
+  { href: "/admin/payments",   icon: CreditCard, label: "Payments"  },
+  { href: "/admin/users",      icon: Users,      label: "Users"     },
+  { href: "/admin/templates",  icon: Layers,     label: "Templates" },
+  { href: "/admin/settings",   icon: Settings,   label: "Settings"  },
 ] as const;
 
 function getInitials(name: string) {
@@ -45,7 +47,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-black" style={{ color: "var(--nc-text)" }}>NEX CARD</span>
-                <span className="rounded-full px-1.5 py-0.5 text-[9px] font-black text-black"
+                <span className="rounded-full px-1.5 py-0.5 text-[9px] font-black text-white"
                   style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
                   ADMIN
                 </span>
@@ -60,25 +62,13 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
           </button>
         </div>
 
-        {/* Admin user card */}
-        <div className="mx-3 mt-4 rounded-xl p-3"
-          style={{ background: `${brand2}12`, border: `1px solid ${brand2}25` }}>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-black text-black"
-              style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
-              {getInitials(user.name)}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-bold" style={{ color: "var(--nc-text)" }}>{user.name}</p>
-              <p className="truncate text-[10px]" style={{ color: "var(--nc-text-3)" }}>{user.email}</p>
-            </div>
-          </div>
-        </div>
+       
 
         {/* Nav items */}
         <nav className="flex-1 space-y-1 px-3 pt-5">
           <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-widest"
             style={{ color: "var(--nc-text-3)" }}>Admin Menu</p>
+            
           {NAV.map(({ href, icon: Icon, label }) => {
             const active = pathname === href || (href !== "/admin" && pathname.startsWith(href));
             return (
@@ -91,6 +81,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
               </Link>
             );
           })}
+          
         </nav>
 
         {/* Bottom */}
@@ -108,13 +99,28 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
             </div>
             <ThemeToggle size="sm" />
           </div>
+           {/* Admin user card */}
+        <div className=" mt-4 rounded-xl p-3"
+          style={{ background: `${brand2}12`, border: `1px solid ${brand2}25` }}>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-black text-white"
+              style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
+              {getInitials(user.name)}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-bold" style={{ color: "var(--nc-text)" }}>{user.name}</p>
+              <p className="truncate text-[10px]" style={{ color: "var(--nc-text-3)" }}>{user.email}</p>
+            </div>
+             <form action="/api/auth/logout" method="GET">
+                        <button type="submit"
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all nc-nav-item">
+                          <LogOut className="h-4 w-4 shrink-0" style={{ color: "var(--nc-text-3)" }} />
+                        </button>
+                      </form>
+          </div>
+        </div>
 
-          {/* Back to dashboard */}
-          <Link href="/dashboard" onClick={() => setOpen(false)}
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all nc-nav-item">
-            <ArrowLeft className="h-4 w-4 shrink-0" style={{ color: "var(--nc-text-3)" }} />
-            <span style={{ color: "var(--nc-text-3)" }}>User Dashboard</span>
-          </Link>
+         
         </div>
       </>
     );

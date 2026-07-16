@@ -81,7 +81,7 @@ export async function generateMetadata({
   }
 
   const title = profile.metaTitle ?? `${profile.user.name} · ${profile.category.name}`;
-  const description = profile.metaDescription ?? `View ${profile.user.name}'s ${profile.category.name} on PresenceCard.`;
+  const description = profile.metaDescription ?? `View ${profile.user.name}'s ${profile.category.name} on NEX CARD.`;
   const ogImage = profile.ogImageUrl ?? `${process.env.NEXT_PUBLIC_APP_URL}/api/og?slug=${slug}`;
 
   return {

@@ -358,7 +358,7 @@ export interface ResolvedProfile {
   id: string;
   slug: string;
   isPublished: boolean;
-  viewCount: bigint;
+  viewCount: number;
   metaTitle: string | null;
   metaDescription: string | null;
   ogImageUrl: string | null;

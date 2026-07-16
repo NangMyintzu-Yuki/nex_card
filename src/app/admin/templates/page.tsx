@@ -1,13 +1,15 @@
 // src/app/admin/templates/page.tsx
-// Admin template catalogue — view all 20 templates, toggle active/premium
+// Admin template catalogue — view all templates, toggle active/premium, set prices
 
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
+import { PriceEditor } from "./_components/price-editor";
+import { TemplateToggle } from "./_components/template-toggle";
 
-export const metadata: Metadata = { title: "Templates — Admin · PresenceCard" };
+export const metadata: Metadata = { title: "Templates — Admin · NEX CARD" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminTemplatesPage() {
@@ -38,8 +40,8 @@ export default async function AdminTemplatesPage() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
       <div className="mb-8">
-        <h1 className="text-2xl font-black text-white">Template Catalogue</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Template Catalogue</h1>
+        <p className="mt-1 text-sm" style={{ color: "var(--nc-text-3)" }}>
           {categories.reduce((acc, c) => acc + c.templates.length, 0)} templates across{" "}
           {categories.length} categories
         </p>
@@ -57,14 +59,14 @@ export default async function AdminTemplatesPage() {
                     className="h-3 w-3 rounded-full"
                     style={{ background: color }}
                   />
-                  <h2 className="text-lg font-black text-white">
+                  <h2 className="text-lg font-black" style={{ color: "var(--nc-text)" }}>
                     {category.name}
                   </h2>
-                  <span className="rounded-full border border-white/10 px-2 py-0.5 text-xs text-neutral-500">
+                  <span className="nc-badge" style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text-3)", borderColor: "var(--nc-border)" }}>
                     {category._count.profiles} profiles
                   </span>
                 </div>
-                <span className="font-mono text-xs text-neutral-700">
+                <span className="font-mono text-xs" style={{ color: "var(--nc-text-3)" }}>
                   {category.slug}
                 </span>
               </div>
@@ -74,10 +76,10 @@ export default async function AdminTemplatesPage() {
                 {category.templates.map((template) => (
                   <div
                     key={template.id}
-                    className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] transition-all hover:border-white/10"
+                    className="nc-card overflow-hidden rounded-2xl transition-all"
                   >
                     {/* Thumbnail */}
-                    <div className="relative aspect-video w-full bg-neutral-900 overflow-hidden">
+                    <div className="relative aspect-video w-full overflow-hidden" style={{ background: "var(--nc-bg-2)" }}>
                       <Image
                         src={template.thumbnailUrl}
                         alt={template.name}
@@ -102,8 +104,8 @@ export default async function AdminTemplatesPage() {
                     <div className="p-4">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <h3 className="font-bold text-white">{template.name}</h3>
-                          <p className="font-mono text-xs text-neutral-600 truncate">
+                          <h3 className="font-bold" style={{ color: "var(--nc-text)" }}>{template.name}</h3>
+                          <p className="font-mono text-xs truncate" style={{ color: "var(--nc-text-3)" }}>
                             {template.codeIdentifier}
                           </p>
                         </div>
@@ -115,35 +117,29 @@ export default async function AdminTemplatesPage() {
                       </div>
 
                       <div className="mt-3 flex items-center justify-between text-xs">
-                        <span className="text-neutral-600">
+                        <span style={{ color: "var(--nc-text-3)" }}>
                           {template._count.profiles} uses
                         </span>
-                        <span className="text-neutral-600">
+                        <span style={{ color: "var(--nc-text-3)" }}>
                           Sort: {template.sortOrder}
                         </span>
                       </div>
 
-                      {/* Toggle buttons — wire to Server Actions in production */}
-                      <div className="mt-3 flex gap-1.5">
-                        <button
-                          className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-colors ${
-                            template.isActive
-                              ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                              : "bg-white/5 text-neutral-600 hover:text-white"
-                          }`}
-                        >
-                          {template.isActive ? "Active" : "Inactive"}
-                        </button>
-                        <button
-                          className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-colors ${
-                            template.isPremium
-                              ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
-                              : "bg-white/5 text-neutral-600 hover:text-white"
-                          }`}
-                        >
-                          {template.isPremium ? "PRO" : "Free"}
-                        </button>
-                      </div>
+                      {/* Toggle buttons */}
+                      <TemplateToggle
+                        templateId={template.id}
+                        isActive={template.isActive}
+                        isPremium={template.isPremium}
+                      />
+
+                      {/* Price editor */}
+                      <PriceEditor
+                        templateId={template.id}
+                        templateName={template.name}
+                        priceQrOnly={template.priceQrOnly}
+                        priceNfcCard={template.priceNfcCard}
+                        priceNfcQr={template.priceNfcQr}
+                      />
                     </div>
                   </div>
                 ))}

@@ -4,6 +4,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export async function GET(request: NextRequest) {
   const sessionToken = request.cookies.get("session_token")?.value;
 
@@ -14,7 +16,7 @@ export async function GET(request: NextRequest) {
       .catch(() => {});
   }
 
-  const response = NextResponse.redirect(new URL("/", request.url));
+  const response = NextResponse.redirect(new URL("/", APP_URL));
 
   // Clear the cookie
   response.cookies.set("session_token", "", {

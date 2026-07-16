@@ -32,7 +32,8 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message ?? "Login failed."); return; }
-      router.push("/dashboard");
+      const dest = data.user?.role === "ADMIN" ? "/admin" : "/dashboard";
+      router.push(dest);
     } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {

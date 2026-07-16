@@ -1,64 +1,55 @@
 // src/app/api/upload/route.ts
-// POST /api/upload — generates a presigned R2 URL for client-side direct upload
-// The client uploads directly to R2, keeping our server free of binary data
+// POST /api/upload — handles file uploads for payment screenshots
 
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 import { getServerSession } from "@/lib/auth/session";
-import { generatePresignedUploadUrl } from "@/lib/storage/r2-upload";
 
-const UploadRequestSchema = z.object({
-  contentType: z.enum([
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-    "image/avif",
-    "image/gif",
-  ]),
-  folder: z
-    .enum(["avatars", "gallery", "logos", "og-images"])
-    .default("gallery"),
-  fileSize: z.number().int().min(1).max(8 * 1024 * 1024), // max 8MB
-});
+const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "payments");
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export async function POST(request: NextRequest) {
   try {
-    // Auth check
     const session = await getServerSession();
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const parsed = UploadRequestSchema.safeParse(body);
+    const formData = await request.formData();
+    const file = formData.get("file") as File | null;
 
-    if (!parsed.success) {
-      return NextResponse.json(
-        { message: parsed.error.issues[0]?.message ?? "Invalid request." },
-        { status: 400 }
-      );
+    if (!file) {
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const { contentType, folder, fileSize } = parsed.data;
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: "File too large (max 5MB)" }, { status: 400 });
+    }
 
-    // Generate presigned URL (valid for 5 minutes)
-    const { uploadUrl, publicUrl, key } = await generatePresignedUploadUrl({
-      userId: session.user.id,
-      contentType,
-      folder,
-    });
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
+    }
 
-    return NextResponse.json({
-      uploadUrl,   // PUT to this URL with the file binary
-      publicUrl,   // Store this in the profile dynamicJsonData
-      key,         // Keep for potential future deletion
-    });
-  } catch (error) {
-    console.error("[Upload API]", error);
-    return NextResponse.json(
-      { message: "Upload failed. Please try again." },
-      { status: 500 }
-    );
+    // Ensure upload directory exists
+    await mkdir(UPLOAD_DIR, { recursive: true });
+
+    // Generate unique filename: userId-timestamp.ext
+    const ext = file.name.split(".").pop() || "jpg";
+    const filename = `${session.user.id}-${Date.now()}.${ext}`;
+    const filepath = path.join(UPLOAD_DIR, filename);
+
+    // Write file
+    const bytes = await file.arrayBuffer();
+    await writeFile(filepath, Buffer.from(bytes));
+
+    // Return public URL path
+    const url = `/uploads/payments/${filename}`;
+
+    return NextResponse.json({ url, filename });
+  } catch (err) {
+    console.error("Upload error:", err);
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }

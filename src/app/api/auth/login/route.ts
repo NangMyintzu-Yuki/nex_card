@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log("user",user)
     // Generic message — don't reveal whether email exists
     const invalidMessage = "Invalid email or password.";
 
@@ -58,9 +57,6 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordValid = await verifyPassword(password, user.hashedPassword);
-    console.log("passwordValid",passwordValid)
-    console.log("passwordValid",password)
-    console.log("passwordValid",user.hashedPassword)
     if (!passwordValid) {
       return NextResponse.json({ message: invalidMessage }, { status: 401 });
     }

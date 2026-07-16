@@ -117,26 +117,26 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
           <Link href="/dashboard"
-            className="mb-2 inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-white transition-colors">
+            className="nc-btn-ghost mb-2 inline-flex items-center gap-1.5 text-xs transition-colors px-2 py-1">
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Profiles
           </Link>
-          <h1 className="text-2xl font-black text-white flex items-center gap-2">
+          <h1 className="text-2xl font-black flex items-center gap-2" style={{ color: "var(--nc-text)" }}>
             <QrCode className="h-6 w-6" style={{ color: accentColor }} />
             QR Code
             <span className="font-mono text-indigo-400">/{profile.slug}</span>
           </h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm" style={{ color: "var(--nc-text-2)" }}>
             {profile.category.name} · {profile.template.name}
           </p>
         </div>
 
         <div className="flex gap-2">
           <Link href={`/dashboard/edit/${profile.slug}`}
-            className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:border-white/20 transition-all">
+            className="nc-btn-brand flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all">
             Edit Content
           </Link>
           <Link href={publicUrl} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-neutral-400 hover:text-white transition-all">
+            className="nc-btn-ghost flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm transition-all">
             <ExternalLink className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -148,7 +148,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
         <div className="lg:col-span-3 space-y-5">
 
           {/* QR code card */}
-          <div className="overflow-hidden rounded-3xl border border-white/5 bg-white/[0.03]">
+          <div className="nc-card overflow-hidden rounded-3xl">
             {/* QR visual area */}
             <div className="relative flex items-center justify-center p-10"
               style={{ background: `linear-gradient(135deg, ${accentColor}08, ${accentColor}03)` }}>
@@ -187,7 +187,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                     style={{ borderColor: `${accentColor}40`, background: `${accentColor}08` }}>
                     <div className="space-y-2">
                       <QrCode className="mx-auto h-16 w-16" style={{ color: `${accentColor}50` }} />
-                      <p className="text-xs text-neutral-600 px-4">
+                      <p className="text-xs px-4" style={{ color: "var(--nc-text-3)" }}>
                         Generate your QR to see it here
                       </p>
                     </div>
@@ -207,14 +207,14 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
             </div>
 
             {/* QR URL display */}
-            <div className="border-t border-white/5 px-5 py-4">
-              <p className="mb-1 text-xs font-semibold text-neutral-600">QR points to</p>
+            <div className="px-5 py-4" style={{ borderTop: "1px solid var(--nc-border)" }}>
+              <p className="mb-1 text-xs font-semibold" style={{ color: "var(--nc-text-3)" }}>QR points to</p>
               <div className="flex items-center justify-between gap-3">
-                <code className="flex-1 truncate rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-indigo-300 font-mono">
+                <code className="nc-input flex-1 truncate rounded-lg px-3 py-2 text-xs font-mono" style={{ color: "var(--nc-brand-2)" }}>
                   {qrScanUrl}
                 </code>
                 <button onClick={handleCopy}
-                  className="flex shrink-0 items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-xs text-neutral-400 hover:border-white/20 hover:text-white transition-all">
+                  className="nc-btn-ghost flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs transition-all">
                   {copied ? <><Check className="h-3.5 w-3.5 text-emerald-400" /> Copied!</> : <><Copy className="h-3.5 w-3.5" /> Copy</>}
                 </button>
               </div>
@@ -223,24 +223,24 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
 
           {/* Download controls (only when locked) */}
           {isLocked && (
-            <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03]">
-              <div className="border-b border-white/5 px-5 py-4">
-                <h3 className="font-bold text-white text-sm">Download QR Code</h3>
-                <p className="mt-0.5 text-xs text-neutral-600">
+            <div className="nc-card overflow-hidden rounded-2xl">
+              <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--nc-border)" }}>
+                <h3 className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>Download QR Code</h3>
+                <p className="mt-0.5 text-xs" style={{ color: "var(--nc-text-3)" }}>
                   High-resolution versions for print and digital use
                 </p>
               </div>
               <div className="p-5 space-y-4">
                 {/* Size selector */}
                 <div>
-                  <p className="mb-2 text-xs font-semibold text-neutral-500">Size</p>
+                  <p className="mb-2 text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Size</p>
                   <div className="flex gap-2">
                     {([256, 512, 1024] as const).map((s) => (
                       <button key={s} onClick={() => setQrSize(s)}
                         className={`flex-1 rounded-xl py-2 text-xs font-semibold transition-colors ${
                           qrSize === s
                             ? "text-white"
-                            : "border border-white/10 bg-white/5 text-neutral-500 hover:text-white"
+                            : "nc-btn-ghost"
                         }`}
                         style={qrSize === s ? { background: accentColor } : {}}>
                         {s}px
@@ -252,16 +252,16 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                 {/* Download buttons */}
                 <div className="grid grid-cols-2 gap-3">
                   <button onClick={() => handleDownload("svg", qrSize)}
-                    className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-semibold text-white hover:bg-white/10 hover:border-white/20 transition-all">
+                    className="nc-btn-ghost flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all">
                     <Download className="h-4 w-4" />
                     SVG
-                    <span className="text-xs text-neutral-600">Vector</span>
+                    <span className="text-xs" style={{ color: "var(--nc-text-3)" }}>Vector</span>
                   </button>
                   <button onClick={() => handleDownload("png", qrSize)}
-                    className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-semibold text-white hover:bg-white/10 hover:border-white/20 transition-all">
+                    className="nc-btn-ghost flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all">
                     <Download className="h-4 w-4" />
                     PNG
-                    <span className="text-xs text-neutral-600">{qrSize}px</span>
+                    <span className="text-xs" style={{ color: "var(--nc-text-3)" }}>{qrSize}px</span>
                   </button>
                 </div>
 
@@ -281,11 +281,11 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
         <div className="lg:col-span-2 space-y-5">
 
           {/* Stats */}
-          <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03]">
-            <div className="border-b border-white/5 px-5 py-4">
-              <h3 className="font-bold text-white text-sm">Performance</h3>
+          <div className="nc-card overflow-hidden rounded-2xl">
+            <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--nc-border)" }}>
+              <h3 className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>Performance</h3>
             </div>
-            <div className="divide-y divide-white/5">
+            <div className="divide-y" style={{ borderColor: "var(--nc-border)" }}>
               {[
                 { icon: Scan,       label: "QR Scans",    value: (isLocked ? profile.qrScanCount : 0).toLocaleString(), color: accentColor },
                 { icon: Eye,        label: "Page Views",  value: profile.viewCount.toLocaleString(),                     color: "#0ea5e9"  },
@@ -297,32 +297,32 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                       style={{ background: `${color}15` }}>
                       <Icon className="h-4 w-4" style={{ color }} />
                     </div>
-                    <p className="text-sm text-neutral-400">{label}</p>
+                    <p className="text-sm" style={{ color: "var(--nc-text-2)" }}>{label}</p>
                   </div>
-                  <p className="font-bold text-white text-sm">{value}</p>
+                  <p className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>{value}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Lock Status */}
-          <div className={`overflow-hidden rounded-2xl border ${
+          <div className={`overflow-hidden rounded-2xl ${
             isLocked
-              ? "border-emerald-500/20 bg-emerald-500/5"
-              : "border-white/5 bg-white/[0.03]"
+              ? "border border-emerald-500/20 bg-emerald-500/5"
+              : "nc-card"
           }`}>
             <div className="px-5 py-4">
               <div className="flex items-center gap-2.5 mb-3">
                 <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                  isLocked ? "bg-emerald-500/20" : "bg-white/5"
-                }`}>
-                  <Lock className={`h-4 w-4 ${isLocked ? "text-emerald-400" : "text-neutral-600"}`} />
+                  isLocked ? "bg-emerald-500/20" : ""
+                }`} style={!isLocked ? { background: "var(--nc-bg-card)" } : undefined}>
+                  <Lock className={`h-4 w-4 ${isLocked ? "text-emerald-400" : ""}`} style={!isLocked ? { color: "var(--nc-text-3)" } : undefined} />
                 </div>
                 <div>
-                  <p className="font-bold text-white text-sm">
+                  <p className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>
                     {isLocked ? "Profile Locked" : "Not Yet Locked"}
                   </p>
-                  <p className="text-xs text-neutral-600">
+                  <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
                     {isLocked ? "Template & category are frozen" : "Lock activates on first QR generation"}
                   </p>
                 </div>
@@ -400,7 +400,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                     </p>
                     <div className="flex gap-2">
                       <button onClick={() => setShowConfirm(false)}
-                        className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-semibold text-neutral-400 hover:text-white transition-colors">
+                        className="nc-btn-ghost flex-1 rounded-xl py-3 text-sm font-semibold transition-colors">
                         Cancel
                       </button>
                       <form action={submitAction} className="flex-1">
@@ -420,9 +420,9 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
             </div>
           ) : (
             /* Already locked — show usage tips */
-            <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03]">
-              <div className="border-b border-white/5 px-5 py-4">
-                <h3 className="font-bold text-white text-sm">How to Use Your QR</h3>
+            <div className="nc-card overflow-hidden rounded-2xl">
+              <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--nc-border)" }}>
+                <h3 className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>How to Use Your QR</h3>
               </div>
               <div className="px-5 py-5 space-y-3">
                 {[
@@ -432,15 +432,15 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                   { emoji: "📱", tip: "Add to your Instagram bio or WhatsApp status" },
                   { emoji: "🎪", tip: "Use at events, conferences, and exhibitions" },
                 ].map(({ emoji, tip }) => (
-                  <div key={tip} className="flex items-start gap-3 text-sm text-neutral-500">
+                  <div key={tip} className="flex items-start gap-3 text-sm" style={{ color: "var(--nc-text-2)" }}>
                     <span className="shrink-0 text-base">{emoji}</span>
                     {tip}
                   </div>
                 ))}
 
-                <div className="mt-2 rounded-xl border border-white/5 bg-white/[0.02] p-3">
-                  <p className="text-xs text-neutral-600">
-                    <strong className="text-neutral-400">Pro tip:</strong> Download the SVG version for print
+                <div className="mt-2 nc-card rounded-xl p-3">
+                  <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                    <strong style={{ color: "var(--nc-text-2)" }}>Pro tip:</strong> Download the SVG version for print
                     (infinitely scalable) and PNG for digital use.
                   </p>
                 </div>
@@ -449,18 +449,18 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
           )}
 
           {/* Profile card preview */}
-          <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03]">
+          <div className="nc-card overflow-hidden rounded-2xl">
             <div className="relative aspect-video overflow-hidden">
               <img
                 src={profile.template.thumbnailUrl}
                 alt={profile.template.name}
                 className="h-full w-full object-cover opacity-70"
               />
-              <div className="absolute inset-0 flex flex-col items-start justify-end gap-1 bg-gradient-to-t from-neutral-950/90 to-transparent p-4">
-                <span className="text-xs text-neutral-400">{profile.category.name}</span>
-                <span className="text-sm font-bold text-white">{profile.template.name}</span>
+              <div className="absolute inset-0 flex flex-col items-start justify-end gap-1 p-4" style={{ background: "linear-gradient(to top, var(--nc-bg), transparent)" }}>
+                <span className="text-xs" style={{ color: "var(--nc-text-2)" }}>{profile.category.name}</span>
+                <span className="text-sm font-bold" style={{ color: "var(--nc-text)" }}>{profile.template.name}</span>
                 <Link href={publicUrl} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-xs text-neutral-400 hover:text-white transition-colors">
+                  className="nc-btn-ghost flex items-center gap-1 text-xs transition-colors">
                   <ExternalLink className="h-3 w-3" />
                   {appUrl.replace("https://", "")}/{profile.slug}
                 </Link>

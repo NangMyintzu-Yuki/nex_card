@@ -103,21 +103,21 @@ export async function generateMetadata({
   const resolvedDescription =
     metaDescription ||
     (user?.name && category?.name
-      ? `View ${user.name}'s ${category.name} on PresenceCard.`
+      ? `View ${user.name}'s ${category.name} on NEX CARD.`
       : "A beautiful digital presence page.");
 
   const resolvedOgImage =
     ogImageUrl ||
     (slug
       ? `${process.env.NEXT_PUBLIC_APP_URL}/api/og?slug=${slug}`
-      : `${process.env.NEXT_PUBLIC_APP_URL}/default-og.png`);
+      : `${process.env.NEXT_PUBLIC_APP_URL}/api/og`);
 
   const canonicalUrl = `${process.env.NEXT_PUBLIC_APP_URL}/${slug}`;
 
   return {
     title: resolvedTitle,
     description: resolvedDescription,
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://presencecard.io"),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://nexcard.io"),
     alternates: {
       canonical: canonicalUrl,
     },
@@ -134,14 +134,14 @@ export async function generateMetadata({
           alt: resolvedTitle,
         },
       ],
-      siteName: "PresenceCard",
+      siteName: "NEX CARD",
     },
     twitter: {
       card: "summary_large_image",
       title: resolvedTitle,
       description: resolvedDescription,
       images: [resolvedOgImage],
-      creator: "@presencecard",
+      creator: "@nexcard",
     },
     robots: {
       index: profile.isPublished,
@@ -202,7 +202,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
               Dashboard
             </a>
           </div>
-          <p className="mt-6 text-xs text-neutral-700">PresenceCard</p>
+          <p className="mt-6 text-xs text-neutral-700">NEX CARD</p>
         </div>
       </main>
     );
@@ -348,19 +348,19 @@ function WeddingSwitch({
 }: SwitchProps<ReturnType<typeof parseTemplateData<"wedding-invitation">>>) {
   const props = { data, accentColor: accentColor ?? undefined };
 
- switch (templateCode) {
-    case TEMPLATE_IDS.BUSINESS_AD.MARQUEE:
-      return <MarqueeBusiness {...props as any} />;
-    case TEMPLATE_IDS.BUSINESS_AD.DISTRICT:
-      return <DistrictBusiness {...props as any} />;
-    case TEMPLATE_IDS.BUSINESS_AD.EMPIRE:
-      return <EmpireBusiness {...props as any} />;
-    case TEMPLATE_IDS.BUSINESS_AD.NEON:
-      return <NeonBusiness {...props as any} />;
-    case TEMPLATE_IDS.BUSINESS_AD.VAULT:
-      return <VaultBusiness {...props as any} />;
+  switch (templateCode) {
+    case TEMPLATE_IDS.WEDDING.ETERNAL:
+      return <EternalWedding {...props} />;
+    case TEMPLATE_IDS.WEDDING.BLOSSOM:
+      return <BlossomWedding {...props} />;
+    case TEMPLATE_IDS.WEDDING.NOIR:
+      return <NoirWedding {...props} />;
+    case TEMPLATE_IDS.WEDDING.CELESTIAL:
+      return <CelestialWedding {...props} />;
+    case TEMPLATE_IDS.WEDDING.RUSTIC:
+      return <RusticWedding {...props} />;
     default:
-      return <MarqueeBusiness {...props as any} />;
+      return <EternalWedding {...props} />;
   }
 }
 

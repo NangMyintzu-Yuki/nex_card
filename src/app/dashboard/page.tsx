@@ -1,235 +1,276 @@
 // src/app/dashboard/page.tsx
-// User Workspace Panel — Profile listing, data editor, publish controls
+// User Workspace Panel — Profile listing
 
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import {
-  Plus, ExternalLink, Eye, Pencil, Lock,
-  Sparkles, BarChart3, Globe, Settings, QrCode,
-} from "lucide-react";
+import { Plus, ExternalLink, Eye, Pencil, Lock, QrCode, Clock, XCircle, CheckCircle, Upload } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";
 import { getCachedUserProfiles } from "@/lib/cache/profile-cache";
+import { ResubmitPayment } from "./_components/resubmit-payment";
 
 export const metadata: Metadata = {
-  title: "Dashboard — PresenceCard",
+  title: "Dashboard — NEX CARD",
 };
 
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{ new?: string; pending?: string }>;
 }) {
   const session = await getServerSession();
   if (!session?.user?.id) redirect("/login");
+  if (session.user.role === "ADMIN") redirect("/admin");
 
-  const { new: newSlug } = await searchParams;
+  const { new: newSlug, pending } = await searchParams;
   const profiles = await getCachedUserProfiles(session.user.id);
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
-      {/* Sidebar */}
-      <div className="fixed left-0 top-0 hidden h-full w-60 flex-col border-r border-white/5 bg-neutral-900 lg:flex">
-        <div className="flex items-center gap-2.5 border-b border-white/5 px-5 py-4">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500">
-            <Sparkles className="h-3.5 w-3.5 text-white" />
+    <div className="mx-auto max-w-5xl px-6 py-10">
+      {/* New profile success banner */}
+      {newSlug && (
+        <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4"
+          style={{ border: "1px solid rgba(34,197,94,0.2)", background: "rgba(34,197,94,0.05)" }}>
+          <div>
+            <p className="font-semibold" style={{ color: "var(--nc-success)" }}>Profile created successfully!</p>
+            <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-2)" }}>
+              Your page is live at{" "}
+              <span className="font-mono" style={{ color: "var(--nc-success)" }}>
+                nexcard.io/{newSlug}
+              </span>
+              . Now fill in your details.
+            </p>
           </div>
-          <span className="font-bold">PresenceCard</span>
+          <Link href={`/${newSlug}`} target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all"
+            style={{ border: "1px solid rgba(34,197,94,0.3)", color: "var(--nc-success)" }}>
+            <ExternalLink className="h-3.5 w-3.5" />
+            View Live
+          </Link>
         </div>
+      )}
 
-        <nav className="flex-1 px-3 py-4 space-y-1">
-          {[
-            { icon: Globe, label: "Profiles", href: "/dashboard", active: true },
-            { icon: BarChart3, label: "Analytics", href: "/dashboard/analytics", active: false },
-            { icon: Settings, label: "Settings", href: "/dashboard/settings", active: false },
-          ].map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.label} href={item.href}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all ${
-                  item.active
-                    ? "bg-indigo-500/10 font-semibold text-indigo-300"
-                    : "text-neutral-500 hover:bg-white/5 hover:text-white"
-                }`}>
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="border-t border-white/5 p-4">
-          <div className="flex items-center gap-3 rounded-xl p-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/20 text-xs font-bold text-indigo-300">
-              {session.user.name?.charAt(0).toUpperCase()}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-white">{session.user.name}</p>
-              <p className="truncate text-xs text-neutral-600">{session.user.email}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="lg:pl-60">
-        <div className="mx-auto max-w-5xl px-6 py-10">
-
-          {/* New profile success banner */}
-          {newSlug && (
-            <div className="mb-6 flex items-center justify-between rounded-2xl border border-emerald-500/20 bg-emerald-500/5 px-5 py-4">
-              <div>
-                <p className="font-semibold text-emerald-300">Profile created successfully!</p>
-                <p className="mt-0.5 text-sm text-emerald-400/70">
-                  Your page is live at{" "}
-                  <span className="font-mono text-emerald-300">
-                    presencecard.io/{newSlug}
-                  </span>
-                  . Now fill in your details.
-                </p>
-              </div>
-              <Link href={`/${newSlug}`} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 rounded-lg border border-emerald-500/30 px-3 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/10 transition-all">
-                <ExternalLink className="h-3.5 w-3.5" />
-                View Live
-              </Link>
-            </div>
-          )}
-
-          {/* Header */}
-          <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+      {/* Pending approval banner */}
+      {pending && (
+        <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4"
+          style={{ border: "1px solid rgba(251,191,36,0.2)", background: "rgba(251,191,36,0.05)" }}>
+          <div className="flex items-center gap-3">
+            <Clock className="h-5 w-5 shrink-0 text-amber-400" />
             <div>
-              <h1 className="text-2xl font-black">My Profiles</h1>
-              <p className="mt-1 text-sm text-neutral-500">
-                {profiles.length} of 4 categories claimed
+              <p className="font-semibold text-amber-300">Payment Submitted!</p>
+              <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-2)" }}>
+                Your payment is pending admin approval. You&apos;ll be able to edit your profile once approved.
               </p>
             </div>
-            {profiles.length < 4 && (
-              <Link href="/dashboard/onboarding"
-                className="flex items-center gap-2 rounded-xl bg-indigo-500 px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-indigo-400 hover:shadow-lg hover:shadow-indigo-500/25">
-                <Plus className="h-4 w-4" />
-                New Profile
-              </Link>
-            )}
           </div>
+        </div>
+      )}
 
-          {/* Profiles grid */}
-          {profiles.length > 0 ? (
-            <div className="grid gap-5 sm:grid-cols-2">
-              {profiles.map((profile) => (
-                <div key={profile.id}
-                  className="group overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] transition-all hover:border-white/10 hover:bg-white/[0.05]">
-                  {/* Template preview strip */}
-                  <div className="relative h-32 w-full overflow-hidden bg-neutral-900">
-                    <img
-                      src={profile.template.thumbnailUrl}
-                      alt={profile.template.name}
-                      className="h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 to-transparent" />
-                    <div className="absolute bottom-3 left-4 flex items-center gap-2">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-                        profile.isPublished
-                          ? "bg-emerald-500/20 text-emerald-300"
-                          : "bg-amber-500/20 text-amber-300"
-                      }`}>
-                        {profile.isPublished ? "● Live" : "⚠ Draft — not visible"}
-                      </span>
-                    </div>
-                    {profile.templateLocked && (
-                      <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-xs text-white/50 backdrop-blur">
-                        <Lock className="h-2.5 w-2.5" />
-                        Locked
+      {/* Header */}
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>My Profiles</h1>
+          <p className="mt-1 text-sm" style={{ color: "var(--nc-text-3)" }}>
+            {profiles.length} profile{profiles.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+        {profiles.length < 4 && (
+          <Link href="/dashboard/onboarding"
+            className="nc-btn-brand flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold">
+            <Plus className="h-4 w-4" />
+            New Profile
+          </Link>
+        )}
+      </div>
+
+      {/* Profiles grid */}
+      {profiles.length > 0 ? (
+        <div className="grid gap-5 sm:grid-cols-2">
+          {profiles.map((profile) => {
+            const isPremiumTemplate = profile.template.isPremium;
+            const paymentApproved = profile.paymentStatus === "APPROVED";
+            const paymentPending = profile.paymentStatus === "PENDING";
+            const paymentRejected = profile.paymentStatus === "REJECTED";
+            const canEdit = !isPremiumTemplate || paymentApproved;
+
+            return (
+            <div key={profile.id}
+              className="nc-card group overflow-hidden rounded-2xl transition-all">
+              {/* Template preview strip */}
+              <div className="relative h-32 w-full overflow-hidden" style={{ background: "var(--nc-bg-2)" }}>
+                <img
+                  src={profile.template.thumbnailUrl}
+                  alt={profile.template.name}
+                  className="h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, var(--nc-bg), transparent)" }} />
+                <div className="absolute bottom-3 left-4 flex items-center gap-2">
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                    profile.isPublished
+                      ? "bg-emerald-500/20 text-emerald-300"
+                      : "bg-amber-500/20 text-amber-300"
+                  }`}>
+                    {profile.isPublished ? "● Live" : "⚠ Draft — not visible"}
+                  </span>
+                </div>
+                {profile.templateLocked && (
+                  <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs backdrop-blur"
+                    style={{ border: "1px solid var(--nc-border)", background: "rgba(0,0,0,0.4)", color: "var(--nc-text-3)" }}>
+                    <Lock className="h-2.5 w-2.5" />
+                    Locked
+                  </div>
+                )}
+              </div>
+
+              <div className="p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>{profile.category.name}</p>
+                    <p className="font-bold" style={{ color: "var(--nc-text)" }}>{profile.template.name}</p>
+                    <p className="mt-0.5 font-mono text-xs" style={{ color: "var(--nc-text-3)" }}>
+                      /{profile.slug}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs" style={{ color: "var(--nc-text-3)" }}>
+                    <Eye className="h-3.5 w-3.5" />
+                    {profile.viewCount.toString()}
+                  </div>
+                </div>
+
+                {/* Payment status badge */}
+                {isPremiumTemplate && (
+                  <div className="mt-3">
+                    {paymentPending && (
+                      <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs" style={{ background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)" }}>
+                        <Clock className="h-3.5 w-3.5 text-amber-400" />
+                        <span className="font-semibold text-amber-300">Pending Approval</span>
+                      </div>
+                    )}
+                    {paymentRejected && (
+                      <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                        <XCircle className="h-3.5 w-3.5 text-red-400" />
+                        <span className="font-semibold text-red-300">Payment Rejected</span>
+                      </div>
+                    )}
+                    {paymentApproved && (
+                      <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}>
+                        <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
+                        <span className="font-semibold text-emerald-300">Approved</span>
+                      </div>
+                    )}
+                    {!profile.paymentStatus && (
+                      <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs" style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)" }}>
+                        <Upload className="h-3.5 w-3.5" style={{ color: "var(--nc-brand-1)" }} />
+                        <span className="font-semibold" style={{ color: "var(--nc-brand-1)" }}>Payment Required</span>
                       </div>
                     )}
                   </div>
+                )}
 
-                  <div className="p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-xs text-neutral-500">{profile.category.name}</p>
-                        <p className="font-bold text-white">{profile.template.name}</p>
-                        <p className="mt-0.5 font-mono text-xs text-neutral-600">
-                          /{profile.slug}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-neutral-600">
-                        <Eye className="h-3.5 w-3.5" />
-                        {profile.viewCount.toString()}
-                      </div>
+                {/* Resubmit / submit payment */}
+                {isPremiumTemplate && (profile.paymentStatus === "REJECTED" || !profile.paymentStatus) && (
+                  <div className="mt-3">
+                    <ResubmitPayment
+                      profileId={profile.id}
+                      templateName={profile.template.name}
+                      prices={{
+                        priceQrOnly: profile.template.priceQrOnly,
+                        priceNfcCard: profile.template.priceNfcCard,
+                        priceNfcQr: profile.template.priceNfcQr,
+                      }}
+                      existingTier={profile.payment?.tier}
+                    />
+                  </div>
+                )}
+
+                <div className="mt-4 flex gap-2">
+                  {canEdit ? (
+                    <Link href={`/dashboard/edit/${profile.slug}`}
+                      className="nc-btn-ghost flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold">
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit
+                    </Link>
+                  ) : (
+                    <div className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold cursor-not-allowed opacity-50"
+                      style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text-3)" }}>
+                      <Pencil className="h-3.5 w-3.5" />
+                      {paymentPending ? "Awaiting Approval" : paymentRejected ? "Reupload Required" : "Edit"}
                     </div>
-
-                    <div className="mt-4 flex gap-2">
-                      <Link href={`/dashboard/edit/${profile.slug}`}
-                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 py-2 text-xs font-semibold text-white transition-all hover:border-white/20 hover:bg-white/10">
-                        <Pencil className="h-3.5 w-3.5" />
-                        Edit
-                      </Link>
-                      <Link href={`/dashboard/qr/${profile.slug}`}
-                        className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all hover:border-white/20 hover:text-white ${
-                          profile.templateLocked
-                            ? "border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
-                            : "border border-white/10 bg-white/5 text-neutral-400"
-                        }`}
-                        title={profile.templateLocked ? "QR locked — view QR" : "Generate QR code"}>
-                        <QrCode className="h-3.5 w-3.5" />
-                      </Link>
-                      <Link href={`/${profile.slug}`} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-neutral-400 transition-all hover:border-white/20 hover:text-white">
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </Link>
+                  )}
+                  {canEdit ? (
+                    <Link href={`/dashboard/qr/${profile.slug}`}
+                      className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                        profile.templateLocked
+                          ? "bg-amber-500/10 text-amber-400"
+                          : ""
+                      }`}
+                      style={!profile.templateLocked ? { background: "var(--nc-bg-hover)", color: "var(--nc-text-2)" } : undefined}
+                      title={profile.templateLocked ? "QR locked — view QR" : "Generate QR code"}>
+                      <QrCode className="h-3.5 w-3.5" />
+                    </Link>
+                  ) : (
+                    <div className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold cursor-not-allowed opacity-50"
+                      style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text-3)" }}>
+                      <QrCode className="h-3.5 w-3.5" />
                     </div>
-
-                    <p className="mt-3 text-xs text-neutral-700">
-                      Updated {new Date(profile.updatedAt).toLocaleDateString("en-US", {
-                        month: "short", day: "numeric", year: "numeric"
-                      })}
-                    </p>
-                  </div>
+                  )}
+                  <Link href={`/${profile.slug}`} target="_blank" rel="noopener noreferrer"
+                    className="nc-btn-ghost flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs">
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
-              ))}
-            </div>
-          ) : (
-            /* Empty state */
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 py-20 text-center">
-              <div className="mb-4 text-5xl">✨</div>
-              <h2 className="text-xl font-black">Create your first profile</h2>
-              <p className="mt-2 max-w-sm text-sm text-neutral-500">
-                Choose a category, pick a template, and claim your unique URL. Takes under 2 minutes.
-              </p>
-              <Link href="/dashboard/onboarding"
-                className="mt-6 flex items-center gap-2 rounded-xl bg-indigo-500 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-indigo-400">
-                <Plus className="h-4 w-4" />
-                Create First Profile
-              </Link>
-            </div>
-          )}
 
-          {/* Remaining categories */}
-          {profiles.length > 0 && profiles.length < 4 && (
-            <div className="mt-8">
-              <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-neutral-600">
-                More Profile Types
-              </p>
-              <Link href="/dashboard/onboarding"
-                className="flex items-center justify-between rounded-xl border border-dashed border-white/10 px-5 py-4 transition-all hover:border-indigo-500/30 hover:bg-indigo-500/5">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-dashed border-white/10">
-                    <Plus className="h-4 w-4 text-neutral-500" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">Add Another Profile Type</p>
-                    <p className="text-xs text-neutral-600">
-                      {4 - profiles.length} categor{4 - profiles.length === 1 ? "y" : "ies"} remaining
-                    </p>
-                  </div>
-                </div>
-                <ExternalLink className="h-4 w-4 text-neutral-600" />
-              </Link>
+                <p className="mt-3 text-xs" style={{ color: "var(--nc-text-3)" }}>
+                  Updated {new Date(profile.updatedAt).toLocaleDateString("en-US", {
+                    month: "short", day: "numeric", year: "numeric"
+                  })}
+                </p>
+              </div>
             </div>
-          )}
+            );
+          })}
         </div>
-      </div>
+      ) : (
+        /* Empty state */
+        <div className="nc-card flex flex-col items-center justify-center rounded-2xl py-20 text-center">
+          <div className="mb-4 text-5xl">✨</div>
+          <h2 className="text-xl font-black" style={{ color: "var(--nc-text)" }}>Create your first profile</h2>
+          <p className="mt-2 max-w-sm text-sm" style={{ color: "var(--nc-text-3)" }}>
+            Choose a category, pick a template, and claim your unique URL. Takes under 2 minutes.
+          </p>
+          <Link href="/dashboard/onboarding"
+            className="nc-btn-brand mt-6 flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold">
+            <Plus className="h-4 w-4" />
+            Create First Profile
+          </Link>
+        </div>
+      )}
+
+      {/* Remaining categories */}
+      {profiles.length > 0 && profiles.length < 4 && (
+        <div className="mt-8">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--nc-text-3)" }}>
+            More Profile Types
+          </p>
+          <Link href="/dashboard/onboarding"
+            className="flex items-center justify-between rounded-xl px-5 py-4 transition-all"
+            style={{ border: "1px dashed var(--nc-border)" }}>
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg"
+                style={{ border: "1px dashed var(--nc-border)" }}>
+                <Plus className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold" style={{ color: "var(--nc-text)" }}>Add Another Profile Type</p>
+                <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                  {4 - profiles.length} categor{4 - profiles.length === 1 ? "y" : "ies"} remaining
+                </p>
+              </div>
+            </div>
+            <ExternalLink className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@
 // Seeds all categories, 5 templates per category, and a demo user + profile
 
 import { PrismaClient } from "@prisma/client";
-import { createHash } from "crypto";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -11,8 +11,7 @@ const prisma = new PrismaClient();
 // ─────────────────────────────────────────────────────────────────────────────
 
 function hashPassword(plain: string): string {
-  // NOTE: In production use bcrypt or argon2 — never raw SHA-256
-  return createHash("sha256").update(plain).digest("hex");
+  return bcrypt.hashSync(plain, 12);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -397,7 +396,7 @@ async function main() {
       status: "ACTIVE",
       emailVerifiedAt: new Date(),
     },
-    update: {},
+    update: { hashedPassword: hashPassword("admin-change-me-in-prod") },
     select: { id: true },
   });
   console.log(`  ✓ admin@presencecard.io (${adminUser.id})`);
@@ -416,7 +415,7 @@ async function main() {
       avatarUrl:
         "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&q=80",
     },
-    update: {},
+    update: { hashedPassword: hashPassword("demo-password-123") },
     select: { id: true },
   });
   console.log(`  ✓ demo@presencecard.io (${demoUser.id})`);

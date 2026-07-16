@@ -5,7 +5,7 @@ import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { formatNumber } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Admin Overview — NEX CARD" };
+export const metadata: Metadata = { title: "Admin Overview" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminOverviewPage() {
@@ -90,7 +90,7 @@ export default async function AdminOverviewPage() {
                 <div className="flex items-center gap-2">
                   {u.role === "ADMIN" && (
                     <span className="rounded-full px-2 py-0.5 text-[10px] font-black text-black"
-                      style={{ background: "linear-gradient(135deg,#d4af37,#f0c050)" }}>ADMIN</span>
+                      style={{ background: "var(--nc-brand-grad)" }}>ADMIN</span>
                   )}
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                     u.status === "ACTIVE"

@@ -1,7 +1,13 @@
-# PresenceCard Platform
+# NEX CARD — Digital Name Card Platform
 
-**Multi-Template Multi-Tenant Digital Presence Platform**  
-Next.js 15 (App Router) · Tailwind CSS · MySQL (Prisma ORM) · TypeScript
+**Multi-Template Multi-Tenant Digital Presence Platform**
+Next.js 15 (App Router) · React 19 · TypeScript · Prisma ORM · MySQL · Tailwind CSS
+
+---
+
+## Overview
+
+NEX CARD is a platform where users create shareable digital identity pages using premium templates, share them via unique URLs, and generate QR codes. Premium templates require a one-time payment (in MMK) with a screenshot-proof workflow reviewed by an admin.
 
 ---
 
@@ -13,191 +19,154 @@ npm install
 
 # 2. Environment
 cp .env.example .env.local
-# Fill in DATABASE_URL, NEXT_PUBLIC_APP_URL, SESSION_SECRET
+# Fill in DATABASE_URL, NEXT_PUBLIC_APP_URL, REVALIDATION_SECRET, R2_* keys
 
 # 3. Database
-npm run db:generate   # generate Prisma client
-npm run db:push       # push schema to DB
-npm run db:seed       # seed categories, templates, demo users
+npm run db:generate     # generate Prisma client
+npm run db:migrate:prod # apply migrations (production) / npm run db:migrate (dev)
+npm run db:seed         # seed categories, templates, demo users
 
 # 4. Dev server
-npm run dev           # → http://localhost:3000
+npm run dev             # → http://localhost:3000
 ```
 
-**Demo credentials**
+**Demo credentials** (after `npm run db:seed`)
 - Admin: `admin@presencecard.io` / `admin-change-me-in-prod`
 - User:  `demo@presencecard.io`  / `demo-password-123`
-- Live demo profile: `http://localhost:3000/alex-rivera`
+
+> Change all passwords before production deployment.
 
 ---
 
-## Architecture
+## Project Details — End-to-End Flow
 
+### 1. Authentication
+- Cookie-based sessions (`session_token`), HttpOnly + Secure + SameSite=Lax.
+- Login redirects `ADMIN` → `/admin`; `USER` → `/dashboard`.
+- Middleware guards `/dashboard` and `/admin` at the edge; admin pages are double-gated (middleware + layout).
+
+### 2. Onboarding (premium templates)
 ```
-presencecard-platform/
-├── prisma/
-│   ├── schema.prisma              # 6 models: User, Session, Category, Template, UserProfile
-│   ├── seed.ts                    # Seeds 4 categories × 5 templates + demo data
-│   └── migrations/                # Raw DDL migration for direct MySQL deploy
-│
-└── src/
-    ├── middleware.ts               # Edge route protection (/dashboard, /admin)
-    ├── types/templates.ts          # Master TS types + TEMPLATE_IDS constants
-    │
-    ├── lib/
-    │   ├── db/prisma.ts           # Singleton Prisma client
-    │   ├── auth/
-    │   │   ├── session.ts         # Cookie-based session helper
-    │   │   └── hash.ts            # bcrypt hash/verify
-    │   ├── cache/profile-cache.ts # ISR + revalidateTag helpers
-    │   ├── storage/r2-upload.ts   # Cloudflare R2 upload + presigned URLs
-    │   ├── utils.ts               # cn(), toSlug(), formatNumber(), etc.
-    │   ├── validators/
-    │   │   └── template-schemas.ts  # Zod schemas for all 4 category shapes
-    │   └── actions/
-    │       ├── profile-actions.ts   # selectTemplate, updateProfile
-    │       ├── qr-actions.ts        # generateQR, incrementQRScanCount
-    │       ├── account-actions.ts   # changePassword, updateProfileInfo, deleteAccount
-    │       └── admin-actions.ts     # toggleUserStatus, toggleTemplate
-    │
-    ├── app/
-    │   ├── page.tsx                       # Marketing landing page
-    │   ├── login/ register/               # Auth pages
-    │   ├── [slug]/page.tsx                # Public profile render (ISR + OG)
-    │   ├── p/[slug]/page.tsx              # QR-scan route (separate scan tracking)
-    │   ├── dashboard/
-    │   │   ├── page.tsx                   # Profile cards listing
-    │   │   ├── analytics/page.tsx         # Per-profile view stats
-    │   │   ├── settings/page.tsx          # Account, password, export, delete
-    │   │   ├── edit/[slug]/               # Profile content editor
-    │   │   ├── onboarding/                # 3-step category→template→slug flow
-    │   │   └── qr/[slug]/                 # QR code generator + lock manager
-    │   ├── admin/                         # Role-gated admin panel
-    │   └── api/
-    │       ├── auth/login|register|logout  # Cookie auth endpoints
-    │       ├── og/                         # Dynamic OG image (ImageResponse)
-    │       ├── qr/[slug]/                  # SVG/PNG QR generation (qrcode pkg)
-    │       ├── slug/check/                 # Real-time slug availability
-    │       ├── upload/                     # R2 presigned URL generator
-    │       ├── export/data/                # JSON data export download
-    │       └── revalidate/                 # Webhook ISR cache purge
-    │
-    └── components/
-        ├── ui/                     # Button, Input, Badge, Card, Spinner, Avatar
-        ├── layout/template-shell.tsx  # PresenceCard attribution wrapper
-        └── templates/              # All 20 world-class templates (see below)
+Register → /dashboard/onboarding
+  1. Category selection      (Digital Name Card / Portfolio / Business Ad / Wedding)
+  2. Template selection      (premium templates show pricing tiers)
+  3. Pricing tier selection  (QR Only / NFC Only / NFC + QR)
+  4. Payment upload          (upload screenshot of bank/Viber transfer in MMK)
+  5. Confirm slug            (claims public URL, locks template)
+```
+Free templates skip steps 3–4.
+
+### 3. Payment Tiers & Pricing
+Pricing is per-template (configurable by admin) in MMK:
+
+| Tier | `Template` column | Description |
+|------|-------------------|-------------|
+| **QR_ONLY** | `priceQrOnly` | QR code only |
+| **NFC_CARD** | `priceNfcCard` | NFC card (device-dependent; requires NFC-capable phone) |
+| **PHYSICAL_CARD** | `priceNfcQr` | NFC + QR combo with QR fallback |
+
+### 4. Payment Submission & Review Flow
+```
+User selects template + tier → uploads screenshot
+  → POST /api/upload (returns path, e.g. /uploads/payments/..)
+  → submitPaymentAction():
+       • validates profile ownership + premium template
+       • verifies submitted amount matches template price for tier
+       • creates Payment (status=PENDING) + sets UserProfile.paymentStatus=PENDING
+       • (Real DB) wrapped in $transaction; (Mock DB) sequential writes
+
+Admin → /admin/payments (filter: Pending / Approved / Rejected)
+  → Approve  → Payment.status=APPROVED, UserProfile.paymentStatus=APPROVED
+               → user may now edit profile content
+  → Reject   → Payment.status=REJECTED (+ optional adminNote),
+               UserProfile.paymentStatus=REJECTED
+               → user sees "Resubmit Payment" on dashboard
+
+User dashboard:
+  • paymentStatus=PENDING   → "Pending Approval"
+  • paymentStatus=APPROVED  → profile editable
+  • paymentStatus=REJECTED  → "Resubmit Payment" (re-uploads + resubmits)
 ```
 
----
+Key files:
+- `src/lib/actions/payment-actions.ts` — `submitPaymentAction`, `getPaymentForProfile`
+- `src/app/dashboard/_components/resubmit-payment.tsx` — submit/resubmit modal
+- `src/app/admin/payments/page.tsx` + `_components/approve-reject-buttons.tsx`
+- `src/lib/actions/admin-actions.ts` — `approvePaymentAction`, `rejectPaymentAction`
 
-## 20 Templates — Design Research & Implementation
+### 5. Template Locking
+- `templateLocked: true` once onboarding is confirmed — template/category frozen.
+- `qrLocked: true` after first QR generation.
+- Profile **content** (name, bio, contacts, images) is always editable after approval.
 
-All templates were redesigned from scratch after researching industry leaders in each category.
-
-### Digital Name Card (5 templates)
-
-| Template | Design Inspiration | Key Features |
-|----------|-------------------|--------------|
-| **Aurora** | HiHello × Linear × Stripe | Glassmorphism mesh-gradient hero, full contact rows, skill tags, gradient CTA |
-| **Obsidian** | Notion brutalism × Bloomberg | High-contrast pure black, editorial typography, contact table, social border chips |
-| **Prism** | Vercel dashboard × Raycast | Multi-spectrum gradient, per-skill progress bars, colour-coded social grid |
-| **Coral** | Linktree Premium × Beacons.ai | Warm bio-link layout, emoji contact pills, centred avatar, 2-col social grid |
-| **Titanium** | Apple Metal × Porsche design | Metallic grid bg, precision data table for contacts, 2-col skill bars, monospace socials |
-
-**All digital name card templates include:** phone, email, WhatsApp, LinkedIn, GitHub, Twitter/X, Instagram, TikTok, Telegram, website — displayed visibly with accessible tap targets.
-
-### Portfolio (5 templates)
-
-| Template | Target User | Design Inspiration |
-|----------|-------------|-------------------|
-| **Canvas** | Designers, SMEs, creatives | Awwwards editorial white — sticky nav, featured project grid, testimonials |
-| **Studio** | Photographers, filmmakers, agencies | Full-bleed cinematic dark — project images as hero, grayscale hover |
-| **Forge** | Developers, open source | Terminal monospace — JSON contacts block, project list with #hashtag tags |
-| **Spectrum** | Creative directors, brand designers | Bold bento grid — oversized typography, masonry gallery, colour-coded skill cards |
-| **Blueprint** | Architects, consultants, engineers | Technical grid background — constellation timeline, code-monospace typography |
-
-### Business Advertisement (5 templates)
-
-| Template | Target Business | Design Inspiration |
-|----------|----------------|-------------------|
-| **Marquee** | SaaS startups, tech companies | Stripe × Linear × Vercel — scrolling ticker, bold hero, pricing cards |
-| **District** | Local businesses, F&B, retail | Square × Toast POS — warm whites, review stars, hours table, maps link |
-| **Empire** | Corporate, professional services | McKinsey × Deloitte — fixed nav, dark testimonial strip, enterprise polish |
-| **Neon** | Nightlife, events, entertainment | Spotify × Resident Advisor — full-bleed masonry gallery, minimal typography |
-| **Vault** | Finance, legal, luxury goods | Hermès × Goldman Sachs — Roman numeral services, pull-quote testimonials, gold palette |
-
-### Wedding Invitation (5 templates)
-
-| Template | Style | Design Inspiration |
-|----------|-------|-------------------|
-| **Eternal** | Timeless luxury | Riley & Grey × Zola — full love-story timeline, countdown, gallery masonry |
-| **Blossom** | Soft floral bohemian | Minted botanical — organic blob avatars, petal decorations, pastel palette |
-| **Noir** | Cinematic black & white | Wong Kar-wai × Kubrick — film-grain overlay, grayscale photos with colour hover |
-| **Celestial** | Deep space romantic | NASA aesthetic × Zola cosmic — CSS star-particle SVG field, nebula glow blobs |
-| **Rustic** | Botanical outdoor | Junebug Weddings × boho — dashed border frames, botanical emoji corners, earth tones |
+### 6. QR & Sharing
+- Public profile: `/{slug}` (ISR 3600s, `revalidateTag("profile:{slug}")`).
+- QR route: `/p/{slug}` tracks `qrScanCount` independently.
 
 ---
 
 ## Database Schema
 
-Six models, `cuid()` primary keys:
+Six models: `User`, `Session`, `Category`, `Template`, `UserProfile`, `Payment`.
 
-```
-User → Session (auth)
-Category → Template (catalogue)  
-User + Category + Template → UserProfile (core entity)
-```
+| Model | Key columns |
+|-------|-------------|
+| `User` | `email`, `role (ADMIN/USER)`, `status (ACTIVE/SUSPENDED/PENDING_VERIFICATION)`, `hashedPassword` |
+| `Template` | `codeIdentifier`, `isPremium`, `priceQrOnly`, `priceNfcCard`, `priceNfcQr` |
+| `UserProfile` | `slug` (unique), `templateLocked`, `qrLocked`, `paymentStatus`, `viewCount (BigInt)`, `dynamicJsonData (JSON)` |
+| `Payment` | `userProfileId` (unique), `tier (QR_ONLY/NFC_CARD/PHYSICAL_CARD)`, `amount`, `screenshotUrl`, `status (PENDING/APPROVED/REJECTED)`, `adminNote`, `reviewedBy` |
 
-**Key design decisions:**
-- `dynamicJsonData JSON` — all template-specific content in one column, validated by Zod at app layer
-- `templateLocked BOOLEAN` — set on onboarding confirm; enforced server-side in every action
-- `qrLocked BOOLEAN` — set on first QR generation; freezes template + category permanently  
-- `qrScanCount BIGINT` — separate from `viewCount` to distinguish QR vs organic traffic
-- `UNIQUE(userId, categoryId)` — one profile per category per user, enforced at DB level
-- `viewCount BIGINT` — prevents overflow for viral profiles
+**Enums**
+- `PaymentTier`: `QR_ONLY`, `NFC_CARD`, `PHYSICAL_CARD`
+- `PaymentStatus`: `PENDING`, `APPROVED`, `REJECTED`
 
----
-
-## QR Code System
-
-```
-User publishes profile → navigates to /dashboard/qr/[slug]
-→ Clicks "Generate QR" → amber lock warning shown
-→ Confirms → generateQRAction():
-    • Sets qrLocked=true, templateLocked=true, qrGeneratedAt=now
-    • Purges ISR cache for that slug
-→ QR displayed — download SVG (vector) or PNG (128/256/512/1024px)
-→ QR points to /p/[slug] (separate route):
-    • Increments qrScanCount independently
-    • Shows QRScanBadge (auto-dismisses after 6s)
-    • Renders full template identically
-→ After lock: template + category permanently frozen; content editable forever
-```
+**Design notes**
+- `viewCount`/`qrScanCount` are `BigInt` (converted to `Number` before `unstable_cache` serialization).
+- `UNIQUE(userId, categoryId)` — one profile per category per user.
+- Migration `0002_rename_price_physical_to_nfcqr` renamed `pricePhysical` → `priceNfcQr`.
 
 ---
 
-## ISR + Cache Strategy
+## Key Routes
 
-- All public profiles: `revalidate = 3600` (1 hour CDN edge cache)
-- `revalidateTag("profile:{slug}")` called immediately on every profile save
-- `revalidateTag("user-profiles:{userId}")` for dashboard list
-- `/api/revalidate` webhook for external purges (protected by `REVALIDATION_SECRET`)
+| Route | Type | Description |
+|-------|------|-------------|
+| `/` | Public | Landing page |
+| `/login`, `/register` | Public | Auth pages |
+| `/{slug}` | Public | Profile render engine |
+| `/p/{slug}` | Public | QR-scanned profile landing |
+| `/dashboard` | Protected | User workspace — profile listing + payment status |
+| `/dashboard/onboarding` | Protected | Category → template → tier → payment → slug |
+| `/dashboard/edit/{slug}` | Protected | Profile content editor |
+| `/dashboard/qr/{slug}` | Protected | QR code manager |
+| `/dashboard/analytics` | Protected | Profile analytics |
+| `/admin` | Admin | Overview |
+| `/admin/payments` | Admin | Payment approvals |
+| `/admin/users` | Admin | User management |
+| `/admin/templates` | Admin | Template catalogue + pricing |
+| `/api/upload` | Session | Payment screenshot upload (returns local path) |
+| `/api/slug/check` | Public | Slug availability |
+| `/api/revalidate` | Secret | ISR cache purge (`REVALIDATION_SECRET`) |
 
 ---
 
 ## Scripts
 
 ```bash
-npm run dev           # Turbopack dev server
-npm run build         # Production build
-npm run type-check    # TypeScript check (no emit)
-npm run lint          # ESLint
-npm run format        # Prettier
-npm run test          # Vitest unit tests
-npm run db:generate   # Generate Prisma client after schema changes
-npm run db:push       # Push schema changes to DB (dev)
-npm run db:migrate    # Create + apply migration (dev)
-npm run db:migrate:prod  # Apply existing migrations (production)
-npm run db:studio     # Open Prisma Studio GUI
-npm run db:seed       # Seed categories, templates, demo data
+npm run dev             # dev server (port 3000)
+npm run build           # production build (prisma generate + next build)
+npm run start           # start production server
+npm run type-check      # tsc --noEmit
+npm run lint            # eslint
+npm run test            # vitest
+npm run db:generate     # prisma generate
+npm run db:migrate      # create + apply migration (dev)
+npm run db:migrate:prod # apply migrations (production)
+npm run db:seed         # seed data
 ```
+
+---
+
+## Branding
+
+Logo lives in `src/components/ui/nex-card-logo.tsx` (exports `NexCardLogo`, `NexCardLogoStatic`, `NexCardLogoAuto`). Theme tokens: `.nc-dark` (gold/black) and `.nc-light` (navy/white) defined in `globals.css`.
