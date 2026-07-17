@@ -1,5 +1,4 @@
-// src/app/page.tsx — NEX CARD marketing landing page
-// Fully themed with CSS vars, supports both dark/gold and light/navy
+
 
 import Link from "next/link";
 import { ThemeProvider } from "@/lib/theme/theme-context";
