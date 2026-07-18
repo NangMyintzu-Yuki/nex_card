@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "@/lib/auth/session";
 import { ThemeProvider } from "@/lib/theme/theme-context";
 import { DashboardSidebar } from "./_components/dashboard-sidebar";
+import { DashboardShell } from "./_components/dashboard-shell";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -21,20 +22,20 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
 
   return (
     <ThemeProvider>
-      <div className="flex min-h-screen" style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
-        <DashboardSidebar
-          user={{
-            id: session.user.id,
-            name: session.user.name,
-            email: session.user.email,
-            role: session.user.role,
-          }}
-        />
-
-        <div className="flex-1 lg:pl-64">
-          {children}
-        </div>
-      </div>
+      <DashboardShell
+        sidebar={
+          <DashboardSidebar
+            user={{
+              id: session.user.id,
+              name: session.user.name,
+              email: session.user.email,
+              role: session.user.role,
+            }}
+          />
+        }
+      >
+        {children}
+      </DashboardShell>
     </ThemeProvider>
   );
 }

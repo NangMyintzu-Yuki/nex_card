@@ -70,7 +70,6 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
       title: "Identity",
       fields: [
         { key: "fullName",   label: "Full Name",   type: "text",     placeholder: "Alex Rivera",           required: true, maxLength: 120 },
-        { key: "pronouns",   label: "Pronouns",    type: "text",     placeholder: "they/them",                              maxLength: 30  },
         { key: "jobTitle",   label: "Job Title",   type: "text",     placeholder: "Senior Product Designer", required: true, maxLength: 120 },
         { key: "company",    label: "Company",     type: "text",     placeholder: "Horizon Labs",            required: true, maxLength: 120 },
         { key: "tagline",    label: "Tagline",     type: "text",     placeholder: "Designing systems that scale.",           maxLength: 200 },
@@ -128,7 +127,7 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
         { key: "bio",         label: "Bio",         type: "textarea", required: true,  maxLength: 2000 },
         { key: "avatarUrl",   label: "Avatar URL",  type: "url" },
         { key: "resumeUrl",   label: "Resume URL",  type: "url",      placeholder: "https://…/resume.pdf" },
-        { key: "availability",label: "Availability",type: "text",     placeholder: "available / limited / unavailable" },
+        { key: "availability",label: "Availability",type: "text",     placeholder: "available / limited / unavailable", maxLength: 30 },
         { key: "availabilityNote", label: "Availability Note", type: "text", maxLength: 200 },
       ],
     },
@@ -160,7 +159,7 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
         { key: "logoUrl",       label: "Logo URL",        type: "url" },
         { key: "heroImageUrl",  label: "Hero Image URL",  type: "url" },
         { key: "industry",      label: "Industry",        type: "text",     maxLength: 80 },
-        { key: "founded",       label: "Year Founded",    type: "text",     placeholder: "2018" },
+        { key: "founded",       label: "Year Founded",    type: "text",     placeholder: "2018", maxLength: 4 },
         { key: "primaryCtaLabel", label: "CTA Button Label", type: "text",  required: true, maxLength: 60 },
         { key: "primaryCtaUrl",   label: "CTA Button URL",   type: "url",   required: true },
       ],
@@ -187,12 +186,12 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
     {
       id: "couple", title: "The Couple",
       fields: [
-        { key: "partner1.name",     label: "Partner 1 Name",     type: "text", required: true },
-        { key: "partner1.nickname", label: "Partner 1 Nickname", type: "text" },
+        { key: "partner1.name",     label: "Partner 1 Name",     type: "text", required: true, maxLength: 80 },
+        { key: "partner1.nickname", label: "Partner 1 Nickname", type: "text", maxLength: 40 },
         { key: "partner1.photoUrl", label: "Partner 1 Photo URL",type: "url"  },
         { key: "partner1.bio",      label: "Partner 1 Bio",      type: "textarea", maxLength: 600 },
-        { key: "partner2.name",     label: "Partner 2 Name",     type: "text", required: true },
-        { key: "partner2.nickname", label: "Partner 2 Nickname", type: "text" },
+        { key: "partner2.name",     label: "Partner 2 Name",     type: "text", required: true, maxLength: 80 },
+        { key: "partner2.nickname", label: "Partner 2 Nickname", type: "text", maxLength: 40 },
         { key: "partner2.photoUrl", label: "Partner 2 Photo URL",type: "url"  },
         { key: "partner2.bio",      label: "Partner 2 Bio",      type: "textarea", maxLength: 600 },
       ],
@@ -203,9 +202,9 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
         { key: "weddingDate",   label: "Wedding Date & Time", type: "text",     placeholder: "2025-11-15T14:00:00+08:00", required: true },
         { key: "headline",      label: "Headline",            type: "text",     placeholder: "Together at last", maxLength: 200 },
         { key: "coupleMessage", label: "Message from the Couple", type: "textarea", maxLength: 1000 },
-        { key: "hashtag",       label: "Wedding Hashtag",     type: "text",     placeholder: "AlexAndJordanForever" },
-        { key: "songTitle",     label: "Song Title",          type: "text" },
-        { key: "songArtist",    label: "Song Artist",         type: "text" },
+        { key: "hashtag",       label: "Wedding Hashtag",     type: "text",     placeholder: "AlexAndJordanForever", maxLength: 60 },
+        { key: "songTitle",     label: "Song Title",          type: "text", maxLength: 120 },
+        { key: "songArtist",    label: "Song Artist",         type: "text", maxLength: 120 },
         { key: "spotifyUrl",    label: "Spotify URL",         type: "url" },
       ],
     },
@@ -432,7 +431,7 @@ function ImageUploadField({
 
 function SocialLinksEditor({ value, onChange }: { value: unknown[]; onChange: (v: unknown[]) => void }) {
   const links = (value as Array<Record<string, string>>) ?? [];
-  const PLATFORMS = ["linkedin","github","twitter","instagram","facebook","youtube","tiktok","website","whatsapp","telegram"];
+  const PLATFORMS = ["linkedin","github","twitter","instagram","facebook","youtube","tiktok","website","whatsapp","telegram","viber","discord"];
   return (
     <div className="space-y-2">
       {links.map((l, i) => (
@@ -721,13 +720,24 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
   const renderField = (field: FieldDef) => {
     const val = getFieldValue(field.key);
     const base = "nc-input w-full px-3 py-2.5 text-sm transition-colors";
+    const charCount = typeof val === "string" ? val.length : 0;
+    const nearLimit = field.maxLength && charCount > field.maxLength * 0.9;
+
+    const charCounter = field.maxLength ? (
+      <p className="mt-1 text-right text-xs tabular-nums" style={{ color: nearLimit ? "var(--nc-danger)" : "var(--nc-text-3)" }}>
+        {charCount}/{field.maxLength}
+      </p>
+    ) : null;
 
     switch (field.type) {
       case "textarea":
         return (
-          <textarea value={String(val ?? "")} onChange={(e) => setFieldValue(field.key, e.target.value)}
-            placeholder={field.placeholder} maxLength={field.maxLength} rows={4}
-            className={`${base} resize-none`} />
+          <div>
+            <textarea value={String(val ?? "")} onChange={(e) => setFieldValue(field.key, e.target.value)}
+              placeholder={field.placeholder} maxLength={field.maxLength} rows={4}
+              className={`${base} resize-none`} />
+            {charCounter}
+          </div>
         );
       case "color":
         return (
@@ -760,9 +770,12 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
         return <ImageUploadField value={String(val ?? "")} onChange={(v) => setFieldValue(field.key, v)} placeholder={field.placeholder} />;
       default:
         return (
-          <input type={field.type} value={String(val ?? "")} onChange={(e) => setFieldValue(field.key, e.target.value)}
-            placeholder={field.placeholder} maxLength={field.maxLength}
-            className={base} />
+          <div>
+            <input type={field.type} value={String(val ?? "")} onChange={(e) => setFieldValue(field.key, e.target.value)}
+              placeholder={field.placeholder} maxLength={field.maxLength}
+              className={base} />
+            {charCounter}
+          </div>
         );
     }
   };

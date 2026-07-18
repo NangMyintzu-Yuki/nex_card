@@ -20,6 +20,7 @@ interface QRManagerProps {
   profile: {
     id: string;
     slug: string;
+    userName: string;
     isPublished: boolean;
     templateLocked: boolean;
     qrLocked: boolean;
@@ -70,6 +71,9 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
   const [copied, setCopied]       = useState(false);
   const [qrSize, setQrSize]       = useState<256 | 512 | 1024>(512);
   const [qrFormat, setQrFormat]   = useState<"svg" | "png">("svg");
+  const [qrLoaded, setQrLoaded]   = useState(false);
+  const [justGenerated, setJustGenerated] = useState(false);
+  const [cacheBuster, setCacheBuster] = useState<string>("");
   const qrImgRef = useRef<HTMLImageElement>(null);
 
   // Update lock state when action completes
@@ -78,8 +82,17 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
       setIsLocked(true);
       setLockedAt(formState.qrGeneratedAt);
       setShowConfirm(false);
+      setJustGenerated(true);
+      setQrLoaded(false);
+      setCacheBuster(`&t=${Date.now()}`);
+      setTimeout(() => setJustGenerated(false), 2000);
     }
   }, [formState]);
+
+  // Set cache buster on mount (client-only) to avoid hydration mismatch
+  useEffect(() => {
+    setCacheBuster(`&t=${Date.now()}`);
+  }, []);
 
   function handleCopy() {
     navigator.clipboard.writeText(qrScanUrl).then(() => {
@@ -95,7 +108,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
     const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = objectUrl;
-    a.download = `presencecard-qr-${profile.slug}.${format}`;
+    a.download = `nexcard-${profile.userName.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase()}-qr.${format}`;
     a.click();
     URL.revokeObjectURL(objectUrl);
   }
@@ -159,13 +172,20 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                   {/* Actual QR from API */}
                   <div className="relative overflow-hidden rounded-2xl shadow-2xl"
                     style={{ boxShadow: `0 0 40px ${accentColor}25` }}>
+                    {!qrLoaded && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-2xl"
+                        style={{ background: `${accentColor}10` }}>
+                        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                      </div>
+                    )}
                     <img
                       ref={qrImgRef}
-                      src={`${qrApiUrl}?format=svg&size=512`}
+                      src={`${qrApiUrl}?format=svg&size=512${cacheBuster}`}
                       alt={`QR code for ${profile.slug}`}
                       width={220}
                       height={220}
-                      className="block"
+                      className={`block transition-opacity duration-500 ${qrLoaded ? "opacity-100" : "opacity-0"}`}
+                      onLoad={() => setQrLoaded(true)}
                     />
                     {/* NEX CARD logo overlay in center */}
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-md">
@@ -180,6 +200,12 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                   <div className="absolute -right-3 -top-3 flex items-center gap-1 rounded-full bg-emerald-500 px-2.5 py-1 text-xs font-bold text-white shadow-lg">
                     <Lock className="h-3 w-3" /> Locked
                   </div>
+                  {/* Just-generated success flash */}
+                  {justGenerated && (
+                    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white shadow-lg animate-bounce">
+                      <Check className="h-3 w-3" /> QR Generated!
+                    </div>
+                  )}
                 </div>
               ) : (
                 /* Placeholder QR before generation */

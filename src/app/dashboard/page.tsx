@@ -96,20 +96,20 @@ export default async function DashboardPage({
 
             return (
             <div key={profile.id}
-              className="nc-card group overflow-hidden rounded-2xl transition-all">
+              className="nc-card nc-profile-card group overflow-hidden rounded-2xl transition-all">
               {/* Template preview strip */}
               <div className="relative h-32 w-full overflow-hidden" style={{ background: "var(--nc-bg-2)" }}>
                 <img
                   src={resolveThumbnailUrl(profile.template.thumbnailUrl, profile.template.name)}
                   alt={profile.template.name}
-                  className="h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-105"
+                  className="h-full w-full object-cover opacity-80 transition-all duration-500 group-hover:scale-110 group-hover:opacity-100"
                 />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, var(--nc-bg), transparent)" }} />
                 <div className="absolute bottom-3 left-4 flex items-center gap-2">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold backdrop-blur-sm ${
                     profile.isPublished
-                      ? "bg-emerald-500/20 text-emerald-300"
-                      : "bg-amber-500/20 text-amber-300"
+                      ? "bg-emerald-500/30 text-emerald-300"
+                      : "bg-amber-500/30 text-amber-300"
                   }`}>
                     {profile.isPublished ? "● Live" : "⚠ Draft — not visible"}
                   </span>

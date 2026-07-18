@@ -38,6 +38,7 @@ export default async function QRPage({
       qrScanCount: true,
       viewCount: true,
       updatedAt: true,
+      user: { select: { name: true } },
       category: { select: { name: true, slug: true } },
       template: {
         select: {
@@ -56,6 +57,7 @@ export default async function QRPage({
     <QRManager
       profile={{
         ...profile,
+        userName: profile.user.name,
         viewCount: Number(profile.viewCount),
         qrScanCount: Number(profile.qrScanCount),
         qrGeneratedAt: profile.qrGeneratedAt?.toISOString() ?? null,

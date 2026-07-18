@@ -96,7 +96,6 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
   const [copied, setCopied] = useState(false);
   const {
     fullName,
-    pronouns,
     jobTitle,
     company,
     avatarUrl,
@@ -110,7 +109,7 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
     ctaUrl,
   } = data;
 
-  const sorted = [...contacts].sort((a, b) => {
+  const sorted = [...(contacts ?? [])].sort((a, b) => {
     const ai = PRIORITY.indexOf(a.type),
       bi = PRIORITY.indexOf(b.type);
     return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
@@ -149,7 +148,6 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
             <h1 className="text-3xl font-black leading-none tracking-tighter text-white">
               {fullName}
             </h1>
-            {pronouns && <p className="text-xs text-neutral-700">{pronouns}</p>}
             <p
               className="mt-1 text-sm font-bold uppercase tracking-wider"
               style={{ color: accentColor }}

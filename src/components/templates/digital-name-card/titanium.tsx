@@ -33,7 +33,7 @@ const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address
 
 export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
   const [copied,setCopied]=useState(false);
-  const {fullName,pronouns,jobTitle,company,companyLogoUrl,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote,ctaLabel,ctaUrl}=data;
+  const {fullName,jobTitle,company,companyLogoUrl,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote,ctaLabel,ctaUrl}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
   const s=accentColor;
 
@@ -58,7 +58,7 @@ export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h1 className="text-lg font-black leading-tight text-white">{fullName}{pronouns&&<span className="ml-1.5 text-xs font-normal text-slate-600"> ({pronouns})</span>}</h1>
+                  <h1 className="text-lg font-black leading-tight text-white">{fullName}</h1>
                   <p className="text-xs font-semibold uppercase tracking-widest mt-0.5" style={{color:s}}>{jobTitle}</p>
                 </div>
                 {companyLogoUrl&&<Image src={companyLogoUrl} alt={company} width={48} height={20} className="h-5 w-auto object-contain opacity-50 shrink-0"/>}

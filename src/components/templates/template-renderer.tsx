@@ -6,12 +6,24 @@ import dynamic from "next/dynamic";
 import { TEMPLATE_IDS } from "@/types/templates";
 import type { CategorySlug } from "@/lib/validators/template-schemas";
 import {
-  parseTemplateData,
+  safeParseTemplateData,
   type DigitalNameCardData,
   type PortfolioData,
   type BusinessAdData,
   type WeddingInvitationData,
 } from "@/lib/validators/template-schemas";
+
+const DEFAULTS: Record<CategorySlug, Record<string, unknown>> = {
+  "digital-name-card": { fullName: "", jobTitle: "", company: "", contacts: [], socialLinks: [] },
+  "portfolio": { fullName: "", headline: "", bio: "", contacts: [], socialLinks: [], projects: [], experience: [] },
+  "business-ad": { businessName: "", tagline: "", description: "", contacts: [], socialLinks: [], services: [] },
+  "wedding-invitation": { partner1: { name: "" }, partner2: { name: "" }, weddingDate: "", events: [], loveHistory: [], gallery: [] },
+};
+
+function getDefaultData(categorySlug: CategorySlug, rawJson: unknown) {
+  const data = (typeof rawJson === "object" && rawJson !== null ? rawJson : {}) as Record<string, unknown>;
+  return { ...DEFAULTS[categorySlug], ...data };
+}
 
 const AuroraNameCard = dynamic(() =>
   import("@/components/templates/digital-name-card/aurora").then((m) => ({
@@ -130,15 +142,20 @@ export function TemplateRenderer({
   dynamicJsonData,
   accentColor,
 }: TemplateRendererProps) {
-  const parsedData = parseTemplateData(categorySlug, dynamicJsonData);
   const accent = accentColor ?? undefined;
+
+  // Use safeParse to avoid crashes on missing/invalid fields
+  const result = safeParseTemplateData(categorySlug, dynamicJsonData);
+  const parsedData = result.success
+    ? result.data
+    : getDefaultData(categorySlug, dynamicJsonData);
 
   switch (categorySlug) {
     case "digital-name-card":
       return (
         <DigitalNameCardSwitch
           templateCode={templateCode}
-          data={parsedData as DigitalNameCardData}
+          data={parsedData as any}
           accentColor={accent}
         />
       );
@@ -146,7 +163,7 @@ export function TemplateRenderer({
       return (
         <PortfolioSwitch
           templateCode={templateCode}
-          data={parsedData as PortfolioData}
+          data={parsedData as any}
           accentColor={accent}
         />
       );
@@ -154,7 +171,7 @@ export function TemplateRenderer({
       return (
         <BusinessAdSwitch
           templateCode={templateCode}
-          data={parsedData as BusinessAdData}
+          data={parsedData as any}
           accentColor={accent}
         />
       );
@@ -162,7 +179,7 @@ export function TemplateRenderer({
       return (
         <WeddingSwitch
           templateCode={templateCode}
-          data={parsedData as WeddingInvitationData}
+          data={parsedData as any}
           accentColor={accent}
         />
       );

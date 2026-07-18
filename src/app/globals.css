@@ -419,6 +419,7 @@ body {
 
   /* Shadows */
   --nc-shadow:        0 8px 32px rgba(0,0,0,0.6);
+  --nc-shadow-hover:  0 12px 40px rgba(0,0,0,0.7);
   --nc-glow:          0 8px 28px rgba(212,175,55,0.35);
 
   /* Status */
@@ -464,6 +465,7 @@ html.nc-light,
 
   /* Shadows */
   --nc-shadow:        0 4px 24px rgba(26,58,107,0.1);
+  --nc-shadow-hover:  0 8px 32px rgba(26,58,107,0.15);
   --nc-glow:          0 8px 28px rgba(26,58,107,0.28);
 
   /* Status */
@@ -499,6 +501,28 @@ html.nc-light,
   border: 1px solid var(--nc-border);
   box-shadow: var(--nc-shadow);
   border-radius: 1rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.nc-card:hover {
+  box-shadow: var(--nc-shadow-hover, var(--nc-shadow));
+  border-color: var(--nc-border-brand);
+}
+
+/* Dashboard profile card hover */
+@keyframes nc-card-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.nc-profile-card {
+  animation: nc-card-enter 0.4s ease both;
+}
+.nc-profile-card:nth-child(1) { animation-delay: 0ms; }
+.nc-profile-card:nth-child(2) { animation-delay: 60ms; }
+.nc-profile-card:nth-child(3) { animation-delay: 120ms; }
+.nc-profile-card:nth-child(4) { animation-delay: 180ms; }
+.nc-profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.15);
 }
 
 /* Sidebar nav item */

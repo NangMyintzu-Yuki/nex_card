@@ -34,7 +34,7 @@ const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address
 
 export function CoralNameCard({ data, accentColor="#f97316" }: Props) {
   const [copied,setCopied]=useState(false);
-  const {fullName,pronouns,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote,ctaLabel,ctaUrl}=data;
+  const {fullName,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote,ctaLabel,ctaUrl}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
   const w1=accentColor,w2="#dc2626";
 
@@ -51,7 +51,7 @@ export function CoralNameCard({ data, accentColor="#f97316" }: Props) {
               </div>
             </div>
           </div>
-          <h1 className="text-2xl font-black text-white">{fullName}{pronouns&&<span className="ml-2 text-sm font-normal text-white/35">({pronouns})</span>}</h1>
+          <h1 className="text-2xl font-black text-white">{fullName}</h1>
           <p className="mt-0.5 text-sm font-semibold" style={{color:w1}}>{jobTitle}</p>
           <p className="text-xs text-white/40">{company}</p>
           {tagline&&<p className="mt-3 max-w-xs text-sm leading-relaxed text-white/55">{tagline}</p>}

@@ -34,7 +34,6 @@ import { RusticWedding } from "../../../../../components/templates/wedding/rusti
 
 const SAMPLE_NAME_CARD_DATA = {
   fullName: "Alex Rivera",
-  pronouns: "they/them",
   jobTitle: "Senior Product Designer",
   company: "Horizon Labs",
   tagline: "Designing systems that scale. Shipping products that matter.",

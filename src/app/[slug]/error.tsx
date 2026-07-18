@@ -54,6 +54,10 @@ export default function ProfileError({
           </p>
         )}
 
+        <p className="mt-2 font-mono text-xs text-red-400/70 break-all">
+          {error.message}
+        </p>
+
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <button
             onClick={reset}

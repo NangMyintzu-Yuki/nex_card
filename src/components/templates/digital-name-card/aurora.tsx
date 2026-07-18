@@ -96,7 +96,7 @@ const CONTACT_PRIORITY = ["phone","email","whatsapp","viber","telegram","website
 
 export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
   const [copied, setCopied] = useState(false);
-  const { fullName, pronouns, jobTitle, company, companyLogoUrl,
+  const { fullName, jobTitle, company, companyLogoUrl,
     tagline, bio, avatarUrl, contacts, socialLinks, skills, featuredQuote, ctaLabel, ctaUrl } = data;
 
   const sortedContacts = [...contacts].sort((a, b) => {
@@ -154,7 +154,6 @@ export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
             </div>
             <h1 className="text-2xl font-black leading-tight text-white">
               {fullName}
-              {pronouns && <span className="ml-2 text-sm font-normal text-white/35">({pronouns})</span>}
             </h1>
             <p className="text-sm font-semibold" style={{ color: accentColor }}>{jobTitle}</p>
             <p className="text-xs text-white/45">{company}</p>

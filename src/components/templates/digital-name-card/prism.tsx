@@ -35,7 +35,7 @@ const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address
 
 export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
   const [copied,setCopied]=useState(false);
-  const {fullName,pronouns,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills,ctaLabel,ctaUrl}=data;
+  const {fullName,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills,ctaLabel,ctaUrl}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
 
   return (
@@ -56,7 +56,7 @@ export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
                   <div className="flex h-full w-full items-center justify-center text-2xl font-black text-white" style={{background:`linear-gradient(135deg,${accentColor},#06b6d4)`}}>{fullName.charAt(0)}</div>}
               </div>
             </div>
-            <h1 className="text-xl font-black text-white">{fullName}{pronouns&&<span className="ml-1.5 text-xs font-normal text-white/30">({pronouns})</span>}</h1>
+            <h1 className="text-xl font-black text-white">{fullName}</h1>
             <p className="text-sm font-semibold" style={{background:`linear-gradient(90deg,${accentColor},#06b6d4)`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>{jobTitle}</p>
             <p className="text-xs text-white/40">{company}</p>
             {tagline&&<p className="mt-2 text-xs text-white/50 italic">&ldquo;{tagline}&rdquo;</p>}

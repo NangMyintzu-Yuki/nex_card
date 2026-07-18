@@ -68,7 +68,6 @@ describe("DigitalNameCardSchema", () => {
     const result = DigitalNameCardSchema.safeParse(validCard);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.pronouns).toBeUndefined();
       expect(result.data.bio).toBeUndefined();
     }
   });

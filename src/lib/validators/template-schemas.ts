@@ -53,7 +53,6 @@ const ContactFieldSchema = z.object({
 
 export const DigitalNameCardSchema = z.object({
   fullName: z.string().min(1).max(120),
-  pronouns: z.string().max(30).optional(),
   jobTitle: z.string().min(1).max(120),
   company: z.string().min(1).max(120),
   companyLogoUrl: z.string().url().optional().or(z.literal("")),

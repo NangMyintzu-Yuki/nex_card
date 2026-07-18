@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
   // ── Image optimization ──────────────────────────────────────────────────
   images: {
     remotePatterns: [
+      // Local dev uploads
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
       // User-uploaded content via your storage provider
       {
         protocol: "https",
