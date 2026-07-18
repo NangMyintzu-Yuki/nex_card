@@ -529,11 +529,11 @@ export default function LandingPage() {
               © {new Date().getFullYear()} NEX CARD. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
-              {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((l) => (
-                <a key={l} href="#" className="text-xs transition-colors duration-200 hover:opacity-70"
+              {[["Privacy Policy", "/legal/privacy"], ["Terms of Service", "/legal/terms"], ["Cookie Policy", "/legal/cookies"]].map(([l, h]) => (
+                <Link key={l} href={h} className="text-xs transition-colors duration-200 hover:opacity-70"
                   style={{ color: "var(--nc-text-3)" }}>
                   {l}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
