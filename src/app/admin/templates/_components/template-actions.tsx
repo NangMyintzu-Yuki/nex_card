@@ -1,7 +1,7 @@
 // src/app/admin/templates/_components/template-actions.tsx
-// Server Components only — no "use client"
 
 import { toggleTemplateField, saveTemplatePrices } from "@/lib/actions/template-admin-actions";
+import { SubmitButton } from "./submit-button";
 
 export function ActiveToggle({
   templateId,
@@ -14,8 +14,7 @@ export function ActiveToggle({
 
   return (
     <form action={action}>
-      <button
-        type="submit"
+      <SubmitButton
         className="rounded-full px-2.5 py-1 text-xs font-semibold transition-colors"
         style={
           isActive
@@ -24,7 +23,7 @@ export function ActiveToggle({
         }
       >
         {isActive ? "On" : "Off"}
-      </button>
+      </SubmitButton>
     </form>
   );
 }
@@ -57,12 +56,11 @@ export function PriceForm({
       <PriceField name="priceQrOnly" label="QR" defaultValue={priceQrOnly} />
       <PriceField name="priceNfcCard" label="NFC" defaultValue={priceNfcCard} />
       <PriceField name="priceNfcQr" label="NFC+QR" defaultValue={priceNfcQr} />
-      <button
-        type="submit"
+      <SubmitButton
         className="nc-btn-brand mb-px rounded-lg px-3 py-1.5 text-xs font-bold transition-opacity hover:opacity-90"
       >
         Save
-      </button>
+      </SubmitButton>
     </form>
   );
 }

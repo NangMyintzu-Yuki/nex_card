@@ -2,7 +2,7 @@
   "site_name": "NEX CARD",
   "site_url": "https://nexcard.io",
   "support_email": "nangmyintzu89@gmail.com",
-  "maintenance_mode": true,
+  "maintenance_mode": false,
   "allow_registration": true,
   "require_email_verify": false,
   "max_profiles_per_user": 4,
