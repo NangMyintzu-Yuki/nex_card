@@ -66,37 +66,38 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12"
+    <main className="relative flex h-dvh flex-col items-center justify-center overflow-hidden px-3 py-4 sm:h-auto sm:min-h-screen sm:px-4 sm:py-12"
       style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
 
       {/* Theme toggle top-right */}
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
         <ThemeToggle size="md" showLabel />
       </div>
 
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="mb-8 flex flex-col items-center gap-3">
-          <NexCardLogoStatic size={52} isDark={isDark} />
+        <div className="mb-3 flex flex-col items-center gap-1 sm:mb-8 sm:gap-3">
+          <NexCardLogoStatic size={64} showText isDark={isDark} className="sm:hidden" />
+          <NexCardLogoStatic size={120} showText isDark={isDark} className="hidden sm:block" />
           <div className="text-center">
-            <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Welcome back</h1>
-            <p className="text-sm mt-0.5" style={{ color: "var(--nc-text-2)" }}>Sign in to your NEX CARD account</p>
+            <h1 className="text-lg font-black sm:text-2xl" style={{ color: "var(--nc-text)" }}>Welcome back</h1>
+            <p className="mt-0.5 text-[11px] sm:text-sm" style={{ color: "var(--nc-text-2)" }}>Sign in to your NEX CARD account</p>
           </div>
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl p-6 space-y-4"
+        <div className="rounded-2xl p-3.5 space-y-2.5 sm:p-6 sm:space-y-4"
           style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)", boxShadow: "var(--nc-shadow)" }}>
 
           {error && (
-            <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
+            <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs sm:text-sm text-red-400">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>
+              <label className="mb-1 block text-[11px] font-semibold sm:mb-1.5 sm:text-xs" style={{ color: "var(--nc-text-2)" }}>
                 Email Address
               </label>
               <input
@@ -113,9 +114,9 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <div className="mb-1.5 flex items-center justify-between">
-                <label className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Password</label>
-                <Link href="/forgot-password" className="text-xs hover:underline" style={{ color: brand2 }}>
+              <div className="mb-1 flex items-center justify-between sm:mb-1.5">
+                <label className="text-[11px] font-semibold sm:text-xs" style={{ color: "var(--nc-text-2)" }}>Password</label>
+                <Link href="/forgot-password" className="text-[11px] hover:underline sm:text-xs" style={{ color: brand2 }}>
                   Forgot password?
                 </Link>
               </div>
@@ -135,27 +136,16 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-black text-black transition-all hover:opacity-90 disabled:opacity-50 mt-2"
+              className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-black text-black transition-all hover:opacity-90 disabled:opacity-50 sm:mt-2"
               style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
               {loading ? (
                 <><div className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />Signing in…</>
               ) : "Sign In"}
             </button>
           </form>
-
-          {/* Demo credentials — development only */}
-          {process.env.NODE_ENV === "development" && (
-          <div className="rounded-xl px-4 py-3" style={{ background: "var(--nc-bg-hover)", border: "1px solid var(--nc-border)" }}>
-            <p className="text-xs font-semibold mb-1" style={{ color: "var(--nc-text-2)" }}>Demo credentials</p>
-            <button onClick={() => { setEmail("demo@nexcard.io"); setPassword("demo-password-123"); }}
-              className="text-xs hover:underline" style={{ color: brand2 }}>
-              demo@nexcard.io / demo-password-123
-            </button>
-          </div>
-          )}
         </div>
 
-        <p className="mt-6 text-center text-sm" style={{ color: "var(--nc-text-2)" }}>
+        <p className="mt-3 text-center text-xs sm:mt-6 sm:text-sm" style={{ color: "var(--nc-text-2)" }}>
           Don&apos;t have an account?{" "}
           <Link href="/register" className="font-bold hover:underline" style={{ color: brand2 }}>
             Create one free

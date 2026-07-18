@@ -47,7 +47,10 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
         {/* Logo */}
         <div className="flex items-center justify-between px-4 py-3 border-b"
           style={{ borderColor: "var(--nc-sidebar-border)" }}>
-          <NexCardLogoStatic size={32} isDark={isDark} />
+          <div className="flex items-center gap-2">
+            <NexCardLogoStatic size={32} isDark={isDark} />
+            <span className="text-sm font-black leading-none tracking-wide" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
+          </div>
           <button onClick={() => setMobileOpen(false)}
             className="flex h-8 w-8 items-center justify-center rounded-lg lg:hidden"
             style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text-2)" }}>

@@ -3,6 +3,10 @@
 
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { getServerSession } from "@/lib/auth/session";
+import { MaintenanceGuard } from "./_components/maintenance-guard";
 import "./globals.css";
 
 const inter = Inter({
@@ -56,14 +60,35 @@ const themeBootScript = `
 })();
 `;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+function isMaintenanceMode(): boolean {
+  try {
+    const raw = readFileSync(join(process.cwd(), "data", "settings.json"), "utf-8");
+    return JSON.parse(raw).maintenance_mode === true;
+  } catch {
+    return false;
+  }
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const maintenanceOn = isMaintenanceMode();
+  let isAdmin = false;
+
+  if (maintenanceOn) {
+    const session = await getServerSession();
+    isAdmin = session?.user?.role === "ADMIN";
+  }
+
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} nc-dark`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
       <body className={`${inter.className} antialiased`} style={{ background: "var(--nc-bg)" }}>
-        {children}
+        {maintenanceOn && !isAdmin ? (
+          <MaintenanceGuard>{children}</MaintenanceGuard>
+        ) : (
+          children
+        )}
       </body>
     </html>
   );

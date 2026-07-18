@@ -1,0 +1,15 @@
+{
+  "site_name": "NEX CARD",
+  "site_url": "https://nexcard.io",
+  "support_email": "nangmyintzu89@gmail.com",
+  "maintenance_mode": true,
+  "allow_registration": true,
+  "require_email_verify": false,
+  "max_profiles_per_user": 4,
+  "enable_og_images": true,
+  "enable_analytics": true,
+  "enable_r2_uploads": true,
+  "isr_revalidate_sec": 3600,
+  "notify_new_user": true,
+  "notify_email": "nangmyintzu89@gmail.com"
+}

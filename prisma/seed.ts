@@ -384,38 +384,38 @@ async function main() {
   // ── 3. Admin user ───────────────────────────────────────────────────────
   console.log("\n👤 Seeding admin user…");
   const adminUser = await prisma.user.upsert({
-    where: { email: "admin@nexcard.io" },
+    where: { email: "nangmyintzu89@gmail.com" },
     create: {
-      email: "admin@nexcard.io",
+      email: "nangmyintzu89@gmail.com",
       name: "Admin",
-      hashedPassword: hashPassword("admin-change-me-in-prod"),
+      hashedPassword: hashPassword("password"),
       role: "ADMIN",
       status: "ACTIVE",
       emailVerifiedAt: new Date(),
     },
-    update: { hashedPassword: hashPassword("admin-change-me-in-prod") },
+    update: { hashedPassword: hashPassword("password") },
     select: { id: true },
   });
-  console.log(`  ✓ admin@nexcard.io (${adminUser.id})`);
+  console.log(`  ✓ nangmyintzu89@gmail.com (${adminUser.id})`);
 
   // ── 4. Demo user ────────────────────────────────────────────────────────
   console.log("\n👤 Seeding demo user…");
   const demoUser = await prisma.user.upsert({
-    where: { email: "demo@nexcard.io" },
+    where: { email: "user@gmail.com" },
     create: {
-      email: "demo@nexcard.io",
+      email: "user@gmail.com",
       name: "Alex Rivera",
-      hashedPassword: hashPassword("demo-password-123"),
+      hashedPassword: hashPassword("password"),
       role: "USER",
       status: "ACTIVE",
       emailVerifiedAt: new Date(),
       avatarUrl:
         "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&q=80",
     },
-    update: { hashedPassword: hashPassword("demo-password-123") },
+    update: { hashedPassword: hashPassword("password") },
     select: { id: true },
   });
-  console.log(`  ✓ demo@nexcard.io (${demoUser.id})`);
+  console.log(`  ✓ user@gmail.com (${demoUser.id})`);
 
   // ── 5. Demo profile (Aurora Name Card) ─────────────────────────────────
   console.log("\n📄 Seeding demo profile…");
@@ -457,7 +457,7 @@ async function main() {
   console.log("\n✅ Seed complete!\n");
   console.log("  Categories:  ", Object.keys(categoryRecords).length);
   console.log("  Templates:   ", Object.keys(templateRecords).length);
-  console.log("  Admin login: admin@nexcard.io / admin-change-me-in-prod");
+  console.log("  Admin login: nangmyintzu89@gmail.com / password");
   console.log("  Demo login:  demo@nexcard.io  / demo-password-123");
   console.log("  Demo page:   http://localhost:3000/alex-rivera\n");
 }

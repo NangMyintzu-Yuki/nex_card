@@ -242,7 +242,6 @@ export default async function DashboardPage({
       ) : (
         /* Empty state */
         <div className="nc-card flex flex-col items-center justify-center rounded-2xl py-20 text-center">
-          <div className="mb-4 text-5xl">✨</div>
           <h2 className="text-xl font-black" style={{ color: "var(--nc-text)" }}>Create your first profile</h2>
           <p className="mt-2 max-w-sm text-sm" style={{ color: "var(--nc-text-3)" }}>
             Choose a category, pick a template, and claim your unique URL. Takes under 2 minutes.

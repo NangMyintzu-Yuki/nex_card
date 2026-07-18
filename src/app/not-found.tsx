@@ -9,7 +9,7 @@ export default function NotFound() {
 
       {/* Logo */}
       <div className="mb-8">
-        <NexCardLogo size={48} />
+        <NexCardLogo size={48} isDark />
       </div>
 
       {/* Big 404 */}

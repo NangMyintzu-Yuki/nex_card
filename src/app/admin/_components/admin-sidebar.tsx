@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   BarChart3, Users, Layers, Settings, ArrowLeft, Menu, X, ChevronRight, CreditCard,
-  LogOut,
+  LogOut, TrendingUp,
 } from "lucide-react";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -17,6 +17,7 @@ interface AdminUser { id: string; name: string; email: string; role: string; }
 const NAV = [
   { href: "/admin",            icon: BarChart3,  label: "Overview"  },
   { href: "/admin/payments",   icon: CreditCard, label: "Payments"  },
+  { href: "/admin/revenue",    icon: TrendingUp, label: "Revenue"   },
   { href: "/admin/users",      icon: Users,      label: "Users"     },
   { href: "/admin/templates",  icon: Layers,     label: "Templates" },
   { href: "/admin/settings",   icon: Settings,   label: "Settings"  },
@@ -46,7 +47,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
             <NexCardLogoStatic size={28} showText={false} isDark={isDark} />
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-sm font-black" style={{ color: "#d4af37" }}>NEX CARD</span>
+                <span className="text-sm font-black leading-none" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
                 <span className="rounded-full px-1.5 py-0.5 text-[9px] font-black text-white"
                   style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
                   ADMIN

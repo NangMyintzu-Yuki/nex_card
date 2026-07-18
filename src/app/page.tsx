@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ThemeProvider } from "@/lib/theme/theme-context";
+import { ThemeProvider, useTheme } from "@/lib/theme/theme-context";
 import { NexCardLogo } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useScrollReveal, useScrollRevealChildren } from "@/lib/hooks/use-scroll-reveal";
@@ -17,6 +17,16 @@ const FEATURE_ICONS = [
 ];
 
 export default function LandingPage() {
+  return (
+    <ThemeProvider>
+      <LandingContent />
+    </ThemeProvider>
+  );
+}
+
+function LandingContent() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [activeCategory, setActiveCategory] = useState("All");
   const statsRef = useScrollRevealChildren<HTMLDivElement>();
   const featuresRef = useScrollRevealChildren<HTMLElement>();
@@ -66,14 +76,16 @@ export default function LandingPage() {
   ];
 
   return (
-    <ThemeProvider>
     <main style={{ background: "var(--nc-bg)", color: "var(--nc-text)", minHeight: "100vh" }}>
 
       {/* ── Nav ───────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 border-b"
         style={{ background: "var(--nc-bg)", borderColor: "var(--nc-border)", backdropFilter: "blur(20px)" }}>
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <NexCardLogo size={36} />
+          <Link href="/" className="flex items-center gap-2.5">
+            <NexCardLogo size={36} isDark={isDark} />
+            <span className="text-lg font-black leading-none" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
+          </Link>
           <nav className="hidden items-center gap-8 md:flex">
             {["Features", "Templates", "How it Works"].map(l => (
               <a key={l} href={`#${l.toLowerCase().replace(/\s/g,"-")}`}
@@ -408,8 +420,9 @@ export default function LandingPage() {
             style={{ background: "var(--nc-brand-grad)", opacity: 0.1 }} />
 
           <div className="relative mx-auto max-w-3xl text-center">
-            <div className="sr-item sr-scale mb-8">
-              <NexCardLogo size={72} className="mx-auto" />
+            <div className="sr-item sr-scale mb-8 flex items-center justify-center gap-3">
+              <NexCardLogo size={72} isDark={isDark} />
+              <span className="text-4xl font-black leading-none md:text-5xl lg:text-6xl" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
             </div>
             <div className="sr-item">
               <h2 className="text-4xl font-black tracking-tight mb-5 md:text-5xl lg:text-6xl" style={{ color: "var(--nc-text)" }}>
@@ -455,7 +468,10 @@ export default function LandingPage() {
           <div className="grid gap-12 md:grid-cols-4">
             {/* Brand column */}
             <div className="md:col-span-1">
-              <NexCardLogo size={32} />
+              <div className="flex items-center gap-2">
+                <NexCardLogo size={32} isDark={isDark} />
+                <span className="text-base font-black leading-none" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
+              </div>
               <p className="mt-4 max-w-xs text-sm leading-relaxed" style={{ color: "var(--nc-text-3)" }}>
                 Your digital identity, elevated. Create stunning name cards, portfolios, and more.
               </p>
@@ -540,6 +556,5 @@ export default function LandingPage() {
         </div>
       </footer>
     </main>
-    </ThemeProvider>
   );
 }
