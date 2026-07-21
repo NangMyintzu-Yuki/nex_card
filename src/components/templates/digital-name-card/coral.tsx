@@ -1,4 +1,4 @@
-// CORAL — Warm, approachable, bio-link layout. For normal users, influencers, freelancers.
+// CORAL — Warm, approachable, bio-link layout. For all professionals and freelancers.
 "use client";
 import { useState } from "react";
 import Image from "next/image";
@@ -29,7 +29,7 @@ const CT: Record<string,{emoji:string;label:string;href:(v:string)=>string}> = {
   website:{emoji:"🌐",label:"Website",href:v=>v.startsWith("http")?v:`https://${v}`},
   address:{emoji:"📍",label:"Address",href:v=>`https://maps.google.com/?q=${encodeURIComponent(v)}`},
 };
-const SOCIAL_EMOJI: Record<string,string>={linkedin:"💼",github:"🐙",twitter:"𝕏",instagram:"📸",facebook:"👥",youtube:"▶️",tiktok:"🎵",whatsapp:"💬",telegram:"✈️",viber:"📲",discord:"🎮",website:"🌐",behance:"🎨",dribbble:"🏀",medium:"📝",stackoverflow:"📚",snapchat:"👻",pinterest:"📌"};
+const SOCIAL_EMOJI: Record<string,string>={linkedin:"💼",twitter:"𝕏",instagram:"📸",facebook:"👥",youtube:"▶️",tiktok:"🎵",whatsapp:"💬",telegram:"✈️",viber:"📲",discord:"🎮",website:"🌐",behance:"🎨",dribbble:"🏀",medium:"📝",snapchat:"👻",pinterest:"📌"};
 const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address"];
 
 export function CoralNameCard({ data, accentColor="#f97316" }: Props) {

@@ -18,7 +18,7 @@ const AVAIL_MAP: Record<string,{dot:string;text:string}> = {
   unavailable:{dot:"bg-red-400",text:"Not available"},
 };
 
-const SP_EMOJI: Record<string,string>={linkedin:"💼",github:"🐙",twitter:"𝕏",instagram:"📸",facebook:"👥",youtube:"▶️",tiktok:"🎵",whatsapp:"💬",telegram:"✈️",viber:"📲",discord:"🎮",website:"🌐",behance:"🎨",dribbble:"🏀",medium:"📝",stackoverflow:"📚"};
+const SP_EMOJI: Record<string,string>={linkedin:"💼",twitter:"𝕏",instagram:"📸",facebook:"👥",youtube:"▶️",tiktok:"🎵",whatsapp:"💬",telegram:"✈️",viber:"📲",discord:"🎮",website:"🌐",behance:"🎨",dribbble:"🏀",medium:"📝"};
 
 export function SpectrumPortfolio({ data, accentColor="#f59e0b" }: PP) {
   const {fullName,headline,bio,avatarUrl,projects,skills,socialLinks,contacts,testimonials,gallery,resumeUrl,availability} = data;
@@ -85,7 +85,7 @@ export function SpectrumPortfolio({ data, accentColor="#f59e0b" }: PP) {
       {/* Skills dark */}
       {data.skills.length>0&&<section className="border-b-4 border-zinc-900 bg-zinc-950 px-6 py-14">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-8 text-3xl font-black text-white">Stack</h2>
+          <h2 className="mb-8 text-3xl font-black text-white">Expertise</h2>
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {data.skills.map((g,i)=>{
               const colors=[accentColor,"#6366f1","#ec4899","#22c55e","#0ea5e9","#f97316"];

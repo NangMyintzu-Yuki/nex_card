@@ -1,4 +1,4 @@
-// TITANIUM — Metallic enterprise. For C-Suite, senior professionals, corporate users.
+// TITANIUM — Metallic enterprise. For executives and corporate professionals.
 "use client";
 import { useState } from "react";
 import Image from "next/image";
@@ -114,7 +114,7 @@ export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
           {/* Skills */}
           {skills&&skills.length>0&&(
             <div className="px-5 py-4" style={{borderBottom:"1px solid rgba(148,163,184,0.08)"}}>
-              <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-700">Expertise</p>
+              <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-700">Skills</p>
               <div className="grid grid-cols-2 gap-1.5">
                 {skills.map((s2,i)=>(
                   <div key={i} className="rounded-lg px-2.5 py-2" style={{background:"rgba(148,163,184,0.05)",border:"1px solid rgba(148,163,184,0.08)"}}>

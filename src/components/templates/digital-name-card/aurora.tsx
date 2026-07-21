@@ -1,8 +1,5 @@
 // src/components/templates/digital-name-card/aurora.tsx
-// AURORA — Premium glassmorphism digital name card
-// Research: HiHello + Blinq + V1CE + Wave Connect best practices 2025-2026
-// KEY FEATURES: vCard download, share sheet, ALL social icons (WhatsApp/Viber/Telegram/etc.)
-// Prominent phone/email, multiple websites, universal persona design
+// AURORA — Premium glassmorphism digital name card / Universal persona design
 
 "use client";
 import { useState } from "react";
@@ -62,7 +59,6 @@ const SP: Record<string, { label: string; bg: string; text: string; emoji: strin
   telegram:      { label: "Telegram",  bg: "#2aabee20", text: "#2aabee", emoji: "✈️"  },
   viber:         { label: "Viber",     bg: "#7360f220", text: "#7360f2", emoji: "📲" },
   linkedin:      { label: "LinkedIn",  bg: "#0077b520", text: "#0077b5", emoji: "💼" },
-  github:        { label: "GitHub",    bg: "#e6edf320", text: "#e6edf3", emoji: "🐙" },
   twitter:       { label: "X / Twitter", bg: "#ffffff15", text: "#ffffff", emoji: "𝕏" },
   instagram:     { label: "Instagram", bg: "#e1306c20", text: "#e1306c", emoji: "📸" },
   facebook:      { label: "Facebook",  bg: "#1877f220", text: "#1877f2", emoji: "👥" },
@@ -75,8 +71,6 @@ const SP: Record<string, { label: string; bg: string; text: string; emoji: strin
   behance:       { label: "Behance",   bg: "#1769ff20", text: "#1769ff", emoji: "🅱️"  },
   dribbble:      { label: "Dribbble",  bg: "#ea4c8920", text: "#ea4c89", emoji: "🏀" },
   medium:        { label: "Medium",    bg: "#ffffff15", text: "#ffffff", emoji: "📝" },
-  devto:         { label: "Dev.to",    bg: "#ffffff15", text: "#ffffff", emoji: "👨‍💻" },
-  stackoverflow: { label: "Stack Overflow", bg: "#f4802420", text: "#f48024", emoji: "📚" },
   website:       { label: "Website",   bg: "#a78bfa20", text: "#a78bfa", emoji: "🌐" },
 };
 
@@ -243,7 +237,7 @@ export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
           {/* Skills */}
           {skills && skills.length > 0 && (
             <div className="mt-5 px-5">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-white/25">Skills</p>
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-white/25">Expertise</p>
               <div className="flex flex-wrap gap-1.5">
                 {skills.map((s, i) => (
                   <span key={i} className="rounded-lg px-2.5 py-1 text-xs text-white/65"

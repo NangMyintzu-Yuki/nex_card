@@ -17,7 +17,7 @@ const AVAIL_MAP: Record<string,{dot:string;text:string}> = {
   unavailable:{dot:"bg-red-400",text:"Not available"},
 };
 
-const SP_EMOJI: Record<string,string>={linkedin:"💼",github:"🐙",twitter:"𝕏",instagram:"📸",facebook:"👥",youtube:"▶️",tiktok:"🎵",whatsapp:"💬",telegram:"✈️",viber:"📲",discord:"🎮",website:"🌐",behance:"🎨",dribbble:"🏀",medium:"📝",stackoverflow:"📚"};
+const SP_EMOJI: Record<string,string>={linkedin:"💼",twitter:"𝕏",instagram:"📸",facebook:"👥",youtube:"▶️",tiktok:"🎵",whatsapp:"💬",telegram:"✈️",viber:"📲",discord:"🎮",website:"🌐",behance:"🎨",dribbble:"🏀",medium:"📝"};
 
 export function StudioPortfolio({ data, accentColor="#ec4899" }: PP) {
   const {fullName,headline,bio,avatarUrl,projects,skills,experience,socialLinks,contacts,testimonials,resumeUrl,availability} = data;
@@ -68,7 +68,7 @@ export function StudioPortfolio({ data, accentColor="#ec4899" }: PP) {
                   <p className="text-sm text-zinc-400 line-clamp-1">{p.description}</p>
                   <div className="mt-2 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                     {p.liveUrl&&<a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-bold" style={{color:accentColor}}>Live ↗</a>}
-                    {p.repoUrl&&<a href={p.repoUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-zinc-400">Code ↗</a>}
+                    {p.repoUrl&&<a href={p.repoUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-zinc-400">Details ↗</a>}
                   </div>
                 </div>
               </div>
@@ -80,7 +80,7 @@ export function StudioPortfolio({ data, accentColor="#ec4899" }: PP) {
       {/* Skills */}
       {data.skills.length>0&&<section className="border-t border-zinc-800 px-6 py-12">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-8 text-2xl font-black">Craft & Tools</h2>
+          <h2 className="mb-8 text-2xl font-black">Expertise</h2>
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {data.skills.map((g,i)=>(
               <div key={i} className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">

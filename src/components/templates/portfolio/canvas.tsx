@@ -1,9 +1,9 @@
-// ALL 5 PORTFOLIO TEMPLATES — Redesigned for ALL personas
-// Canvas: Universal clean white — suits everyone (designer, CEO, developer, SME)
-// Studio: Dark cinematic — creative agencies, photographers, filmmakers
-// Forge: Terminal/developer — engineers, open source, technical roles
-// Spectrum: Bento bold — creative directors, brand designers, influencers
-// Blueprint: Technical grid — architects, consultants, analysts, PMs
+// ALL 5 PORTFOLIO TEMPLATES — Suits all professions
+// Canvas: Universal clean white — professionals, creatives, business owners
+// Studio: Dark cinematic — agencies, photographers, filmmakers
+// Forge: Bold minimal — modern professionals, solopreneurs
+// Spectrum: Bento bold — directors, brand designers, influencers
+// Blueprint: Structured grid — consultants, analysts, PMs, executives
 
 import Image from "next/image";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
@@ -22,7 +22,7 @@ const AVAIL_MAP: Record<string,{dot:string;text:string}> = {
   unavailable:{dot:"bg-red-400",text:"Not available"},
 };
 
-const SP_EMOJI: Record<string,string>={linkedin:"💼",github:"🐙",twitter:"𝕏",instagram:"📸",facebook:"👥",youtube:"▶️",tiktok:"🎵",whatsapp:"💬",telegram:"✈️",viber:"📲",discord:"🎮",website:"🌐",behance:"🎨",dribbble:"🏀",medium:"📝",stackoverflow:"📚"};
+const SP_EMOJI: Record<string,string>={linkedin:"💼",twitter:"𝕏",instagram:"📸",facebook:"👥",youtube:"▶️",tiktok:"🎵",whatsapp:"💬",telegram:"✈️",viber:"📲",discord:"🎮",website:"🌐",behance:"🎨",dribbble:"🏀",medium:"📝"};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CANVAS — Universal editorial white. Works for every profession.
@@ -110,7 +110,7 @@ export function CanvasPortfolio({ data, accentColor="#0ea5e9" }: PP) {
                     <p className="mt-1 text-sm text-neutral-500 line-clamp-2">{p.description}</p>
                     <div className="mt-3 flex gap-3">
                       {p.liveUrl&&<a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-bold hover:opacity-70" style={{color:accentColor}}>Live ↗</a>}
-                      {p.repoUrl&&<a href={p.repoUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-neutral-400 hover:text-neutral-700">Code ↗</a>}
+                      {p.repoUrl&&<a href={p.repoUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-neutral-400 hover:text-neutral-700">Details ↗</a>}
                       {p.caseStudyUrl&&<a href={p.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-neutral-400 hover:text-neutral-700">Case Study ↗</a>}
                     </div>
                   </div>

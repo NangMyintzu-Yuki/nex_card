@@ -1,6 +1,5 @@
 // src/components/templates/digital-name-card/obsidian.tsx
-// OBSIDIAN — Editorial brutalism. Dark, bold, full contact suite.
-// Suits: Executives, lawyers, architects, senior engineers, business owners
+// OBSIDIAN — Editorial brutalism. Dark, bold, full contact suite. Suits all professionals.
 
 "use client";
 import { useState } from "react";
@@ -74,7 +73,6 @@ const CT: Record<string, { label: string; emoji: string; href: (v: string) => st
 const SP: Record<string, string> = {
   linkedin: "#0077b5",
   twitter: "#ffffff",
-  github: "#e6edf3",
   instagram: "#e1306c",
   facebook: "#1877f2",
   youtube: "#ff5555",
@@ -87,7 +85,6 @@ const SP: Record<string, string> = {
   behance: "#1769ff",
   dribbble: "#ea4c89",
   medium: "#ffffff",
-  stackoverflow: "#f48024",
 };
 
 const PRIORITY = ["phone", "email", "whatsapp", "viber", "telegram", "website", "address"];
@@ -258,7 +255,7 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
         {skills && skills.length > 0 && (
           <div className="mb-5">
             <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.3em] text-neutral-800">
-              Skills
+              Expertise
             </p>
             <div className="flex flex-wrap gap-1.5">
               {skills.map((s, i) => (

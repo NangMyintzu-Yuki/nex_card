@@ -1,4 +1,4 @@
-// PRISM — Spectrum gradients, skill bars, universal persona (developer/designer/CEO/normal user)
+// PRISM — Spectrum gradients, skill bars, universal persona
 "use client";
 import { useState } from "react";
 import Image from "next/image";
@@ -30,7 +30,7 @@ const CT: Record<string,{emoji:string;href:(v:string)=>string}> = {
   website:{emoji:"🌐",href:v=>v.startsWith("http")?v:`https://${v}`},
   address:{emoji:"📍",href:v=>`https://maps.google.com/?q=${encodeURIComponent(v)}`},
 };
-const SP_COLORS: Record<string,string>={linkedin:"#0077b5",github:"#e6edf3",twitter:"#ffffff",instagram:"#e1306c",facebook:"#1877f2",youtube:"#ff5555",tiktok:"#69c9d0",whatsapp:"#25d366",telegram:"#2aabee",viber:"#7360f2",discord:"#5865f2",website:"#a78bfa",behance:"#1769ff",dribbble:"#ea4c89",stackoverflow:"#f48024",medium:"#ffffff"};
+const SP_COLORS: Record<string,string>={linkedin:"#0077b5",twitter:"#ffffff",instagram:"#e1306c",facebook:"#1877f2",youtube:"#ff5555",tiktok:"#69c9d0",whatsapp:"#25d366",telegram:"#2aabee",viber:"#7360f2",discord:"#5865f2",website:"#a78bfa",behance:"#1769ff",dribbble:"#ea4c89",medium:"#ffffff"};
 const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address"];
 
 export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
@@ -103,7 +103,7 @@ export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
         {/* Skill bars */}
         {skills&&skills.length>0&&(
           <div className="mb-4 rounded-2xl p-4" style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)"}}>
-            <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-white/25">Skills</p>
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-white/25">Expertise</p>
             <div className="space-y-2.5">
               {skills.slice(0,6).map((s,i)=>(
                 <div key={i}>
