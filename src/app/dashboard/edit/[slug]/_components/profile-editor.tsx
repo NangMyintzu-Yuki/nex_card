@@ -78,14 +78,6 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
       ],
     },
     {
-      id: "cta",
-      title: "Call to Action",
-      fields: [
-        { key: "ctaLabel", label: "Button Label", type: "text", placeholder: "Book a Call",       maxLength: 60 },
-        { key: "ctaUrl",   label: "Button URL",   type: "url",  placeholder: "https://cal.com/…" },
-      ],
-    },
-    {
       id: "contacts",
       title: "Contact Info",
       description: "Email, phone, website, or address entries.",

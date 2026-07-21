@@ -34,7 +34,7 @@ const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address
 
 export function CoralNameCard({ data, accentColor="#f97316" }: Props) {
   const [copied,setCopied]=useState(false);
-  const {fullName,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote,ctaLabel,ctaUrl}=data;
+  const {fullName,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
   const w1=accentColor,w2="#dc2626";
 
@@ -130,13 +130,6 @@ export function CoralNameCard({ data, accentColor="#f97316" }: Props) {
           </div>
         )}
 
-        {ctaLabel&&ctaUrl&&(
-          <a href={ctaUrl} target="_blank" rel="noopener noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-black text-white mt-2 hover:opacity-90"
-            style={{background:`linear-gradient(135deg,${w1},${w2})`}}>
-            {ctaLabel}
-          </a>
-        )}
         <p className="mt-8 text-center text-[10px] text-white/15">NEX CARD</p>
       </div>
     </main>

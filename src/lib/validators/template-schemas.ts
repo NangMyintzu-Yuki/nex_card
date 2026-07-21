@@ -72,8 +72,6 @@ export const DigitalNameCardSchema = z.object({
     .max(20)
     .optional(),
   featuredQuote: z.string().max(300).optional(),
-  ctaLabel: z.string().max(60).optional(),
-  ctaUrl: z.string().url().optional().or(z.literal("")),
   accentColor: z
     .string()
     .regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/)

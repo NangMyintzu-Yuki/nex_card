@@ -57,8 +57,6 @@ const SAMPLE_NAME_CARD_DATA = {
     { name: "Prototyping", level: 90 },
   ],
   featuredQuote: "Great design is invisible — it removes friction and creates delight without asking for attention.",
-  ctaLabel: "Book a Discovery Call",
-  ctaUrl: "https://cal.com/alexrivera",
   accentColor: "#6366f1",
 };
 

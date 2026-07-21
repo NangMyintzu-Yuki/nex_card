@@ -117,6 +117,23 @@ const TIER_INFO = {
   },
 };
 
+const PAYMENT_METHODS = {
+  KBZPay: {
+    label: "KBZPay",
+    accountName: "NEX CARD",
+    accountNumber: "09-123456789",
+    phone: "09 123 456 789",
+    details: "KBZPay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
+  },
+  AYAPay: {
+    label: "AYA Pay",
+    accountName: "NEX CARD",
+    accountNumber: "09-987654321",
+    phone: "09 987 654 321",
+    details: "AYA Pay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
+  },
+};
+
 const STEP_LABELS = {
   category: "Category",
   template: "Template",
@@ -156,8 +173,10 @@ export function OnboardingClient({
   );
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const [selectedTier, setSelectedTier] = useState<string>("");
+  const [paymentMethod, setPaymentMethod] = useState<keyof typeof PAYMENT_METHODS>("KBZPay");
   const [paymentScreenshotUrl, setPaymentScreenshotUrl] = useState<string>("");
   const [paymentUploading, setPaymentUploading] = useState(false);
+  const [paymentUploadError, setPaymentUploadError] = useState<string>("");
   const [slug, setSlug] = useState<string>("");
   const [slugError, setSlugError] = useState<string>("");
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
@@ -253,6 +272,7 @@ export function OnboardingClient({
     if (!file) return;
 
     setPaymentUploading(true);
+    setPaymentUploadError("");
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -263,10 +283,10 @@ export function OnboardingClient({
       if (res.ok && data.url) {
         setPaymentScreenshotUrl(data.url);
       } else {
-        alert(data.error || "Upload failed");
+        setPaymentUploadError(data.error || "Upload failed. Please try again.");
       }
     } catch {
-      alert("Upload failed. Please try again.");
+      setPaymentUploadError("Upload failed. Please try again.");
     } finally {
       setPaymentUploading(false);
     }
@@ -744,11 +764,55 @@ export function OnboardingClient({
               </div>
             </div>
 
-            {/* Payment instructions */}
-            <div className="mb-6 rounded-xl border px-4 py-3" style={{ borderColor: "var(--nc-brand-2)30", background: "var(--nc-brand-2)08" }}>
-              <p className="text-sm font-semibold" style={{ color: "var(--nc-brand-2)" }}>Payment Instructions</p>
-              <p className="mt-1 text-xs" style={{ color: "var(--nc-text-2)" }}>
-                Transfer the amount to our Viber Pay account, then upload a screenshot of the successful transaction below.
+            {/* Payment method selection */}
+            <div className="mb-6">
+              <p className="mb-3 text-sm font-semibold" style={{ color: "var(--nc-text)" }}>Select Payment Method</p>
+              <div className="grid grid-cols-2 gap-3">
+                {(Object.keys(PAYMENT_METHODS) as Array<keyof typeof PAYMENT_METHODS>).map((key) => {
+                  const pm = PAYMENT_METHODS[key];
+                  const active = paymentMethod === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setPaymentMethod(key)}
+                      className="flex flex-col items-center justify-center rounded-xl border-2 p-4 transition-all"
+                      style={
+                        active
+                          ? { borderColor: "var(--nc-brand-1)", background: "var(--nc-brand-1)10" }
+                          : { borderColor: "var(--nc-border)", background: "var(--nc-bg-card)" }
+                      }
+                    >
+                      <span className="text-lg font-black" style={{ color: active ? "var(--nc-brand-1)" : "var(--nc-text)" }}>
+                        {pm.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Account details */}
+            <div className="mb-6 rounded-xl border p-4" style={{ borderColor: "var(--nc-brand-2)30", background: "var(--nc-brand-2)05" }}>
+              <p className="mb-3 text-sm font-semibold" style={{ color: "var(--nc-brand-2)" }}>
+                {PAYMENT_METHODS[paymentMethod].label} Account Details
+              </p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span style={{ color: "var(--nc-text-2)" }}>Account Name</span>
+                  <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].accountName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: "var(--nc-text-2)" }}>Phone Number</span>
+                  <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].phone}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: "var(--nc-text-2)" }}>Account Number</span>
+                  <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].accountNumber}</span>
+                </div>
+              </div>
+              <p className="mt-3 text-xs" style={{ color: "var(--nc-text-3)" }}>
+                {PAYMENT_METHODS[paymentMethod].details} ကျေးဇူးပြု၍ ငွေလွှဲပြီးပါက အောက်တွင် Screenshot တင်ပေးပါ။
               </p>
             </div>
 
@@ -758,7 +822,21 @@ export function OnboardingClient({
                 Payment Screenshot
               </label>
 
-              {paymentScreenshotUrl ? (
+              {paymentUploading ? (
+                <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8"
+                  style={{ borderColor: "var(--nc-brand-1)40", background: "var(--nc-bg-card)" }}>
+                  <div className="h-10 w-10 animate-spin rounded-full border-3 border-white/20 border-t-indigo-400" />
+                  <p className="mt-4 text-sm font-semibold" style={{ color: "var(--nc-text)" }}>
+                    Uploading...
+                  </p>
+                  <p className="mt-1 text-xs" style={{ color: "var(--nc-text-3)" }}>
+                    Please wait while your screenshot is uploaded
+                  </p>
+                  <div className="mt-4 h-1.5 w-48 overflow-hidden rounded-full" style={{ background: "var(--nc-bg-2)" }}>
+                    <div className="h-full w-full origin-left animate-pulse rounded-full bg-indigo-400" style={{ animation: "none", background: "linear-gradient(90deg, var(--nc-brand-1), #6366f1)" }} />
+                  </div>
+                </div>
+              ) : paymentScreenshotUrl ? (
                 <div className="relative overflow-hidden rounded-xl border" style={{ borderColor: "var(--nc-brand-1)40" }}>
                   <div className="flex items-center gap-3 p-4" style={{ background: "var(--nc-bg-card)" }}>
                     <CheckCircle className="h-8 w-8 shrink-0 text-emerald-400" />
@@ -768,7 +846,7 @@ export function OnboardingClient({
                     </div>
                     <button
                       type="button"
-                      onClick={() => setPaymentScreenshotUrl("")}
+                      onClick={() => { setPaymentScreenshotUrl(""); setPaymentUploadError(""); }}
                       className="shrink-0 rounded-lg p-2 transition-colors hover:bg-white/5"
                     >
                       <XCircle className="h-5 w-5" style={{ color: "var(--nc-text-3)" }} />
@@ -781,19 +859,20 @@ export function OnboardingClient({
                   className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-colors cursor-pointer hover:border-indigo-500/50"
                   style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg-card)" }}
                 >
-                  {paymentUploading ? (
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                  ) : (
-                    <>
-                      <Upload className="mb-3 h-8 w-8" style={{ color: "var(--nc-text-3)" }} />
-                      <p className="text-sm font-semibold" style={{ color: "var(--nc-text)" }}>
-                        Click to upload screenshot
-                      </p>
-                      <p className="mt-1 text-xs" style={{ color: "var(--nc-text-3)" }}>
-                        JPG, PNG, or WebP. Max 5MB.
-                      </p>
-                    </>
-                  )}
+                  <Upload className="mb-3 h-8 w-8" style={{ color: "var(--nc-text-3)" }} />
+                  <p className="text-sm font-semibold" style={{ color: "var(--nc-text)" }}>
+                    Click to upload screenshot
+                  </p>
+                  <p className="mt-1 text-xs" style={{ color: "var(--nc-text-3)" }}>
+                    JPG, PNG, or WebP. Max 5MB.
+                  </p>
+                </div>
+              )}
+
+              {paymentUploadError && (
+                <div className="mt-3 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
+                  <XCircle className="h-4 w-4 shrink-0" />
+                  {paymentUploadError}
                 </div>
               )}
 

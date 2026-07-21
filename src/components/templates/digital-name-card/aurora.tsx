@@ -97,7 +97,7 @@ const CONTACT_PRIORITY = ["phone","email","whatsapp","viber","telegram","website
 export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
   const [copied, setCopied] = useState(false);
   const { fullName, jobTitle, company, companyLogoUrl,
-    tagline, bio, avatarUrl, contacts, socialLinks, skills, featuredQuote, ctaLabel, ctaUrl } = data;
+    tagline, bio, avatarUrl, contacts, socialLinks, skills, featuredQuote } = data;
 
   const sortedContacts = [...contacts].sort((a, b) => {
     const ai = CONTACT_PRIORITY.indexOf(a.type), bi = CONTACT_PRIORITY.indexOf(b.type);
@@ -263,18 +263,7 @@ export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
             </div>
           )}
 
-          {/* CTA */}
-          {ctaLabel && ctaUrl && (
-            <div className="px-5 pt-5">
-              <a href={ctaUrl} target="_blank" rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-black text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                style={{ background: `linear-gradient(135deg, ${accentColor}, #06b6d4)`, boxShadow: `0 8px 24px ${accentColor}50` }}>
-                {ctaLabel}
-              </a>
-            </div>
-          )}
-
-          <div className="mt-5 flex items-center justify-between border-t border-white/5 px-5 py-3.5">
+          <div className="flex items-center justify-between border-t border-white/5 px-5 py-3.5">
             <span className="text-[10px] text-white/20">NEX CARD</span>
             <div className="flex items-center gap-1.5">
               <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />

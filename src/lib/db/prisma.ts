@@ -147,8 +147,6 @@ const DEMO_NAME_CARD_DATA = {
     { name: "Framer", level: 80, category: "Code" },
   ],
   featuredQuote: "Great design is invisible — it removes friction and creates delight without asking for attention.",
-  ctaLabel: "Book a Discovery Call",
-  ctaUrl: "https://cal.com/alexrivera",
   accentColor: "#6366f1",
   backgroundStyle: "mesh",
 };

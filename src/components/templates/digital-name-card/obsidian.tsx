@@ -105,8 +105,6 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
     socialLinks,
     skills,
     featuredQuote,
-    ctaLabel,
-    ctaUrl,
   } = data;
 
   const sorted = [...(contacts ?? [])].sort((a, b) => {
@@ -289,27 +287,6 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
 
         <div className="mb-5 h-px bg-neutral-900" />
 
-        {ctaLabel && ctaUrl && (
-          <a
-            href={ctaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full items-center justify-between px-5 py-4 text-sm font-black uppercase tracking-wider text-black transition-opacity hover:opacity-80"
-            style={{ background: accentColor }}
-          >
-            <span>{ctaLabel}</span>
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <path d="M7 17L17 7M7 7h10v10" />
-            </svg>
-          </a>
-        )}
         <p className="mt-8 text-center text-[10px] uppercase tracking-[0.3em] text-neutral-900">
           NEX CARD
         </p>

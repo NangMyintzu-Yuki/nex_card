@@ -33,7 +33,7 @@ const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address
 
 export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
   const [copied,setCopied]=useState(false);
-  const {fullName,jobTitle,company,companyLogoUrl,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote,ctaLabel,ctaUrl}=data;
+  const {fullName,jobTitle,company,companyLogoUrl,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
   const s=accentColor;
 
@@ -145,17 +145,6 @@ export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
           )}
 
           {featuredQuote&&<div className="px-5 py-4" style={{borderBottom:"1px solid rgba(148,163,184,0.08)"}}><p className="text-xs leading-relaxed text-slate-600 italic">&ldquo;{featuredQuote}&rdquo;</p></div>}
-
-          {ctaLabel&&ctaUrl&&(
-            <div className="px-5 py-4">
-              <a href={ctaUrl} target="_blank" rel="noopener noreferrer"
-                className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-black tracking-wide text-neutral-900 hover:opacity-90 transition-opacity"
-                style={{background:`linear-gradient(135deg,#e2e8f0,${s},#64748b)`}}>
-                <span>{ctaLabel}</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
-              </a>
-            </div>
-          )}
 
           <div className="flex items-center justify-between px-5 py-3" style={{background:"rgba(148,163,184,0.03)",borderTop:"1px solid rgba(148,163,184,0.08)"}}>
             <span className="font-mono text-[10px] text-slate-800">PRESENCECARD</span>

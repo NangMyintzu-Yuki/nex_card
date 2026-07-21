@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 import {
   Upload, X, QrCode, Smartphone, Package, ArrowRight,
-  CheckCircle, XCircle, Clock, Loader2,
+  CheckCircle, XCircle, Clock, Loader2, Banknote,
 } from "lucide-react";
 import { submitPaymentAction, type SubmitPaymentState } from "@/lib/actions/payment-actions";
 
@@ -15,6 +15,23 @@ interface Prices {
   priceNfcCard: number | null;
   priceNfcQr: number | null;
 }
+
+const PAYMENT_METHODS = {
+  KBZPay: {
+    label: "KBZPay",
+    accountName: "NEX CARD",
+    accountNumber: "09-123456789",
+    phone: "09 123 456 789",
+    details: "KBZPay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
+  },
+  AYAPay: {
+    label: "AYA Pay",
+    accountName: "NEX CARD",
+    accountNumber: "09-987654321",
+    phone: "09 987 654 321",
+    details: "AYA Pay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
+  },
+};
 
 const TIER_OPTIONS: {
   value: "QR_ONLY" | "NFC_CARD" | "PHYSICAL_CARD";
@@ -46,6 +63,7 @@ export function ResubmitPayment({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [open, setOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<keyof typeof PAYMENT_METHODS>("KBZPay");
   const [selectedTier, setSelectedTier] = useState<
     "QR_ONLY" | "NFC_CARD" | "PHYSICAL_CARD" | ""
   >(existingTier && (existingTier === "QR_ONLY" || existingTier === "NFC_CARD" || existingTier === "PHYSICAL_CARD")
@@ -203,11 +221,71 @@ export function ResubmitPayment({
                 </div>
               </div>
 
+              {/* Payment method */}
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-widest"
+                  style={{ color: "var(--nc-text-3)" }}>Payment Method</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {(Object.keys(PAYMENT_METHODS) as Array<keyof typeof PAYMENT_METHODS>).map((key) => {
+                    const pm = PAYMENT_METHODS[key];
+                    const active = paymentMethod === key;
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setPaymentMethod(key)}
+                        className="flex items-center justify-center gap-2 rounded-xl border-2 p-3 transition-all"
+                        style={
+                          active
+                            ? { borderColor: "var(--nc-brand-1)", background: "var(--nc-brand-1)10" }
+                            : { borderColor: "var(--nc-border)", background: "var(--nc-bg-card)" }
+                        }
+                      >
+                        <Banknote className="h-4 w-4" style={{ color: active ? "var(--nc-brand-1)" : "var(--nc-text-3)" }} />
+                        <span className="text-sm font-semibold" style={{ color: active ? "var(--nc-brand-1)" : "var(--nc-text)" }}>
+                          {pm.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="mt-3 rounded-lg border p-3 text-xs" style={{ borderColor: "var(--nc-brand-2)20", background: "var(--nc-brand-2)08" }}>
+                  <div className="space-y-1">
+                    <div className="flex justify-between">
+                      <span style={{ color: "var(--nc-text-3)" }}>Account</span>
+                      <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].accountName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: "var(--nc-text-3)" }}>Phone</span>
+                      <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].phone}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: "var(--nc-text-3)" }}>Number</span>
+                      <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].accountNumber}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Screenshot upload */}
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-widest"
                   style={{ color: "var(--nc-text-3)" }}>Payment Screenshot</p>
-                {screenshotUrl ? (
+                {uploading ? (
+                  <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6"
+                    style={{ borderColor: "var(--nc-brand-1)40", background: "var(--nc-bg-card)" }}>
+                    <Loader2 className="mb-2 h-7 w-7 animate-spin" style={{ color: "var(--nc-brand-1)" }} />
+                    <p className="text-sm font-semibold" style={{ color: "var(--nc-text)" }}>
+                      Uploading...
+                    </p>
+                    <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                      Please wait while your screenshot is uploaded
+                    </p>
+                    <div className="mt-3 h-1 w-40 overflow-hidden rounded-full" style={{ background: "var(--nc-bg-2)" }}>
+                      <div className="h-full w-2/3 animate-pulse rounded-full bg-indigo-400" />
+                    </div>
+                  </div>
+                ) : screenshotUrl ? (
                   <div className="flex items-center gap-3 rounded-xl border px-4 py-3"
                     style={{ borderColor: "var(--nc-brand-1)40", background: "var(--nc-bg-card)" }}>
                     <CheckCircle className="h-7 w-7 shrink-0 text-emerald-400" />
@@ -215,7 +293,7 @@ export function ResubmitPayment({
                       <p className="text-sm font-semibold" style={{ color: "var(--nc-text)" }}>Screenshot uploaded</p>
                       <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>Ready to submit</p>
                     </div>
-                    <button type="button" onClick={() => setScreenshotUrl("")}
+                    <button type="button" onClick={() => { setScreenshotUrl(""); setUploadError(""); }}
                       className="shrink-0 rounded-lg p-2 transition-colors hover:bg-white/5"
                       style={{ color: "var(--nc-text-3)" }}>
                       <XCircle className="h-5 w-5" />
@@ -227,11 +305,7 @@ export function ResubmitPayment({
                     className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-colors hover:border-indigo-500/50"
                     style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg-card)" }}
                   >
-                    {uploading ? (
-                      <Loader2 className="mb-2 h-7 w-7 animate-spin" style={{ color: "var(--nc-text-3)" }} />
-                    ) : (
-                      <Upload className="mb-2 h-7 w-7" style={{ color: "var(--nc-text-3)" }} />
-                    )}
+                    <Upload className="mb-2 h-7 w-7" style={{ color: "var(--nc-text-3)" }} />
                     <p className="text-sm font-semibold" style={{ color: "var(--nc-text)" }}>
                       Click to upload screenshot
                     </p>
@@ -248,7 +322,10 @@ export function ResubmitPayment({
                   className="hidden"
                 />
                 {uploadError && (
-                  <p className="mt-2 text-xs text-red-400">{uploadError}</p>
+                  <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400">
+                    <XCircle className="h-3.5 w-3.5 shrink-0" />
+                    {uploadError}
+                  </div>
                 )}
               </div>
 

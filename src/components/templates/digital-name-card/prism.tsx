@@ -35,7 +35,7 @@ const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address
 
 export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
   const [copied,setCopied]=useState(false);
-  const {fullName,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills,ctaLabel,ctaUrl}=data;
+  const {fullName,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
 
   return (
@@ -135,14 +135,6 @@ export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
               );
             })}
           </div>
-        )}
-
-        {ctaLabel&&ctaUrl&&(
-          <a href={ctaUrl} target="_blank" rel="noopener noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-black text-white mb-2"
-            style={{background:`linear-gradient(135deg,${SPECTRUM[0]},${SPECTRUM[4]},${SPECTRUM[8]})`}}>
-            {ctaLabel}
-          </a>
         )}
 
         {/* Save CTA */}

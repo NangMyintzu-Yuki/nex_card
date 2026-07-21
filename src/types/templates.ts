@@ -56,10 +56,6 @@ export interface DigitalNameCardData {
   // Testimonial / quote (obsidian, coral)
   featuredQuote?: string;
 
-  // CTA button
-  ctaLabel?: string;
-  ctaUrl?: string;
-
   // Theme overrides (user-configurable per template)
   accentColor?: string;
   backgroundStyle?: "gradient" | "solid" | "mesh" | "noise";
