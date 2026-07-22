@@ -1,137 +1,65 @@
+"use client";
+
+import React from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { ExternalLink, Github, ArrowUpRight } from "lucide-react";
+import { Sparkles, Heart, Share2, Play, ExternalLink } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
 
 interface PP { data: PortfolioData; accentColor?: string; }
 
-function cHref(type: string, value: string) {
-  if (type === "email") return `mailto:${value}`;
-  if (type === "phone") return `tel:${value.replace(/\s/g,"")}`;
-  return value.startsWith("http") ? value : `https://${value}`;
-}
-
-const AVAIL_MAP: Record<string,{dot:string;text:string}> = {
-  available:{dot:"bg-emerald-400",text:"Open to opportunities"},
-  limited:{dot:"bg-amber-400",text:"Limited availability"},
-  unavailable:{dot:"bg-red-400",text:"Not available"},
-};
-
-const SP_EMOJI: Record<string,string>={linkedin:"💼",twitter:"𝕏",instagram:"📸",facebook:"👥",youtube:"▶️",tiktok:"🎵",whatsapp:"💬",telegram:"✈️",viber:"📲",discord:"🎮",website:"🌐",behance:"🎨",dribbble:"🏀",medium:"📝"};
-
-
-export function BlueprintPortfolio({ data, accentColor="#3b82f6" }: PP) {
-  const {fullName,headline,bio,projects,skills,experience,socialLinks,contacts,testimonials,availability,resumeUrl} = data;
-  const avail=availability?AVAIL_MAP[availability]:null;
+export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
+  const { fullName, headline, bio, avatarUrl, projects, socialLinks, contacts } = data;
 
   return (
-    <main className="min-h-screen text-slate-200" style={{
-      background:"#06101f",
-      backgroundImage:`linear-gradient(rgba(59,130,246,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.06) 1px,transparent 1px)`,
-      backgroundSize:"32px 32px",
-    }}>
-      <div className="mx-auto max-w-5xl px-6 py-14">
-        {/* Header panel */}
-        <div className="mb-10 rounded-2xl border p-8" style={{borderColor:`${accentColor}30`,background:`${accentColor}06`}}>
-          <div className="flex items-start justify-between gap-6 flex-wrap">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] mb-2" style={{color:`${accentColor}80`}}>Professional Profile</p>
-              <h1 className="text-4xl font-black text-white">{fullName}</h1>
-              <p className="mt-1 text-xl text-slate-400">{headline}</p>
-              {avail&&<div className="mt-3 inline-flex items-center gap-2 text-xs text-slate-500"><span className={`h-2 w-2 rounded-full ${avail.dot}`}/>{avail.text}</div>}
+    <main className="min-h-screen bg-slate-950 text-white font-sans p-4 sm:p-8">
+      <div className="mx-auto max-w-4xl space-y-8">
+        
+        {/* CREATOR PROFILE CARD */}
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-8 backdrop-blur-2xl text-center space-y-6">
+          {avatarUrl && (
+            <div className="relative h-28 w-28 mx-auto rounded-full p-1 bg-gradient-to-tr from-pink-500 via-purple-500 to-amber-500 shadow-xl">
+              <div className="relative h-full w-full overflow-hidden rounded-full">
+                <Image src={avatarUrl} alt={fullName} fill className="object-cover" sizes="112px" priority />
+              </div>
             </div>
-            <div className="space-y-2">
-              {contacts.map((c,i)=>(
-                <a key={i} href={cHref(c.type,c.value)} className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
-                  <span style={{color:accentColor}}>→</span> {c.value}
-                </a>
-              ))}
-              {resumeUrl&&<a href={resumeUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm hover:opacity-70 transition-opacity" style={{color:accentColor}}>→ resume.pdf</a>}
-            </div>
+          )}
+
+          <div className="space-y-2">
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight">{fullName}</h1>
+            <p className="text-sm font-semibold text-purple-400">{headline}</p>
+            <p className="text-xs text-slate-300 max-w-lg mx-auto leading-relaxed">{bio}</p>
           </div>
-          <p className="mt-5 text-sm leading-relaxed text-slate-400 max-w-2xl border-t pt-5" style={{borderColor:`${accentColor}20`}}>{bio}</p>
+
+          {/* Social Icons Pill Grid */}
+          <div className="flex flex-wrap justify-center gap-2 pt-2">
+            {socialLinks.map((s, i) => (
+              <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold hover:bg-white/20 transition-all">
+                {s.label || s.platform}
+              </a>
+            ))}
+          </div>
         </div>
 
-        {/* Projects */}
-        {projects.length>0&&(
-          <div className="mb-10">
-            <div className="mb-5 flex items-center gap-3"><div className="h-px flex-1" style={{background:`${accentColor}25`}}/><span className="text-xs font-semibold uppercase tracking-widest" style={{color:`${accentColor}70`}}>Projects</span><div className="h-px flex-1" style={{background:`${accentColor}25`}}/></div>
-            <div className="grid gap-4 md:grid-cols-2">
-              {projects.slice(0,6).map(p=>(
-                <div key={p.id} className="rounded-xl border p-4 transition-all hover:border-blue-500/30" style={{borderColor:`${accentColor}15`,background:`${accentColor}04`}}>
-                  <h3 className="font-bold text-white">{p.title}</h3>
-                  <p className="mt-1 text-xs text-slate-500 line-clamp-2">{p.description}</p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">{p.tags.map((t,i)=><span key={i} className="rounded px-1.5 py-0.5 text-xs" style={{color:accentColor,background:`${accentColor}15`}}>{t}</span>)}</div>
-                  <div className="mt-2.5 flex gap-4">
-                    {p.liveUrl&&<a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-medium hover:opacity-70" style={{color:accentColor}}>Live ↗</a>}
-                    {p.repoUrl&&<a href={p.repoUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-slate-500 hover:text-white">Details ↗</a>}
-                    {p.caseStudyUrl&&<a href={p.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-slate-500 hover:text-white">Case Study ↗</a>}
-                  </div>
+        {/* CREATIVE SHOWCASE */}
+        {projects.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 px-2">Featured Campaigns & Content</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {projects.map((p) => (
+                <div key={p.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3 hover:bg-white/10 transition-all">
+                  {p.coverImageUrl && (
+                    <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900">
+                      <Image src={p.coverImageUrl} alt={p.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                    </div>
+                  )}
+                  <h3 className="font-bold text-sm">{p.title}</h3>
+                  <p className="text-xs text-slate-400 line-clamp-2">{p.description}</p>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Skills */}
-        {data.skills.length>0&&(
-          <div className="mb-10">
-            <div className="mb-5 flex items-center gap-3"><div className="h-px flex-1" style={{background:`${accentColor}25`}}/><span className="text-xs font-semibold uppercase tracking-widest" style={{color:`${accentColor}70`}}>Expertise</span><div className="h-px flex-1" style={{background:`${accentColor}25`}}/></div>
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {data.skills.map((g,i)=>(
-                <div key={i} className="rounded-xl border p-4" style={{borderColor:`${accentColor}12`,background:`${accentColor}04`}}>
-                  <p className="mb-2 text-xs font-bold uppercase tracking-wider" style={{color:accentColor}}>{g.category}</p>
-                  <p className="text-xs text-slate-500 leading-relaxed">{g.items.join(" · ")}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Experience timeline */}
-        {experience.length>0&&(
-          <div className="mb-10">
-            <div className="mb-5 flex items-center gap-3"><div className="h-px flex-1" style={{background:`${accentColor}25`}}/><span className="text-xs font-semibold uppercase tracking-widest" style={{color:`${accentColor}70`}}>Experience</span><div className="h-px flex-1" style={{background:`${accentColor}25`}}/></div>
-            <div className="relative border-l pl-6" style={{borderColor:`${accentColor}20`}}>
-              {experience.map((e,i)=>(
-                <div key={i} className="mb-6 relative">
-                  <div className="absolute -left-8 top-1 h-3 w-3 rounded-full border-2" style={{background:"#06101f",borderColor:accentColor}}/>
-                  <div className="flex flex-wrap items-baseline gap-2 mb-1">
-                    <h3 className="font-bold text-white">{e.role}</h3>
-                    <span className="text-sm text-slate-500">@ {e.company}</span>
-                    <span className="text-xs text-slate-700">{e.startDate.slice(0,7)}—{e.endDate?e.endDate.slice(0,7):"present"}</span>
-                  </div>
-                  <p className="text-sm text-slate-500 leading-relaxed">{e.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Testimonials */}
-        {testimonials&&testimonials.length>0&&(
-          <div className="mb-10">
-            <div className="mb-5 flex items-center gap-3"><div className="h-px flex-1" style={{background:`${accentColor}25`}}/><span className="text-xs font-semibold uppercase tracking-widest" style={{color:`${accentColor}70`}}>Testimonials</span><div className="h-px flex-1" style={{background:`${accentColor}25`}}/></div>
-            <div className="grid gap-4 md:grid-cols-2">
-              {testimonials.slice(0,4).map((t,i)=>(
-                <div key={i} className="rounded-xl border p-4" style={{borderColor:`${accentColor}12`,background:`${accentColor}04`}}>
-                  <p className="text-sm leading-relaxed text-slate-400 italic">&ldquo;{t.text}&rdquo;</p>
-                  <div className="mt-3 flex items-center gap-2 border-t pt-3" style={{borderColor:`${accentColor}10`}}>
-                    {t.avatarUrl&&<div className="relative h-8 w-8 overflow-hidden rounded-full"><Image src={t.avatarUrl} alt={t.author} fill className="object-cover" sizes="32px"/></div>}
-                    <div><p className="text-xs font-bold text-white">{t.author}</p><p className="text-xs text-slate-600">{t.role}{t.company&&` · ${t.company}`}</p></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <footer className="border-t pt-6 flex flex-wrap justify-between items-center gap-4" style={{borderColor:`${accentColor}20`}}>
-          <div className="flex flex-wrap gap-3">
-            {socialLinks.map((s,i)=><a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-slate-600 hover:text-white transition-colors">{SP_EMOJI[s.platform]} {s.label??s.platform}</a>)}
-          </div>
-          <p className="text-xs text-slate-800">NEX CARD</p>
-        </footer>
       </div>
     </main>
   );
