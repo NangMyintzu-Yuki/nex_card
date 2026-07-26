@@ -79,7 +79,7 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
             );
           })}
 
-          {/* QR & NFC shortcut */}
+          {/* QR shortcut */}
           <div className="mt-4 pt-4 border-t" style={{ borderColor: "var(--nc-border)" }}>
             <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-widest"
               style={{ color: "var(--nc-text-3)" }}>
@@ -90,12 +90,6 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
               onClick={() => setMobileOpen(false)}>
               <QrCode className="h-4 w-4 shrink-0" style={{ color: "var(--nc-text-2)" }} />
               <span style={{ color: "var(--nc-text-2)" }}>QR Codes</span>
-            </Link>
-            <Link href="/dashboard/nfc"
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all nc-nav-item"
-              onClick={() => setMobileOpen(false)}>
-              <Smartphone className="h-4 w-4 shrink-0" style={{ color: "var(--nc-text-2)" }} />
-              <span style={{ color: "var(--nc-text-2)" }}>NFC Setup</span>
             </Link>
           </div>
 
@@ -135,7 +129,7 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
         <div className=" mt-4 rounded-xl p-3"
           style={{ background: "var(--nc-sidebar-item)", border: "1px solid var(--nc-border)" }}>
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-black text-black"
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-black text-white"
               style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
               {getInitials(user.name)}
             </div>
@@ -144,7 +138,7 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
               <p className="truncate text-xs" style={{ color: "var(--nc-text-3)" }}>{user.email}</p>
             </div>
             {user.role === "ADMIN" && (
-              <span className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-black text-black"
+              <span className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-black text-white"
                 style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
                 ADMIN
               </span>
@@ -179,7 +173,7 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
         onClick={() => setMobileOpen(true)}
         className="fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-xl lg:hidden"
         style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
-        <Menu className="h-5 w-5 text-black" />
+        <Menu className="h-5 w-5 text-white" />
       </button>
 
       {/* Mobile drawer overlay */}

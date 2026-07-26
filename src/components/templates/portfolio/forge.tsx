@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { ExternalLink, ArrowUpRight } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
 

@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 import { daysUntil, formatEventDateTime, formatShortDate, formatTime, formatWeddingDate } from "@/lib/helps";
@@ -84,7 +84,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa" }: WeddingProps
                 <div className="relative h-44 w-44 overflow-hidden rounded-full mb-4"
                   style={{ border: `2px solid ${accentColor}40`, boxShadow: `0 0 30px ${accentColor}20` }}>
                   {p.photoUrl ? (
-                    <Image src={p.photoUrl} alt={p.name} fill className="object-cover" sizes="176px" />
+                    <img src={p.photoUrl} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-5xl"
                       style={{ background: `${accentColor}15` }}>
@@ -126,7 +126,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa" }: WeddingProps
                     {m.imageUrl && (
                       <div className="relative aspect-[4/3] mt-4 overflow-hidden rounded-xl border"
                         style={{ borderColor: `${accentColor}20` }}>
-                        <Image src={m.imageUrl} alt={m.title} fill className="object-cover opacity-90" sizes="400px" />
+                        <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover opacity-90" />
                       </div>
                     )}
                   </div>
@@ -146,8 +146,8 @@ export function CelestialWedding({ data, accentColor = "#a78bfa" }: WeddingProps
               {gallery.slice(0, 9).map((img, i) => (
                 <div key={i} className="relative aspect-square overflow-hidden rounded-xl border"
                   style={{ borderColor: `${accentColor}15` }}>
-                  <Image src={img.url} alt={img.alt} fill
-                    className="object-cover opacity-85 hover:opacity-100 hover:scale-105 transition-all duration-500" sizes="300px" />
+                  <img src={img.url} alt={img.alt}
+                    className="absolute inset-0 h-full w-full object-cover opacity-85 hover:opacity-100 hover:scale-105 transition-all duration-500" />
                 </div>
               ))}
             </div>

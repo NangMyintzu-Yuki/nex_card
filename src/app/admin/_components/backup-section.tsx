@@ -64,7 +64,7 @@ export function BackupSection() {
           <button
             onClick={sendEmailBackup}
             disabled={emailStatus === "loading"}
-            className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold text-black transition-all hover:opacity-90 disabled:opacity-50"
+            className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold transition-all hover:opacity-90 disabled:opacity-50"
             style={{ background: "var(--nc-brand-grad)" }}>
             {emailStatus === "loading" ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />

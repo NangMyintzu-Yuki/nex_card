@@ -596,6 +596,20 @@ html.nc-light .nc-btn-brand,
   border-color: var(--nc-border-brand);
 }
 
+/* Light mode button text color overrides */
+html.nc-light .bg-emerald-500,
+.nc-light .bg-emerald-500 { color: #ffffff; }
+html.nc-light .bg-red-500,
+.nc-light .bg-red-500 { color: #ffffff; }
+html.nc-light .bg-indigo-500,
+.nc-light .bg-indigo-500 { color: #ffffff; }
+html.nc-light .bg-amber-500,
+.nc-light .bg-amber-500 { color: #ffffff; }
+html.nc-light .bg-emerald-400,
+.nc-light .bg-emerald-400 { color: #ffffff; }
+html.nc-light .bg-red-400,
+.nc-light .bg-red-400 { color: #ffffff; }
+
 /* Table */
 .nc-table th { color: var(--nc-text-3); border-bottom: 1px solid var(--nc-border); }
 .nc-table td { border-bottom: 1px solid var(--nc-border); color: var(--nc-text-2); }

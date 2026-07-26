@@ -52,6 +52,8 @@ export function RevenueClient({ categories, templates }: Props) {
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
   const [showFilters, setShowFilters] = useState(true);
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 10;
 
   const filteredTemplates = categoryFilter === "ALL"
     ? templates
@@ -89,6 +91,7 @@ export function RevenueClient({ categories, templates }: Props) {
     setTierFilter("ALL");
     setDateFrom("");
     setDateTo("");
+    setPage(1);
   }
 
   const hasActiveFilters = statusFilter !== "ALL" || categoryFilter !== "ALL" ||
@@ -145,6 +148,15 @@ export function RevenueClient({ categories, templates }: Props) {
     }
   };
 
+  const tierLabel = (tier: string) => {
+    switch (tier) {
+      case "QR_ONLY": return "QR Only";
+      case "NFC_CARD": return "NFC Only";
+      case "PHYSICAL_CARD": return "QR + NFC";
+      default: return tier.replace(/_/g, " ");
+    }
+  };
+
   const statusColor = (status: string) => {
     switch (status) {
       case "APPROVED": return { bg: "rgba(34,197,94,0.1)", text: "#22c55e", border: "rgba(34,197,94,0.25)" };
@@ -198,7 +210,7 @@ export function RevenueClient({ categories, templates }: Props) {
             <Filter className="h-3.5 w-3.5" />
             Filters
             {hasActiveFilters && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-black text-black"
+              <span className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-black text-white"
                 style={{ background: "var(--nc-brand-grad)" }}>
                 {[statusFilter, categoryFilter, templateFilter, tierFilter, dateFrom, dateTo]
                   .filter((v) => v && v !== "ALL").length}
@@ -259,8 +271,8 @@ export function RevenueClient({ categories, templates }: Props) {
               <select value={tierFilter} onChange={(e) => setTierFilter(e.target.value)} style={selectStyle} className="w-full">
                 <option value="ALL">All Tiers</option>
                 <option value="QR_ONLY">QR Only</option>
-                <option value="NFC_CARD">NFC Card</option>
-                <option value="PHYSICAL_CARD">Physical Card</option>
+                <option value="NFC_CARD">NFC Only</option>
+                <option value="PHYSICAL_CARD">QR + NFC</option>
               </select>
             </div>
 
@@ -338,7 +350,7 @@ export function RevenueClient({ categories, templates }: Props) {
                   {tierIcon(tier)}
                 </div>
                 <div>
-                  <p className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>{tier.replace(/_/g, " ")}</p>
+                  <p className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>{tierLabel(tier)}</p>
                   <p className="text-sm font-black" style={{ color: "var(--nc-text)" }}>
                     {data.revenue.toLocaleString()} MMK
                   </p>
@@ -364,6 +376,7 @@ export function RevenueClient({ categories, templates }: Props) {
             <p className="mt-1 text-xs" style={{ color: "var(--nc-text-3)" }}>Try adjusting your filters or wait for payments.</p>
           </div>
         ) : (
+          <>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
@@ -379,7 +392,7 @@ export function RevenueClient({ categories, templates }: Props) {
                 </tr>
               </thead>
               <tbody>
-                {payments.map((p) => {
+                {payments.slice((page - 1) * PER_PAGE, page * PER_PAGE).map((p) => {
                   const sc = statusColor(p.status);
                   return (
                     <tr key={p.id} className="transition-colors hover:bg-[var(--nc-bg-hover)]"
@@ -401,7 +414,7 @@ export function RevenueClient({ categories, templates }: Props) {
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold"
                           style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text-2)", border: "1px solid var(--nc-border)" }}>
-                          {tierIcon(p.tier)} {p.tier.replace(/_/g, " ")}
+                          {tierIcon(p.tier)} {tierLabel(p.tier)}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right font-bold whitespace-nowrap" style={{ color: "var(--nc-text)" }}>
@@ -419,6 +432,32 @@ export function RevenueClient({ categories, templates }: Props) {
               </tbody>
             </table>
           </div>
+          {/* Pagination */}
+          {payments.length > PER_PAGE && (
+            <div className="flex items-center justify-between border-t px-4 py-3" style={{ borderColor: "var(--nc-border)" }}>
+              <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                Showing {Math.min((page - 1) * PER_PAGE + 1, payments.length)}–{Math.min(page * PER_PAGE, payments.length)} of {payments.length}
+              </p>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+                  className="nc-btn-ghost rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40">
+                  Prev
+                </button>
+                {Array.from({ length: Math.ceil(payments.length / PER_PAGE) }, (_, i) => i + 1).map((p) => (
+                  <button key={p} onClick={() => setPage(p)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${p === page ? "nc-btn-brand" : "nc-btn-ghost"}`}>
+                    {p}
+                  </button>
+                ))}
+                <button onClick={() => setPage((p) => Math.min(Math.ceil(payments.length / PER_PAGE), p + 1))}
+                  disabled={page >= Math.ceil(payments.length / PER_PAGE)}
+                  className="nc-btn-ghost rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40">
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+          </>
         )}
       </div>
     </>

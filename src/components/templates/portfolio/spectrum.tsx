@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Github, ArrowUpRight } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
@@ -54,7 +53,7 @@ export function SpectrumPortfolio({ data, accentColor="#f59e0b" }: PP) {
                 ))}
               </div>
             </div>
-            {avatarUrl&&<div className="relative aspect-square max-w-xs overflow-hidden rounded-3xl border-4 border-zinc-900 mx-auto md:mx-0"><Image src={avatarUrl} alt={fullName} fill className="object-cover" sizes="320px" priority/></div>}
+            {avatarUrl&&<div className="relative aspect-square max-w-xs overflow-hidden rounded-3xl border-4 border-zinc-900 mx-auto md:mx-0"><img src={avatarUrl} alt={fullName} className="absolute inset-0 h-full w-full object-cover"/></div>}
           </div>
         </div>
       </section>
@@ -67,7 +66,7 @@ export function SpectrumPortfolio({ data, accentColor="#f59e0b" }: PP) {
             {projects.slice(0,6).map((p,i)=>(
               <div key={p.id} className={`group overflow-hidden rounded-2xl border-2 border-zinc-900 ${i===0?"col-span-2 row-span-2":""}`}>
                 {p.coverImageUrl&&<div className={`relative overflow-hidden bg-zinc-100 ${i===0?"aspect-[4/3]":"aspect-square"}`}>
-                  <Image src={p.coverImageUrl} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="400px"/>
+                  <img src={p.coverImageUrl} alt={p.title} className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"/>
                 </div>}
                 <div className="border-t-2 border-zinc-900 p-3">
                   <h3 className="font-black text-sm leading-tight">{p.title}</h3>
@@ -110,7 +109,7 @@ export function SpectrumPortfolio({ data, accentColor="#f59e0b" }: PP) {
               <div key={i} className="rounded-2xl border-2 border-zinc-100 p-5">
                 <p className="text-sm leading-relaxed text-zinc-600 italic">&ldquo;{t.text}&rdquo;</p>
                 <div className="mt-4 flex items-center gap-2 border-t border-zinc-100 pt-3">
-                  {t.avatarUrl&&<div className="relative h-8 w-8 overflow-hidden rounded-full"><Image src={t.avatarUrl} alt={t.author} fill className="object-cover" sizes="32px"/></div>}
+                  {t.avatarUrl&&<div className="relative h-8 w-8 overflow-hidden rounded-full"><img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover"/></div>}
                   <div><p className="text-xs font-bold">{t.author}</p><p className="text-xs text-zinc-400">{t.role}{t.company&&` · ${t.company}`}</p></div>
                 </div>
               </div>

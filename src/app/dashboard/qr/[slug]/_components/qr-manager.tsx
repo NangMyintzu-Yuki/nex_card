@@ -56,6 +56,8 @@ function formatDate(iso: string): string {
 
 export function QRManager({ profile, appUrl }: QRManagerProps) {
   const accentColor = profile.template.accentColor ?? "#6366f1";
+  const isDark = typeof document !== "undefined" ? document.documentElement.classList.contains("nc-dark") : true;
+  const brandGrad = isDark ? "linear-gradient(135deg, #c9973a, #d4af37)" : "linear-gradient(135deg, #1a3a6b, #4a9fd4)";
   const publicUrl   = `${appUrl}/${profile.slug}`;
   const qrScanUrl   = `${appUrl}/p/${profile.slug}`;
   const qrApiUrl    = `/api/qr/${profile.slug}`;
@@ -266,10 +268,9 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                       <button key={s} onClick={() => setQrSize(s)}
                         className={`flex-1 rounded-xl py-2 text-xs font-semibold transition-colors ${
                           qrSize === s
-                            ? "text-white"
+                            ? "bg-[var(--nc-brand-2)] text-white"
                             : "nc-btn-ghost"
-                        }`}
-                        style={qrSize === s ? { background: accentColor } : {}}>
+                        }`}>
                         {s}px
                       </button>
                     ))}
@@ -294,8 +295,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
 
                 {/* Share */}
                 <button onClick={handleShare}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition-all hover:opacity-90"
-                  style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)` }}>
+                  className="nc-btn-brand flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all hover:opacity-90">
                   <Share2 className="h-4 w-4" />
                   Share QR Link
                 </button>
@@ -415,8 +415,8 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                   <button
                     onClick={() => setShowConfirm(true)}
                     disabled={!profile.isPublished}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-black transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-                    style={{ background: "linear-gradient(135deg, #f59e0b, #f97316)" }}>
+                    className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                    style={{ background: brandGrad }}>
                     <QrCode className="h-4 w-4" />
                     Generate My QR Code
                   </button>
@@ -425,7 +425,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                     <p className="text-center text-sm font-semibold text-amber-300">
                       Are you sure? This cannot be undone.
                     </p>
-                    <div className="flex gap-2">
+                    <div className="flex flex-row gap-2 sm:flex-row">
                       <button onClick={() => setShowConfirm(false)}
                         className="nc-btn-ghost flex-1 rounded-xl py-3 text-sm font-semibold transition-colors">
                         Cancel
@@ -433,10 +433,10 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                       <form action={submitAction} className="flex-1">
                         <input type="hidden" name="profileId" value={profile.id} />
                         <button type="submit" disabled={isPending}
-                          className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-black transition-all hover:opacity-90 disabled:opacity-50"
-                          style={{ background: "#f59e0b" }}>
+                          className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition-all hover:opacity-90 disabled:opacity-50"
+                          style={{ background: brandGrad }}>
                           {isPending
-                            ? <><div className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />Locking…</>
+                            ? <><div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />Locking…</>
                             : <><Lock className="h-4 w-4" />Yes, Lock & Generate</>}
                         </button>
                       </form>

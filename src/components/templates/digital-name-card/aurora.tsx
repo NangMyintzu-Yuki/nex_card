@@ -3,8 +3,8 @@
 
 "use client";
 import { useState } from "react";
-import Image from "next/image";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
+import { AvatarZoom } from "@/components/templates/avatar-zoom";
 
 interface Props { data: DigitalNameCardData; accentColor?: string; }
 
@@ -36,22 +36,6 @@ function saveVCard(d: DigitalNameCardData) {
   URL.revokeObjectURL(url);
 }
 
-async function nativeShare(d: DigitalNameCardData) {
-  const url = window.location.href;
-  const phone = d.contacts.find(c => c.type === "phone")?.value ?? "";
-  const email = d.contacts.find(c => c.type === "email")?.value ?? "";
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title: `${d.fullName}${d.jobTitle ? " — " + d.jobTitle : ""}`,
-        text: [d.fullName, d.company, phone, email].filter(Boolean).join("\n"),
-        url,
-      });
-    } catch { /* cancelled */ }
-  } else {
-    await navigator.clipboard?.writeText(url);
-  }
-}
 
 // ── Social platform config ──────────────────────────────────────────────────
 const SP: Record<string, { label: string; bg: string; text: string; emoji: string }> = {
@@ -125,19 +109,18 @@ export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
             }} />
             {companyLogoUrl && (
               <div className="absolute bottom-3 right-4">
-                <Image src={companyLogoUrl} alt={company} width={80} height={28}
-                  className="h-7 w-auto object-contain brightness-0 invert opacity-70" />
+                <img src={companyLogoUrl} alt={company ?? ""} className="h-7 w-auto object-contain brightness-0 invert opacity-70" />
               </div>
             )}
           </div>
 
           {/* Avatar */}
-          <div className="-mt-14 px-5">
+          <div className="-mt-14 px-5 relative" style={{ zIndex: 10 }}>
             <div className="mb-3 w-fit">
               <div className="h-[88px] w-[88px] overflow-hidden rounded-2xl ring-4 ring-neutral-950"
                 style={{ outline: `2px solid ${accentColor}` }}>
                 {avatarUrl ? (
-                  <Image src={avatarUrl} alt={fullName} width={88} height={88} className="h-full w-full object-cover" priority />
+                  <AvatarZoom src={avatarUrl} alt={fullName} className="h-full w-full" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-3xl font-black text-white"
                     style={{ background: `linear-gradient(135deg, ${accentColor}, #06b6d4)` }}>
@@ -155,18 +138,12 @@ export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
           </div>
 
           {/* ── ACTION BUTTONS ─────────────────────────────────────── */}
-          <div className="mt-4 grid grid-cols-3 gap-2 px-5">
+          <div className="mt-4 grid grid-cols-2 gap-2 px-5">
             <button onClick={() => saveVCard(data)}
               className="flex flex-col items-center gap-1 rounded-2xl py-3 transition-all hover:scale-105 active:scale-95"
               style={{ background: `${accentColor}20`, border: `1px solid ${accentColor}35` }}>
               <span className="text-xl">👤</span>
               <span className="text-[10px] font-bold text-white/70">Save Contact</span>
-            </button>
-            <button onClick={() => nativeShare(data)}
-              className="flex flex-col items-center gap-1 rounded-2xl py-3 transition-all hover:scale-105 active:scale-95"
-              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
-              <span className="text-xl">📤</span>
-              <span className="text-[10px] font-bold text-white/70">Share</span>
             </button>
             <button onClick={async () => {
               await navigator.clipboard?.writeText(window.location.href);
@@ -226,7 +203,7 @@ export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
                       className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all hover:scale-105"
                       style={{ background: m.bg, border: `1px solid ${m.text}25`, color: m.text }}>
                       <span>{m.emoji}</span>
-                      {s.label ?? m.label}
+                      {s.label ? s.label : ""}
                     </a>
                   );
                 })}
@@ -236,7 +213,7 @@ export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
 
           {/* Skills */}
           {skills && skills.length > 0 && (
-            <div className="mt-5 px-5">
+            <div className="mt-5 mb-4 px-5">
               <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-white/25">Expertise</p>
               <div className="flex flex-wrap gap-1.5">
                 {skills.map((s, i) => (
@@ -264,16 +241,6 @@ export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
               <span className="text-[10px] text-white/30">Active</span>
             </div>
           </div>
-        </div>
-
-        {/* Sticky save CTA */}
-        <div className="mt-4 text-center">
-          <button onClick={() => saveVCard(data)}
-            className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black text-black shadow-xl transition-all hover:opacity-90 active:scale-95"
-            style={{ background: `linear-gradient(135deg, ${accentColor}, #06b6d4)`, boxShadow: `0 8px 24px ${accentColor}40` }}>
-            💾 Save to Contacts
-          </button>
-          <p className="mt-2 text-[10px] text-white/25">Downloads a .vcf file — works on iPhone & Android</p>
         </div>
       </div>
     </main>

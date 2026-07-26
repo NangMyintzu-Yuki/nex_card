@@ -106,8 +106,7 @@ export default async function AnalyticsPage() {
           <div className="px-5 py-14 text-center">
             <p className="text-sm" style={{ color: "var(--nc-text-3)" }}>No profiles yet.</p>
             <Link href="/dashboard/onboarding"
-              className="mt-4 inline-block rounded-xl px-5 py-2.5 text-sm font-bold"
-              style={{ color: "var(--nc-text)", background: "linear-gradient(135deg, var(--nc-brand-1,#d4af37), var(--nc-brand-3,#f0c050))" }}>
+              className="mt-4 inline-block rounded-xl px-5 py-2.5 text-sm font-bold nc-btn-brand">
               Create Profile →
             </Link>
           </div>
@@ -164,27 +163,6 @@ export default async function AnalyticsPage() {
         )}
       </div>
 
-      {/* Tips */}
-      <div className="mt-6 rounded-2xl px-5 py-5"
-        style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
-        <h3 className="mb-3 text-sm font-bold" style={{ color: "var(--nc-text)" }}>
-          Tips to increase views
-        </h3>
-        <ul className="space-y-2 text-sm" style={{ color: "var(--nc-text-2)" }}>
-          {[
-            "Add your NEX CARD link to your LinkedIn bio and email signature.",
-            "Generate a QR code and print it on your business cards.",
-            "Program an NFC tag — place it on your desk or phone case.",
-            "Share your page on LinkedIn when you start a new role.",
-            "Add a custom OG image for better social preview click-through.",
-          ].map((tip, i) => (
-            <li key={i} className="flex items-start gap-2">
-              <span className="mt-0.5 shrink-0" style={{ color: "var(--nc-brand-2,#d4af37)" }}>→</span>
-              {tip}
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 }

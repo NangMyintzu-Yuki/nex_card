@@ -234,9 +234,13 @@ export async function updateProfileAction(
   );
 
   if (!validation.success) {
+    const fieldList = validation.error.issues.map((i) => {
+      const path = i.path.join(".");
+      return path ? `${path}: ${i.message}` : i.message;
+    }).join("; ");
     return {
       status: "error",
-      message: "Profile data failed schema validation.",
+      message: `Validation failed: ${fieldList}`,
       fieldErrors: validation.error.flatten().fieldErrors,
     };
   }

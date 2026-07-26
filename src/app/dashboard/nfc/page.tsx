@@ -53,7 +53,7 @@ export default async function NfcHubPage() {
             No NFC-eligible profiles yet. Choose <strong>NFC Only</strong> or <strong>NFC + QR</strong> during onboarding.
           </p>
           <Link href="/dashboard/onboarding"
-            className="mt-4 inline-block rounded-xl px-5 py-2.5 text-sm font-bold text-black"
+            className="mt-4 inline-block rounded-xl px-5 py-2.5 text-sm font-bold text-white"
             style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
             Create Profile →
           </Link>

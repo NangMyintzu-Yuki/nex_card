@@ -122,10 +122,9 @@ export default function SettingsPage() {
               <input name="avatarUrl" type="url" placeholder="https://…/avatar.jpg" className={inputCls} />
             </div>
             <button type="submit" disabled={profilePending}
-              className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-black text-black disabled:opacity-50"
-              style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
+              className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-black disabled:opacity-50">
               {profilePending
-                ? <><div className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />Saving…</>
+                ? <><div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />Saving…</>
                 : "Save Changes"
               }
             </button>
@@ -183,10 +182,9 @@ export default function SettingsPage() {
                 required autoComplete="new-password" className={inputCls} />
             </div>
             <button type="submit" disabled={pwPending}
-              className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-black text-black disabled:opacity-50"
-              style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
+              className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-black disabled:opacity-50">
               {pwPending
-                ? <><div className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />Updating…</>
+                ? <><div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />Updating…</>
                 : "Update Password"
               }
             </button>

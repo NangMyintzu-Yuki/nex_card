@@ -12,6 +12,7 @@ import {
 import prisma from "@/lib/db/prisma";
 import type { CategorySlug } from "@/lib/validators/template-schemas";
 import { TemplateRenderer } from "@/components/templates/template-renderer";
+import { SafeTemplateRenderer } from "@/app/p/[slug]/safe-renderer";
 import { ProfileJsonLd } from "@/lib/seo/json-ld";
 import { APP_URL } from "@/lib/env";
 
@@ -176,7 +177,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         }}
       />
       <Suspense fallback={<ProfileLoadingSkeleton />}>
-        <TemplateRenderer
+        <SafeTemplateRenderer
           categorySlug={categorySlug}
           templateCode={profile.template.codeIdentifier}
           dynamicJsonData={profile.dynamicJsonData}

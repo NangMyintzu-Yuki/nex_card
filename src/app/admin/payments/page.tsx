@@ -106,7 +106,7 @@ export default async function AdminPaymentsPage({
             className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
               (status || "PENDING") === tab.value
                 ? "bg-indigo-500 text-white"
-                : "hover:bg-white/5"
+                : "nc-btn-ghost"
             }`}
             style={(status || "PENDING") !== tab.value ? { color: "var(--nc-text-2)" } : undefined}
           >

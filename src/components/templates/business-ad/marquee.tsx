@@ -1,6 +1,5 @@
 'use client';
 
-import Image from "next/image";
 import type { BusinessAdData } from "@/lib/validators/template-schemas";
 
 interface BP {
@@ -80,11 +79,9 @@ export function MarqueeBusiness({ data, accentColor = "#6366f1" }: BP) {
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 py-3.5 min-w-0">
             <div className="flex items-center gap-3 min-w-0 shrink">
               {logoUrl ? (
-                <Image
+                <img
                   src={logoUrl}
                   alt={businessName}
-                  width={130}
-                  height={40}
                   className="h-8 sm:h-9 w-auto max-w-[130px] sm:max-w-[160px] object-contain shrink-0"
                 />
               ) : (
@@ -136,13 +133,10 @@ export function MarqueeBusiness({ data, accentColor = "#6366f1" }: BP) {
         <section className="relative w-full min-h-[60vh] sm:min-h-[70vh] flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16 border-b border-white/10 overflow-hidden">
           {heroImageUrl && (
             <div className="absolute inset-0 z-0">
-              <Image
+              <img
                 src={heroImageUrl}
                 alt={businessName}
-                fill
-                className="object-cover opacity-20 filter blur-[2px]"
-                sizes="100vw"
-                priority
+                className="absolute inset-0 h-full w-full object-cover opacity-20 filter blur-[2px]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent" />
             </div>
@@ -302,12 +296,10 @@ export function MarqueeBusiness({ data, accentColor = "#6366f1" }: BP) {
                     key={i}
                     className="group relative aspect-square overflow-hidden rounded-xl bg-neutral-900 border border-white/10 w-full min-w-0"
                   >
-                    <Image
+                    <img
                       src={img.url}
                       alt={img.alt || "Gallery image"}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 50vw, 25vw"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
                 ))}
@@ -345,11 +337,9 @@ export function MarqueeBusiness({ data, accentColor = "#6366f1" }: BP) {
                     </div>
                     <div className="mt-6 flex items-center gap-3 pt-6 border-t border-white/10 min-w-0">
                       {t.avatarUrl ? (
-                        <Image
+                        <img
                           src={t.avatarUrl}
                           alt={t.author}
-                          width={36}
-                          height={36}
                           className="rounded-full object-cover shrink-0"
                         />
                       ) : (

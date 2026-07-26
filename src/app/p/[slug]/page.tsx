@@ -12,8 +12,8 @@ import {
 import prisma from "@/lib/db/prisma";
 import type { CategorySlug } from "@/lib/validators/template-schemas";
 import { TemplateRenderer } from "@/components/templates/template-renderer";
-import { QRScanBadge } from "@/components/templates/qr-scan-badge";
 import { APP_URL } from "@/lib/env";
+import { SafeTemplateRenderer } from "./safe-renderer";
 
 export const revalidate = 3600;
 
@@ -119,8 +119,7 @@ export default async function QRProfilePage({ params }: PageProps) {
 
   return (
     <Suspense fallback={<QRLoadingSkeleton />}>
-      <QRScanBadge slug={slug} accentColor={accentColor} />
-      <TemplateRenderer
+      <SafeTemplateRenderer
         categorySlug={categorySlug}
         templateCode={profile.template.codeIdentifier}
         dynamicJsonData={profile.dynamicJsonData}

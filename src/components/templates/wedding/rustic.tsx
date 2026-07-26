@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 import { daysUntil, formatEventDateTime, formatShortDate, formatTime, formatWeddingDate } from "@/lib/helps";
@@ -76,7 +76,7 @@ export function RusticWedding({ data, accentColor = "#65a30d" }: WeddingProps) {
                 <div className="relative mb-4 h-40 w-40 overflow-hidden border-4"
                   style={{ borderRadius: "50% 50% 45% 55% / 55% 45% 55% 45%", borderColor: "#c9a96e80" }}>
                   {p.photoUrl ? (
-                    <Image src={p.photoUrl} alt={p.name} fill className="object-cover" sizes="160px" />
+                    <img src={p.photoUrl} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-4xl"
                       style={{ background: `${accentColor}15` }}>
@@ -110,7 +110,7 @@ export function RusticWedding({ data, accentColor = "#65a30d" }: WeddingProps) {
                   {m.location && <p className="mt-1 text-xs" style={{ color: "#a08060" }}>📍 {m.location}</p>}
                   {m.imageUrl && (
                     <div className="relative aspect-video mt-3 overflow-hidden rounded-xl">
-                      <Image src={m.imageUrl} alt={m.title} fill className="object-cover" sizes="400px" />
+                      <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -130,7 +130,7 @@ export function RusticWedding({ data, accentColor = "#65a30d" }: WeddingProps) {
                 <div key={i} className="mb-3 break-inside-avoid overflow-hidden rounded-xl border-2 border-dashed"
                   style={{ borderColor: "#c9a96e40" }}>
                   <div className="relative aspect-square">
-                    <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="250px" />
+                    <img src={img.url} alt={img.alt} className="absolute inset-0 h-full w-full object-cover" />
                   </div>
                 </div>
               ))}

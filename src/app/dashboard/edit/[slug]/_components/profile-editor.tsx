@@ -56,11 +56,12 @@ interface FieldSection {
 interface FieldDef {
   key: string;       // dot-notation path in the JSON, e.g. "contacts.0.value"
   label: string;
-  type: "text" | "textarea" | "url" | "email" | "tel" | "color" | "image-upload" | "array-contacts" | "array-social" | "array-skills" | "array-projects" | "array-experience" | "array-services" | "array-milestones" | "array-events" | "array-gallery";
+  type: "text" | "textarea" | "url" | "email" | "tel" | "color" | "select" | "image-upload" | "array-contacts" | "array-social" | "array-skills" | "array-projects" | "array-experience" | "array-services" | "array-milestones" | "array-events" | "array-gallery";
   placeholder?: string;
   maxLength?: number;
   required?: boolean;
   hint?: string;
+  options?: string[];
 }
 
 const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
@@ -69,10 +70,10 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
       id: "identity",
       title: "Identity",
       fields: [
-        { key: "fullName",   label: "Full Name",   type: "text",     placeholder: "Alex Rivera",           required: true, maxLength: 120 },
+        { key: "fullName",   label: "Full Name",   type: "text",     placeholder: "Alex Rivera",           required: true, maxLength: 30 },
         { key: "jobTitle",   label: "Job Title",   type: "text",     placeholder: "Senior Product Designer", required: true, maxLength: 120 },
-        { key: "company",    label: "Company",     type: "text",     placeholder: "Horizon Labs",            required: true, maxLength: 120 },
-        { key: "tagline",    label: "Tagline",     type: "text",     placeholder: "Designing systems that scale.",           maxLength: 200 },
+        { key: "company",    label: "Company",     type: "text",     placeholder: "Horizon Labs",            maxLength: 30 },
+        { key: "tagline",    label: "Tagline",     type: "text",     placeholder: "Designing systems that scale.",           maxLength: 150 },
         { key: "bio",        label: "Bio",         type: "textarea", placeholder: "A short paragraph about yourself.",       maxLength: 1000 },
         { key: "avatarUrl",  label: "Profile Photo", type: "image-upload", placeholder: "https://...", hint: "Upload a photo or paste a direct image URL" },
       ],
@@ -114,29 +115,32 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
       id: "identity",
       title: "About",
       fields: [
-        { key: "fullName",    label: "Full Name",   type: "text",     required: true,  maxLength: 120 },
-        { key: "headline",    label: "Headline",    type: "text",     required: true,  maxLength: 200, placeholder: "Full-stack developer & open-source contributor" },
-        { key: "bio",         label: "Bio",         type: "textarea", required: true,  maxLength: 2000 },
-        { key: "avatarUrl",   label: "Avatar URL",  type: "url" },
-        { key: "resumeUrl",   label: "Resume URL",  type: "url",      placeholder: "https://…/resume.pdf" },
-        { key: "availability",label: "Availability",type: "text",     placeholder: "available / limited / unavailable", maxLength: 30 },
-        { key: "availabilityNote", label: "Availability Note", type: "text", maxLength: 200 },
+        { key: "fullName",    label: "Full Name",           type: "text",           required: true,  maxLength: 120, placeholder: "Your display name" },
+        { key: "headline",    label: "Headline",            type: "text",           required: true,  maxLength: 200, placeholder: "Full-stack developer & open-source contributor" },
+        { key: "bio",         label: "Bio",                 type: "textarea",       required: true,  maxLength: 2000, placeholder: "Tell visitors what you do, your experience, and what you're looking for…" },
+        { key: "avatarUrl",   label: "Profile Photo",       type: "image-upload",   placeholder: "https://...", hint: "Upload a photo or paste a direct image URL" },
+        { key: "resumeUrl",   label: "Resume / CV URL",     type: "url",            placeholder: "https://…/resume.pdf" },
+        { key: "availability",label: "Availability Status",  type: "select",         placeholder: "available", options: ["available", "limited", "unavailable"], hint: "Shown as a badge on your profile" },
+        { key: "availabilityNote", label: "Availability Note", type: "text",         placeholder: "Open to freelance projects", maxLength: 200, hint: "Optional note next to your status badge" },
       ],
     },
     {
-      id: "contacts", title: "Contact",
+      id: "contacts", title: "Contact Info",
+      description: "Email, phone, website, or address entries.",
       fields: [{ key: "contacts", label: "Contacts", type: "array-contacts" }],
     },
     {
-      id: "social", title: "Social",
+      id: "social", title: "Social Links",
       fields: [{ key: "socialLinks", label: "Social Links", type: "array-social" }],
     },
     {
       id: "projects", title: "Projects",
+      description: "Showcase your best work. Mark projects as featured to highlight them.",
       fields: [{ key: "projects", label: "Projects", type: "array-projects" }],
     },
     {
-      id: "experience", title: "Experience",
+      id: "experience", title: "Work Experience",
+      description: "Your professional background and roles.",
       fields: [{ key: "experience", label: "Experience", type: "array-experience" }],
     },
   ],
@@ -256,28 +260,56 @@ function setNestedValue(obj: Record<string, unknown>, path: string, value: unkno
 function ContactsEditor({ value, onChange }: { value: unknown[]; onChange: (v: unknown[]) => void }) {
   const contacts = (value as Array<Record<string, string>>) ?? [];
   const TYPES = ["email", "phone", "website", "address"];
+  const TYPE_LABELS: Record<string, string> = { email: "✉ Email", phone: "📱 Phone", website: "🌐 Website", address: "📍 Address" };
+
+  function setType(index: number, type: string) {
+    const n = [...contacts];
+    n[index] = { ...n[index], type };
+    onChange(n);
+  }
+
+  function clearType(index: number) {
+    const n = [...contacts];
+    n[index] = { ...n[index], type: "", value: "" };
+    onChange(n);
+  }
+
   return (
     <div className="space-y-2">
-      {contacts.map((c, i) => (
-        <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-start">
-          <div className="flex gap-2 sm:flex-1">
-            <select value={c.type ?? "email"} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], type: e.target.value }; onChange(n); }}
-              className="rounded-lg px-2 py-2 text-xs w-24 shrink-0 nc-input">
-              {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
-            <input value={c.value ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], value: e.target.value }; onChange(n); }}
-              placeholder="Value" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+      {contacts.map((c, i) => {
+        const usedTypes = new Set(contacts.filter((_, j) => j !== i).map((x) => x.type).filter(Boolean));
+        const availableTypes = TYPES.filter((t) => !usedTypes.has(t));
+        return (
+          <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-start">
+            <div className="flex gap-2 sm:flex-1">
+              {c.type ? (
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500/10 px-2.5 py-2 text-xs font-semibold text-indigo-400 shrink-0">
+                  {TYPE_LABELS[c.type] ?? c.type}
+                  <button type="button" onClick={() => clearType(i)}
+                    className="ml-0.5 text-indigo-400/50 hover:text-red-400 transition-colors">&times;</button>
+                </span>
+              ) : (
+                <select value="" onChange={(e) => setType(i, e.target.value)}
+                  className="rounded-lg px-2 py-2 text-xs w-24 shrink-0 nc-input">
+                  <option value="" disabled>Type…</option>
+                  {availableTypes.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
+              )}
+              <input value={c.value ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], value: e.target.value }; onChange(n); }}
+                placeholder={c.type === "email" ? "you@example.com" : c.type === "phone" ? "+95 9xxx" : c.type === "website" ? "https://…" : "Full address"}
+                className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+            </div>
+            <div className="flex gap-2 items-center">
+              <input value={c.label ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
+                placeholder="Label (optional)" className="flex-1 sm:w-28 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
+              <button onClick={() => onChange(contacts.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
-          <div className="flex gap-2 items-center">
-            <input value={c.label ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
-              placeholder="Label (optional)" className="flex-1 sm:w-28 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
-            <button onClick={() => onChange(contacts.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-      ))}
-      <button onClick={() => onChange([...contacts, { type: "email", value: "", label: "" }])}
+        );
+      })}
+      <button onClick={() => onChange([...contacts, { type: "", value: "", label: "" }])}
         className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Contact
       </button>
@@ -424,34 +456,61 @@ function ImageUploadField({
 function SocialLinksEditor({ value, onChange }: { value: unknown[]; onChange: (v: unknown[]) => void }) {
   const links = (value as Array<Record<string, string>>) ?? [];
   const PLATFORMS = ["linkedin","github","twitter","instagram","facebook","youtube","tiktok","website","whatsapp","telegram","viber","discord"];
+  const PLATFORM_ICONS: Record<string, string> = { linkedin:"💼", github:"🐙", twitter:"𝕏", instagram:"📸", facebook:"👥", youtube:"▶️", tiktok:"🎵", whatsapp:"💬", telegram:"✈️", viber:"📲", discord:"🎮", website:"🌐" };
+
+  function setPlatform(index: number, platform: string) {
+    const n = [...links];
+    n[index] = { ...n[index], platform };
+    onChange(n);
+  }
+
+  function clearPlatform(index: number) {
+    const n = [...links];
+    n[index] = { ...n[index], platform: "", url: "" };
+    onChange(n);
+  }
+
   return (
     <div className="space-y-2">
-      {links.map((l, i) => (
-        <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="flex gap-2 sm:flex-1">
-            <select value={l.platform ?? "website"} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], platform: e.target.value }; onChange(n); }}
-              className="nc-input rounded-lg px-2 py-2 text-xs w-28 shrink-0">
-              {PLATFORMS.map((p) => <option key={p} value={p}>{p}</option>)}
-            </select>
-            <input value={l.url ?? ""} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], url: e.target.value }; onChange(n); }}
-              onBlur={(e) => {
-                const v = e.target.value.trim();
-                if (v && !v.startsWith("http://") && !v.startsWith("https://")) {
-                  const n = [...links]; n[i] = { ...n[i], url: `https://${v}` }; onChange(n);
-                }
-              }}
-              placeholder="https://linkedin.com/in/yourname" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+      {links.map((l, i) => {
+        const usedPlatforms = new Set(links.filter((_, j) => j !== i).map((x) => x.platform).filter(Boolean));
+        const availablePlatforms = PLATFORMS.filter((p) => !usedPlatforms.has(p));
+        return (
+          <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="flex gap-2 sm:flex-1">
+              {l.platform ? (
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500/10 px-2.5 py-2 text-xs font-semibold text-indigo-400 shrink-0">
+                  {PLATFORM_ICONS[l.platform] ?? "🔗"} {l.platform}
+                  <button type="button" onClick={() => clearPlatform(i)}
+                    className="ml-0.5 text-indigo-400/50 hover:text-red-400 transition-colors">&times;</button>
+                </span>
+              ) : (
+                <select value="" onChange={(e) => setPlatform(i, e.target.value)}
+                  className="nc-input rounded-lg px-2 py-2 text-xs w-28 shrink-0">
+                  <option value="" disabled>Platform…</option>
+                  {availablePlatforms.map((p) => <option key={p} value={p}>{p}</option>)}
+                </select>
+              )}
+              <input value={l.url ?? ""} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], url: e.target.value }; onChange(n); }}
+                onBlur={(e) => {
+                  const v = e.target.value.trim();
+                  if (v && !v.startsWith("http://") && !v.startsWith("https://")) {
+                    const n = [...links]; n[i] = { ...n[i], url: `https://${v}` }; onChange(n);
+                  }
+                }}
+                placeholder="https://linkedin.com/in/yourname" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+            </div>
+            <div className="flex gap-2 items-center">
+              <input value={l.label ?? ""} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
+                placeholder="Label" className="flex-1 sm:w-24 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
+              <button onClick={() => onChange(links.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
-          <div className="flex gap-2 items-center">
-            <input value={l.label ?? ""} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
-              placeholder="Label" className="flex-1 sm:w-24 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
-            <button onClick={() => onChange(links.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-      ))}
-      <button onClick={() => onChange([...links, { platform: "website", url: "", label: "" }])}
+        );
+      })}
+      <button onClick={() => onChange([...links, { platform: "", url: "", label: "" }])}
         className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Social Link
       </button>
@@ -612,26 +671,142 @@ function ServicesEditor({ value, onChange }: { value: unknown[]; onChange: (v: u
 
 function ProjectsEditor({ value, onChange }: { value: unknown[]; onChange: (v: unknown[]) => void }) {
   const projects = (value as Array<Record<string, unknown>>) ?? [];
+  const [tagInputs, setTagInputs] = useState<Record<number, string>>({});
+
+  function addProject() {
+    const newId = `proj-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    onChange([...projects, {
+      id: newId,
+      title: "",
+      description: "",
+      coverImageUrl: "",
+      tags: [],
+      liveUrl: "",
+      repoUrl: "",
+      caseStudyUrl: "",
+      year: undefined,
+      featured: false,
+    }]);
+  }
+
+  function updateProject(index: number, updates: Record<string, unknown>) {
+    const n = [...projects];
+    n[index] = { ...n[index], ...updates };
+    onChange(n);
+  }
+
+  function removeProject(index: number) {
+    onChange(projects.filter((_, j) => j !== index));
+  }
+
+  function addTag(projectIndex: number) {
+    const raw = tagInputs[projectIndex] ?? "";
+    const tag = raw.trim();
+    if (!tag) return;
+    const current = (projects[projectIndex]?.tags as string[]) ?? [];
+    if (current.includes(tag) || current.length >= 8) return;
+    updateProject(projectIndex, { tags: [...current, tag] });
+    setTagInputs((prev) => ({ ...prev, [projectIndex]: "" }));
+  }
+
+  function removeTag(projectIndex: number, tagIndex: number) {
+    const current = (projects[projectIndex]?.tags as string[]) ?? [];
+    updateProject(projectIndex, { tags: current.filter((_, j) => j !== tagIndex) });
+  }
+
   return (
-    <div className="space-y-3">
-      {projects.map((p, i) => (
-        <div key={i} className="nc-card rounded-xl p-4 space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Project {i + 1}</span>
-            <button onClick={() => onChange(projects.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+    <div className="space-y-4">
+      {projects.map((p, i) => {
+        const tags = (p.tags as string[]) ?? [];
+        return (
+          <div key={i} className="nc-card rounded-xl p-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Project {i + 1}</span>
+              <button onClick={() => removeProject(i)} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+            </div>
+
+            {/* Title */}
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Project Title *</label>
+              <input value={String(p.title ?? "")} onChange={(e) => updateProject(i, { title: e.target.value })}
+                placeholder="My Awesome Project" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Description</label>
+              <textarea value={String(p.description ?? "")} onChange={(e) => updateProject(i, { description: e.target.value })}
+                placeholder="Briefly describe what this project does and your role…" rows={3}
+                className="w-full nc-input rounded-lg px-3 py-2 text-sm resize-none" />
+              <p className="mt-0.5 text-right text-xs tabular-nums" style={{ color: "var(--nc-text-3)" }}>
+                {(p.description as string)?.length ?? 0}/600
+              </p>
+            </div>
+
+            {/* Cover Image */}
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Cover Image URL</label>
+              <input value={String(p.coverImageUrl ?? "")} onChange={(e) => updateProject(i, { coverImageUrl: e.target.value })}
+                placeholder="https://…/project-screenshot.png" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+
+            {/* URLs row */}
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Live URL</label>
+                <input value={String(p.liveUrl ?? "")} onChange={(e) => updateProject(i, { liveUrl: e.target.value })}
+                  placeholder="https://myproject.com" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Repo URL</label>
+                <input value={String(p.repoUrl ?? "")} onChange={(e) => updateProject(i, { repoUrl: e.target.value })}
+                  placeholder="https://github.com/…" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Case Study URL</label>
+                <input value={String(p.caseStudyUrl ?? "")} onChange={(e) => updateProject(i, { caseStudyUrl: e.target.value })}
+                  placeholder="https://…/case-study" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+              </div>
+            </div>
+
+            {/* Year + Featured */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Year</label>
+                <input type="number" min={1990} max={2100} value={p.year != null ? String(p.year) : ""} onChange={(e) => updateProject(i, { year: e.target.value ? parseInt(e.target.value) : undefined })}
+                  placeholder="2024" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer mt-5">
+                <input type="checkbox" checked={Boolean(p.featured)} onChange={(e) => updateProject(i, { featured: e.target.checked })} className="rounded" />
+                <span className="text-xs font-medium" style={{ color: "var(--nc-text-2)" }}>Featured</span>
+              </label>
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Tags <span style={{ color: "var(--nc-text-3)" }}>(max 8)</span></label>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {tags.map((t, ti) => (
+                  <span key={ti} className="inline-flex items-center gap-1 rounded-md bg-indigo-500/10 px-2 py-0.5 text-xs text-indigo-400">
+                    {t}
+                    <button type="button" onClick={() => removeTag(i, ti)} className="hover:text-red-400">&times;</button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input value={tagInputs[i] ?? ""} onChange={(e) => setTagInputs((prev) => ({ ...prev, [i]: e.target.value }))}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(i); } }}
+                  placeholder="Add a tag and press Enter" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm" />
+                <button type="button" onClick={() => addTag(i)}
+                  className="nc-btn-ghost rounded-lg px-3 py-2 text-xs font-semibold hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+                  Add
+                </button>
+              </div>
+            </div>
           </div>
-          {["title","description","coverImageUrl","liveUrl","repoUrl"].map((key) => (
-            <input key={key} value={String(p[key] ?? "")} onChange={(e) => { const n = [...projects]; n[i] = { ...n[i], [key]: e.target.value, id: (p.id as string) || `proj-${Date.now()}-${i}` }; onChange(n); }}
-              placeholder={key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())}
-              className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
-          ))}
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={Boolean(p.featured)} onChange={(e) => { const n = [...projects]; n[i] = { ...n[i], featured: e.target.checked }; onChange(n); }} className="rounded" />
-            <span className="text-xs" style={{ color: "var(--nc-text-2)" }}>Featured project</span>
-          </label>
-        </div>
-      ))}
-      <button onClick={() => onChange([...projects, { id: `proj-${Date.now()}`, title: "", description: "", coverImageUrl: "", tags: [] }])}
+        );
+      })}
+      <button onClick={addProject}
         className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Project
       </button>
@@ -642,28 +817,55 @@ function ProjectsEditor({ value, onChange }: { value: unknown[]; onChange: (v: u
 function ExperienceEditor({ value, onChange }: { value: unknown[]; onChange: (v: unknown[]) => void }) {
   const experience = (value as Array<Record<string, string>>) ?? [];
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {experience.map((e, i) => (
-        <div key={i} className="nc-card rounded-xl p-4 space-y-2">
+        <div key={i} className="nc-card rounded-xl p-4 space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Role {i + 1}</span>
             <button onClick={() => onChange(experience.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
-          {[
-            { key: "role",        placeholder: "Senior Engineer" },
-            { key: "company",     placeholder: "Acme Corp" },
-            { key: "startDate",   placeholder: "2022-01" },
-            { key: "endDate",     placeholder: "2024-06 (leave blank if current)" },
-            { key: "location",    placeholder: "Remote / KL" },
-            { key: "description", placeholder: "What you did there…" },
-          ].map(({ key, placeholder }) => (
-            key === "description"
-              ? <textarea key={key} value={e[key] ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], [key]: ev.target.value }; onChange(n); }}
-                  placeholder={placeholder} rows={3}
-                  className="w-full nc-input rounded-lg px-3 py-2 text-sm resize-none" />
-              : <input key={key} value={e[key] ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], [key]: ev.target.value }; onChange(n); }}
-                  placeholder={placeholder} className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
-          ))}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Job Title / Role *</label>
+              <input value={e.role ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], role: ev.target.value }; onChange(n); }}
+                placeholder="Senior Engineer" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Company *</label>
+              <input value={e.company ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], company: ev.target.value }; onChange(n); }}
+                placeholder="Acme Corp" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Start Date *</label>
+              <input value={e.startDate ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], startDate: ev.target.value }; onChange(n); }}
+                placeholder="2022-01" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>End Date</label>
+              <input value={e.endDate ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], endDate: ev.target.value }; onChange(n); }}
+                placeholder="2024-06 (leave blank if current)" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Location</label>
+              <input value={e.location ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], location: ev.target.value }; onChange(n); }}
+                placeholder="Remote / Kuala Lumpur" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Company Logo URL</label>
+              <input value={e.logoUrl ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], logoUrl: ev.target.value }; onChange(n); }}
+                placeholder="https://…/company-logo.png" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Description</label>
+            <textarea value={e.description ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], description: ev.target.value }; onChange(n); }}
+              placeholder="What you accomplished in this role…" rows={3}
+              className="w-full nc-input rounded-lg px-3 py-2 text-sm resize-none" />
+          </div>
         </div>
       ))}
       <button onClick={() => onChange([...experience, { role: "", company: "", startDate: "", description: "" }])}
@@ -739,6 +941,15 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
             <input type="text" value={String(val ?? "#6366f1")} onChange={(e) => setFieldValue(field.key, e.target.value)}
               placeholder="#6366f1" className="nc-input flex-1 rounded-xl px-3 py-2.5 text-sm font-mono" />
           </div>
+        );
+      case "select":
+        return (
+          <select value={String(val ?? field.placeholder ?? "")} onChange={(e) => setFieldValue(field.key, e.target.value)}
+            className="nc-input w-full px-3 py-2.5 text-sm">
+            {field.options?.map((opt) => (
+              <option key={opt} value={opt}>{opt.charAt(0).toUpperCase() + opt.slice(1)}</option>
+            ))}
+          </select>
         );
       case "array-contacts":
         return <ContactsEditor value={(val as unknown[]) ?? []} onChange={(v) => setFieldValue(field.key, v)} />;

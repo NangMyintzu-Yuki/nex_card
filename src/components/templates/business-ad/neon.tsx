@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   MapPin,
@@ -208,11 +207,9 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-3">
             {logoUrl ? (
-              <Image
+              <img
                 src={logoUrl}
                 alt={businessName || "Business Logo"}
-                width={140}
-                height={36}
                 className="h-9 w-auto object-contain"
               />
             ) : (
@@ -342,13 +339,10 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
 
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/90 shadow-2xl backdrop-blur-sm">
                   {heroImageUrl ? (
-                    <Image
+                    <img
                       src={heroImageUrl}
                       alt={businessName || "Business hero banner"}
-                      fill
-                      className="object-cover"
-                      priority
-                      sizes="(max-width: 1024px) 100vw, 500px"
+                      className="absolute inset-0 h-full w-full object-cover"
                     />
                   ) : (
                     <div className="flex h-full flex-col items-center justify-center p-8 text-center text-zinc-600">
@@ -443,12 +437,10 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
                   key={i}
                   className="group relative aspect-square overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-lg"
                 >
-                  <Image
+                  <img
                     src={img.url}
                     alt={img.alt || `Gallery image ${i + 1}`}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
@@ -616,12 +608,10 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
                   <div className="mt-8 flex items-center gap-4 border-t border-zinc-800/80 pt-6">
                     {t.avatarUrl ? (
                       <div className="relative h-11 w-11 overflow-hidden rounded-full border border-zinc-700">
-                        <Image
+                        <img
                           src={t.avatarUrl}
                           alt={t.author || "Avatar"}
-                          fill
-                          className="object-cover"
-                          sizes="44px"
+                          className="absolute inset-0 h-full w-full object-cover"
                         />
                       </div>
                     ) : (
@@ -794,11 +784,9 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="flex items-center gap-3">
             {logoUrl ? (
-              <Image
+              <img
                 src={logoUrl}
                 alt={businessName || "Footer Logo"}
-                width={100}
-                height={30}
                 className="h-7 w-auto object-contain"
               />
             ) : (

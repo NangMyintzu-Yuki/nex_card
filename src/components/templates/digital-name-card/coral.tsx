@@ -1,8 +1,8 @@
 // CORAL — Warm, approachable, bio-link layout. For all professionals and freelancers.
 "use client";
 import { useState } from "react";
-import Image from "next/image";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
+import { AvatarZoom } from "@/components/templates/avatar-zoom";
 
 interface Props { data: DigitalNameCardData; accentColor?: string; }
 
@@ -46,7 +46,7 @@ export function CoralNameCard({ data, accentColor="#f97316" }: Props) {
           <div className="mb-4 relative">
             <div className="h-24 w-24 overflow-hidden rounded-full" style={{padding:"3px",background:`linear-gradient(135deg,${w1},${w2})`,boxShadow:`0 0 40px ${w1}50`}}>
               <div className="h-full w-full overflow-hidden rounded-full">
-                {avatarUrl?<Image src={avatarUrl} alt={fullName} width={90} height={90} className="h-full w-full object-cover" priority/>:
+                {avatarUrl?<AvatarZoom src={avatarUrl} alt={fullName} className="h-full w-full" />:
                   <div className="flex h-full w-full items-center justify-center text-3xl font-black text-white" style={{background:`linear-gradient(135deg,${w1},${w2})`}}>{fullName.charAt(0)}</div>}
               </div>
             </div>
@@ -73,13 +73,9 @@ export function CoralNameCard({ data, accentColor="#f97316" }: Props) {
         </button>
 
         {/* Share row */}
-        <div className="mb-5 grid grid-cols-2 gap-2">
-          <button onClick={()=>{if(navigator.share){navigator.share({title:fullName,url:window.location.href}).catch(()=>{});}else{navigator.clipboard?.writeText(window.location.href);}}}
-            className="flex items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold text-white/70 transition-all hover:text-white" style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"}}>
-            📤 Share
-          </button>
+        <div className="mb-5">
           <button onClick={()=>{navigator.clipboard?.writeText(window.location.href);setCopied(true);setTimeout(()=>setCopied(false),2000);}}
-            className="flex items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold text-white/70 transition-all hover:text-white" style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"}}>
+            className="flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold text-white/70 transition-all hover:text-white" style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"}}>
             {copied?"✅ Copied":"🔗 Copy Link"}
           </button>
         </div>
@@ -111,7 +107,7 @@ export function CoralNameCard({ data, accentColor="#f97316" }: Props) {
               <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 transition-all hover:scale-[1.02]" style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"}}>
                 <span className="text-base">{SOCIAL_EMOJI[s.platform]??"🔗"}</span>
-                <span className="text-xs font-medium text-white/65 truncate">{s.label??s.platform}</span>
+                <span className="text-xs font-medium text-white/65 truncate">{s.label ? s.label : s.platform}</span>
               </a>
             ))}
           </div>

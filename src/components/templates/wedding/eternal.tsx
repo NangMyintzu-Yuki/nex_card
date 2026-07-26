@@ -5,7 +5,7 @@
 // Celestial: Deep cosmos with real CSS star particles
 // Rustic: Botanical warmth with decorative frame elements
 
-import Image from "next/image";
+
 import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
@@ -41,7 +41,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e" }: WeddingProps) 
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-24 text-center">
         {gallery.length > 0 && (
           <div className="absolute inset-0">
-            <Image src={gallery[0].url} alt="Cover" fill className="object-cover opacity-20" sizes="100vw" priority />
+            <img src={gallery[0].url} alt="Cover" className="absolute inset-0 h-full w-full object-cover opacity-20" />
             <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, ${bg}30 0%, ${bg}95 60%, ${bg} 100%)` }} />
           </div>
         )}
@@ -120,7 +120,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e" }: WeddingProps) 
                 {p.photoUrl ? (
                   <div className="relative mb-4 h-44 w-44 overflow-hidden rounded-full border-4"
                     style={{ borderColor: `${gold}50`, boxShadow: `0 0 40px ${gold}20` }}>
-                    <Image src={p.photoUrl} alt={p.name} fill className="object-cover" sizes="176px" />
+                    <img src={p.photoUrl} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
                   </div>
                 ) : (
                   <div className="mb-4 flex h-44 w-44 items-center justify-center rounded-full border-4 text-5xl"
@@ -178,7 +178,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e" }: WeddingProps) 
                       {m.imageUrl && (
                         <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lg"
                           style={{ border: `1px solid ${gold}25` }}>
-                          <Image src={m.imageUrl} alt={m.title} fill className="object-cover" sizes="400px" />
+                          <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
                         </div>
                       )}
                     </div>
@@ -203,8 +203,8 @@ export function EternalWedding({ data, accentColor = "#c9a96e" }: WeddingProps) 
               {gallery.slice(0, 12).map((img, i) => (
                 <div key={i} className="mb-3 break-inside-avoid overflow-hidden rounded-xl shadow-sm">
                   <div className="relative aspect-square">
-                    <Image src={img.url} alt={img.alt} fill
-                      className="object-cover hover:scale-105 transition-transform duration-700" sizes="300px" />
+                    <img src={img.url} alt={img.alt}
+                      className="absolute inset-0 h-full w-full object-cover hover:scale-105 transition-transform duration-700" />
                   </div>
                   {img.caption && (
                     <p className="py-1.5 text-center text-xs italic px-2" style={{ color: "#a08060" }}>{img.caption}</p>

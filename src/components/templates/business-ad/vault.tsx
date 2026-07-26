@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import {
   ChevronRight,
@@ -91,11 +90,9 @@ export function VaultBusiness({ data, accentColor = "#6366f1" }: BP) {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             {logoUrl ? (
-              <Image
+              <img
                 src={logoUrl}
                 alt={businessName}
-                width={120}
-                height={40}
                 className="h-9 w-auto object-contain"
               />
             ) : (
@@ -461,11 +458,9 @@ export function VaultBusiness({ data, accentColor = "#6366f1" }: BP) {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-3">
             {logoUrl && (
-              <Image
+              <img
                 src={logoUrl}
                 alt={businessName}
-                width={80}
-                height={28}
                 className="h-6 w-auto object-contain opacity-50"
               />
             )}

@@ -2,9 +2,8 @@
 // OBSIDIAN — Editorial brutalism. Dark, bold, full contact suite. Suits all professionals.
 
 "use client";
-import { useState } from "react";
-import Image from "next/image";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
+import { AvatarZoom } from "@/components/templates/avatar-zoom";
 
 interface Props {
   data: DigitalNameCardData;
@@ -90,7 +89,6 @@ const SP: Record<string, string> = {
 const PRIORITY = ["phone", "email", "whatsapp", "viber", "telegram", "website", "address"];
 
 export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
-  const [copied, setCopied] = useState(false);
   const {
     fullName,
     jobTitle,
@@ -126,29 +124,31 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
               className="contrast-110 h-20 w-20 shrink-0 overflow-hidden grayscale"
               style={{ outline: `2px solid ${accentColor}` }}
             >
-              <Image
+              <AvatarZoom
                 src={avatarUrl}
                 alt={fullName}
-                width={80}
-                height={80}
-                className="h-full w-full object-cover"
-                priority
+                className="h-full w-full"
+                imageClassName="contrast-110 grayscale"
               />
             </div>
           )}
           <div>
-            <p className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.3em] text-neutral-600">
-              {company}
-            </p>
+            {company && (
+              <p className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.3em] text-neutral-600">
+                {company}
+              </p>
+            )}
             <h1 className="text-3xl font-black leading-none tracking-tighter text-white">
               {fullName}
             </h1>
-            <p
-              className="mt-1 text-sm font-bold uppercase tracking-wider"
-              style={{ color: accentColor }}
-            >
-              {jobTitle}
-            </p>
+            {jobTitle && (
+              <p
+                className="mt-1 text-sm font-bold uppercase tracking-wider"
+                style={{ color: accentColor }}
+              >
+                {jobTitle}
+              </p>
+            )}
           </div>
         </div>
 
@@ -164,29 +164,13 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
         {bio && <p className="mb-5 text-sm leading-relaxed text-neutral-500">{bio}</p>}
 
         {/* Action row */}
-        <div className="mb-5 flex gap-2">
+        <div className="mb-5">
           <button
             onClick={() => saveVCard(data)}
-            className="flex-1 py-3 text-xs font-black uppercase tracking-wider text-black transition-all hover:opacity-90"
+            className="w-full py-3 text-xs font-black uppercase tracking-wider text-black transition-all hover:opacity-90"
             style={{ background: accentColor }}
           >
             💾 Save Contact
-          </button>
-          <button
-            onClick={async () => {
-              if (navigator.share) {
-                try {
-                  await navigator.share({ title: fullName, url: window.location.href });
-                } catch {}
-              } else {
-                await navigator.clipboard?.writeText(window.location.href);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-              }
-            }}
-            className="flex-1 border border-neutral-800 py-3 text-xs font-bold uppercase tracking-wider text-neutral-400 transition-all hover:border-neutral-600 hover:text-white"
-          >
-            {copied ? "✓ Copied" : "📤 Share"}
           </button>
         </div>
 
@@ -243,7 +227,7 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
                       color: baseColor as React.CSSProperties["color"] 
                     }}
                   >
-                    {s.label ?? s.platform}
+                    {s.label ? s.label : s.platform}
                   </a>
                 );
               })}

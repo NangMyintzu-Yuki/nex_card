@@ -52,11 +52,11 @@ const ContactFieldSchema = z.object({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const DigitalNameCardSchema = z.object({
-  fullName: z.string().min(1).max(120),
+  fullName: z.string().min(1).max(30),
   jobTitle: z.string().min(1).max(120),
-  company: z.string().min(1).max(120),
+  company: z.string().max(30).optional(),
   companyLogoUrl: z.string().url().optional().or(z.literal("")),
-  tagline: z.string().max(200).optional(),
+  tagline: z.string().max(150).optional(),
   bio: z.string().max(1000).optional(),
   avatarUrl: z.string().url().optional().or(z.literal("")),
   contacts: z.array(ContactFieldSchema).min(0).max(8),
@@ -88,11 +88,11 @@ export type DigitalNameCardData = z.infer<typeof DigitalNameCardSchema>;
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PortfolioProjectSchema = z.object({
-  id: z.string().cuid(),
+  id: z.string().min(1),
   title: z.string().min(1).max(120),
-  description: z.string().max(600),
-  tags: z.array(z.string().max(30)).max(8),
-  coverImageUrl: z.string().url(),
+  description: z.string().max(600).optional().default(""),
+  tags: z.array(z.string().max(30)).max(8).optional().default([]),
+  coverImageUrl: z.string().url().optional().or(z.literal("")),
   liveUrl: z.preprocess((v) => { if (typeof v !== "string" || v.trim() === "") return ""; const s = v.trim(); return s.startsWith("http") ? s : `https://${s}`; }, z.string().url().optional().or(z.literal(""))),
   repoUrl: z.preprocess((v) => { if (typeof v !== "string" || v.trim() === "") return ""; const s = v.trim(); return s.startsWith("http") ? s : `https://${s}`; }, z.string().url().optional().or(z.literal(""))),
   year: z.number().int().min(1990).max(2100).optional(),
@@ -103,9 +103,9 @@ const PortfolioProjectSchema = z.object({
 const PortfolioExperienceSchema = z.object({
   company: z.string().min(1).max(120),
   role: z.string().min(1).max(120),
-  startDate: z.string().datetime({ offset: true }).or(z.string().regex(/^\d{4}-\d{2}$/)),
-  endDate: z.string().datetime({ offset: true }).or(z.string().regex(/^\d{4}-\d{2}$/)).optional(),
-  description: z.string().max(800),
+  startDate: z.string().min(1).max(40),
+  endDate: z.string().max(40).optional(),
+  description: z.string().max(800).optional().default(""),
   logoUrl: z.string().url().optional().or(z.literal("")),
   location: z.string().max(100).optional(),
 });

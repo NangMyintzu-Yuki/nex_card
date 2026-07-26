@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import {
   ArrowRight,
   Building2,
@@ -251,11 +250,9 @@ export function DistrictBusiness({
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3.5">
           <div className="flex items-center gap-3">
             {logoUrl ? (
-              <Image
+              <img
                 src={logoUrl}
                 alt={businessName}
-                width={140}
-                height={45}
                 className="h-10 w-auto object-contain"
               />
             ) : (
@@ -453,13 +450,10 @@ export function DistrictBusiness({
               <div className="relative mx-auto max-w-md lg:max-w-none">
                 {heroImageUrl ? (
                   <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border-4 border-white shadow-2xl">
-                    <Image
+                    <img
                       src={heroImageUrl}
                       alt={businessName}
-                      fill
-                      className="object-cover"
-                      priority
-                      sizes="(max-width: 1024px) 100vw, 500px"
+                      className="absolute inset-0 h-full w-full object-cover"
                     />
                   </div>
                 ) : (
@@ -522,11 +516,10 @@ export function DistrictBusiness({
                   <div className="flex flex-col sm:flex-row items-center gap-6">
                     {ceoMember.avatarUrl ? (
                       <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-md">
-                        <Image
+                        <img
                           src={ceoMember.avatarUrl}
                           alt={ceoMember.name}
-                          fill
-                          className="object-cover"
+                          className="absolute inset-0 h-full w-full object-cover"
                         />
                       </div>
                     ) : (
@@ -641,11 +634,10 @@ export function DistrictBusiness({
 
                     {s.imageUrl && (
                       <div className="relative mb-4 aspect-[16/9] w-full overflow-hidden rounded-xl border border-slate-100">
-                        <Image
+                        <img
                           src={s.imageUrl}
                           alt={s.title}
-                          fill
-                          className="object-cover"
+                          className="absolute inset-0 h-full w-full object-cover"
                         />
                       </div>
                     )}

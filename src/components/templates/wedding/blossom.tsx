@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 import { daysUntil, formatEventDateTime, formatShortDate, formatTime, formatWeddingDate } from "@/lib/helps";
@@ -62,7 +62,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6" }: WeddingProps) 
                     borderColor: `${accentColor}40`,
                   }}>
                   {p.photoUrl ? (
-                    <Image src={p.photoUrl} alt={p.name} fill className="object-cover" sizes="160px" />
+                    <img src={p.photoUrl} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-4xl"
                       style={{ background: `${accentColor}15` }}>
@@ -103,7 +103,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6" }: WeddingProps) 
                     {m.imageUrl && (
                       <div className="relative aspect-video mt-4 overflow-hidden rounded-2xl border-2"
                         style={{ borderColor: `${accentColor}20` }}>
-                        <Image src={m.imageUrl} alt={m.title} fill className="object-cover" sizes="400px" />
+                        <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     )}
                   </div>
@@ -124,7 +124,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6" }: WeddingProps) 
                 <div key={i} className="mb-3 break-inside-avoid overflow-hidden rounded-2xl border-2"
                   style={{ borderColor: `${accentColor}20` }}>
                   <div className="relative aspect-square">
-                    <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="250px" />
+                    <img src={img.url} alt={img.alt} className="absolute inset-0 h-full w-full object-cover" />
                   </div>
                 </div>
               ))}

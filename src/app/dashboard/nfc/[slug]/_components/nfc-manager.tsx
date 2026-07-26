@@ -82,12 +82,12 @@ export function NfcManager({ profile, nfcUrl }: NfcManagerProps) {
             </h2>
             <ol className="space-y-4 text-sm" style={{ color: "var(--nc-text-2)" }}>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-black"
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                   style={{ background: "var(--nc-accent, #f59e0b)" }}>1</span>
                 <span>Get a blank NTAG213/215/216 NFC sticker or card (available online).</span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-black"
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                   style={{ background: "var(--nc-accent, #f59e0b)" }}>2</span>
                 <span>
                   Use a free NFC writer app (e.g. <em>NFC Tools</em> on Android/iOS) to write this URL as a <strong>URL record</strong>:
@@ -98,7 +98,7 @@ export function NfcManager({ profile, nfcUrl }: NfcManagerProps) {
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-black"
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                   style={{ background: "var(--nc-accent, #f59e0b)" }}>3</span>
                 <span>Tap the tag on a phone to verify it opens your profile, then click &quot;Mark as Programmed&quot; below.</span>
               </li>
@@ -138,7 +138,7 @@ export function NfcManager({ profile, nfcUrl }: NfcManagerProps) {
             <button
               type="submit"
               disabled={pending || !profile.isPublished}
-              className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-black text-black transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-black text-white transition-opacity hover:opacity-90 disabled:opacity-50"
               style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}
             >
               {pending ? "Saving…" : "Mark NFC Tag as Programmed"}

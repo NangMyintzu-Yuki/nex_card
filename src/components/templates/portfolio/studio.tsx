@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Github, ArrowUpRight } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
@@ -29,7 +28,7 @@ export function StudioPortfolio({ data, accentColor="#ec4899" }: PP) {
       <section className="relative min-h-[85vh] flex flex-col justify-end px-6 pb-16 overflow-hidden">
         {projects[0]?.coverImageUrl&&(
           <div className="absolute inset-0">
-            <Image src={projects[0].coverImageUrl} alt="Hero" fill className="object-cover opacity-20" sizes="100vw" priority/>
+            <img src={projects[0].coverImageUrl} alt="Hero" className="absolute inset-0 h-full w-full object-cover opacity-20"/>
             <div className="absolute inset-0" style={{background:"linear-gradient(to top,#09090b 40%,transparent)"}}/>
           </div>
         )}
@@ -45,7 +44,7 @@ export function StudioPortfolio({ data, accentColor="#ec4899" }: PP) {
               </div>
             </div>
             <div className="flex flex-col items-end gap-3">
-              {avatarUrl&&<div className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-white/10"><Image src={avatarUrl} alt={fullName} fill className="object-cover" sizes="64px"/></div>}
+              {avatarUrl&&<div className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-white/10"><img src={avatarUrl} alt={fullName} className="absolute inset-0 h-full w-full object-cover"/></div>}
               {resumeUrl&&<a href={resumeUrl} target="_blank" rel="noopener noreferrer" className="rounded-full px-5 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/10 transition-all">Resume ↓</a>}
             </div>
           </div>
@@ -60,7 +59,7 @@ export function StudioPortfolio({ data, accentColor="#ec4899" }: PP) {
             {projects.slice(0,6).map(p=>(
               <div key={p.id} className="group relative overflow-hidden rounded-2xl bg-zinc-900">
                 {p.coverImageUrl&&<div className="relative aspect-[4/3] overflow-hidden">
-                  <Image src={p.coverImageUrl} alt={p.title} fill className="object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" sizes="600px"/>
+                  <img src={p.coverImageUrl} alt={p.title} className="absolute inset-0 h-full w-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"/>
                 </div>}
                 <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-zinc-950/90 to-transparent p-5">
                   <div className="flex flex-wrap gap-1 mb-1">{p.tags.slice(0,2).map((t,i)=><span key={i} className="rounded-full border border-white/20 px-2 py-0.5 text-xs text-white/60">{t}</span>)}</div>
@@ -119,7 +118,7 @@ export function StudioPortfolio({ data, accentColor="#ec4899" }: PP) {
               <div key={i} className="rounded-xl border border-zinc-800 p-5">
                 <p className="text-sm leading-relaxed text-zinc-300 italic">&ldquo;{t.text}&rdquo;</p>
                 <div className="mt-4 flex items-center gap-3 border-t border-zinc-800 pt-3">
-                  {t.avatarUrl&&<div className="relative h-8 w-8 overflow-hidden rounded-full"><Image src={t.avatarUrl} alt={t.author} fill className="object-cover" sizes="32px"/></div>}
+                  {t.avatarUrl&&<div className="relative h-8 w-8 overflow-hidden rounded-full"><img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover"/></div>}
                   <div><p className="text-xs font-bold text-white">{t.author}</p><p className="text-xs text-zinc-600">{t.role}{t.company&&` · ${t.company}`}</p></div>
                 </div>
               </div>

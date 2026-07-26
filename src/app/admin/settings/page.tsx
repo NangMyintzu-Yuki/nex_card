@@ -153,7 +153,7 @@ export default function AdminSettingsPage() {
         <button
           onClick={saveAll}
           disabled={!dirty || saving}
-          className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-black transition-all hover:opacity-90 disabled:opacity-40"
+           className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all hover:opacity-90 disabled:opacity-40"
           style={{ background: "var(--nc-brand-grad)" }}>
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {saving ? "Saving…" : "Save Changes"}

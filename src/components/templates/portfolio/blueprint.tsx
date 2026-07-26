@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Github, ArrowUpRight } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
@@ -117,7 +116,7 @@ export function BlueprintPortfolio({ data, accentColor="#3b82f6" }: PP) {
                 <div key={i} className="rounded-xl border p-4" style={{borderColor:`${accentColor}12`,background:`${accentColor}04`}}>
                   <p className="text-sm leading-relaxed text-slate-400 italic">&ldquo;{t.text}&rdquo;</p>
                   <div className="mt-3 flex items-center gap-2 border-t pt-3" style={{borderColor:`${accentColor}10`}}>
-                    {t.avatarUrl&&<div className="relative h-8 w-8 overflow-hidden rounded-full"><Image src={t.avatarUrl} alt={t.author} fill className="object-cover" sizes="32px"/></div>}
+                    {t.avatarUrl&&<div className="relative h-8 w-8 overflow-hidden rounded-full"><img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover"/></div>}
                     <div><p className="text-xs font-bold text-white">{t.author}</p><p className="text-xs text-slate-600">{t.role}{t.company&&` · ${t.company}`}</p></div>
                   </div>
                 </div>

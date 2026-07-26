@@ -15,7 +15,7 @@ import {
 
 const DEFAULTS: Record<CategorySlug, Record<string, unknown>> = {
   "digital-name-card": { fullName: "", jobTitle: "", company: "", contacts: [], socialLinks: [] },
-  "portfolio": { fullName: "", headline: "", bio: "", contacts: [], socialLinks: [], projects: [], experience: [] },
+  "portfolio": { fullName: "", headline: "", bio: "", avatarUrl: "", contacts: [], socialLinks: [], projects: [], experience: [], skills: [], availability: undefined },
   "business-ad": { businessName: "", tagline: "", description: "", contacts: [], socialLinks: [], services: [] },
   "wedding-invitation": { partner1: { name: "" }, partner2: { name: "" }, weddingDate: "", events: [], loveHistory: [], gallery: [] },
 };

@@ -139,7 +139,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
       <button onClick={() => setOpen(true)}
         className="fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-xl lg:hidden"
         style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
-        <Menu className="h-5 w-5 text-black" />
+        <Menu className="h-5 w-5 text-white" />
       </button>
 
       {/* Mobile drawer */}

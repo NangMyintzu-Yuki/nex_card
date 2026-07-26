@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 
@@ -24,7 +24,7 @@ export function NoirWedding({ data, accentColor = "#ffffff" }: WeddingProps) {
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
         {gallery.length > 0 && (
           <div className="absolute inset-0">
-            <Image src={gallery[0].url} alt="Cover" fill className="object-cover grayscale opacity-35" sizes="100vw" priority />
+            <img src={gallery[0].url} alt="Cover" className="absolute inset-0 h-full w-full object-cover grayscale opacity-35" />
             <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0.85) 60%, #0a0a0a 100%)" }} />
           </div>
         )}
@@ -69,8 +69,8 @@ export function NoirWedding({ data, accentColor = "#ffffff" }: WeddingProps) {
                   </div>
                   {m.imageUrl && (
                     <div className={`relative aspect-[4/3] overflow-hidden ${i % 2 !== 0 ? "md:order-1" : ""}`}>
-                      <Image src={m.imageUrl} alt={m.title} fill
-                        className="object-cover grayscale hover:grayscale-0 transition-all duration-700" sizes="400px" />
+                      <img src={m.imageUrl} alt={m.title}
+                        className="absolute inset-0 h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
                     </div>
                   )}
                 </div>
@@ -88,8 +88,8 @@ export function NoirWedding({ data, accentColor = "#ffffff" }: WeddingProps) {
             <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
               {gallery.slice(1, 10).map((img, i) => (
                 <div key={i} className="relative aspect-square overflow-hidden">
-                  <Image src={img.url} alt={img.alt} fill
-                    className="object-cover grayscale hover:grayscale-0 hover:scale-105 transition-all duration-700" sizes="300px" />
+                  <img src={img.url} alt={img.alt}
+                    className="absolute inset-0 h-full w-full object-cover grayscale hover:grayscale-0 hover:scale-105 transition-all duration-700" />
                 </div>
               ))}
             </div>

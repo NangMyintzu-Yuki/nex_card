@@ -1,8 +1,7 @@
 // PRISM — Spectrum gradients, skill bars, universal persona
 "use client";
-import { useState } from "react";
-import Image from "next/image";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
+import { AvatarZoom } from "@/components/templates/avatar-zoom";
 
 interface Props { data: DigitalNameCardData; accentColor?: string; }
 
@@ -34,7 +33,6 @@ const SP_COLORS: Record<string,string>={linkedin:"#0077b5",twitter:"#ffffff",ins
 const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address"];
 
 export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
-  const [copied,setCopied]=useState(false);
   const {fullName,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
 
@@ -49,10 +47,10 @@ export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
           <div className="relative h-20 overflow-hidden" style={{background:`linear-gradient(135deg,${SPECTRUM[0]}40,${SPECTRUM[4]}30,${SPECTRUM[8]}25)`}}>
             <div className="absolute inset-0 opacity-25" style={{backgroundImage:`repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,255,255,0.02) 8px,rgba(255,255,255,0.02) 9px)`}} />
           </div>
-          <div className="-mt-10 px-5 pb-5">
+          <div className="-mt-10 px-5 pb-5 relative" style={{zIndex:10}}>
             <div className="mb-3 w-fit" style={{padding:"2px",background:`linear-gradient(135deg,${SPECTRUM[0]},${SPECTRUM[4]},${SPECTRUM[8]})`,borderRadius:"16px"}}>
               <div className="overflow-hidden rounded-[14px] h-[68px] w-[68px]">
-                {avatarUrl?<Image src={avatarUrl} alt={fullName} width={68} height={68} className="h-full w-full object-cover" priority/>:
+                {avatarUrl?<AvatarZoom src={avatarUrl} alt={fullName} className="h-full w-full" />:
                   <div className="flex h-full w-full items-center justify-center text-2xl font-black text-white" style={{background:`linear-gradient(135deg,${accentColor},#06b6d4)`}}>{fullName.charAt(0)}</div>}
               </div>
             </div>
@@ -64,17 +62,13 @@ export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
         </div>
 
         {/* Action buttons */}
-        <div className="mb-4 grid grid-cols-3 gap-2">
+        <div className="mb-4 grid grid-cols-2 gap-2">
           <button onClick={()=>saveVCard(data)} className="flex flex-col items-center gap-1 rounded-2xl py-3 transition-all hover:scale-105" style={{background:`${accentColor}20`,border:`1px solid ${accentColor}35`}}>
             <span className="text-lg">👤</span><span className="text-[10px] font-bold text-white/70">Save Contact</span>
           </button>
-          <button onClick={()=>{if(navigator.share){navigator.share({title:fullName,url:window.location.href}).catch(()=>{});}else{navigator.clipboard?.writeText(window.location.href);}}}
+          <button onClick={()=>{navigator.clipboard?.writeText(window.location.href);}}
             className="flex flex-col items-center gap-1 rounded-2xl py-3 transition-all hover:scale-105" style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"}}>
-            <span className="text-lg">📤</span><span className="text-[10px] font-bold text-white/70">Share</span>
-          </button>
-          <button onClick={()=>{navigator.clipboard?.writeText(window.location.href);setCopied(true);setTimeout(()=>setCopied(false),2000);}}
-            className="flex flex-col items-center gap-1 rounded-2xl py-3 transition-all hover:scale-105" style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"}}>
-            <span className="text-lg">{copied?"✅":"🔗"}</span><span className="text-[10px] font-bold text-white/70">{copied?"Copied!":"Copy Link"}</span>
+            <span className="text-lg">🔗</span><span className="text-[10px] font-bold text-white/70">Copy Link</span>
           </button>
         </div>
 
@@ -130,19 +124,13 @@ export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
                   className="flex items-center gap-2 rounded-xl px-3 py-2.5 transition-all hover:scale-[1.02]"
                   style={{background:`${color}12`,border:`1px solid ${color}25`}}>
                   <div className="h-2 w-2 rounded-full" style={{background:color}}/>
-                  <span className="text-xs font-medium text-white/70 truncate">{s.label??s.platform}</span>
+                  <span className="text-xs font-medium text-white/70 truncate">{s.label ? s.label : s.platform}</span>
                 </a>
               );
             })}
           </div>
         )}
 
-        {/* Save CTA */}
-        <button onClick={()=>saveVCard(data)}
-          className="w-full rounded-2xl py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:opacity-90"
-          style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)"}}>
-          💾 Save to Contacts (.vcf)
-        </button>
         <p className="mt-6 text-center text-[10px] text-white/15">NEX CARD</p>
       </div>
     </main>

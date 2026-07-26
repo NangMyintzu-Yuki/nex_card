@@ -1,8 +1,7 @@
 // TITANIUM — Metallic enterprise. For executives and corporate professionals.
 "use client";
-import { useState } from "react";
-import Image from "next/image";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
+import { AvatarZoom } from "@/components/templates/avatar-zoom";
 
 interface Props { data: DigitalNameCardData; accentColor?: string; }
 
@@ -32,7 +31,6 @@ const CT: Record<string,{emoji:string;label:string;href:(v:string)=>string}> = {
 const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address"];
 
 export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
-  const [copied,setCopied]=useState(false);
   const {fullName,jobTitle,company,companyLogoUrl,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
   const s=accentColor;
@@ -53,7 +51,7 @@ export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
           {/* Header */}
           <div className="flex items-center gap-4 px-5 py-5" style={{borderBottom:"1px solid rgba(148,163,184,0.08)"}}>
             {avatarUrl?<div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl" style={{border:`1px solid ${s}40`}}>
-              <Image src={avatarUrl} alt={fullName} width={64} height={64} className="h-full w-full object-cover" priority/>
+              <AvatarZoom src={avatarUrl} alt={fullName} className="h-full w-full" />
             </div>:<div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl text-xl font-black text-neutral-900" style={{background:`linear-gradient(135deg,${s},#64748b)`}}>{fullName.charAt(0)}</div>}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
@@ -61,9 +59,9 @@ export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
                   <h1 className="text-lg font-black leading-tight text-white">{fullName}</h1>
                   <p className="text-xs font-semibold uppercase tracking-widest mt-0.5" style={{color:s}}>{jobTitle}</p>
                 </div>
-                {companyLogoUrl&&<Image src={companyLogoUrl} alt={company} width={48} height={20} className="h-5 w-auto object-contain opacity-50 shrink-0"/>}
+                {companyLogoUrl&&<img src={companyLogoUrl} alt={company ?? ""} className="h-5 w-auto object-contain opacity-50 shrink-0"/>} 
               </div>
-              <p className="mt-0.5 text-xs text-slate-600">{company}</p>
+              <p className="mt-0.5 text-xs text-slate-600">{company||""}</p>
             </div>
           </div>
 
@@ -77,17 +75,13 @@ export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
           {bio&&<div className="px-5 py-4" style={{borderBottom:"1px solid rgba(148,163,184,0.08)"}}><p className="text-xs leading-relaxed text-slate-500">{bio}</p></div>}
 
           {/* Action buttons */}
-          <div className="grid grid-cols-3 gap-2 px-5 py-4" style={{borderBottom:"1px solid rgba(148,163,184,0.08)"}}>
+          <div className="grid grid-cols-2 gap-2 px-5 py-4" style={{borderBottom:"1px solid rgba(148,163,184,0.08)"}}>
             <button onClick={()=>saveVCard(data)} className="flex flex-col items-center gap-1 rounded-xl py-2.5 transition-all hover:scale-105" style={{background:`${s}12`,border:`1px solid ${s}25`}}>
               <span className="text-base">👤</span><span className="text-[9px] font-bold" style={{color:s}}>Save Contact</span>
             </button>
-            <button onClick={()=>{if(navigator.share){navigator.share({title:fullName,url:window.location.href}).catch(()=>{});}else{navigator.clipboard?.writeText(window.location.href);}}}
+            <button onClick={()=>{navigator.clipboard?.writeText(window.location.href);}}
               className="flex flex-col items-center gap-1 rounded-xl py-2.5 transition-all hover:scale-105" style={{background:"rgba(148,163,184,0.06)",border:"1px solid rgba(148,163,184,0.1)"}}>
-              <span className="text-base">📤</span><span className="text-[9px] font-bold text-slate-600">Share</span>
-            </button>
-            <button onClick={()=>{navigator.clipboard?.writeText(window.location.href);setCopied(true);setTimeout(()=>setCopied(false),2000);}}
-              className="flex flex-col items-center gap-1 rounded-xl py-2.5 transition-all hover:scale-105" style={{background:"rgba(148,163,184,0.06)",border:"1px solid rgba(148,163,184,0.1)"}}>
-              <span className="text-base">{copied?"✅":"🔗"}</span><span className="text-[9px] font-bold text-slate-600">{copied?"Copied":"Copy"}</span>
+              <span className="text-base">🔗</span><span className="text-[9px] font-bold text-slate-600">Copy</span>
             </button>
           </div>
 
@@ -137,7 +131,7 @@ export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
                 {socialLinks.map((sl,i)=>(
                   <a key={i} href={sl.url} target="_blank" rel="noopener noreferrer"
                     className="rounded px-2.5 py-1.5 text-xs font-mono text-slate-500 transition-colors hover:text-white" style={{background:"rgba(148,163,184,0.06)",border:"1px solid rgba(148,163,184,0.1)"}}>
-                    {sl.label??sl.platform}
+                    {sl.label ? sl.label : sl.platform}
                   </a>
                 ))}
               </div>
