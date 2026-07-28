@@ -425,7 +425,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                     <p className="text-center text-sm font-semibold text-amber-300">
                       Are you sure? This cannot be undone.
                     </p>
-                    <div className="flex flex-row gap-2 sm:flex-row">
+                    <div className="flex flex-row gap-2 sm:flex-col">
                       <button onClick={() => setShowConfirm(false)}
                         className="nc-btn-ghost flex-1 rounded-xl py-3 text-sm font-semibold transition-colors">
                         Cancel

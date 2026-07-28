@@ -7,7 +7,6 @@ import type { Metadata } from "next";
 import { Plus, ExternalLink, Eye, Pencil, Lock, QrCode, Clock, XCircle, CheckCircle, Upload } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";
 import { getCachedUserProfiles } from "@/lib/cache/profile-cache";
-import { ResubmitPayment } from "./_components/resubmit-payment";
 import { resolveThumbnailUrl } from "@/lib/thumbnails";
 
 export const metadata: Metadata = {
@@ -17,13 +16,13 @@ export const metadata: Metadata = {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string; pending?: string }>;
+  searchParams: Promise<{ new?: string; pending?: string; paymentFailed?: string }>;
 }) {
   const session = await getServerSession();
   if (!session?.user?.id) redirect("/login");
   if (session.user.role === "ADMIN") redirect("/admin");
 
-  const { new: newSlug, pending } = await searchParams;
+  const { new: newSlug, pending, paymentFailed } = await searchParams;
   const profiles = await getCachedUserProfiles(session.user.id);
 
   return (
@@ -61,6 +60,22 @@ export default async function DashboardPage({
               <p className="font-semibold text-amber-300">Payment Submitted!</p>
               <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-2)" }}>
                 Your payment is pending admin approval. You&apos;ll be able to edit your profile once approved.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment failed banner */}
+      {paymentFailed && (
+        <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4"
+          style={{ border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)" }}>
+          <div className="flex items-center gap-3">
+            <XCircle className="h-5 w-5 shrink-0 text-red-400" />
+            <div>
+              <p className="font-semibold text-red-300">Payment Submission Failed</p>
+              <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-2)" }}>
+                Your profile was created, but the payment couldn&apos;t be submitted. Please resubmit your payment screenshot below.
               </p>
             </div>
           </div>
@@ -171,16 +186,14 @@ export default async function DashboardPage({
                 {/* Resubmit / submit payment */}
                 {isPremiumTemplate && (profile.paymentStatus === "REJECTED" || !profile.paymentStatus) && (
                   <div className="mt-3">
-                    <ResubmitPayment
-                      profileId={profile.id}
-                      templateName={profile.template.name}
-                      prices={{
-                        priceQrOnly: profile.template.priceQrOnly,
-                        priceNfcCard: profile.template.priceNfcCard,
-                        priceNfcQr: profile.template.priceNfcQr,
-                      }}
-                      existingTier={profile.payment?.tier}
-                    />
+                    <Link
+                      href={`/dashboard/payment/${profile.id}`}
+                      className="flex items-center justify-center gap-1.5 rounded-lg py-2 px-2 text-xs font-semibold transition-all"
+                      style={{ background: "rgba(251,191,36,0.12)", color: "#fbbf24" }}
+                    >
+                      <Upload className="h-3.5 w-3.5" />
+                      {profile.paymentStatus === "REJECTED" ? "Resubmit Payment" : "Submit Payment"}
+                    </Link>
                   </div>
                 )}
 

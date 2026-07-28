@@ -13,7 +13,16 @@ import {
   X,
   Star,
   Layers,
-  Award
+  Award,
+  Linkedin,
+  Github,
+  Twitter,
+  Instagram,
+  Youtube,
+  Facebook,
+  Send,
+  Music,
+  MessageCircle,
 } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
 
@@ -61,6 +70,24 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
   const filteredProjects = selectedCategory === "All"
     ? projects
     : projects.filter((p) => p.tags.includes(selectedCategory));
+
+  function SocialIcon({ platform, className = "h-4 w-4" }: { platform: string; className?: string }) {
+    const c = "currentColor";
+    const icons: Record<string, React.ReactNode> = {
+      linkedin: <Linkedin className={className} />,
+      github: <Github className={className} />,
+      twitter: <Twitter className={className} />,
+      instagram: <Instagram className={className} />,
+      youtube: <Youtube className={className} />,
+      facebook: <Facebook className={className} />,
+      website: <Globe className={className} />,
+      whatsapp: <Phone className={className} />,
+      telegram: <Send className={className} />,
+      tiktok: <Music className={className} />,
+      discord: <MessageCircle className={className} />,
+    };
+    return <>{icons[platform] ?? <Globe className={className} />}</>;
+  }
 
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-rose-500 selection:text-white relative">
@@ -430,9 +457,10 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-xs text-zinc-300 hover:text-white hover:border-zinc-700 transition-all"
+                className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-zinc-300 hover:text-white hover:border-zinc-700 transition-all"
+                title={s.label || s.platform}
               >
-                {s.label || s.platform}
+                <SocialIcon platform={s.platform} className="h-4 w-4" />
               </a>
             ))}
           </div>

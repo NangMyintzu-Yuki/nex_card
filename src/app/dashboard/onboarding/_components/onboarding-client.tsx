@@ -206,11 +206,11 @@ export function OnboardingClient({
 
   // Redirect after successful creation — also auto-submit payment for premium templates
   const [profileCreated, setProfileCreated] = useState(false);
+  const [paymentAutoError, setPaymentAutoError] = useState<string>("");
   useEffect(() => {
     if (formState.status === "success" && !profileCreated) {
       setProfileCreated(true);
       if (isPremium && selectedTier && paymentScreenshotUrl) {
-        // Auto-submit payment with the new profile ID
         const paymentFormData = new FormData();
         paymentFormData.append("profileId", formState.profileId);
         paymentFormData.append("tier", selectedTier);
@@ -231,6 +231,9 @@ export function OnboardingClient({
   useEffect(() => {
     if (profileCreated && paymentFormState.status === "success") {
       router.push(`/dashboard?pending=true`);
+    }
+    if (profileCreated && paymentFormState.status === "error") {
+      setPaymentAutoError(paymentFormState.message);
     }
   }, [profileCreated, paymentFormState, router]);
 
@@ -259,6 +262,10 @@ export function OnboardingClient({
 
   const handleProceedToPricing = () => {
     if (!selectedTemplateId) return;
+    if (!isPremium) {
+      setStep("confirm");
+      return;
+    }
     setStep("pricing");
   };
 
@@ -925,7 +932,7 @@ export function OnboardingClient({
             <div className="mb-6 sm:mb-8">
               <button
                 type="button"
-                onClick={() => setStep("payment")}
+                onClick={() => setStep(isPremium ? "payment" : "template")}
                 className="nc-btn-ghost text-sm transition-colors px-2 py-1"
               >
                 ← Back
@@ -1026,6 +1033,23 @@ export function OnboardingClient({
             {formState.status === "error" && (
               <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
                 {formState.message}
+              </div>
+            )}
+
+            {/* Payment auto-submit error */}
+            {paymentAutoError && (
+              <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-400">
+                <p className="font-semibold">Profile created, but payment submission failed.</p>
+                <p className="mt-1">{paymentAutoError}</p>
+                <div className="mt-3 flex items-center gap-2">
+                  <Link
+                    href="/dashboard"
+                    className="rounded-lg bg-amber-500/20 px-3 py-1.5 text-xs font-semibold text-amber-300 hover:bg-amber-500/30 transition-colors"
+                  >
+                    Go to Dashboard
+                  </Link>
+                  <span className="text-xs text-amber-400/70">You can resubmit payment from there.</span>
+                </div>
               </div>
             )}
 

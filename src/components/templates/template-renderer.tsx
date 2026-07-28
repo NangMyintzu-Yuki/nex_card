@@ -2,6 +2,8 @@
 // Shared template switching engine with dynamic imports for code splitting.
 // Only the selected template's JS/CSS is loaded per request.
 
+"use client";
+
 import dynamic from "next/dynamic";
 import { TEMPLATE_IDS } from "@/types/templates";
 import type { CategorySlug } from "@/lib/validators/template-schemas";

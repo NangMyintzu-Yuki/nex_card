@@ -1,7 +1,7 @@
 // src/app/dashboard/edit/[slug]/_components/profile-editor.tsx
 "use client";
 
-import { useState, useRef, useActionState, useCallback } from "react";
+import { useState, useRef, useEffect, useActionState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -56,7 +56,7 @@ interface FieldSection {
 interface FieldDef {
   key: string;       // dot-notation path in the JSON, e.g. "contacts.0.value"
   label: string;
-  type: "text" | "textarea" | "url" | "email" | "tel" | "color" | "select" | "image-upload" | "array-contacts" | "array-social" | "array-skills" | "array-projects" | "array-experience" | "array-services" | "array-milestones" | "array-events" | "array-gallery";
+  type: "text" | "textarea" | "url" | "email" | "tel" | "color" | "select" | "image-upload" | "array-contacts" | "array-social" | "array-skills" | "array-projects" | "array-experience" | "array-services" | "array-milestones" | "array-events" | "array-gallery" | "array-category-skills";
   placeholder?: string;
   maxLength?: number;
   required?: boolean;
@@ -142,6 +142,11 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
       id: "experience", title: "Work Experience",
       description: "Your professional background and roles.",
       fields: [{ key: "experience", label: "Experience", type: "array-experience" }],
+    },
+    {
+      id: "skills", title: "Skills",
+      description: "Group your skills into categories (e.g. Frontend, Backend, Tools).",
+      fields: [{ key: "skills", label: "Skills", type: "array-category-skills" }],
     },
   ],
 
@@ -402,8 +407,8 @@ function ImageUploadField({
       {tab === "upload" ? (
         <div>
           <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
-            onChange={handleFile} className="hidden" id={`img-upload-${folder}`} />
-          <label htmlFor={`img-upload-${folder}`}
+            onChange={handleFile} className="hidden" />
+          <label onClick={() => inputRef.current?.click()}
             className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-5 text-sm transition-all cursor-pointer ${
               uploading
                 ? "border-indigo-500/30 bg-indigo-500/5 text-indigo-400"
@@ -455,8 +460,22 @@ function ImageUploadField({
 
 function SocialLinksEditor({ value, onChange }: { value: unknown[]; onChange: (v: unknown[]) => void }) {
   const links = (value as Array<Record<string, string>>) ?? [];
-  const PLATFORMS = ["linkedin","github","twitter","instagram","facebook","youtube","tiktok","website","whatsapp","telegram","viber","discord"];
-  const PLATFORM_ICONS: Record<string, string> = { linkedin:"💼", github:"🐙", twitter:"𝕏", instagram:"📸", facebook:"👥", youtube:"▶️", tiktok:"🎵", whatsapp:"💬", telegram:"✈️", viber:"📲", discord:"🎮", website:"🌐" };
+const PLATFORMS = ["linkedin","github","twitter","instagram","facebook","youtube","tiktok","website","whatsapp","telegram","viber","discord"];
+const PLATFORM_ICONS: Record<string, string> = { linkedin:"💼", github:"🐙", twitter:"𝕏", instagram:"📸", facebook:"👥", youtube:"▶️", tiktok:"🎵", whatsapp:"💬", telegram:"✈️", viber:"📲", discord:"🎮", website:"🌐" };
+const PLATFORM_PLACEHOLDERS: Record<string, string> = {
+  linkedin: "https://linkedin.com/in/yourname",
+  github: "https://github.com/yourname",
+  twitter: "https://twitter.com/yourhandle",
+  instagram: "https://instagram.com/yourname",
+  facebook: "https://facebook.com/yourname",
+  youtube: "https://youtube.com/@yourchannel",
+  tiktok: "https://tiktok.com/@yourhandle",
+  website: "https://yourwebsite.com",
+  whatsapp: "https://wa.me/yournumber",
+  telegram: "https://t.me/yourhandle",
+  viber: "https://viber.me/yourname",
+  discord: "https://discord.gg/invitecode",
+};
 
   function setPlatform(index: number, platform: string) {
     const n = [...links];
@@ -498,7 +517,7 @@ function SocialLinksEditor({ value, onChange }: { value: unknown[]; onChange: (v
                     const n = [...links]; n[i] = { ...n[i], url: `https://${v}` }; onChange(n);
                   }
                 }}
-                placeholder="https://linkedin.com/in/yourname" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+                placeholder={l.platform ? PLATFORM_PLACEHOLDERS[l.platform] ?? "https://..." : "https://..."} className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
             </div>
             <div className="flex gap-2 items-center">
               <input value={l.label ?? ""} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
@@ -539,6 +558,44 @@ function SkillsEditor({ value, onChange }: { value: unknown[]; onChange: (v: unk
       <button onClick={() => onChange([...skills, { name: "", level: 80 }])}
         className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
         <Plus className="h-3 w-3" /> Add Skill
+      </button>
+    </div>
+  );
+}
+
+function CategorySkillsEditor({ value, onChange }: { value: unknown[]; onChange: (v: unknown[]) => void }) {
+  const groups = (value as Array<{ category: string; items: string[] }>) ?? [];
+  return (
+    <div className="space-y-4">
+      {groups.map((g, i) => (
+        <div key={i} className="nc-card rounded-xl p-4 space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Category {i + 1}</span>
+            <button onClick={() => onChange(groups.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+          </div>
+          <input value={g.category ?? ""} onChange={(e) => { const n = [...groups]; n[i] = { ...n[i], category: e.target.value }; onChange(n); }}
+            placeholder="Category name (e.g. Frontend, Backend, Tools)" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+          <div className="space-y-1.5">
+            {g.items.map((item, j) => (
+              <div key={j} className="flex gap-2 items-center">
+                <input value={item} onChange={(e) => { const n = [...groups]; const items = [...n[i].items]; items[j] = e.target.value; n[i] = { ...n[i], items }; onChange(n); }}
+                  placeholder="Skill name" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm" />
+                <button onClick={() => { const n = [...groups]; n[i] = { ...n[i], items: n[i].items.filter((_, k) => k !== j) }; onChange(n); }}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+            <button onClick={() => { const n = [...groups]; n[i] = { ...n[i], items: [...n[i].items, ""] }; onChange(n); }}
+              className="flex items-center gap-1 text-xs nc-btn-ghost rounded-lg px-2 py-1 hover:text-indigo-400 transition-colors">
+              <Plus className="h-3 w-3" /> Add skill
+            </button>
+          </div>
+        </div>
+      ))}
+      <button onClick={() => onChange([...groups, { category: "", items: [""] }])}
+        className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
+        <Plus className="h-3 w-3" /> Add Category
       </button>
     </div>
   );
@@ -745,9 +802,13 @@ function ProjectsEditor({ value, onChange }: { value: unknown[]; onChange: (v: u
 
             {/* Cover Image */}
             <div>
-              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Cover Image URL</label>
-              <input value={String(p.coverImageUrl ?? "")} onChange={(e) => updateProject(i, { coverImageUrl: e.target.value })}
-                placeholder="https://…/project-screenshot.png" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Cover Image</label>
+              <ImageUploadField
+                value={String(p.coverImageUrl ?? "")}
+                onChange={(url) => updateProject(i, { coverImageUrl: url })}
+                placeholder="https://…/project-screenshot.png"
+                folder="gallery"
+              />
             </div>
 
             {/* URLs row */}
@@ -855,9 +916,13 @@ function ExperienceEditor({ value, onChange }: { value: unknown[]; onChange: (v:
                 placeholder="Remote / Kuala Lumpur" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Company Logo URL</label>
-              <input value={e.logoUrl ?? ""} onChange={(ev) => { const n = [...experience]; n[i] = { ...n[i], logoUrl: ev.target.value }; onChange(n); }}
-                placeholder="https://…/company-logo.png" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Company Logo</label>
+              <ImageUploadField
+                value={e.logoUrl ?? ""}
+                onChange={(url) => { const n = [...experience]; n[i] = { ...n[i], logoUrl: url }; onChange(n); }}
+                placeholder="https://…/company-logo.png"
+                folder="logos"
+              />
             </div>
           </div>
           <div>
@@ -894,6 +959,17 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
     updateProfileAction,
     { status: "idle" }
   );
+
+  const [successVisible, setSuccessVisible] = useState(false);
+
+  useEffect(() => {
+    if (formState.status === "success") {
+      setSuccessVisible(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      const timer = setTimeout(() => setSuccessVisible(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [formState.status]);
 
   const sections = CATEGORY_FIELD_SECTIONS[categorySlug] ?? [];
 
@@ -969,6 +1045,8 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
         return <ProjectsEditor value={(val as unknown[]) ?? []} onChange={(v) => setFieldValue(field.key, v)} />;
       case "array-experience":
         return <ExperienceEditor value={(val as unknown[]) ?? []} onChange={(v) => setFieldValue(field.key, v)} />;
+      case "array-category-skills":
+        return <CategorySkillsEditor value={(val as unknown[]) ?? []} onChange={(v) => setFieldValue(field.key, v)} />;
       case "image-upload":
         return <ImageUploadField value={String(val ?? "")} onChange={(v) => setFieldValue(field.key, v)} placeholder={field.placeholder} />;
       default:
@@ -1024,7 +1102,7 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
       </div>
 
       {/* Success/error banner */}
-      {formState.status === "success" && (
+      {successVisible && (
         <div className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 px-5 py-3.5">
           <Check className="h-4 w-4 shrink-0 text-emerald-400" />
           <p className="text-sm text-emerald-300">Profile saved and published live!</p>
@@ -1140,44 +1218,6 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
           )}
         </div>
       </div>
-
-      {/* QR Code callout — shown after publishing */}
-      {isPublished && !profile.qrLocked && (
-        <div className="mt-5 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 px-5 py-4">
-          <div className="flex items-start gap-3">
-            <QrCode className="h-5 w-5 shrink-0 text-indigo-400 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>Ready to generate your QR code?</p>
-              <p className="mt-0.5 text-xs" style={{ color: "var(--nc-text-2)" }}>
-                Your profile is live. Generate a QR code for events, business cards, or your email signature.
-                This will permanently lock your template and category.
-              </p>
-            </div>
-            <Link href={`/dashboard/qr/${profile.slug}`}
-              className="shrink-0 flex items-center gap-1.5 rounded-xl bg-indigo-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-indigo-400 transition-all">
-              <QrCode className="h-3.5 w-3.5" />
-              Generate QR
-            </Link>
-          </div>
-        </div>
-      )}
-      {profile.qrLocked && (
-        <div className="mt-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-4">
-          <div className="flex items-center gap-3">
-            <QrCode className="h-5 w-5 shrink-0 text-amber-400" />
-            <div className="flex-1">
-              <p className="font-bold text-amber-300 text-sm">QR Code Active & Locked</p>
-              <p className="mt-0.5 text-xs" style={{ color: "var(--nc-text-2)" }}>
-                Your QR code is live and permanently set. Content edits are still saved normally.
-              </p>
-            </div>
-            <Link href={`/dashboard/qr/${profile.slug}`}
-              className="shrink-0 flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm font-bold text-amber-400 hover:bg-amber-500/20 transition-all">
-              View QR
-            </Link>
-          </div>
-        </div>
-      )}
 
       {/* Save button */}
       <form action={submitAction} className="mt-8">
