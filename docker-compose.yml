@@ -1,0 +1,51 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nexcard
+      MYSQL_USER: nexcard
+      MYSQL_PASSWORD: nexcard
+    ports:
+      - "3306:3306"
+    volumes:
+      - nexcard_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build: .
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql://nexcard:nexcard@mysql:3306/nexcard
+    entrypoint: ["node", "./node_modules/prisma/build/index.js", "migrate", "deploy"]
+    restart: "no"
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: mysql://nexcard:nexcard@mysql:3306/nexcard
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      REVALIDATION_SECRET: change-me-in-production
+      CRON_SECRET: change-me-in-production
+      ALLOW_LOCAL_STORAGE: "true"
+      STORAGE_DRIVER: local
+      NODE_ENV: production
+    volumes:
+      - nexcard_uploads:/app/public/uploads
+
+volumes:
+  nexcard_mysql:
+  nexcard_uploads:

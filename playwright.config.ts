@@ -17,12 +17,10 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: "npm run dev",
-        url: "http://localhost:3000",
-        reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
-      },
+  webServer: {
+    command: process.env.CI ? "npm start" : "npm run dev",
+    url: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+  },
 });

@@ -1,0 +1,38 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Migrate → Build → Restart
+    runs-on: ubuntu-latest
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Notice
+        run: |
+          echo "Enable with repository variable DEPLOY_ENABLED=true"
+          echo "Set secrets: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_PATH"
+
+      - name: Remote deploy via SSH
+        if: ${{ secrets.DEPLOY_HOST != '' }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+            git pull
+            docker compose build app
+            docker compose run --rm migrate
+            docker compose up -d app

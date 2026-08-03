@@ -36,16 +36,11 @@ export async function generateSqlDump(): Promise<string> {
   lines.push(users.map((r) => rowValues(userCols, r as unknown as Record<string, unknown>)).join(",\n") + ";");
   lines.push("");
 
-  // ── Sessions ──
-  const sessions = await prisma.session.findMany({ orderBy: { createdAt: "asc" } });
-  const sessionCols = ["id", "userId", "sessionToken", "expires", "createdAt"];
-  lines.push(`-- Table: sessions (${sessions.length} rows)`);
-  if (sessions.length) {
-    lines.push(`INSERT INTO sessions (${sessionCols.join(", ")}) VALUES`);
-    lines.push(sessions.map((r) => rowValues(sessionCols, r as unknown as Record<string, unknown>)).join(",\n") + ";");
-  } else {
-    lines.push("-- (no rows)");
-  }
+  // ── Sessions — count only; never dump live session tokens ──
+  const sessionCount = await prisma.session.count();
+  lines.push(`-- Table: sessions (${sessionCount} active rows)`);
+  lines.push("-- INTENTIONALLY OMITTED: sessionToken values must not leave the server.");
+  lines.push("-- After restore, users will need to sign in again.");
   lines.push("");
 
   // ── Categories ──
@@ -97,7 +92,9 @@ export async function generateSqlDump(): Promise<string> {
   lines.push("");
 
   lines.push("SET FOREIGN_KEY_CHECKS = 1;");
-  lines.push(`-- End of backup — ${users.length} users, ${sessions.length} sessions, ${categories.length} categories, ${templates.length} templates, ${profiles.length} profiles, ${payments.length} payments`);
+  lines.push(
+    `-- End of backup — ${users.length} users, ${sessionCount} sessions (omitted), ${categories.length} categories, ${templates.length} templates, ${profiles.length} profiles, ${payments.length} payments`
+  );
 
   return lines.join("\n");
 }

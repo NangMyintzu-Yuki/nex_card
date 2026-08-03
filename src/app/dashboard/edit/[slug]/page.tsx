@@ -25,7 +25,6 @@ export default async function EditProfilePage({
   const session = await getServerSession();
   if (!session?.user?.id) redirect("/login");
 
-  // Fetch the profile — must belong to this user
   const profile = await prisma.userProfile.findFirst({
     where: { slug, userId: session.user.id },
     select: {
@@ -37,7 +36,8 @@ export default async function EditProfilePage({
       metaTitle: true,
       metaDescription: true,
       ogImageUrl: true,
-       qrLocked: true,
+      qrLocked: true,
+      paymentStatus: true,
       updatedAt: true,
       category: { select: { id: true, name: true, slug: true } },
       template: {
@@ -47,12 +47,17 @@ export default async function EditProfilePage({
           codeIdentifier: true,
           thumbnailUrl: true,
           accentColor: true,
+          isPremium: true,
         },
       },
     },
   });
 
   if (!profile) notFound();
+
+  if (profile.template.isPremium && profile.paymentStatus !== "APPROVED") {
+    redirect(`/dashboard/payment/${profile.id}`);
+  }
 
   return (
     <ProfileEditor

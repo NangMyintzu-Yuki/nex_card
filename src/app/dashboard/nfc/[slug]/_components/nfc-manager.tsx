@@ -8,6 +8,7 @@ import {
   markNfcProgrammedAction,
   type MarkNfcState,
 } from "@/lib/actions/nfc-action";
+import { NfcWebWriteButton } from "./nfc-web-write";
 
 interface NfcManagerProps {
   profile: {
@@ -18,6 +19,7 @@ interface NfcManagerProps {
     nfcProgrammedAt: string | null;
     paymentTier: string | null;
     paymentStatus: string | null;
+    nfcFulfillment?: string | null;
   };
   nfcUrl: string;
 }
@@ -90,7 +92,7 @@ export function NfcManager({ profile, nfcUrl }: NfcManagerProps) {
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                   style={{ background: "var(--nc-accent, #f59e0b)" }}>2</span>
                 <span>
-                  Use a free NFC writer app (e.g. <em>NFC Tools</em> on Android/iOS) to write this URL as a <strong>URL record</strong>:
+                  Use a free NFC writer app (e.g. <em>NFC Tools</em> on Android/iOS) or Web NFC below to write this URL as a <strong>URL record</strong>:
                   <code className="mt-2 block rounded-lg px-3 py-2 font-mono text-xs break-all"
                     style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text)" }}>
                     {nfcUrl}
@@ -100,10 +102,18 @@ export function NfcManager({ profile, nfcUrl }: NfcManagerProps) {
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                   style={{ background: "var(--nc-accent, #f59e0b)" }}>3</span>
-                <span>Tap the tag on a phone to verify it opens your profile, then click &quot;Mark as Programmed&quot; below.</span>
+                <span>Tap the tag on a phone to verify it opens <code>/n/{profile.slug}</code>, then click &quot;Mark as Programmed&quot; below.</span>
               </li>
             </ol>
           </div>
+
+          {profile.nfcFulfillment && (
+            <p className="mb-4 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>
+              Fulfillment: {profile.nfcFulfillment.replace(/_/g, " ")}
+            </p>
+          )}
+
+          <NfcWebWriteButton url={nfcUrl} />
 
           <div className="mb-6 flex flex-wrap gap-3">
             <a

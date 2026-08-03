@@ -136,6 +136,8 @@ export interface TemplateRendererProps {
   templateCode: string;
   dynamicJsonData: unknown;
   accentColor?: string | null;
+  /** Public profile slug — enables in-page RSVP/guestbook for wedding templates */
+  publicSlug?: string;
 }
 
 export function TemplateRenderer({
@@ -143,6 +145,7 @@ export function TemplateRenderer({
   templateCode,
   dynamicJsonData,
   accentColor,
+  publicSlug,
 }: TemplateRendererProps) {
   const accent = accentColor ?? undefined;
 
@@ -183,6 +186,7 @@ export function TemplateRenderer({
           templateCode={templateCode}
           data={parsedData as any}
           accentColor={accent}
+          publicSlug={publicSlug}
         />
       );
     default:
@@ -194,6 +198,7 @@ interface SwitchProps<T> {
   templateCode: string;
   data: T;
   accentColor?: string;
+  publicSlug?: string;
 }
 
 function DigitalNameCardSwitch({
@@ -247,22 +252,21 @@ function BusinessAdSwitch({
   data,
   accentColor,
 }: SwitchProps<BusinessAdData>) {
-  // Business templates use slightly different prop shapes — cast at boundary
   const props = { data, accentColor };
 
   switch (templateCode) {
     case TEMPLATE_IDS.BUSINESS_AD.MARQUEE:
-      return <MarqueeBusiness {...(props as any)} />;
+      return <MarqueeBusiness {...props} />;
     case TEMPLATE_IDS.BUSINESS_AD.DISTRICT:
-      return <DistrictBusiness {...(props as any)} />;
+      return <DistrictBusiness {...props} />;
     case TEMPLATE_IDS.BUSINESS_AD.EMPIRE:
-      return <EmpireBusiness {...(props as any)} />;
+      return <EmpireBusiness {...props} />;
     case TEMPLATE_IDS.BUSINESS_AD.NEON:
-      return <NeonBusiness {...(props as any)} />;
+      return <NeonBusiness {...props} />;
     case TEMPLATE_IDS.BUSINESS_AD.VAULT:
-      return <VaultBusiness {...(props as any)} />;
+      return <VaultBusiness {...props} />;
     default:
-      return <MarqueeBusiness {...(props as any)} />;
+      return <MarqueeBusiness {...props} />;
   }
 }
 
@@ -270,8 +274,9 @@ function WeddingSwitch({
   templateCode,
   data,
   accentColor,
+  publicSlug,
 }: SwitchProps<WeddingInvitationData>) {
-  const props = { data, accentColor };
+  const props = { data, accentColor, slug: publicSlug };
 
   switch (templateCode) {
     case TEMPLATE_IDS.WEDDING.ETERNAL:

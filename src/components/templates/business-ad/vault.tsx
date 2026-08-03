@@ -1,474 +1,292 @@
+// src/components/templates/business-ad/vault.tsx
+// Vault — institutional light: cool slate, tabular services, certification stamps
 "use client";
 
 import { useState } from "react";
+import { TemplateImage } from "@/components/templates/template-image";
 import {
-  ChevronRight,
-  ArrowUpRight,
-  Sparkles,
-  Clock,
-  Building2,
-  Award,
-  Calendar,
-  ChevronDown,
-} from "lucide-react";
-import type { BusinessAdData } from "@/lib/validators/template-schemas";
+  contactHref,
+  formatAddress,
+  type BusinessAdProps,
+} from "./_shared";
+import { SocialIconLinks } from "./_social-links";
 
-interface BP {
-  data: BusinessAdData;
-  accentColor?: string;
-}
-
-function cHref(type: string, value: string) {
-  if (type === "email") return `mailto:${value}`;
-  if (type === "phone") return `tel:${value.replace(/\s/g, "")}`;
-  if (type === "website") return value.startsWith("http") ? value : `https://${value}`;
-  return "#";
-}
-
-const C_EMOJI: Record<string, string> = {
-  email: "✉️",
-  phone: "📱",
-  website: "🌐",
-  address: "📍",
-  whatsapp: "💬",
-  viber: "📲",
-  telegram: "✈️",
-};
-
-const S_EMOJI: Record<string, string> = {
-  linkedin: "💼",
-  github: "🐙",
-  twitter: "𝕏",
-  instagram: "📸",
-  facebook: "👥",
-  youtube: "▶️",
-  tiktok: "🎵",
-  whatsapp: "💬",
-  telegram: "✈️",
-  viber: "📲",
-  discord: "🎮",
-  website: "🌐",
-};
-
-export function VaultBusiness({ data, accentColor = "#6366f1" }: BP) {
+export function VaultBusiness({
+  data,
+  accentColor = "#3b5368",
+}: BusinessAdProps) {
   const {
     businessName,
     tagline,
     description,
     logoUrl,
-    services,
-    contacts,
-    socialLinks,
-    testimonials,
-    faq,
+    services = [],
+    contacts = [],
+    socialLinks = [],
+    testimonials = [],
+    faq = [],
     primaryCtaLabel,
     primaryCtaUrl,
-    certifications,
+    secondaryCtaLabel,
+    secondaryCtaUrl,
+    certifications = [],
     founded,
     industry,
-    whatWeDo,
-    history,
-    businessHours,
+    employeeCount,
+    address,
   } = data;
 
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
   const accent = accentColor;
+  const addr = formatAddress(address);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#030712] font-sans text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
-      {/* Background Glow Spheres for Modern Tech Look */}
-      <div
-        className="pointer-events-none absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full opacity-20 blur-[140px]"
-        style={{ background: accent }}
-      />
-      <div
-        className="pointer-events-none absolute -right-40 top-[40%] h-[600px] w-[600px] rounded-full opacity-15 blur-[160px]"
-        style={{ background: accent }}
-      />
-
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#030712]/80 backdrop-blur-md transition-all">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={businessName}
-                className="h-9 w-auto object-contain"
-              />
-            ) : (
-              <div className="flex items-center gap-2">
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-xl font-bold text-white shadow-lg"
-                  style={{ background: `linear-gradient(135deg, ${accent}, #1e1b4b)` }}
-                >
-                  {businessName.charAt(0)}
-                </div>
-                <div>
-                  <span className="text-lg font-extrabold tracking-tight text-white">
-                    {businessName}
-                  </span>
-                  {founded && (
-                    <span className="block text-[10px] font-medium uppercase tracking-widest text-slate-400">
-                      Est. {founded}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
+    <main
+      className="min-h-screen w-full max-w-full overflow-x-clip bg-[#eef1f4] text-[#1a2330] antialiased"
+      style={{ fontFamily: "system-ui, 'IBM Plex Sans', 'Segoe UI', sans-serif" }}
+    >
+      {/* Centered mark + rule */}
+      <header className="border-b border-[#cfd6de] bg-[#f7f9fb] px-5 py-12 text-center sm:px-8 sm:py-16">
+        {logoUrl && (
+          <div className="relative mx-auto mb-6 h-14 w-14 overflow-hidden rounded-full border border-[#cfd6de] bg-white">
+            <TemplateImage
+              src={logoUrl}
+              alt=""
+              fill
+              className="object-contain p-2"
+              sizes="56px"
+            />
           </div>
-
-          <nav className="hidden items-center gap-8 md:flex">
-            {["About", "Services", "History", "Contact"].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="text-xs font-semibold uppercase tracking-wider text-slate-300 transition-colors hover:text-white"
-              >
-                {item}
-              </a>
-            ))}
-          </nav>
-
+        )}
+        <p
+          className="font-mono text-[10px] uppercase tracking-[0.35em]"
+          style={{ color: accent }}
+        >
+          {industry || "Professional services"}
+          {founded ? ` · Est. ${founded}` : ""}
+        </p>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+          {businessName}
+        </h1>
+        <div className="mx-auto mt-5 h-px w-16" style={{ background: accent }} />
+        <p className="mx-auto mt-5 max-w-lg text-sm leading-relaxed text-[#4a5563]">
+          {tagline}
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <a
             href={primaryCtaUrl}
-            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:shadow-lg"
+            className="px-6 py-2.5 text-sm font-semibold text-white"
             style={{ background: accent }}
           >
-            <span>{primaryCtaLabel}</span>
-            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            {primaryCtaLabel}
           </a>
+          {secondaryCtaLabel && secondaryCtaUrl && (
+            <a
+              href={secondaryCtaUrl}
+              className="border border-[#cfd6de] bg-white px-6 py-2.5 text-sm font-semibold text-[#1a2330]"
+            >
+              {secondaryCtaLabel}
+            </a>
+          )}
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative px-6 pb-20 pt-24 md:pb-32 md:pt-36">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid items-center gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              {industry && (
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-slate-300 backdrop-blur-md">
-                  <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
-                  <span>{industry}</span>
-                </div>
-              )}
-
-              <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl">
-                {businessName}
-              </h1>
-
-              <p
-                className="mt-6 text-xl font-medium leading-snug text-slate-300 md:text-2xl"
-                style={{ color: accent }}
+      {/* Certification stamps */}
+      {(certifications.length > 0 || employeeCount) && (
+        <section className="border-b border-[#cfd6de] bg-white px-5 py-6 sm:px-8">
+          <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-4">
+            {employeeCount && (
+              <span className="border border-[#cfd6de] px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-[#4a5563]">
+                Team {employeeCount}
+              </span>
+            )}
+            {certifications.map((c) => (
+              <span
+                key={c}
+                className="border px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider"
+                style={{ borderColor: accent, color: accent }}
               >
-                {tagline}
-              </p>
-
-              <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-400 md:text-lg">
-                {description}
-              </p>
-
-              {certifications && certifications.length > 0 && (
-                <div className="mt-8 flex flex-wrap gap-2">
-                  {certifications.map((cert, i) => (
-                    <span
-                      key={i}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-slate-300"
-                    >
-                      <Award className="h-3.5 w-3.5 text-indigo-400" />
-                      {cert}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Floating Glassmorphism Hero Visual */}
-            <div className="lg:col-span-5">
-              <div className="relative rounded-3xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-8 shadow-2xl backdrop-blur-2xl">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4 border-b border-white/10 pb-6">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/20 text-indigo-400">
-                      <Building2 className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-white">Corporate Profile</h4>
-                      <p className="text-xs text-slate-400">Enterprise Excellence</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
-                      <p className="text-xs text-slate-400">Established</p>
-                      <p className="mt-1 text-lg font-bold text-white">{founded || "N/A"}</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
-                      <p className="text-xs text-slate-400">Industry Leader</p>
-                      <p className="mt-1 text-lg font-bold text-white">Certified</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* What We Do Section (Bento Cards) */}
-      {whatWeDo && whatWeDo.length > 0 && (
-        <section className="border-t border-white/10 bg-slate-950/40 px-6 py-24">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-16 text-center">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-400">
-                Capabilities
-              </h2>
-              <p className="mt-2 text-3xl font-bold text-white sm:text-4xl">What We Do</p>
-            </div>
-
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {whatWeDo.map((item, i) => (
-                <div
-                  key={i}
-                  className="group relative rounded-2xl border border-white/10 bg-white/[0.02] p-8 transition-all hover:border-white/20 hover:bg-white/[0.05] hover:shadow-2xl"
-                >
-                  {item.iconName && (
-                    <div className="mb-5 inline-block text-3xl">{item.iconName}</div>
-                  )}
-                  <h3 className="text-xl font-bold text-white transition-colors group-hover:text-indigo-400">
-                    {item.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-400">{item.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Services / Practice Areas */}
-      <section id="services" className="border-t border-white/10 px-6 py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-16">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-400">
-              Solutions
-            </h2>
-            <p className="mt-2 text-3xl font-bold text-white sm:text-4xl">
-              Practice Areas & Services
-            </p>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {services.map((s, i) => (
-              <div
-                key={i}
-                className="flex flex-col justify-between rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm transition-all hover:translate-y-1"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-slate-500">0{i + 1}</span>
-                    {s.price && (
-                      <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-300">
-                        {s.price}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="mt-4 text-xl font-bold text-white">{s.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-400">{s.description}</p>
-
-                  {s.features && (
-                    <ul className="mt-6 space-y-2 border-t border-white/5 pt-6">
-                      {s.features.map((f, j) => (
-                        <li key={j} className="flex items-center gap-2 text-xs text-slate-300">
-                          <ChevronRight className="h-3.5 w-3.5 text-indigo-400" />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
+                {c}
+              </span>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Credentials / about */}
+      <section className="px-5 py-14 sm:px-8">
+        <div className="mx-auto max-w-2xl">
+          <h2
+            className="font-mono text-[10px] uppercase tracking-[0.3em]"
+            style={{ color: accent }}
+          >
+            Overview
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-[#2d3748]">{description}</p>
         </div>
       </section>
 
-      {/* History Timeline */}
-      {history && history.length > 0 && (
-        <section id="history" className="border-t border-white/10 bg-slate-950/40 px-6 py-24">
+      {/* Services as price table — tabular */}
+      {services.length > 0 && (
+        <section className="border-y border-[#cfd6de] bg-white px-5 py-14 sm:px-8">
           <div className="mx-auto max-w-4xl">
-            <div className="mb-16 text-center">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-400">
-                Evolution
-              </h2>
-              <p className="mt-2 text-3xl font-bold text-white sm:text-4xl">Our Journey</p>
-            </div>
-
-            <div className="relative space-y-12 border-l border-white/10 pl-6 md:pl-10">
-              {history.map((h, i) => (
-                <div key={i} className="group relative">
-                  {/* Glowing Node Dot */}
-                  <div
-                    className="transition-scale absolute -left-[31px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-[#030712] group-hover:scale-125 md:-left-[47px]"
-                    style={{ background: accent }}
-                  />
-                  <div className="inline-flex items-center gap-2 rounded-md bg-white/5 px-3 py-1 font-mono text-xs font-bold text-indigo-300">
-                    <Calendar className="h-3 w-3" />
-                    {h.year}
-                  </div>
-                  <h3 className="mt-2 text-lg font-bold text-white">{h.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-400">{h.description}</p>
-                </div>
-              ))}
+            <h2
+              className="font-mono text-[10px] uppercase tracking-[0.3em]"
+              style={{ color: accent }}
+            >
+              Schedule of services
+            </h2>
+            <div className="mt-6 overflow-x-auto">
+              <table className="w-full min-w-[480px] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b-2 border-[#1a2330]">
+                    <th className="py-3 pr-4 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#4a5563]">
+                      Service
+                    </th>
+                    <th className="py-3 pr-4 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#4a5563]">
+                      Scope
+                    </th>
+                    <th className="py-3 text-right font-mono text-[10px] font-semibold uppercase tracking-wider text-[#4a5563]">
+                      Fee
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {services.map((s, i) => (
+                    <tr
+                      key={i}
+                      className="border-b border-[#e2e8f0] align-top"
+                      style={
+                        s.highlighted
+                          ? { background: `${accent}08` }
+                          : undefined
+                      }
+                    >
+                      <td className="py-4 pr-4 font-semibold">{s.title}</td>
+                      <td className="py-4 pr-4 text-[#4a5563]">
+                        {s.description}
+                        {s.features && s.features.length > 0 && (
+                          <ul className="mt-2 space-y-0.5 text-xs text-[#718096]">
+                            {s.features.map((f) => (
+                              <li key={f}>— {f}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </td>
+                      <td className="py-4 text-right font-mono text-xs whitespace-nowrap">
+                        {s.price || "—"}
+                        {s.priceNote && (
+                          <span className="mt-1 block text-[10px] text-[#718096]">
+                            {s.priceNote}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </section>
       )}
 
-      {/* Testimonials */}
+      {/* Testimonials — restrained */}
       {testimonials && testimonials.length > 0 && (
-        <section className="border-t border-white/10 px-6 py-24">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-16">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-400">
-                Endorsements
-              </h2>
-              <p className="mt-2 text-3xl font-bold text-white sm:text-4xl">Client Testimonials</p>
-            </div>
-
-            <div className="grid gap-8 md:grid-cols-3">
-              {testimonials.slice(0, 3).map((t, i) => (
-                <div
+        <section className="px-5 py-14 sm:px-8">
+          <div className="mx-auto max-w-4xl">
+            <h2
+              className="font-mono text-[10px] uppercase tracking-[0.3em]"
+              style={{ color: accent }}
+            >
+              Client statements
+            </h2>
+            <div className="mt-8 grid gap-6 md:grid-cols-2">
+              {testimonials.slice(0, 4).map((t, i) => (
+                <blockquote
                   key={i}
-                  className="rounded-2xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-md"
+                  className="border-l-2 bg-white px-5 py-4"
+                  style={{ borderColor: accent }}
                 >
-                  <p className="text-sm italic leading-relaxed text-slate-300">
-                    &ldquo;{t.text}&rdquo;
-                  </p>
-                  <div className="mt-6 border-t border-white/5 pt-4">
-                    <p className="text-xs font-bold uppercase tracking-wider text-white">
-                      — {t.author}
-                    </p>
-                  </div>
-                </div>
+                  <p className="text-sm leading-relaxed text-[#2d3748]">{t.text}</p>
+                  <footer className="mt-3 font-mono text-[10px] uppercase tracking-wider text-[#718096]">
+                    {t.author}
+                  </footer>
+                </blockquote>
               ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* FAQ Accordion */}
+      {/* FAQ accordion */}
       {faq && faq.length > 0 && (
-        <section className="border-t border-white/10 bg-slate-950/40 px-6 py-24">
-          <div className="mx-auto max-w-3xl">
-            <div className="mb-12 text-center">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-400">FAQ</h2>
-              <p className="mt-2 text-3xl font-bold text-white">Frequently Asked Questions</p>
-            </div>
-
-            <div className="space-y-4">
+        <section className="border-t border-[#cfd6de] bg-white px-5 py-14 sm:px-8">
+          <div className="mx-auto max-w-2xl">
+            <h2
+              className="font-mono text-[10px] uppercase tracking-[0.3em]"
+              style={{ color: accent }}
+            >
+              Frequently asked
+            </h2>
+            <div className="mt-6">
               {faq.map((item, i) => (
-                <details
-                  key={i}
-                  className="group rounded-2xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-sm transition-all [&_summary::-webkit-details-marker]:hidden"
-                >
-                  <summary className="flex cursor-pointer items-center justify-between font-semibold text-white">
-                    <span>{item.question}</span>
-                    <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform duration-300 group-open:rotate-180" />
-                  </summary>
-                  <p className="mt-4 text-sm leading-relaxed text-slate-400">{item.answer}</p>
-                </details>
+                <div key={i} className="border-b border-[#e2e8f0]">
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                    className="flex w-full items-center justify-between gap-4 py-4 text-left text-sm font-semibold"
+                  >
+                    {item.question}
+                    <span className="font-mono text-xs text-[#718096]">
+                      {openFaq === i ? "−" : "+"}
+                    </span>
+                  </button>
+                  {openFaq === i && (
+                    <p className="pb-4 text-sm leading-relaxed text-[#4a5563]">
+                      {item.answer}
+                    </p>
+                  )}
+                </div>
               ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* Contact Section */}
-      <section id="contact" className="border-t border-white/10 px-6 py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-5">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-400">
-                Get In Touch
-              </h2>
-              <p className="mt-2 text-3xl font-bold text-white sm:text-4xl">Connect With Us</p>
-              <p className="mt-4 text-sm leading-relaxed text-slate-400">
-                Reach out to discuss partnerships, services, or general inquiries.
-              </p>
-
-              {businessHours && businessHours.length > 0 && (
-                <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-                  <div className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white">
-                    <Clock className="h-4 w-4 text-indigo-400" />
-                    Office Hours
-                  </div>
-                  <div className="space-y-2">
-                    {businessHours.map((h, i) => (
-                      <div key={i} className="flex justify-between text-xs">
-                        <span className="text-slate-400">{h.day}</span>
-                        <span className={h.isClosed ? "text-slate-600" : "text-slate-200"}>
-                          {h.isClosed ? "Closed" : `${h.open} – ${h.close}`}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="lg:col-span-7">
-              <div className="grid gap-4 sm:grid-cols-2">
-                {contacts.map((c, i) => (
-                  <a
-                    key={i}
-                    href={cHref(c.type, c.value)}
-                    className="group rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition-all hover:border-white/20 hover:bg-white/[0.05]"
-                  >
-                    <span className="text-2xl">{C_EMOJI[c.type] ?? "📋"}</span>
-                    <p className="mt-3 text-xs font-bold uppercase tracking-wider text-slate-400">
-                      {c.label ?? c.type}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-white transition-colors group-hover:text-indigo-400">
-                      {c.value}
-                    </p>
-                  </a>
-                ))}
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                {socialLinks.map((s, i) => (
-                  <a
-                    key={i}
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white"
-                  >
-                    <span>{S_EMOJI[s.platform]}</span>
-                    <span>{s.label ?? s.platform}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
+      {/* Formal contact */}
+      <section className="px-5 py-16 sm:px-8" style={{ background: accent, color: "#f7f9fb" }}>
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-2xl font-semibold">Contact the office</h2>
+          {addr && <p className="mt-3 text-sm opacity-85">{addr}</p>}
+          <div className="mt-6 flex flex-wrap justify-center gap-4 text-sm">
+            {contacts.map((c, i) => (
+              <a
+                key={i}
+                href={contactHref(c.type, c.value)}
+                className="underline-offset-2 hover:underline"
+              >
+                {c.label || c.value}
+              </a>
+            ))}
           </div>
+          <a
+            href={primaryCtaUrl}
+            className="mt-8 inline-block bg-white px-7 py-3 text-sm font-semibold"
+            style={{ color: accent }}
+          >
+            {primaryCtaLabel}
+          </a>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 px-6 py-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
-          <div className="flex items-center gap-3">
-            {logoUrl && (
-              <img
-                src={logoUrl}
-                alt={businessName}
-                className="h-6 w-auto object-contain opacity-50"
-              />
-            )}
-            <span className="text-xs font-medium text-slate-500">
-              © {new Date().getFullYear()} {businessName}. All rights reserved.
-            </span>
-          </div>
-          <span className="font-mono text-xs text-slate-600">NEX CARD Vault</span>
+      <footer className="border-t border-[#cfd6de] bg-[#f7f9fb] px-5 py-8 sm:px-8">
+        <div className="mx-auto flex max-w-4xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-semibold">{businessName}</p>
+          <SocialIconLinks
+            links={socialLinks}
+            linkClassName="border border-[#cfd6de] text-[#718096] hover:border-[#3b5368] hover:text-[#1a2330]"
+            iconClassName="h-3.5 w-3.5"
+          />
         </div>
       </footer>
     </main>

@@ -6,10 +6,16 @@ import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { verifyPassword } from "@/lib/auth/hash";
 import { randomBytes } from "crypto";
+import {
+  clientIp,
+  maybeCleanupRateLimits,
+  rateLimit,
+} from "@/lib/security/rate-limit";
 
 const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
+  totpCode: z.string().regex(/^\d{6}$/).optional(),
 });
 
 // Session expires in 30 days
@@ -17,6 +23,19 @@ const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   try {
+    maybeCleanupRateLimits();
+    const ip = clientIp(request);
+    const limited = rateLimit(`auth:login:${ip}`, 10, 15 * 60 * 1000);
+    if (!limited.ok) {
+      return NextResponse.json(
+        { message: "Too many login attempts. Please try again later." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(limited.retryAfterSec) },
+        }
+      );
+    }
+
     const body = await request.json();
     const parsed = LoginSchema.safeParse(body);
 
@@ -27,9 +46,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password } = parsed.data;
+    const { email, password, totpCode } = parsed.data;
 
-    // Find user
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase().trim() },
       select: {
@@ -39,10 +57,11 @@ export async function POST(request: NextRequest) {
         hashedPassword: true,
         status: true,
         role: true,
+        totpEnabled: true,
+        totpSecret: true,
       },
     });
 
-    // Generic message — don't reveal whether email exists
     const invalidMessage = "Invalid email or password.";
 
     if (!user) {
@@ -56,12 +75,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (user.status === "PENDING_VERIFICATION") {
+      return NextResponse.json(
+        {
+          message:
+            "Please verify your email before signing in. Check your inbox for the link.",
+        },
+        { status: 403 }
+      );
+    }
+
     const passwordValid = await verifyPassword(password, user.hashedPassword);
     if (!passwordValid) {
       return NextResponse.json({ message: invalidMessage }, { status: 401 });
     }
 
-    // Create session
+    if (user.totpEnabled && user.totpSecret) {
+      const { verifyTotp } = await import("@/lib/auth/totp");
+      if (!totpCode) {
+        return NextResponse.json(
+          {
+            message: "Two-factor code required.",
+            requires2fa: true,
+          },
+          { status: 403 }
+        );
+      }
+      if (!verifyTotp(user.totpSecret, totpCode)) {
+        return NextResponse.json(
+          { message: "Invalid two-factor code." },
+          { status: 401 }
+        );
+      }
+    }
+
     const sessionToken = randomBytes(32).toString("hex");
     const expires = new Date(Date.now() + SESSION_DURATION_MS);
 
@@ -73,13 +120,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Update last login timestamp
     await prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
 
-    // Set HttpOnly cookie
     const response = NextResponse.json({
       success: true,
       user: { id: user.id, name: user.name, email: user.email, role: user.role },

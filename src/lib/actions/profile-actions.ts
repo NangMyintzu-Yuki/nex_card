@@ -4,7 +4,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { purgeProfileCache } from "@/lib/cache/profile-cache";
@@ -13,6 +12,7 @@ import {
   type CategorySlug,
 } from "@/lib/validators/template-schemas";
 import { getServerSession } from "@/lib/auth/session";
+import { isReservedSlug } from "@/lib/slugs/reserved";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION: SELECT TEMPLATE DURING ONBOARDING (one-time lock)
@@ -57,6 +57,13 @@ export async function selectTemplateAction(
 
   const { categoryId, templateId, slug } = parsed.data;
 
+  if (isReservedSlug(slug)) {
+    return {
+      status: "error",
+      message: "That slug is reserved. Please choose a different one.",
+    };
+  }
+
   // Guard: user must not already have a profile for this category
   const existing = await prisma.userProfile.findUnique({
     where: {
@@ -100,6 +107,21 @@ export async function selectTemplateAction(
       status: "error",
       message: "Invalid template selection.",
     };
+  }
+
+  // Guard: max profiles per user (platform setting)
+  if (!existing) {
+    const { getSettings } = await import("@/lib/settings");
+    const settings = await getSettings();
+    const profileCount = await prisma.userProfile.count({
+      where: { userId: session.user.id },
+    });
+    if (profileCount >= settings.max_profiles_per_user) {
+      return {
+        status: "error",
+        message: `You can create at most ${settings.max_profiles_per_user} profiles.`,
+      };
+    }
   }
 
   // Fetch category to get initial empty JSON structure
@@ -207,17 +229,13 @@ export async function updateProfileAction(
     return { status: "error", message: "Profile not found." };
   }
 
-  if (parsed.data.isPublished) {
-    const requiresPayment =
-      profile.template.isPremium && profile.paymentStatus !== "APPROVED";
-
-    if (requiresPayment) {
-      return {
-        status: "error",
-        message:
-          "Payment must be approved before publishing a premium template. Complete payment in onboarding or resubmit your screenshot.",
-      };
-    }
+  // Premium templates require approved payment before any content mutation
+  if (profile.template.isPremium && profile.paymentStatus !== "APPROVED") {
+    return {
+      status: "error",
+      message:
+        "Payment must be approved before editing or publishing a premium template. Complete payment or wait for admin approval.",
+    };
   }
 
   // Parse and validate the JSON against the category's schema
@@ -261,6 +279,57 @@ export async function updateProfileAction(
   // Purge the public cache for this slug immediately
   await purgeProfileCache(profile.slug, session.user.id);
   revalidatePath("/dashboard");
+
+  return { status: "success" };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACTION: DELETE PROFILE (frees slug + category slot for reclaim)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const DeleteProfileInput = z.object({
+  profileId: z.string().cuid(),
+  confirmation: z.literal("DELETE"),
+});
+
+export type DeleteProfileState =
+  | { status: "idle" }
+  | { status: "success" }
+  | { status: "error"; message: string };
+
+export async function deleteProfileAction(
+  _prev: DeleteProfileState,
+  formData: FormData
+): Promise<DeleteProfileState> {
+  const session = await getServerSession();
+  if (!session?.user?.id) {
+    return { status: "error", message: "Unauthorized." };
+  }
+
+  const parsed = DeleteProfileInput.safeParse({
+    profileId: formData.get("profileId"),
+    confirmation: formData.get("confirmation"),
+  });
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message: 'Type DELETE to confirm profile deletion.',
+    };
+  }
+
+  const profile = await prisma.userProfile.findFirst({
+    where: { id: parsed.data.profileId, userId: session.user.id },
+    select: { id: true, slug: true },
+  });
+
+  if (!profile) {
+    return { status: "error", message: "Profile not found." };
+  }
+
+  await prisma.userProfile.delete({ where: { id: profile.id } });
+  await purgeProfileCache(profile.slug, session.user.id);
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/onboarding");
 
   return { status: "success" };
 }

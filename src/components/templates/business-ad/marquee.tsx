@@ -1,441 +1,286 @@
-'use client';
+// src/components/templates/business-ad/marquee.tsx
+// Marquee — kinetic retail / events: full-bleed hero, continuous ticker, coral accent
+"use client";
 
-import type { BusinessAdData } from "@/lib/validators/template-schemas";
+import { TemplateImage } from "@/components/templates/template-image";
+import {
+  contactHref,
+  formatAddress,
+  stars,
+  type BusinessAdProps,
+} from "./_shared";
+import { SocialIconLinks } from "./_social-links";
 
-interface BP {
-  data: BusinessAdData;
-  accentColor?: string;
-}
-
-function cHref(type: string, value: string) {
-  if (type === "email") return `mailto:${value}`;
-  if (type === "phone") return `tel:${value.replace(/\s/g, "")}`;
-  if (type === "website") return value.startsWith("http") ? value : `https://${value}`;
-  return "#";
-}
-
-const C_EMOJI: Record<string, string> = {
-  email: "✉️",
-  phone: "📱",
-  website: "🌐",
-  address: "📍",
-  whatsapp: "💬",
-  viber: "📲",
-  telegram: "✈️",
-};
-
-function StarRating({ r }: { r: number }) {
-  return (
-    <div className="flex gap-1 shrink-0">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} className={i < r ? "text-amber-400" : "text-neutral-700"}>
-          ★
-        </span>
-      ))}
-    </div>
-  );
-}
-
-export function MarqueeBusiness({ data, accentColor = "#6366f1" }: BP) {
+export function MarqueeBusiness({
+  data,
+  accentColor = "#f97316",
+}: BusinessAdProps) {
   const {
-    businessName = "Business Name",
-    tagline = "Your Company Tagline",
-    description = "Company description goes here.",
+    businessName,
+    tagline,
+    description,
     logoUrl,
     heroImageUrl,
     services = [],
     contacts = [],
+    socialLinks = [],
     testimonials = [],
     gallery = [],
-    primaryCtaLabel = "Get Started",
-    primaryCtaUrl = "#",
+    primaryCtaLabel,
+    primaryCtaUrl,
     secondaryCtaLabel,
     secondaryCtaUrl,
-    businessHours = [],
-    certifications = [],
-    founded,
     industry,
-  } = data || {};
+    founded,
+    address,
+  } = data;
 
-  const currentYear = new Date().getFullYear();
+  const accent = accentColor;
+  const tickerItems =
+    services.length > 0
+      ? services.map((s) => s.title)
+      : [tagline, industry, businessName].filter(Boolean) as string[];
+  const tickerLoop = [...tickerItems, ...tickerItems, ...tickerItems];
+  const addr = formatAddress(address);
 
   return (
-    /* Outer strict boundary wrapper to stop horizontal overflow */
-    <div className="relative w-full max-w-full overflow-x-clip bg-neutral-950 text-neutral-100 font-sans antialiased">
-      <main className="w-full max-w-full overflow-x-clip min-h-screen">
-        
-        {/* Top Banner Ticker */}
-        <div className="w-full overflow-hidden py-2 bg-neutral-900 border-b border-white/10">
-          <div className="w-full px-4 text-center">
-            <span className="inline-flex items-center justify-center gap-2 text-xs font-semibold tracking-wider uppercase text-neutral-400 max-w-full truncate">
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: accentColor }} />
-              <span className="truncate">{tagline}</span>
+    <main
+      className="relative min-h-screen w-full max-w-full overflow-x-clip bg-[#121212] text-[#f5f0eb] antialiased"
+      style={{ fontFamily: "var(--font-space), 'Arial Narrow', Impact, sans-serif" }}
+    >
+      <style>{`
+        @keyframes mq-ticker { from { transform: translateX(0); } to { transform: translateX(-33.333%); } }
+        .mq-ticker { animation: mq-ticker 28s linear infinite; }
+        .mq-body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+      `}</style>
+
+      {/* Continuous service ticker */}
+      <div
+        className="overflow-hidden border-b py-2.5"
+        style={{ borderColor: `${accent}55`, background: accent, color: "#111" }}
+      >
+        <div className="mq-ticker flex w-max gap-10 whitespace-nowrap text-xs font-black uppercase tracking-[0.25em]">
+          {tickerLoop.map((item, i) => (
+            <span key={`${item}-${i}`} className="flex items-center gap-10">
+              {item}
+              <span aria-hidden>•</span>
             </span>
-          </div>
+          ))}
         </div>
+      </div>
 
-        {/* Navigation */}
-        <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-neutral-950/90 backdrop-blur-md">
-          <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 py-3.5 min-w-0">
-            <div className="flex items-center gap-3 min-w-0 shrink">
-              {logoUrl ? (
-                <img
-                  src={logoUrl}
-                  alt={businessName}
-                  className="h-8 sm:h-9 w-auto max-w-[130px] sm:max-w-[160px] object-contain shrink-0"
-                />
-              ) : (
-                <span className="text-base sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-neutral-200 to-neutral-400 bg-clip-text text-transparent truncate">
-                  {businessName}
-                </span>
-              )}
-            </div>
-
-            <nav className="hidden items-center gap-6 lg:gap-8 lg:flex text-sm font-medium text-neutral-400 shrink-0">
-              {["About", "Services", "Reviews", "Contact"].map((l) => (
-                <a
-                  key={l}
-                  href={`#${l.toLowerCase()}`}
-                  className="hover:text-white transition-colors"
-                >
-                  {l}
-                </a>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-3 shrink-0">
-              {contacts
-                .filter((c) => c.type === "phone")
-                .slice(0, 1)
-                .map((c, i) => (
-                  <a
-                    key={i}
-                    href={`tel:${c.value.replace(/\s/g, "")}`}
-                    className="hidden text-sm font-medium text-neutral-300 hover:text-white md:block transition-colors truncate"
-                  >
-                    {c.value}
-                  </a>
-                ))}
-              <a
-                href={primaryCtaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative inline-flex items-center justify-center rounded-lg px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-95 shadow-lg shrink-0"
-                style={{ backgroundColor: accentColor }}
-              >
-                {primaryCtaLabel}
-              </a>
-            </div>
+      {/* Full-bleed hero — brand as hero signal */}
+      <section className="relative flex min-h-[88vh] flex-col justify-end overflow-hidden">
+        {heroImageUrl ? (
+          <div className="absolute inset-0">
+            <TemplateImage
+              src={heroImageUrl}
+              alt=""
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/70 to-black/30" />
           </div>
-        </header>
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `radial-gradient(ellipse at 30% 20%, ${accent}33, transparent 50%), #121212`,
+            }}
+          />
+        )}
 
-        {/* Hero Section */}
-        <section className="relative w-full min-h-[60vh] sm:min-h-[70vh] flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16 border-b border-white/10 overflow-hidden">
-          {heroImageUrl && (
-            <div className="absolute inset-0 z-0">
-              <img
-                src={heroImageUrl}
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-14 pt-28 sm:px-8">
+          {logoUrl && (
+            <div className="relative mb-6 h-12 w-36">
+              <TemplateImage
+                src={logoUrl}
                 alt={businessName}
-                className="absolute inset-0 h-full w-full object-cover opacity-20 filter blur-[2px]"
+                fill
+                className="object-contain object-left brightness-0 invert"
+                sizes="144px"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent" />
             </div>
           )}
-
-          <div className="relative z-10 w-full max-w-4xl mx-auto text-center min-w-0">
-            {certifications && certifications.length > 0 && (
-              <div className="mb-4 flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-full">
-                {certifications.map((c, i) => (
-                  <span
-                    key={i}
-                    className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px] sm:text-xs font-medium text-neutral-300 backdrop-blur-md max-w-full truncate"
-                  >
-                    <span className="text-emerald-400 shrink-0">✓</span>
-                    <span className="truncate">{c}</span>
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {industry && (
-              <p
-                className="mb-2 text-[10px] sm:text-xs font-bold tracking-widest uppercase truncate"
-                style={{ color: accentColor }}
-              >
-                {industry}
-              </p>
-            )}
-
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent break-words max-w-full">
-              {businessName}
-            </h1>
-
-            <p className="mt-4 text-base sm:text-xl font-medium text-neutral-300 max-w-2xl mx-auto break-words">
-              {tagline}
+          {industry && (
+            <p
+              className="mb-3 text-[11px] font-bold uppercase tracking-[0.4em]"
+              style={{ color: accent }}
+            >
+              {industry}
+              {founded ? ` · Est. ${founded}` : ""}
             </p>
-
-            <p className="mt-3 max-w-xl mx-auto text-xs sm:text-base text-neutral-400 leading-relaxed break-words">
-              {description}
-            </p>
-
-            <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-xs sm:max-w-none mx-auto">
+          )}
+          <h1 className="max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-tight sm:text-7xl md:text-8xl">
+            {businessName}
+          </h1>
+          <p className="mq-body mt-5 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">
+            {tagline}
+          </p>
+          <div className="mq-body mt-8 flex flex-wrap gap-3">
+            <a
+              href={primaryCtaUrl}
+              className="inline-flex items-center px-7 py-3.5 text-sm font-black uppercase tracking-wider text-black transition-opacity hover:opacity-90"
+              style={{ background: accent }}
+            >
+              {primaryCtaLabel}
+            </a>
+            {secondaryCtaLabel && secondaryCtaUrl && (
               <a
-                href={primaryCtaUrl}
+                href={secondaryCtaUrl}
+                className="inline-flex items-center border border-white/30 px-7 py-3.5 text-sm font-bold uppercase tracking-wider text-white hover:border-white"
+              >
+                {secondaryCtaLabel}
+              </a>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* About strip */}
+      <section className="mq-body border-y border-white/10 px-5 py-16 sm:px-8">
+        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-12">
+          <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-white/40 md:col-span-3">
+            Now showing
+          </p>
+          <p className="text-lg leading-relaxed text-white/80 md:col-span-9 md:text-xl">
+            {description}
+          </p>
+        </div>
+      </section>
+
+      {/* Services as horizontal strip — not cards */}
+      {services.length > 0 && (
+        <section className="px-5 py-16 sm:px-8">
+          <div className="mx-auto max-w-6xl">
+            <h2
+              className="mb-10 text-3xl font-black uppercase tracking-tight sm:text-4xl"
+              style={{ color: accent }}
+            >
+              What&apos;s on
+            </h2>
+            <div className="divide-y divide-white/10 border-y border-white/10">
+              {services.map((s, i) => (
+                <div
+                  key={`${s.title}-${i}`}
+                  className="mq-body grid gap-3 py-6 sm:grid-cols-12 sm:items-baseline"
+                >
+                  <span className="font-mono text-xs text-white/30 sm:col-span-1">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="sm:col-span-4">
+                    <h3 className="text-xl font-black uppercase tracking-wide">
+                      {s.title}
+                    </h3>
+                    {s.price && (
+                      <p className="mt-1 text-sm font-semibold" style={{ color: accent }}>
+                        {s.price}
+                        {s.priceNote ? ` · ${s.priceNote}` : ""}
+                      </p>
+                    )}
+                  </div>
+                  <p className="text-sm leading-relaxed text-white/60 sm:col-span-7">
+                    {s.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Gallery filmstrip */}
+      {gallery && gallery.length > 0 && (
+        <section className="pb-4 pt-4">
+          <div className="flex gap-3 overflow-x-auto px-5 pb-6 sm:px-8">
+            {gallery.map((img, i) => (
+              <div
+                key={img.url + i}
+                className="relative h-56 w-72 shrink-0 overflow-hidden sm:h-72 sm:w-96"
+              >
+                <TemplateImage
+                  src={img.url}
+                  alt={img.alt || `${businessName} ${i + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="384px"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Testimonials — quote wall */}
+      {testimonials && testimonials.length > 0 && (
+        <section className="mq-body border-t border-white/10 px-5 py-16 sm:px-8">
+          <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2">
+            {testimonials.slice(0, 4).map((t, i) => (
+              <blockquote key={i} className="border-l-2 pl-5" style={{ borderColor: accent }}>
+                <p className="text-sm text-white/40">{stars(t.rating)}</p>
+                <p className="mt-2 text-lg leading-snug text-white/90">&ldquo;{t.text}&rdquo;</p>
+                <footer className="mt-3 text-xs font-bold uppercase tracking-wider text-white/40">
+                  {t.author}
+                  {t.platform ? ` · ${t.platform}` : ""}
+                </footer>
+              </blockquote>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* CTA band */}
+      <section
+        className="px-5 py-16 text-center sm:px-8"
+        style={{ background: accent, color: "#111" }}
+      >
+        <h2 className="text-3xl font-black uppercase tracking-tight sm:text-5xl">
+          Ready when you are
+        </h2>
+        <a
+          href={primaryCtaUrl}
+          className="mq-body mt-6 inline-flex bg-black px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white"
+        >
+          {primaryCtaLabel}
+        </a>
+      </section>
+
+      {/* Footer */}
+      <footer className="mq-body border-t border-white/10 px-5 py-12 sm:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:justify-between">
+          <div>
+            <p className="text-lg font-black uppercase">{businessName}</p>
+            {addr && <p className="mt-2 max-w-sm text-sm text-white/50">{addr}</p>}
+            {address?.googleMapsUrl && (
+              <a
+                href={address.googleMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white transition-all hover:scale-[1.02] active:scale-95 shadow-xl shrink-0"
-                style={{
-                  backgroundColor: accentColor,
-                  boxShadow: `0 10px 30px -10px ${accentColor}80`,
-                }}
+                className="mt-2 inline-block text-xs font-bold uppercase tracking-wider"
+                style={{ color: accent }}
               >
-                {primaryCtaLabel}
+                Directions
               </a>
-              {secondaryCtaLabel && secondaryCtaUrl && (
-                <a
-                  href={secondaryCtaUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-neutral-200 hover:bg-white/10 transition-all backdrop-blur-md shrink-0"
-                >
-                  {secondaryCtaLabel}
-                </a>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* Services Section */}
-        {services && services.length > 0 && (
-          <section id="services" className="w-full py-16 sm:py-24 border-b border-white/10 px-4 sm:px-6 overflow-hidden">
-            <div className="mx-auto w-full max-w-6xl">
-              <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16 min-w-0">
-                <span
-                  className="text-xs font-bold uppercase tracking-widest block mb-2"
-                  style={{ color: accentColor }}
-                >
-                  SOLUTIONS
-                </span>
-                <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight break-words">
-                  Comprehensive Services
-                </h2>
-              </div>
-
-              {/* Grid forcing min-w-0 on columns */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 w-full min-w-0">
-                {services.map((s, i) => (
-                  <div
-                    key={i}
-                    className={`relative flex flex-col justify-between p-6 sm:p-8 rounded-2xl transition-all duration-300 w-full min-w-0 overflow-hidden ${
-                      s.highlighted
-                        ? "border border-white/20 bg-neutral-900 shadow-2xl ring-1 ring-white/20"
-                        : "border border-white/10 bg-neutral-900/40 hover:bg-neutral-900 hover:border-white/20"
-                    }`}
-                  >
-                    {s.highlighted && (
-                      <span
-                        className="absolute top-4 right-4 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md z-10 shrink-0"
-                        style={{ backgroundColor: accentColor }}
-                      >
-                        FEATURED
-                      </span>
-                    )}
-
-                    <div className="min-w-0 w-full">
-                      {s.iconName && (
-                        <div className="text-2xl sm:text-3xl mb-3">{s.iconName}</div>
-                      )}
-                      <h3 className="text-lg sm:text-xl font-bold text-white break-words pr-12">
-                        {s.title}
-                      </h3>
-                      {s.price && (
-                        <p className="mt-2 text-xl sm:text-2xl font-extrabold text-white break-words">
-                          {s.price}
-                          {s.priceNote && (
-                            <span className="text-xs font-normal text-neutral-400 ml-1">
-                              {s.priceNote}
-                            </span>
-                          )}
-                        </p>
-                      )}
-                      <p className="mt-3 text-xs sm:text-sm text-neutral-400 leading-relaxed break-words">
-                        {s.description}
-                      </p>
-                    </div>
-
-                    {s.features && s.features.length > 0 && (
-                      <ul className="mt-6 space-y-2 border-t border-white/10 pt-6 w-full min-w-0">
-                        {s.features.map((f, j) => (
-                          <li
-                            key={j}
-                            className="flex items-start gap-2 text-xs font-medium text-neutral-300 min-w-0"
-                          >
-                            <span className="shrink-0" style={{ color: accentColor }}>✓</span>
-                            <span className="break-words min-w-0">{f}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Gallery */}
-        {gallery && gallery.length > 0 && (
-          <section className="w-full py-16 sm:py-24 border-b border-white/10 px-4 sm:px-6 overflow-hidden">
-            <div className="mx-auto w-full max-w-6xl">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-6">
-                Featured Work
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 w-full min-w-0">
-                {gallery.slice(0, 8).map((img, i) => (
-                  <div
-                    key={i}
-                    className="group relative aspect-square overflow-hidden rounded-xl bg-neutral-900 border border-white/10 w-full min-w-0"
-                  >
-                    <img
-                      src={img.url}
-                      alt={img.alt || "Gallery image"}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Testimonials */}
-        {testimonials && testimonials.length > 0 && (
-          <section id="reviews" className="w-full py-16 sm:py-24 border-b border-white/10 px-4 sm:px-6 overflow-hidden">
-            <div className="mx-auto w-full max-w-6xl">
-              <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16 min-w-0">
-                <span
-                  className="text-xs font-bold uppercase tracking-widest block mb-2"
-                  style={{ color: accentColor }}
-                >
-                  Reviews
-                </span>
-                <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-                  Client Feedback
-                </h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full min-w-0">
-                {testimonials.slice(0, 4).map((t, i) => (
-                  <div
-                    key={i}
-                    className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-neutral-900/40 flex flex-col justify-between min-w-0 w-full overflow-hidden"
-                  >
-                    <div className="min-w-0">
-                      <StarRating r={t.rating} />
-                      <p className="mt-4 text-neutral-300 text-xs sm:text-sm leading-relaxed italic break-words">
-                        &ldquo;{t.text}&rdquo;
-                      </p>
-                    </div>
-                    <div className="mt-6 flex items-center gap-3 pt-6 border-t border-white/10 min-w-0">
-                      {t.avatarUrl ? (
-                        <img
-                          src={t.avatarUrl}
-                          alt={t.author}
-                          className="rounded-full object-cover shrink-0"
-                        />
-                      ) : (
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white">
-                          {t.author ? t.author.charAt(0) : "U"}
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <p className="text-xs sm:text-sm font-bold text-white truncate">{t.author}</p>
-                        {t.platform && (
-                          <p className="text-[10px] sm:text-xs text-neutral-500 truncate">{t.platform}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Contact Section */}
-        <section id="contact" className="w-full py-16 sm:py-24 border-b border-white/10 px-4 sm:px-6 overflow-hidden">
-          <div className="mx-auto w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 min-w-0">
-            <div className="min-w-0">
-              <span
-                className="text-xs font-bold uppercase tracking-widest block mb-2"
-                style={{ color: accentColor }}
-              >
-                Get In Touch
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-6">
-                Connect with Us
-              </h2>
-              {contacts && contacts.length > 0 && (
-                <div className="space-y-3 min-w-0">
-                  {contacts.map((c, i) => (
-                    <a
-                      key={i}
-                      href={cHref(c.type, c.value)}
-                      className="flex items-center gap-3 p-3.5 rounded-xl border border-white/10 bg-neutral-900/40 hover:bg-neutral-900 transition-colors min-w-0"
-                    >
-                      <span className="text-lg shrink-0">{C_EMOJI[c.type] ?? "📋"}</span>
-                      <div className="min-w-0">
-                        <p className="text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-                          {c.label ?? c.type}
-                        </p>
-                        <p className="text-xs sm:text-sm font-medium text-neutral-200 truncate">
-                          {c.value}
-                        </p>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {businessHours && businessHours.length > 0 && (
-              <div className="min-w-0">
-                <span
-                  className="text-xs font-bold uppercase tracking-widest block mb-2"
-                  style={{ color: accentColor }}
-                >
-                  Availability
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-6">
-                  Hours
-                </h2>
-                <div className="rounded-xl border border-white/10 bg-neutral-900/40 overflow-hidden divide-y divide-white/5 w-full min-w-0">
-                  {businessHours.map((h, i) => (
-                    <div key={i} className="flex justify-between px-4 sm:px-6 py-3.5 text-xs sm:text-sm min-w-0">
-                      <span className="text-neutral-400 font-medium truncate">
-                        {h.day}
-                      </span>
-                      <span
-                        className={`font-semibold shrink-0 ${
-                          h.isClosed ? "text-neutral-600" : "text-white"
-                        }`}
-                      >
-                        {h.isClosed ? "Closed" : `${h.open} – ${h.close}`}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
             )}
           </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="w-full border-t border-white/10 px-4 sm:px-6 py-6 overflow-hidden">
-          <div className="mx-auto w-full max-w-6xl flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left text-xs text-neutral-500 min-w-0">
-            <p className="truncate">© {currentYear} {businessName}. All rights reserved.</p>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2 text-sm text-white/60">
+              {contacts.map((c, i) => (
+                <a key={i} href={contactHref(c.type, c.value)} className="hover:text-white">
+                  {c.label || c.value}
+                </a>
+              ))}
+            </div>
+            <SocialIconLinks
+              links={socialLinks}
+              linkClassName="border border-white/20 text-white/70 hover:border-white/50 hover:text-white"
+              iconClassName="h-4 w-4"
+            />
           </div>
-        </footer>
-      </main>
-    </div>
+        </div>
+      </footer>
+    </main>
   );
 }

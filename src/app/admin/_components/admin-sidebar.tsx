@@ -112,7 +112,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
               <p className="truncate text-xs font-bold" style={{ color: "var(--nc-text)" }}>{user.name}</p>
               <p className="truncate text-[10px]" style={{ color: "var(--nc-text-3)" }}>{user.email}</p>
             </div>
-             <form action="/api/auth/logout" method="GET">
+             <form action="/api/auth/logout" method="POST">
                         <button type="submit"
                           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all nc-nav-item">
                           <LogOut className="h-4 w-4 shrink-0" style={{ color: "var(--nc-text-3)" }} />

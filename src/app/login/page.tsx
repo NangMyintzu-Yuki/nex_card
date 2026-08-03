@@ -15,11 +15,19 @@ export default function LoginPage() {
 
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
+  const [totpCode, setTotpCode] = useState("");
+  const [needs2fa, setNeeds2fa] = useState(false);
   const [error, setError]       = useState("");
+  const [info, setInfo]         = useState("");
   const [loading, setLoading]   = useState(false);
 
   // Redirect already-authenticated users (valid session in DB, not just stale cookie)
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("verified") === "1") setInfo("Email verified. You can sign in now.");
+    if (params.get("reset") === "1") setInfo("Password updated. You can sign in now.");
+    if (params.get("verify") === "1") setInfo("Account created. Check your email to verify before signing in.");
+
     fetch("/api/auth/me")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -40,10 +48,22 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email,
+          password,
+          ...(totpCode ? { totpCode } : {}),
+        }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.message ?? "Login failed."); return; }
+      if (!res.ok) {
+        if (data.requires2fa) {
+          setNeeds2fa(true);
+          setError("Enter the 6-digit code from your authenticator app.");
+          return;
+        }
+        setError(data.message ?? "Login failed.");
+        return;
+      }
       const dest = data.user?.role === "ADMIN" ? "/admin" : "/dashboard";
       router.replace(dest);
       router.refresh();
@@ -89,6 +109,11 @@ export default function LoginPage() {
         <div className="rounded-2xl p-3.5 space-y-2.5 sm:p-6 sm:space-y-4"
           style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)", boxShadow: "var(--nc-shadow)" }}>
 
+          {info && (
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs sm:text-sm text-emerald-400">
+              {info}
+            </div>
+          )}
           {error && (
             <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs sm:text-sm text-red-400">
               {error}
@@ -132,6 +157,26 @@ export default function LoginPage() {
                 onBlur={e => (e.target.style.borderColor = "var(--nc-border)")}
               />
             </div>
+
+            {needs2fa && (
+              <div>
+                <label className="mb-1 block text-[11px] font-semibold sm:text-xs" style={{ color: "var(--nc-text-2)" }}>
+                  Authenticator code
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="\d{6}"
+                  maxLength={6}
+                  value={totpCode}
+                  onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="123456"
+                  required
+                  autoComplete="one-time-code"
+                  style={inputStyle}
+                />
+              </div>
+            )}
 
             <button
               type="submit"

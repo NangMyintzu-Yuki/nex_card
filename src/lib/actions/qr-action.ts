@@ -1,4 +1,4 @@
-// src/lib/actions/qr-actions.ts
+// src/lib/actions/qr-action.ts
 // Server Action — Generate QR code and lock the profile permanently
 
 "use server";
@@ -9,10 +9,6 @@ import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
 import { purgeProfileCache } from "@/lib/cache/profile-cache";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────────────────────────────────────────
-
 export type GenerateQRState =
   | { status: "idle" }
   | { status: "success"; slug: string; qrGeneratedAt: string; alreadyLocked: boolean }
@@ -22,18 +18,12 @@ const GenerateQRInput = z.object({
   profileId: z.string().cuid(),
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ACTION: Generate QR — locks profile permanently on first call
-// ─────────────────────────────────────────────────────────────────────────────
-
 /**
- * Business rules enforced here:
+ * Business rules:
  * 1. Profile must belong to the requesting user.
- * 2. Profile must be PUBLISHED before a QR can be generated.
- * 3. On first generation: sets qrLocked=true, qrGeneratedAt=now.
- *    After this point: templateId and categoryId are immutable (enforced in
- *    updateProfileAction and selectTemplateAction).
- * 4. Subsequent calls return the existing lock timestamp (idempotent).
+ * 2. Profile must be PUBLISHED.
+ * 3. Premium templates require APPROVED payment.
+ * 4. First generation locks QR permanently (idempotent thereafter).
  */
 export async function generateQRAction(
   _prev: GenerateQRState,
@@ -49,7 +39,6 @@ export async function generateQRAction(
     return { status: "error", message: "Invalid profile ID." };
   }
 
-  // Fetch the profile — must belong to this user
   const profile = await prisma.userProfile.findFirst({
     where: { id: parsed.data.profileId, userId: session.user.id },
     select: {
@@ -59,6 +48,8 @@ export async function generateQRAction(
       qrLocked: true,
       qrGeneratedAt: true,
       templateLocked: true,
+      paymentStatus: true,
+      template: { select: { isPremium: true } },
     },
   });
 
@@ -66,14 +57,22 @@ export async function generateQRAction(
     return { status: "error", message: "Profile not found." };
   }
 
-  if (!profile.isPublished) {
+  if (profile.template.isPremium && profile.paymentStatus !== "APPROVED") {
     return {
       status: "error",
-      message: "Your profile must be published before you can generate a QR code. Enable publishing in the editor first.",
+      message:
+        "Payment must be approved before generating a QR code for a premium template.",
     };
   }
 
-  // If already locked — idempotent: return existing data
+  if (!profile.isPublished) {
+    return {
+      status: "error",
+      message:
+        "Your profile must be published before you can generate a QR code. Enable publishing in the editor first.",
+    };
+  }
+
   if (profile.qrLocked && profile.qrGeneratedAt) {
     return {
       status: "success",
@@ -83,7 +82,6 @@ export async function generateQRAction(
     };
   }
 
-  // First generation — lock the profile permanently
   const now = new Date();
 
   await prisma.userProfile.update({
@@ -91,12 +89,10 @@ export async function generateQRAction(
     data: {
       qrLocked: true,
       qrGeneratedAt: now,
-      // Ensure template is also locked (redundant safety)
       templateLocked: true,
     },
   });
 
-  // Purge ISR cache so the public page reflects the locked state
   await purgeProfileCache(profile.slug, session.user.id);
 
   revalidatePath("/dashboard");

@@ -55,7 +55,7 @@ describe("updateProfileAction", () => {
     }
   });
 
-  it("blocks publishing premium profile without approved payment", async () => {
+  it("blocks any edit of premium profile without approved payment", async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: {
         id: "user-1",
@@ -79,7 +79,7 @@ describe("updateProfileAction", () => {
       makeFormData({
         profileId: "clh3tqyxh0000qzrmn8k8x9y2",
         dynamicJsonData: validCardJson,
-        isPublished: "true",
+        isPublished: "false",
         ogImageUrl: "https://nexcard.io/og.png",
       })
     );

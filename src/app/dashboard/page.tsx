@@ -8,6 +8,7 @@ import { Plus, ExternalLink, Eye, Pencil, Lock, QrCode, Clock, XCircle, CheckCir
 import { getServerSession } from "@/lib/auth/session";
 import { getCachedUserProfiles } from "@/lib/cache/profile-cache";
 import { resolveThumbnailUrl } from "@/lib/thumbnails";
+import { DeleteProfileButton } from "./_components/delete-profile-button";
 
 export const metadata: Metadata = {
   title: "Dashboard — NEX CARD",
@@ -24,6 +25,10 @@ export default async function DashboardPage({
 
   const { new: newSlug, pending, paymentFailed } = await searchParams;
   const profiles = await getCachedUserProfiles(session.user.id);
+  const { getSettings } = await import("@/lib/settings");
+  const settings = await getSettings();
+  const maxProfiles = settings.max_profiles_per_user;
+  const canAddProfile = profiles.length < maxProfiles;
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
@@ -90,7 +95,7 @@ export default async function DashboardPage({
             {profiles.length} profile{profiles.length !== 1 ? "s" : ""}
           </p>
         </div>
-        {profiles.length < 4 && (
+        {canAddProfile && (
           <Link href="/dashboard/onboarding"
             className="nc-btn-brand flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold">
             <Plus className="h-4 w-4" />
@@ -146,6 +151,9 @@ export default async function DashboardPage({
                     <p className="mt-0.5 font-mono text-xs" style={{ color: "var(--nc-text-3)" }}>
                       /{profile.slug}
                     </p>
+                    <div className="mt-2">
+                      <DeleteProfileButton profileId={profile.id} slug={profile.slug} />
+                    </div>
                   </div>
                   <div className="flex items-center gap-1 text-xs" style={{ color: "var(--nc-text-3)" }}>
                     <Eye className="h-3.5 w-3.5" />
@@ -260,7 +268,7 @@ export default async function DashboardPage({
       )}
 
       {/* Remaining categories */}
-      {profiles.length > 0 && profiles.length < 4 && (
+      {profiles.length > 0 && canAddProfile && (
         <div className="mt-8">
           <p className="mb-4 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--nc-text-3)" }}>
             More Profile Types
@@ -276,7 +284,7 @@ export default async function DashboardPage({
               <div>
                 <p className="text-sm font-semibold" style={{ color: "var(--nc-text)" }}>Add Another Profile Type</p>
                 <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
-                  {4 - profiles.length} categor{4 - profiles.length === 1 ? "y" : "ies"} remaining
+                  {maxProfiles - profiles.length} slot{maxProfiles - profiles.length === 1 ? "" : "s"} remaining
                 </p>
               </div>
             </div>

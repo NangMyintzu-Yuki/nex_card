@@ -67,6 +67,9 @@ const TEMPLATES_BY_CATEGORY: Record<
     accentColor: string;
     isPremium: boolean;
     sortOrder: number;
+    priceQrOnly?: number;
+    priceNfcCard?: number;
+    priceNfcQr?: number;
   }>
 > = {
   "digital-name-card": [
@@ -180,9 +183,9 @@ const TEMPLATES_BY_CATEGORY: Record<
       codeIdentifier: "business-marquee",
       name: "Marquee",
       description:
-        "Bold headline-first with scrolling ticker, hero image, and high-energy dark layout.",
-      thumbnailUrl: PH(600, 340, "Marquee", "ef4444"),
-      accentColor: "#ef4444",
+        "Kinetic retail and events layout — full-bleed hero, continuous ticker, coral-accent high contrast.",
+      thumbnailUrl: PH(600, 340, "Marquee", "f97316"),
+      accentColor: "#f97316",
       isPremium: true,
       sortOrder: 1,
     },
@@ -190,9 +193,9 @@ const TEMPLATES_BY_CATEGORY: Record<
       codeIdentifier: "business-district",
       name: "District",
       description:
-        "Warm and trustworthy local-business layout with hours, FAQ, and review sections.",
-      thumbnailUrl: PH(600, 340, "District", "0284c7"),
-      accentColor: "#0284c7",
+        "Coastal local commerce — white and deep teal, hours and address first, bold neighborhood trust.",
+      thumbnailUrl: PH(600, 340, "District", "0f766e"),
+      accentColor: "#0F766E",
       isPremium: true,
       sortOrder: 2,
     },
@@ -200,9 +203,9 @@ const TEMPLATES_BY_CATEGORY: Record<
       codeIdentifier: "business-empire",
       name: "Empire",
       description:
-        "Corporate premium feel for large enterprises. Fixed header, dramatic hero, dark testimonials.",
-      thumbnailUrl: PH(600, 340, "Empire", "7c3aed"),
-      accentColor: "#7c3aed",
+        "Quiet-luxury editorial for premium B2B — espresso and champagne, serif display, asymmetric manifesto.",
+      thumbnailUrl: PH(600, 340, "Empire", "c4a574"),
+      accentColor: "#c4a574",
       isPremium: true,
       sortOrder: 3,
     },
@@ -210,9 +213,9 @@ const TEMPLATES_BY_CATEGORY: Record<
       codeIdentifier: "business-neon",
       name: "Neon",
       description:
-        "Cyberpunk nightlife aesthetic in pure black with neon accents. For bars, clubs, and events.",
-      thumbnailUrl: PH(600, 340, "Neon", "a3e635"),
-      accentColor: "#a3e635",
+        "Velvet nightlife — immersive photo hero, deep navy with rose and amber, soft serif display.",
+      thumbnailUrl: PH(600, 340, "Neon", "e8a87c"),
+      accentColor: "#E8A87C",
       isPremium: true,
       sortOrder: 4,
     },
@@ -220,9 +223,9 @@ const TEMPLATES_BY_CATEGORY: Record<
       codeIdentifier: "business-vault",
       name: "Vault",
       description:
-        "Understated luxury for financial, legal, and consultancy firms. Roman numerals, gold tones.",
-      thumbnailUrl: PH(600, 340, "Vault", "d4af37"),
-      accentColor: "#d4af37",
+        "Institutional light theme for legal and finance — cool slate, certification stamps, tabular fees.",
+      thumbnailUrl: PH(600, 340, "Vault", "3b5368"),
+      accentColor: "#3b5368",
       isPremium: true,
       sortOrder: 5,
     },
@@ -281,6 +284,12 @@ const TEMPLATES_BY_CATEGORY: Record<
     },
   ],
 };
+
+const DEFAULT_PRICES = {
+  priceQrOnly: 10_000,
+  priceNfcCard: 25_000,
+  priceNfcQr: 40_000,
+} as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DEMO PROFILE DATA
@@ -360,10 +369,22 @@ async function main() {
     }
 
     for (const template of templates) {
+      const prices = {
+        priceQrOnly: template.priceQrOnly ?? DEFAULT_PRICES.priceQrOnly,
+        priceNfcCard: template.priceNfcCard ?? DEFAULT_PRICES.priceNfcCard,
+        priceNfcQr: template.priceNfcQr ?? DEFAULT_PRICES.priceNfcQr,
+      };
       const record = await prisma.template.upsert({
         where: { codeIdentifier: template.codeIdentifier },
         create: {
-          ...template,
+          codeIdentifier: template.codeIdentifier,
+          name: template.name,
+          description: template.description,
+          thumbnailUrl: template.thumbnailUrl,
+          accentColor: template.accentColor,
+          isPremium: template.isPremium,
+          sortOrder: template.sortOrder,
+          ...prices,
           categoryId: category.id,
         },
         update: {
@@ -373,6 +394,7 @@ async function main() {
           accentColor: template.accentColor,
           isPremium: template.isPremium,
           sortOrder: template.sortOrder,
+          ...prices,
         },
         select: { id: true, codeIdentifier: true },
       });
@@ -382,40 +404,75 @@ async function main() {
   }
 
   // ── 3. Admin user ───────────────────────────────────────────────────────
+  // Password is set ONLY on create. Re-seeding must never reset production passwords.
   console.log("\n👤 Seeding admin user…");
-  const adminUser = await prisma.user.upsert({
-    where: { email: "nangmyintzu89@gmail.com" },
-    create: {
-      email: "nangmyintzu89@gmail.com",
-      name: "Admin",
-      hashedPassword: hashPassword("password"),
-      role: "ADMIN",
-      status: "ACTIVE",
-      emailVerifiedAt: new Date(),
-    },
-    update: { hashedPassword: hashPassword("password") },
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "nangmyintzu89@gmail.com";
+  const adminPassword =
+    process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe-Admin-NexCard-2026!";
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: adminEmail },
     select: { id: true },
   });
-  console.log(`  ✓ nangmyintzu89@gmail.com (${adminUser.id})`);
+  const adminUser = existingAdmin
+    ? await prisma.user.update({
+        where: { email: adminEmail },
+        data: {
+          name: "Admin",
+          role: "ADMIN",
+          status: "ACTIVE",
+          emailVerifiedAt: new Date(),
+        },
+        select: { id: true },
+      })
+    : await prisma.user.create({
+        data: {
+          email: adminEmail,
+          name: "Admin",
+          hashedPassword: hashPassword(adminPassword),
+          role: "ADMIN",
+          status: "ACTIVE",
+          emailVerifiedAt: new Date(),
+        },
+        select: { id: true },
+      });
+  console.log(`  ✓ ${adminEmail} (${adminUser.id})${existingAdmin ? " [password unchanged]" : " [created]"}`);
 
   // ── 4. Demo user ────────────────────────────────────────────────────────
   console.log("\n👤 Seeding demo user…");
-  const demoUser = await prisma.user.upsert({
-    where: { email: "user@gmail.com" },
-    create: {
-      email: "user@gmail.com",
-      name: "Alex Rivera",
-      hashedPassword: hashPassword("password"),
-      role: "USER",
-      status: "ACTIVE",
-      emailVerifiedAt: new Date(),
-      avatarUrl:
-        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&q=80",
-    },
-    update: { hashedPassword: hashPassword("password") },
+  const demoEmail = process.env.SEED_DEMO_EMAIL ?? "user@gmail.com";
+  const demoPassword =
+    process.env.SEED_DEMO_PASSWORD ?? "ChangeMe-Demo-NexCard-2026!";
+  const existingDemo = await prisma.user.findUnique({
+    where: { email: demoEmail },
     select: { id: true },
   });
-  console.log(`  ✓ user@gmail.com (${demoUser.id})`);
+  const demoUser = existingDemo
+    ? await prisma.user.update({
+        where: { email: demoEmail },
+        data: {
+          name: "Alex Rivera",
+          role: "USER",
+          status: "ACTIVE",
+          emailVerifiedAt: new Date(),
+          avatarUrl:
+            "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&q=80",
+        },
+        select: { id: true },
+      })
+    : await prisma.user.create({
+        data: {
+          email: demoEmail,
+          name: "Alex Rivera",
+          hashedPassword: hashPassword(demoPassword),
+          role: "USER",
+          status: "ACTIVE",
+          emailVerifiedAt: new Date(),
+          avatarUrl:
+            "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&q=80",
+        },
+        select: { id: true },
+      });
+  console.log(`  ✓ ${demoEmail} (${demoUser.id})${existingDemo ? " [password unchanged]" : " [created]"}`);
 
   // ── 5. Demo profile (Aurora Name Card) ─────────────────────────────────
   console.log("\n📄 Seeding demo profile…");
@@ -457,8 +514,13 @@ async function main() {
   console.log("\n✅ Seed complete!\n");
   console.log("  Categories:  ", Object.keys(categoryRecords).length);
   console.log("  Templates:   ", Object.keys(templateRecords).length);
-  console.log("  Admin login: nangmyintzu89@gmail.com / password");
-  console.log("  Demo login:  demo@nexcard.io  / demo-password-123");
+  console.log(`  Admin login: ${adminEmail}`);
+  console.log(`  Demo login:  ${demoEmail}`);
+  if (!existingAdmin || !existingDemo) {
+    console.log(
+      "  Passwords:   set via SEED_ADMIN_PASSWORD / SEED_DEMO_PASSWORD (defaults only apply on first create)"
+    );
+  }
   console.log("  Demo page:   http://localhost:3000/alex-rivera\n");
 }
 

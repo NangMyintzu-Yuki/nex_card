@@ -4,11 +4,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
 import { isValidSlug } from "@/lib/utils";
+import { isReservedSlug } from "@/lib/slugs/reserved";
+import {
+  clientIp,
+  maybeCleanupRateLimits,
+  rateLimit,
+} from "@/lib/security/rate-limit";
 
-// Cache availability checks briefly to reduce DB load during typing
-export const revalidate = 0; // Always fresh
+export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
+  maybeCleanupRateLimits();
+  const ip = clientIp(request);
+  const limited = rateLimit(`slug:check:${ip}`, 60, 60_000);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { available: false, message: "Too many checks. Slow down." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(limited.retryAfterSec) },
+      }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const slug = searchParams.get("slug")?.toLowerCase().trim();
 
@@ -23,15 +41,7 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // Reserved slugs that should never be user-claimed
-  const RESERVED = new Set([
-    "admin", "dashboard", "login", "register", "logout",
-    "api", "settings", "onboarding", "help", "about",
-    "pricing", "contact", "terms", "privacy", "blog",
-    "presencecard", "nexcard", "support", "404", "500", "sitemap",
-  ]);
-
-  if (RESERVED.has(slug)) {
+  if (isReservedSlug(slug)) {
     return NextResponse.json({ available: false, message: "That slug is reserved." });
   }
 

@@ -1,24 +1,28 @@
 // src/app/api/auth/logout/route.ts
-// GET /api/auth/logout — destroys the session and clears the cookie
+// POST /api/auth/logout — destroys the session and clears the cookie
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-export async function GET(request: NextRequest) {
+async function destroySession(request: NextRequest): Promise<NextResponse> {
   const sessionToken = request.cookies.get("session_token")?.value;
 
   if (sessionToken) {
-    // Delete session from DB — ignore errors (already expired, etc.)
     await prisma.session
       .deleteMany({ where: { sessionToken } })
       .catch(() => {});
   }
 
-  const response = NextResponse.redirect(new URL("/", APP_URL));
+  const wantsJson =
+    request.headers.get("accept")?.includes("application/json") ||
+    request.headers.get("content-type")?.includes("application/json");
 
-  // Clear the cookie
+  const response = wantsJson
+    ? NextResponse.json({ success: true })
+    : NextResponse.redirect(new URL("/", APP_URL));
+
   response.cookies.set("session_token", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -30,7 +34,14 @@ export async function GET(request: NextRequest) {
   return response;
 }
 
-// Also support POST for programmatic logout
 export async function POST(request: NextRequest) {
-  return GET(request);
+  return destroySession(request);
+}
+
+/** GET logout is disabled — use POST to prevent CSRF via img/link prefetch. */
+export async function GET() {
+  return NextResponse.json(
+    { message: "Use POST /api/auth/logout to sign out." },
+    { status: 405, headers: { Allow: "POST" } }
+  );
 }

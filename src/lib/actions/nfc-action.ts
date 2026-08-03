@@ -81,6 +81,7 @@ export async function markNfcProgrammedAction(
     data: {
       nfcProgrammedAt: now,
       nfcWriteCount: { increment: 1 },
+      nfcFulfillment: "PROGRAMMED",
     },
     select: { nfcWriteCount: true, nfcProgrammedAt: true },
   });
@@ -98,5 +99,61 @@ export async function markNfcProgrammedAction(
 
 /** Returns the URL users should write to their NFC tag */
 export async function getNfcProfileUrl(slug: string): Promise<string> {
-  return `${APP_URL}/p/${slug}`;
+  return `${APP_URL}/n/${slug}`;
+}
+
+const FulfillmentInput = z.object({
+  profileId: z.string().cuid(),
+  status: z.enum(["PENDING_WRITE", "PROGRAMMED", "SHIPPED"]),
+});
+
+export type FulfillmentState =
+  | { status: "idle" }
+  | { status: "success"; fulfillment: string }
+  | { status: "error"; message: string };
+
+/** Owner or admin updates NFC fulfillment pipeline status */
+export async function updateNfcFulfillmentAction(
+  _prev: FulfillmentState,
+  formData: FormData
+): Promise<FulfillmentState> {
+  const session = await getServerSession();
+  if (!session?.user?.id) {
+    return { status: "error", message: "Unauthorized." };
+  }
+
+  const parsed = FulfillmentInput.safeParse({
+    profileId: formData.get("profileId"),
+    status: formData.get("status"),
+  });
+  if (!parsed.success) {
+    return { status: "error", message: "Invalid input." };
+  }
+
+  const profile = await prisma.userProfile.findFirst({
+    where:
+      session.user.role === "ADMIN"
+        ? { id: parsed.data.profileId }
+        : { id: parsed.data.profileId, userId: session.user.id },
+    select: { id: true, slug: true },
+  });
+
+  if (!profile) {
+    return { status: "error", message: "Profile not found." };
+  }
+
+  await prisma.userProfile.update({
+    where: { id: profile.id },
+    data: {
+      nfcFulfillment: parsed.data.status,
+      ...(parsed.data.status === "PROGRAMMED"
+        ? { nfcProgrammedAt: new Date(), nfcWriteCount: { increment: 1 } }
+        : {}),
+    },
+  });
+
+  revalidatePath(`/dashboard/nfc/${profile.slug}`);
+  revalidatePath("/dashboard");
+
+  return { status: "success", fulfillment: parsed.data.status };
 }

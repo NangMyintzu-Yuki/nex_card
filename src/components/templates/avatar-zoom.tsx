@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { X } from "lucide-react";
+import { TemplateImage } from "@/components/templates/template-image";
 
 export function AvatarZoom({
   src,
@@ -39,7 +40,13 @@ export function AvatarZoom({
         className={`relative ${className}`}
         aria-label="View full size photo"
       >
-        <img src={src} alt={alt} className={`h-full w-full object-cover ${imageClassName}`} />
+        <TemplateImage
+          src={src}
+          alt={alt}
+          fill
+          className={`object-cover ${imageClassName}`}
+          sizes="160px"
+        />
       </button>
 
       {open && (
@@ -58,10 +65,13 @@ export function AvatarZoom({
             className="relative max-h-[85vh] max-w-[90vw]"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
+            <TemplateImage
               src={src}
               alt={alt}
+              width={1200}
+              height={1200}
               className="max-h-[85vh] w-auto rounded-2xl object-contain shadow-2xl"
+              sizes="90vw"
             />
           </div>
         </div>

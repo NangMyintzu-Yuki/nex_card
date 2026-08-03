@@ -10,8 +10,9 @@ import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
+import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
 
-interface WeddingProps { data: WeddingInvitationData; accentColor?: string; }
+interface WeddingProps { data: WeddingInvitationData; accentColor?: string; slug?: string; }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SHARED HELPERS
@@ -22,7 +23,7 @@ interface WeddingProps { data: WeddingInvitationData; accentColor?: string; }
 // ETERNAL — Timeless serif gold, full love-story timeline, Riley & Grey inspired
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function EternalWedding({ data, accentColor = "#c9a96e" }: WeddingProps) {
+export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingProps) {
   const {
     partner1, partner2, weddingDate, headline, coupleMessage,
     loveHistory, events, gallery, rsvp, hashtag,
@@ -335,6 +336,15 @@ export function EternalWedding({ data, accentColor = "#c9a96e" }: WeddingProps) 
         {hashtag && <p className="mt-1 text-xs" style={{ color: gold }}>#{hashtag}</p>}
         <p className="mt-8 text-xs" style={{ color: `${gold}30` }}>Made with NEX CARD</p>
       </footer>
+    
+      {slug && (
+        <section className="px-6 py-16 text-center">
+          <WeddingRsvpForm slug={slug} accentColor={gold} />
+          {allowWishes !== false && (
+            <WeddingGuestbookForm slug={slug} accentColor={gold} title={wishesTitle ?? "Leave a wish"} />
+          )}
+        </section>
+      )}
     </main>
   );
 }

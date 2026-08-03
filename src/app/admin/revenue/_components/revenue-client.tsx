@@ -6,7 +6,6 @@ import {
   Download, Filter, Calendar, BarChart3, TrendingUp,
   CreditCard, Smartphone, QrCode, ChevronDown, X, Loader2,
 } from "lucide-react";
-import * as XLSX from "xlsx";
 
 type Category = { id: string; name: string; slug: string };
 type Template = { id: string; name: string; codeIdentifier: string; categoryId: string };
@@ -97,46 +96,72 @@ export function RevenueClient({ categories, templates }: Props) {
   const hasActiveFilters = statusFilter !== "ALL" || categoryFilter !== "ALL" ||
     templateFilter !== "ALL" || tierFilter !== "ALL" || dateFrom || dateTo;
 
-  function exportToExcel() {
+  function exportToCsv() {
     if (!payments.length) return;
     setExporting(true);
 
-    const rows = payments.map((p) => ({
-      Date: new Date(p.createdAt).toLocaleDateString("en-US"),
-      User: p.userName,
-      Email: p.userEmail,
-      Profile: p.profileSlug,
-      Category: p.categoryName,
-      Template: p.templateName,
-      Tier: p.tier.replace("_", " "),
-      Amount: p.amount,
-      Currency: p.currency,
-      Status: p.status,
-    }));
+    const headers = [
+      "Date",
+      "User",
+      "Email",
+      "Profile",
+      "Category",
+      "Template",
+      "Tier",
+      "Amount",
+      "Currency",
+      "Status",
+    ];
 
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Revenue");
+    const escape = (value: string | number) => {
+      const s = String(value);
+      if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+      return s;
+    };
 
-    // Summary sheet
+    const lines = [
+      headers.join(","),
+      ...payments.map((p) =>
+        [
+          new Date(p.createdAt).toLocaleDateString("en-US"),
+          p.userName,
+          p.userEmail,
+          p.profileSlug,
+          p.categoryName,
+          p.templateName,
+          p.tier.replace("_", " "),
+          p.amount,
+          p.currency,
+          p.status,
+        ]
+          .map(escape)
+          .join(",")
+      ),
+    ];
+
     if (stats) {
-      const summaryRows = [
-        { Metric: "Total Revenue", Value: `${stats.approvedRevenue.toLocaleString()} MMK` },
-        { Metric: "Pending Revenue", Value: `${stats.pendingRevenue.toLocaleString()} MMK` },
-        { Metric: "Total Transactions", Value: stats.totalTransactions },
-        { Metric: "", Value: "" },
-        { Metric: "Tier Breakdown", Value: "" },
-        ...Object.entries(stats.byTier).map(([tier, data]) => ({
-          Metric: tier.replace("_", " "),
-          Value: `${data.revenue.toLocaleString()} MMK (${data.count} txns)`,
-        })),
-      ];
-      const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
-      XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
+      lines.push("");
+      lines.push("Metric,Value");
+      lines.push(`Total Revenue,${stats.approvedRevenue} MMK`);
+      lines.push(`Pending Revenue,${stats.pendingRevenue} MMK`);
+      lines.push(`Total Transactions,${stats.totalTransactions}`);
+      for (const [tier, data] of Object.entries(stats.byTier)) {
+        lines.push(
+          `${tier.replace("_", " ")},${data.revenue} MMK (${data.count} txns)`
+        );
+      }
     }
 
+    const blob = new Blob([lines.join("\n")], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const href = URL.createObjectURL(blob);
+    const a = document.createElement("a");
     const date = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `nex-card-revenue-${date}.xlsx`);
+    a.href = href;
+    a.download = `nex-card-revenue-${date}.csv`;
+    a.click();
+    URL.revokeObjectURL(href);
     setExporting(false);
   }
 
@@ -218,11 +243,11 @@ export function RevenueClient({ categories, templates }: Props) {
             )}
           </button>
           <button
-            onClick={exportToExcel}
+            onClick={exportToCsv}
             disabled={exporting || !payments.length}
             className="nc-btn-brand flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all hover:opacity-90 disabled:opacity-50">
             {exporting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-            Export Excel
+            Export CSV
           </button>
         </div>
       </div>

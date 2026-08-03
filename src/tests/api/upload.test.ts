@@ -143,8 +143,12 @@ describe("POST /api/upload", () => {
       driver: "cloudinary",
     });
 
+    const pngBytes = new Uint8Array([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+      0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+    ]);
     const formData = new FormData();
-    formData.append("file", new File(["fake"], "photo.png", { type: "image/png" }));
+    formData.append("file", new File([pngBytes], "photo.png", { type: "image/png" }));
     formData.append("folder", "gallery");
 
     const res = await POST(

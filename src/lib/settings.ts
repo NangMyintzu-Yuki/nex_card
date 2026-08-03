@@ -1,9 +1,12 @@
-// src/lib/settings.ts — Read/write platform settings from JSON file
+// src/lib/settings.ts — Platform settings (DB-backed with JSON file fallback)
+
 import { readFile, writeFile, mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import { join } from "path";
+import { z } from "zod";
 
 const SETTINGS_PATH = join(process.cwd(), "data", "settings.json");
+const SETTINGS_KEY = "platform";
 
 export type Settings = {
   site_name: string;
@@ -21,6 +24,22 @@ export type Settings = {
   notify_email: string;
 };
 
+export const SettingsSchema = z.object({
+  site_name: z.string().min(1).max(80),
+  site_url: z.string().url(),
+  support_email: z.string().email(),
+  maintenance_mode: z.boolean(),
+  allow_registration: z.boolean(),
+  require_email_verify: z.boolean(),
+  max_profiles_per_user: z.number().int().min(1).max(20),
+  enable_og_images: z.boolean(),
+  enable_analytics: z.boolean(),
+  enable_r2_uploads: z.boolean(),
+  isr_revalidate_sec: z.number().int().min(60).max(86400),
+  notify_new_user: z.boolean(),
+  notify_email: z.string().email(),
+});
+
 const DEFAULTS: Settings = {
   site_name: "NEX CARD",
   site_url: "https://nexcard.io",
@@ -37,7 +56,7 @@ const DEFAULTS: Settings = {
   notify_email: "admin@nexcard.io",
 };
 
-export async function getSettings(): Promise<Settings> {
+async function readFileSettings(): Promise<Settings> {
   try {
     if (!existsSync(SETTINGS_PATH)) return { ...DEFAULTS };
     const raw = await readFile(SETTINGS_PATH, "utf-8");
@@ -47,11 +66,70 @@ export async function getSettings(): Promise<Settings> {
   }
 }
 
-export async function updateSettings(partial: Partial<Settings>): Promise<Settings> {
-  const current = await getSettings();
-  const updated = { ...current, ...partial };
+async function writeFileSettings(settings: Settings): Promise<void> {
   const dir = join(process.cwd(), "data");
   if (!existsSync(dir)) await mkdir(dir, { recursive: true });
-  await writeFile(SETTINGS_PATH, JSON.stringify(updated, null, 2), "utf-8");
-  return updated;
+  await writeFile(SETTINGS_PATH, JSON.stringify(settings, null, 2), "utf-8");
+}
+
+async function readDbSettings(): Promise<Settings | null> {
+  if (!process.env.DATABASE_URL) return null;
+  try {
+    const prisma = (await import("@/lib/db/prisma")).default;
+    const row = await prisma.systemSetting.findUnique({
+      where: { key: SETTINGS_KEY },
+    });
+    if (!row?.value || typeof row.value !== "object") return null;
+    return { ...DEFAULTS, ...(row.value as Partial<Settings>) };
+  } catch {
+    return null;
+  }
+}
+
+async function writeDbSettings(settings: Settings): Promise<void> {
+  if (!process.env.DATABASE_URL) return;
+  try {
+    const prisma = (await import("@/lib/db/prisma")).default;
+    await prisma.systemSetting.upsert({
+      where: { key: SETTINGS_KEY },
+      create: { key: SETTINGS_KEY, value: settings },
+      update: { value: settings },
+    });
+  } catch (err) {
+    console.error("[settings] DB write failed — file fallback only", err);
+  }
+}
+
+export async function getSettings(): Promise<Settings> {
+  const fromDb = await readDbSettings();
+  if (fromDb) return fromDb;
+  return readFileSettings();
+}
+
+export async function updateSettings(
+  partial: Partial<Settings>
+): Promise<Settings> {
+  const current = await getSettings();
+  const merged = { ...current, ...partial };
+  const parsed = SettingsSchema.safeParse(merged);
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")
+    );
+  }
+  await writeDbSettings(parsed.data);
+  await writeFileSettings(parsed.data);
+  return parsed.data;
+}
+
+/** Sync helper for root layout maintenance check */
+export function getSettingsSyncFallback(): Settings {
+  try {
+    if (!existsSync(SETTINGS_PATH)) return { ...DEFAULTS };
+    const { readFileSync } = require("fs") as typeof import("fs");
+    const raw = readFileSync(SETTINGS_PATH, "utf-8");
+    return { ...DEFAULTS, ...JSON.parse(raw) };
+  } catch {
+    return { ...DEFAULTS };
+  }
 }

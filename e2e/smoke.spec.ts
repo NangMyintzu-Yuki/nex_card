@@ -37,4 +37,14 @@ test.describe("NEX CARD smoke tests", () => {
     const text = await res.text();
     expect(text).toContain("<urlset");
   });
+
+  test("forgot-password page loads", async ({ page }) => {
+    await page.goto("/forgot-password");
+    await expect(page.getByRole("heading", { name: /reset password/i })).toBeVisible();
+  });
+
+  test("health endpoint is ok", async ({ request }) => {
+    const res = await request.get("/api/health");
+    expect(res.ok()).toBeTruthy();
+  });
 });

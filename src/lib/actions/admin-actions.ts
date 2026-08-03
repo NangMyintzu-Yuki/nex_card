@@ -5,6 +5,9 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
+import { writeAuditLog } from "@/lib/audit";
+import { sendMail } from "@/lib/mail/mailer";
+import { paymentStatusHtml } from "@/lib/mail/templates";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -28,6 +31,27 @@ async function requireAdmin(): Promise<string | AdminActionState> {
     return { status: "error", message: "Unauthorized." };
   }
   return session.user.id;
+}
+
+async function notifyPaymentUser(
+  userId: string,
+  status: "APPROVED" | "REJECTED",
+  note?: string | null
+) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, name: true },
+    });
+    if (!user?.email) return;
+    await sendMail({
+      to: user.email,
+      subject: `NEX CARD payment ${status === "APPROVED" ? "approved" : "rejected"}`,
+      html: paymentStatusHtml(user.name, status, note),
+    });
+  } catch (err) {
+    console.error("[admin] payment notify failed", err);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -54,15 +78,17 @@ export async function approvePaymentAction(
   }
 
   const { paymentId } = parsed.data;
-
   const isRealDB = !!process.env.DATABASE_URL;
 
   try {
+    let userId: string | null = null;
+
     if (isRealDB) {
       await prisma.$transaction(async (tx) => {
         const payment = await tx.payment.findUnique({ where: { id: paymentId } });
         if (!payment) throw new Error("Payment not found");
         if (payment.status !== "PENDING") throw new Error("Payment is not pending");
+        userId = payment.userId;
 
         await tx.payment.update({
           where: { id: paymentId },
@@ -81,7 +107,10 @@ export async function approvePaymentAction(
     } else {
       const payment = await prisma.payment.findUnique({ where: { id: paymentId } });
       if (!payment) return { status: "error", message: "Payment not found." };
-      if (payment.status !== "PENDING") return { status: "error", message: "Payment is not pending." };
+      if (payment.status !== "PENDING") {
+        return { status: "error", message: "Payment is not pending." };
+      }
+      userId = payment.userId;
 
       await prisma.payment.update({
         where: { id: paymentId },
@@ -98,6 +127,15 @@ export async function approvePaymentAction(
       });
     }
 
+    await writeAuditLog({
+      actorId: adminId,
+      action: "payment.approve",
+      targetType: "Payment",
+      targetId: paymentId,
+    });
+
+    if (userId) void notifyPaymentUser(userId, "APPROVED");
+
     revalidatePath("/admin/payments");
     revalidatePath("/admin");
     revalidatePath("/dashboard");
@@ -105,12 +143,16 @@ export async function approvePaymentAction(
     return { status: "success", message: "Payment approved. User can now edit their profile." };
   } catch (err) {
     console.error("approvePaymentAction error:", err);
+    const msg = err instanceof Error ? err.message : "Failed to approve payment.";
+    if (msg.includes("not pending") || msg.includes("not found")) {
+      return { status: "error", message: msg };
+    }
     return { status: "error", message: "Failed to approve payment." };
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ACTION: REJECT PAYMENT
+// ACTION: REJECT PAYMENT (PENDING only)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const RejectInput = z.object({
@@ -135,14 +177,19 @@ export async function rejectPaymentAction(
   }
 
   const { paymentId, adminNote } = parsed.data;
-
   const isRealDB = !!process.env.DATABASE_URL;
 
   try {
+    let userId: string | null = null;
+
     if (isRealDB) {
       await prisma.$transaction(async (tx) => {
         const payment = await tx.payment.findUnique({ where: { id: paymentId } });
         if (!payment) throw new Error("Payment not found");
+        if (payment.status !== "PENDING") {
+          throw new Error("Only pending payments can be rejected");
+        }
+        userId = payment.userId;
 
         await tx.payment.update({
           where: { id: paymentId },
@@ -162,6 +209,10 @@ export async function rejectPaymentAction(
     } else {
       const payment = await prisma.payment.findUnique({ where: { id: paymentId } });
       if (!payment) return { status: "error", message: "Payment not found." };
+      if (payment.status !== "PENDING") {
+        return { status: "error", message: "Only pending payments can be rejected." };
+      }
+      userId = payment.userId;
 
       await prisma.payment.update({
         where: { id: paymentId },
@@ -179,6 +230,16 @@ export async function rejectPaymentAction(
       });
     }
 
+    await writeAuditLog({
+      actorId: adminId,
+      action: "payment.reject",
+      targetType: "Payment",
+      targetId: paymentId,
+      meta: adminNote ? { adminNote } : undefined,
+    });
+
+    if (userId) void notifyPaymentUser(userId, "REJECTED", adminNote);
+
     revalidatePath("/admin/payments");
     revalidatePath("/admin");
     revalidatePath("/dashboard");
@@ -186,6 +247,14 @@ export async function rejectPaymentAction(
     return { status: "success", message: "Payment rejected." };
   } catch (err) {
     console.error("rejectPaymentAction error:", err);
+    const msg = err instanceof Error ? err.message : "Failed to reject payment.";
+    if (
+      msg.includes("pending") ||
+      msg.includes("not found") ||
+      msg.includes("Only pending")
+    ) {
+      return { status: "error", message: msg };
+    }
     return { status: "error", message: "Failed to reject payment." };
   }
 }
@@ -217,7 +286,6 @@ export async function toggleUserStatusAction(
     return { status: "error", message: "Invalid status." };
   }
 
-  // Prevent admin from suspending themselves
   if (userId === adminId) {
     return { status: "error", message: "You cannot modify your own account." };
   }
@@ -225,7 +293,15 @@ export async function toggleUserStatusAction(
   try {
     await prisma.user.update({
       where: { id: userId },
-      data: { status: newStatus as any },
+      data: { status: newStatus as "ACTIVE" | "SUSPENDED" },
+    });
+
+    await writeAuditLog({
+      actorId: adminId,
+      action: "user.status",
+      targetType: "User",
+      targetId: userId,
+      meta: { status: newStatus },
     });
 
     revalidatePath("/admin/users");
@@ -272,6 +348,14 @@ export async function toggleTemplateAction(
       data: { [field]: value === "true" },
     });
 
+    await writeAuditLog({
+      actorId: adminId,
+      action: "template.toggle",
+      targetType: "Template",
+      targetId: templateId,
+      meta: { field, value: value === "true" },
+    });
+
     revalidatePath("/admin/templates");
     revalidatePath("/dashboard/onboarding");
 
@@ -288,9 +372,18 @@ export async function toggleTemplateAction(
 
 const UpdatePricesInput = z.object({
   templateId: z.string().min(1),
-  priceQrOnly: z.preprocess((v) => v === "" || v === null ? null : Number(v), z.number().nullable()),
-  priceNfcCard: z.preprocess((v) => v === "" || v === null ? null : Number(v), z.number().nullable()),
-  priceNfcQr: z.preprocess((v) => v === "" || v === null ? null : Number(v), z.number().nullable()),
+  priceQrOnly: z.preprocess(
+    (v) => (v === "" || v === null ? null : Number(v)),
+    z.number().nullable()
+  ),
+  priceNfcCard: z.preprocess(
+    (v) => (v === "" || v === null ? null : Number(v)),
+    z.number().nullable()
+  ),
+  priceNfcQr: z.preprocess(
+    (v) => (v === "" || v === null ? null : Number(v)),
+    z.number().nullable()
+  ),
 });
 
 export async function updateTemplatePricesAction(
@@ -321,6 +414,14 @@ export async function updateTemplatePricesAction(
         priceNfcCard,
         priceNfcQr,
       },
+    });
+
+    await writeAuditLog({
+      actorId: adminId,
+      action: "template.prices",
+      targetType: "Template",
+      targetId: templateId,
+      meta: { priceQrOnly, priceNfcCard, priceNfcQr },
     });
 
     revalidatePath("/admin/templates");

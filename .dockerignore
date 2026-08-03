@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.env
+.env.*
+!.env.example
+data
+src/lib/db/mock-db.json
+coverage
+playwright-report
+test-results
+*.md
+!docs/AUTH_UPGRADE.md

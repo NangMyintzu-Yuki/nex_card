@@ -113,6 +113,19 @@ export default async function QRProfilePage({ params }: PageProps) {
   }
 
   incrementQRScanCount(profile.id);
+  const { getSettings } = await import("@/lib/settings");
+  const settings = await getSettings();
+  if (settings.enable_analytics) {
+    const { headers } = await import("next/headers");
+    const { trackProfileEvent } = await import("@/lib/analytics/track");
+    const h = await headers();
+    trackProfileEvent({
+      profileId: profile.id,
+      type: "QR_SCAN",
+      referrer: h.get("referer"),
+      userAgent: h.get("user-agent"),
+    });
+  }
 
   const categorySlug = profile.category.slug as CategorySlug;
   const accentColor = profile.template.accentColor ?? undefined;
@@ -124,6 +137,7 @@ export default async function QRProfilePage({ params }: PageProps) {
         templateCode={profile.template.codeIdentifier}
         dynamicJsonData={profile.dynamicJsonData}
         accentColor={accentColor}
+        publicSlug={slug}
       />
     </Suspense>
   );

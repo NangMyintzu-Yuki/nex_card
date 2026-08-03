@@ -1,14 +1,5 @@
 // src/app/api/upload/route.ts
 // POST /api/upload — unified FormData upload for all storage drivers
-//
-// Set STORAGE_DRIVER in .env: local | r2 | cloudinary | supabase
-//
-// FormData fields:
-//   file   (required)
-//   folder (optional) — payments | avatars | gallery | logos | og-images
-//
-// Optional R2 presigned flow (advanced): JSON body when
-// STORAGE_DRIVER=r2 and STORAGE_R2_USE_PRESIGNED=true
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -22,6 +13,12 @@ import {
   ALLOWED_IMAGE_TYPES,
 } from "@/lib/storage";
 import { generateR2PresignedUrl } from "@/lib/storage/providers/r2";
+import { detectImageMime } from "@/lib/security/image-magic";
+import {
+  clientIp,
+  maybeCleanupRateLimits,
+  rateLimit,
+} from "@/lib/security/rate-limit";
 
 const PresignedUploadInput = z.object({
   contentType: z.string().min(1),
@@ -42,6 +39,19 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    maybeCleanupRateLimits();
+    const ip = clientIp(request);
+    const limited = rateLimit(`upload:${ip}`, 30, 60_000);
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: "Too many uploads. Please try again later." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(limited.retryAfterSec) },
+        }
+      );
+    }
+
     const session = await getServerSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -120,16 +130,29 @@ async function handleFormDataUpload(request: NextRequest, userId: string) {
     );
   }
 
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number])) {
-    return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
-  }
-
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
+  const detected = detectImageMime(buffer);
+  if (!detected) {
+    return NextResponse.json(
+      { error: "File content is not a valid image (JPEG, PNG, WebP, GIF, AVIF)." },
+      { status: 400 }
+    );
+  }
+
+  // Prefer magic-byte MIME over client-declared type
+  if (
+    file.type &&
+    ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number]) &&
+    file.type !== detected
+  ) {
+    // Mismatch is OK if both are allowed images — use detected
+  }
+
   const result = await uploadFile({
     buffer,
-    contentType: file.type,
+    contentType: detected,
     userId,
     folder,
     originalFilename: file.name,

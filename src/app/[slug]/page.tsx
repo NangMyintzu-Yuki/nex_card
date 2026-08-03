@@ -149,7 +149,20 @@ export default async function PublicProfilePage({ params }: PageProps) {
     );
   }
 
-  incrementProfileViewCount(profile.id);
+  const { getSettings } = await import("@/lib/settings");
+  const settings = await getSettings();
+  if (settings.enable_analytics) {
+    incrementProfileViewCount(profile.id);
+    const { headers } = await import("next/headers");
+    const { trackProfileEvent } = await import("@/lib/analytics/track");
+    const h = await headers();
+    trackProfileEvent({
+      profileId: profile.id,
+      type: "VIEW",
+      referrer: h.get("referer"),
+      userAgent: h.get("user-agent"),
+    });
+  }
 
   const categorySlug = profile.category.slug as CategorySlug;
   const data = profile.dynamicJsonData as Record<string, unknown>;
@@ -182,6 +195,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
           templateCode={profile.template.codeIdentifier}
           dynamicJsonData={profile.dynamicJsonData}
           accentColor={profile.template.accentColor}
+          publicSlug={slug}
         />
       </Suspense>
     </>

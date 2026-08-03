@@ -3,12 +3,13 @@ import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 import { daysUntil, formatEventDateTime, formatShortDate, formatTime, formatWeddingDate } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
+import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
 
-interface WeddingProps { data: WeddingInvitationData; accentColor?: string; }
+interface WeddingProps { data: WeddingInvitationData; accentColor?: string; slug?: string; }
 
 
-export function BlossomWedding({ data, accentColor = "#f472b6" }: WeddingProps) {
-  const { partner1, partner2, weddingDate, headline, loveHistory, events, gallery, rsvp, hashtag, coupleMessage } = data;
+export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingProps) {
+  const { partner1, partner2, weddingDate, headline, loveHistory, events, gallery, rsvp, hashtag, coupleMessage, allowWishes, wishesTitle } = data;
   const days = daysUntil(weddingDate);
 
   return (
@@ -183,6 +184,15 @@ export function BlossomWedding({ data, accentColor = "#f472b6" }: WeddingProps) 
       <footer className="border-t px-6 py-8 text-center" style={{ borderColor: `${accentColor}20` }}>
         <p className="text-sm" style={{ color: "#8b3254" }}>🌸 Made with NEX CARD 🌸</p>
       </footer>
+    
+      {slug && (
+        <section className="px-6 py-16 text-center">
+          <WeddingRsvpForm slug={slug} accentColor={accentColor} />
+          {allowWishes !== false && (
+            <WeddingGuestbookForm slug={slug} accentColor={accentColor} title={wishesTitle ?? "Leave a wish"} />
+          )}
+        </section>
+      )}
     </main>
   );
 }

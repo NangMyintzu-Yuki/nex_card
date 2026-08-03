@@ -60,6 +60,12 @@ export default async function AnalyticsPage() {
   const totalNfc    = profiles.reduce((s, p) => s + Number(p.nfcWriteCount ?? 0), 0);
   const published   = profiles.filter((p) => p.isPublished).length;
 
+  const { getProfileAnalyticsSummary } = await import("@/lib/analytics/track");
+  const series = await getProfileAnalyticsSummary(
+    profiles.map((p) => p.id),
+    30
+  );
+
   const STATS = [
     { label: "Total Views",       value: formatNumber(totalViews),  color: "#6366f1", emoji: "👁️"  },
     { label: "QR Scans",          value: formatNumber(totalScans),  color: "#f59e0b", emoji: "📱" },
@@ -92,6 +98,66 @@ export default async function AnalyticsPage() {
           </div>
         ))}
       </div>
+
+      {/* Daily series + referrers + devices (Phase C events) */}
+      {(series.daily.length > 0 || series.referrers.length > 0 || series.devices.length > 0) && (
+        <div className="mb-8 grid gap-4 lg:grid-cols-3">
+          <div className="rounded-2xl p-5 lg:col-span-2"
+            style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
+            <h2 className="mb-4 text-sm font-bold" style={{ color: "var(--nc-text)" }}>
+              Last 30 days
+            </h2>
+            <div className="space-y-2 max-h-64 overflow-y-auto text-xs font-mono">
+              {series.daily.length === 0 ? (
+                <p style={{ color: "var(--nc-text-3)" }}>No event data yet — views will appear here.</p>
+              ) : (
+                series.daily.map((d) => (
+                  <div key={d.day} className="flex justify-between gap-3" style={{ color: "var(--nc-text-2)" }}>
+                    <span>{d.day}</span>
+                    <span>
+                      {d.views} views · {d.qr} QR · {d.nfc} NFC
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="rounded-2xl p-5"
+              style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
+              <h2 className="mb-3 text-sm font-bold" style={{ color: "var(--nc-text)" }}>Top referrers</h2>
+              {series.referrers.length === 0 ? (
+                <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>None yet</p>
+              ) : (
+                <ul className="space-y-1 text-xs" style={{ color: "var(--nc-text-2)" }}>
+                  {series.referrers.map((r) => (
+                    <li key={r.host} className="flex justify-between gap-2">
+                      <span className="truncate">{r.host}</span>
+                      <span>{r.count}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="rounded-2xl p-5"
+              style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
+              <h2 className="mb-3 text-sm font-bold" style={{ color: "var(--nc-text)" }}>Devices</h2>
+              {series.devices.length === 0 ? (
+                <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>None yet</p>
+              ) : (
+                <ul className="space-y-1 text-xs" style={{ color: "var(--nc-text-2)" }}>
+                  {series.devices.map((d) => (
+                    <li key={d.device} className="flex justify-between gap-2">
+                      <span>{d.device}</span>
+                      <span>{d.count}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Profile breakdown */}
       <div className="overflow-hidden rounded-2xl"

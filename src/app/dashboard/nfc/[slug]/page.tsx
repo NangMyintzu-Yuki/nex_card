@@ -34,6 +34,7 @@ export default async function NfcPage({
       isPublished: true,
       nfcWriteCount: true,
       nfcProgrammedAt: true,
+      nfcFulfillment: true,
       paymentStatus: true,
       payment: { select: { tier: true, status: true } },
     },
@@ -53,6 +54,7 @@ export default async function NfcPage({
         nfcProgrammedAt: profile.nfcProgrammedAt?.toISOString() ?? null,
         paymentTier: profile.payment?.tier ?? null,
         paymentStatus: profile.paymentStatus,
+        nfcFulfillment: profile.nfcFulfillment,
       }}
       nfcUrl={nfcUrl}
     />

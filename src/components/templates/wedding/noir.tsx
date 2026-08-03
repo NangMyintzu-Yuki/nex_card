@@ -4,11 +4,12 @@ import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 
 import { daysUntil, formatEventDateTime, formatShortDate, formatTime, formatWeddingDate } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
-interface WeddingProps { data: WeddingInvitationData; accentColor?: string; }
+import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
+interface WeddingProps { data: WeddingInvitationData; accentColor?: string; slug?: string; }
 
 
-export function NoirWedding({ data, accentColor = "#ffffff" }: WeddingProps) {
-  const { partner1, partner2, weddingDate, headline, loveHistory, events, gallery, rsvp, hashtag, coupleMessage } = data;
+export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProps) {
+  const { partner1, partner2, weddingDate, headline, loveHistory, events, gallery, rsvp, hashtag, coupleMessage, allowWishes, wishesTitle } = data;
   const days = daysUntil(weddingDate);
 
   return (
@@ -142,6 +143,15 @@ export function NoirWedding({ data, accentColor = "#ffffff" }: WeddingProps) {
       <footer className="border-t border-white/5 px-6 py-8 text-center">
         <p className="text-xs text-white/15 uppercase tracking-widest">NEX CARD</p>
       </footer>
+    
+      {slug && (
+        <section className="px-6 py-16 text-center">
+          <WeddingRsvpForm slug={slug} accentColor={accentColor} />
+          {allowWishes !== false && (
+            <WeddingGuestbookForm slug={slug} accentColor={accentColor} title={wishesTitle ?? "Leave a wish"} />
+          )}
+        </section>
+      )}
     </main>
   );
 }

@@ -22,6 +22,15 @@ const PAYMENT_METHODS = {
     accountNumber: "09-123456789",
     phone: "09 123 456 789",
     details: "KBZPay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
+    deepLinkHint: "Open the KBZPay app → Transfer → enter the account above, then upload your screenshot.",
+  },
+  WavePay: {
+    label: "WavePay",
+    accountName: "NEX CARD",
+    accountNumber: "09-555123456",
+    phone: "09 555 123 456",
+    details: "WavePay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
+    deepLinkHint: "Open WavePay → Send Money → use the number above, then upload your transfer screenshot.",
   },
   AYAPay: {
     label: "AYA Pay",
@@ -29,8 +38,9 @@ const PAYMENT_METHODS = {
     accountNumber: "09-987654321",
     phone: "09 987 654 321",
     details: "AYA Pay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
+    deepLinkHint: "Complete the transfer in AYA Pay, then upload the confirmation screenshot.",
   },
-};
+} as const;
 
 const TIER_OPTIONS: {
   value: "QR_ONLY" | "NFC_CARD" | "PHYSICAL_CARD";
@@ -62,6 +72,7 @@ export function PaymentForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [paymentMethod, setPaymentMethod] = useState<keyof typeof PAYMENT_METHODS>("KBZPay");
+  const [transactionRef, setTransactionRef] = useState("");
   const [selectedTier, setSelectedTier] = useState<
     "QR_ONLY" | "NFC_CARD" | "PHYSICAL_CARD" | ""
   >(existingTier && (existingTier === "QR_ONLY" || existingTier === "NFC_CARD" || existingTier === "PHYSICAL_CARD")
@@ -117,6 +128,8 @@ export function PaymentForm({
     fd.append("tier", selectedTier);
     fd.append("amount", String(price));
     fd.append("screenshotUrl", screenshotUrl);
+    fd.append("method", paymentMethod);
+    if (transactionRef.trim()) fd.append("transactionRef", transactionRef.trim());
     submitPayment(fd);
   }
 
@@ -201,6 +214,26 @@ export function PaymentForm({
               <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].accountNumber}</span>
             </div>
           </div>
+          <p className="mt-3 text-xs" style={{ color: "var(--nc-text-3)" }}>
+            {PAYMENT_METHODS[paymentMethod].deepLinkHint}
+          </p>
+          <label className="mt-4 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>
+            Transaction reference (optional)
+            <input
+              value={transactionRef}
+              onChange={(e) => setTransactionRef(e.target.value)}
+              placeholder="e.g. Wave/KBZ txn id"
+              className="mt-1.5 w-full rounded-xl px-3 py-2 text-sm"
+              style={{
+                background: "var(--nc-bg)",
+                border: "1px solid var(--nc-border)",
+                color: "var(--nc-text)",
+              }}
+            />
+          </label>
+          <p className="mt-2 text-[11px]" style={{ color: "var(--nc-text-3)" }}>
+            Online wallet transfer + screenshot proof (fallback). Method is stored with your payment.
+          </p>
         </div>
       </section>
 

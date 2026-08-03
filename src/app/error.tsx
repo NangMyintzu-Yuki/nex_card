@@ -15,8 +15,10 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log to your error tracking service (Sentry, etc.)
     console.error("[GlobalError]", error);
+    void import("@/lib/observability").then(({ captureException }) =>
+      captureException(error, { digest: error.digest, source: "app/error" })
+    );
   }, [error]);
 
   return (

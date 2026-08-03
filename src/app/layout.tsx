@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { getServerSession } from "@/lib/auth/session";
 import { MaintenanceGuard } from "./_components/maintenance-guard";
+import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import "./globals.css";
 
 const inter = Inter({
@@ -62,6 +63,7 @@ const themeBootScript = `
 
 function isMaintenanceMode(): boolean {
   try {
+    // Sync file fallback — DB settings are hydrated via admin PUT into the same file
     const raw = readFileSync(join(process.cwd(), "data", "settings.json"), "utf-8");
     return JSON.parse(raw).maintenance_mode === true;
   } catch {
@@ -84,6 +86,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
       <body className={`${inter.className} antialiased`} style={{ background: "var(--nc-bg)" }}>
+        <RegisterServiceWorker />
         {maintenanceOn && !isAdmin ? (
           <MaintenanceGuard>{children}</MaintenanceGuard>
         ) : (

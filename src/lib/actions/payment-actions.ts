@@ -5,6 +5,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
+import { isOwnedPaymentScreenshotUrl } from "@/lib/security/payment-url";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -33,11 +34,11 @@ export type PaymentInfo = {
 const SubmitPaymentInput = z.object({
   profileId: z.string().min(1),
   tier: z.enum(["QR_ONLY", "NFC_CARD", "PHYSICAL_CARD"]),
-    amount: z.number().positive(),
-    // The upload route returns a local relative path (e.g. /uploads/payments/..),
-    // which is not a valid absolute URL. Accept any non-empty path/URL.
-    screenshotUrl: z.string().min(1, "Screenshot is required"),
-  });
+  amount: z.number().positive(),
+  screenshotUrl: z.string().min(1, "Screenshot is required"),
+  method: z.enum(["KBZPay", "WavePay", "AYAPay", "CBPay", "OTHER"]).default("KBZPay"),
+  transactionRef: z.string().max(120).optional().or(z.literal("")),
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SUBMIT PAYMENT ACTION
@@ -59,6 +60,8 @@ export async function submitPaymentAction(
       tier: formData.get("tier") as string,
       amount: Number(formData.get("amount")),
       screenshotUrl: formData.get("screenshotUrl") as string,
+      method: (formData.get("method") as string) || "KBZPay",
+      transactionRef: (formData.get("transactionRef") as string) || "",
     };
 
     const parsed = SubmitPaymentInput.safeParse(raw);
@@ -69,7 +72,16 @@ export async function submitPaymentAction(
       };
     }
 
-    const { profileId, tier, amount, screenshotUrl } = parsed.data;
+    const { profileId, tier, amount, screenshotUrl, method, transactionRef } =
+      parsed.data;
+
+    if (!isOwnedPaymentScreenshotUrl(screenshotUrl, userId)) {
+      return {
+        status: "error",
+        message:
+          "Invalid payment screenshot. Upload a new screenshot and try again.",
+      };
+    }
 
     // Verify profile belongs to user and template is premium
     const profile = await prisma.userProfile.findFirst({
@@ -122,6 +134,8 @@ export async function submitPaymentAction(
             userProfileId: profileId,
             tier: tier as any,
             amount,
+            method,
+            transactionRef: transactionRef || null,
             screenshotUrl,
             status: "PENDING",
           },
@@ -130,7 +144,12 @@ export async function submitPaymentAction(
         // Update profile payment status
         await tx.userProfile.update({
           where: { id: profileId },
-          data: { paymentStatus: "PENDING" },
+          data: {
+            paymentStatus: "PENDING",
+            ...(tier === "NFC_CARD" || tier === "PHYSICAL_CARD"
+              ? { nfcFulfillment: "PENDING_WRITE" as const }
+              : {}),
+          },
         });
       });
     } else {
@@ -146,6 +165,8 @@ export async function submitPaymentAction(
           userProfileId: profileId,
           tier,
           amount,
+          method,
+          transactionRef: transactionRef || null,
           screenshotUrl,
           status: "PENDING",
         },
@@ -153,7 +174,12 @@ export async function submitPaymentAction(
 
       await prisma.userProfile.update({
         where: { id: profileId },
-        data: { paymentStatus: "PENDING" },
+        data: {
+          paymentStatus: "PENDING",
+          ...(tier === "NFC_CARD" || tier === "PHYSICAL_CARD"
+            ? { nfcFulfillment: "PENDING_WRITE" as const }
+            : {}),
+        },
       });
     }
 
