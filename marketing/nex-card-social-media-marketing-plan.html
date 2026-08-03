@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEX CARD — 60-Day Facebook &amp; TikTok Marketing Plan</title>
+<style>
+  :root {
+    --gold-1: #c9973a;
+    --gold-2: #d4af37;
+    --gold-3: #e4c56a;
+    --ink: #0d0d0f;
+    --ink-2: #1b1b1f;
+    --paper: #ffffff;
+    --paper-2: #f7f5ef;
+    --line: #e6e1d3;
+    --muted: #8a7a5a;
+    --fb: #1877f2;
+    --tt: #00f2ea;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: #1c1a17;
+    background: var(--paper);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  @page { size: A4; margin: 14mm 12mm 16mm 12mm; }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    height: 297mm;
+    background: radial-gradient(1200px 600px at 50% -10%, #26221a 0%, var(--ink) 55%, var(--ink) 100%);
+    color: #f5f1e6;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover .band { position: absolute; inset: 0; opacity: .5; pointer-events: none;
+    background:
+      radial-gradient(600px 300px at 85% 15%, rgba(212,175,55,.14), transparent 70%),
+      radial-gradient(500px 300px at 10% 90%, rgba(212,175,55,.10), transparent 70%); }
+  .cover-inner { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 20mm; }
+  .cover .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 26mm; }
+  .cover .logo-mark { width: 44px; height: 44px; border: 1.5px solid var(--gold-2); display: flex; align-items: center; justify-content: center; color: var(--gold-2); font-weight: 800; font-size: 20px; border-radius: 8px; }
+  .cover .logo-name { font-weight: 800; letter-spacing: 4px; font-size: 20px; color: #fff; }
+  .cover .logo-tag { font-size: 10px; letter-spacing: 2px; color: var(--gold-3); margin-top: 2px; }
+  .cover h1 { font-size: 40px; line-height: 1.12; font-weight: 800; letter-spacing: .5px; }
+  .cover h1 .gold { color: var(--gold-2); }
+  .cover .sub { margin-top: 18px; font-size: 15px; color: #c9c2b0; max-width: 130mm; line-height: 1.6; }
+  .cover .meta { margin-top: 26mm; display: flex; flex-wrap: wrap; gap: 8px; }
+  .cover .meta span { border: 1px solid rgba(212,175,55,.4); color: var(--gold-3); padding: 6px 12px; border-radius: 20px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+  .cover .foot { position: absolute; bottom: 16mm; left: 20mm; right: 20mm; display: flex; justify-content: space-between; color: #6f685a; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; border-top: 1px solid rgba(212,175,55,.25); padding-top: 12px; }
+
+  /* ---------- HEADINGS ---------- */
+  .kicker { color: var(--gold-1); font-weight: 700; letter-spacing: 3px; text-transform: uppercase; font-size: 10px; }
+  h2.sect { font-size: 22px; font-weight: 800; color: var(--ink); margin: 4px 0 2px; }
+  h3.sub { font-size: 14px; font-weight: 700; color: var(--ink-2); margin: 18px 0 6px; }
+  .rule { height: 3px; width: 56px; background: linear-gradient(90deg, var(--gold-1), var(--gold-3)); margin: 10px 0 16px; border-radius: 2px; }
+  p.body { color: #3c3a35; margin-bottom: 10px; }
+  .lead { font-size: 13px; }
+
+  /* ---------- TABLE ---------- */
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; }
+  th { background: var(--ink); color: #f5f1e6; text-align: left; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 8px 9px; }
+  td { border: 1px solid var(--line); padding: 7px 9px; vertical-align: top; font-size: 11.5px; }
+  tr:nth-child(even) td { background: var(--paper-2); }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+  .tag.gold { background: #f4e9cd; color: #8a6a1c; }
+  .tag.fb { background: #e7f0ff; color: #0f5cc0; }
+  .tag.tt { background: #e0fbfa; color: #0b8d89; }
+  .tag.pre { background: #efe9f7; color: #5b3ea8; }
+  .tag.live { background: #e3f6ec; color: #137a46; }
+  .tag.vid { background: #fdeaea; color: #b3272b; }
+  .tag.img { background: #eef2f7; color: #33506f; }
+  .tag.car { background: #fdf3e0; color: #a15c00; }
+  .tag.reel { background: #e0fbfa; color: #0b8d89; }
+  .tag.story { background: #f1e7f7; color: #6d2d91; }
+
+  /* ---------- CARDS ---------- */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: var(--paper); }
+  .card.gold { border-left: 4px solid var(--gold-1); }
+  .card h4 { font-size: 12.5px; font-weight: 800; margin-bottom: 6px; }
+  .card p, .card li { font-size: 11.5px; color: #3c3a35; }
+  .card ul { padding-left: 16px; }
+  .card li { margin-bottom: 3px; }
+
+  /* ---------- SCRIPT BLOCK ---------- */
+  .script { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; page-break-inside: avoid; overflow: hidden; }
+  .script-head { background: var(--ink); color: #f5f1e6; padding: 9px 14px; font-weight: 700; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .script-head .who { color: var(--gold-3); font-weight: 600; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+  .script-body { padding: 12px 14px; }
+  .script-body .label { font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin: 8px 0 4px; }
+  .script-body .mm { color: #1c1a17; font-size: 11.5px; white-space: pre-line; }
+  .script-body .en { color: #6a675f; font-size: 10.5px; font-style: italic; white-space: pre-line; border-left: 2px solid var(--line); padding-left: 8px; }
+
+  .pillrow { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill { background: var(--paper-2); border: 1px solid var(--line); border-radius: 20px; padding: 4px 10px; font-size: 10.5px; color: #3c3a35; }
+
+  .note { background: #fdf8ea; border: 1px solid #ecd9a8; border-left: 4px solid var(--gold-1); border-radius: 8px; padding: 10px 14px; font-size: 11.5px; color: #5a4a22; margin: 10px 0; }
+  .pagehead { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 14px; }
+  .pagehead h2 { font-size: 20px; font-weight: 800; }
+  .pagehead .no { color: var(--gold-1); font-weight: 800; letter-spacing: 2px; }
+  .checkbox { list-style: none; }
+  .checkbox li { padding-left: 24px; position: relative; margin-bottom: 6px; }
+  .checkbox li::before { content: "☐"; position: absolute; left: 0; top: 0; color: var(--gold-1); font-size: 14px; }
+  .kpi-num { font-size: 26px; font-weight: 800; color: var(--ink); }
+  .kpi-sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .banner { background: linear-gradient(90deg, var(--ink), #2a2a30); color: #f5f1e6; border-radius: 10px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; margin: 14px 0; }
+  .banner .big { font-size: 20px; font-weight: 800; color: var(--gold-2); }
+  .banner .small { font-size: 11px; color: #c9c2b0; }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <div class="band"></div>
+  <div class="cover-inner">
+    <div class="logo">
+      <div class="logo-mark">N</div>
+      <div>
+        <div class="logo-name">NEX CARD</div>
+        <div class="logo-tag">DIGITAL IDENTITY &amp; CONNECTION</div>
+      </div>
+    </div>
+    <h1>60-Day Facebook &amp; TikTok<br><span class="gold">Social Media Marketing Plan</span></h1>
+    <p class="sub">Pre-launch build-up, launch week, and post-launch growth content calendar for NEX CARD — the digital name card platform for professionals, businesses, and weddings. Bilingual captions (Burmese + English) ready to schedule and post.</p>
+    <div class="meta">
+      <span>8 Weeks</span><span>60 Days</span><span>Facebook + TikTok</span><span>Pre &amp; Post Launch</span><span>MMK Market</span>
+    </div>
+  </div>
+  <div class="foot">
+    <span>Prepared by: Digital Marketing</span>
+    <span>NEX CARD · Confidential</span>
+  </div>
+</div>
+
+<!-- ================= CONTENTS ================= -->
+<div class="page">
+  <div class="pagehead"><h2>Table of Contents</h2><span class="no">NC-MKT-001</span></div>
+  <table>
+    <tr><th style="width:12%">Section</th><th>Contents</th></tr>
+    <tr><td>1</td><td>Executive Summary — goals, target audience, what we are selling</td></tr>
+    <tr><td>2</td><td>Brand &amp; Offer Overview — products, pricing tiers (QR / NFC / NFC+QR), template catalogue</td></tr>
+    <tr><td>3</td><td>Content Strategy — 6 content pillars, posting cadence, best times, format playbook</td></tr>
+    <tr><td>4</td><td>The 60-Day Calendar — day-by-day schedule (pre-launch &amp; post-launch)</td></tr>
+    <tr><td>5</td><td>Ready-to-Post Scripts — full Facebook captions &amp; TikTok scripts (EN + MM)</td></tr>
+    <tr><td>6</td><td>Hashtag Bank &amp; Captions — reusable hashtag sets per pillar</td></tr>
+    <tr><td>7</td><td>Visual &amp; Creative Guide — graphic/video assets needed per post type</td></tr>
+    <tr><td>8</td><td>Performance KPIs &amp; Tracking — what to measure weekly</td></tr>
+    <tr><td>9</td><td>Launch Checklist &amp; Promotion Mechanics — promos, reviews, paid boost</td></tr>
+  </table>
+
+  <div class="note"><b>How to use this document.</b> Section 4 is the master schedule — post the matching Facebook caption or TikTok script from Section 5 on the scheduled day. Keep the same brand voice: warm, confident, helpful, and local (Burmese-first, English second). Post at the recommended times and tag @nexcard on both platforms. Use the hashtag sets in Section 6 to expand reach.</div>
+</div>
+
+<!-- ================= 1. EXEC SUMMARY ================= -->
+<div class="page">
+  <div class="pagehead"><h2>1 · Executive Summary</h2><span class="no">SECTION 01</span></div>
+  <div class="banner">
+    <div>
+      <div class="small">PRIMARY GOAL FOR 60 DAYS</div>
+      <div class="big">1,200+ profile visits · 300+ early users · 60+ paid cards</div>
+    </div>
+    <div class="small" style="text-align:right">Facebook Reach + TikTok Views<br>drive signups &amp; QR/NFC card sales</div>
+  </div>
+
+  <h3 class="sub">What we are selling</h3>
+  <p class="body">NEX CARD is a platform where anyone creates a shareable digital identity page — a <b>digital name card</b>, a <b>personal portfolio</b>, a <b>business advertisement page</b>, or a <b>wedding invitation</b> — and shares it through a unique URL and a QR code. Premium pages unlock NFC cards (tap to share) and premium templates, with a one-time payment in MMK and admin-verified proof of payment.</p>
+
+  <h3 class="sub">Target audience (Myanmar market first)</h3>
+  <div class="grid2">
+    <div class="card gold"><h4>🎯 Audience 1 — Professionals</h4><p>Engineers, designers, freelancers, salespeople, agents who hand out paper cards and want a shareable digital card + QR.</p></div>
+    <div class="card"><h4>🎯 Audience 2 — SMEs &amp; Shop Owners</h4><p>Restaurants, salons, clinics, small traders who need a mobile business page, business hours, and promotions in one link.</p></div>
+    <div class="card"><h4>🎯 Audience 3 — Couples &amp; Event Planners</h4><p>Engaged couples wanting a digital wedding invitation page with RSVP-style milestones and photo gallery.</p></div>
+    <div class="card"><h4>🎯 Audience 4 — Job Seekers &amp; Creators</h4><p>Graduates and creators who need a portfolio page to link in their CV / TikTok bio.</p></div>
+  </div>
+
+  <h3 class="sub">Campaign phases</h3>
+  <table>
+    <tr><th>Phase</th><th>Weeks</th><th>Focus</th><th>Key Goal</th></tr>
+    <tr><td><span class="tag pre">Pre-Launch</span></td><td>W1–W2 (Day 1–14)</td><td>Teaser, education, waitlist, brand story</td><td>Build anticipation &amp; collect early signups</td></tr>
+    <tr><td><span class="tag gold">Launch</span></td><td>W3–W4 (Day 15–28)</td><td>Product reveal, features, templates, promo</td><td>Convert interest → first paid users</td></tr>
+    <tr><td><span class="tag live">Growth</span></td><td>W5–W8 (Day 29–56)</td><td>Social proof, case studies, offers, engagement</td><td>Scale reach, signups, and repeat users</td></tr>
+  </table>
+
+  <h3 class="sub">Cadence (weekly rhythm)</h3>
+  <table>
+    <tr><th>Platform</th><th>Post days</th><th>Best times (Myanmar Time, UTC+6:30)</th><th>Post types</th></tr>
+    <tr><td><b>Facebook</b></td><td>Mon · Wed · Fri · Sun</td><td>7:00–8:30 PM (peak) · Sun 9–11 AM</td><td>Carousel, image + long caption, reels, polls, live</td></tr>
+    <tr><td><b>TikTok</b></td><td>Tue · Thu · Sat (+ bonus)</td><td>12:00–1:00 PM &amp; 7:00–9:00 PM</td><td>15–35s video, trending audio, before/after, tutorial</td></tr>
+  </table>
+  <div class="note"><b>Rule of thumb:</b> Facebook = relationship &amp; conversion (captions carry the story). TikTok = reach &amp; awareness (hook in the first 2 seconds). Reuse the same topic on both platforms but reformat.</div>
+</div>
+
+<!-- ================= 2. BRAND & OFFER ================= -->
+<div class="page">
+  <div class="pagehead"><h2>2 · Brand &amp; Offer Overview</h2><span class="no">SECTION 02</span></div>
+
+  <h3 class="sub">The 4 categories we sell</h3>
+  <table>
+    <tr><th>Category</th><th>Who it's for</th><th>Sample templates</th></tr>
+    <tr><td><b>Digital Name Card</b></td><td>Professionals &amp; freelancers — one-page identity</td><td>Titanium · Prism · Obsidian · Coral · Aurora</td></tr>
+    <tr><td><b>Portfolio</b></td><td>Creators, developers, job seekers — work showcase</td><td>Canvas · Studio · Forge · Spectrum · Blueprint</td></tr>
+    <tr><td><b>Business Ad</b></td><td>SMEs &amp; shops — services, hours, promotions</td><td>Vault · Neon · Marquee · Empire · District</td></tr>
+    <tr><td><b>Wedding Invitation</b></td><td>Couples — digital invite, gallery, milestones</td><td>Rustic · Noir · Eternal · Celestial · Blossom</td></tr>
+  </table>
+
+  <h3 class="sub">Pricing tiers (one-time, MMK)</h3>
+  <table>
+    <tr><th>Tier</th><th>What the user gets</th><th>Marketing angle</th></tr>
+    <tr><td><b>QR Only</b></td><td>QR code for the digital page</td><td>"Free to scan, instant to share"</td></tr>
+    <tr><td><b>NFC Card</b></td><td>Physical NFC tap-to-share card</td><td>"Tap once — your whole identity transfers"</td></tr>
+    <tr><td><b>NFC + QR</b></td><td>NFC card with QR fallback</td><td>"Double the ways to connect" — flagship offer</td></tr>
+  </table>
+
+  <h3 class="sub">Key features to feature in content</h3>
+  <div class="grid2">
+    <div class="card"><h4>🔗 Unique URL / slug</h4><p>Every profile gets a clean link (yourname.nexcard) — put it in your TikTok bio.</p></div>
+    <div class="card"><h4>📱 NFC tap-to-share</h4><p>Tap the card on any NFC phone — opens the profile instantly.</p></div>
+    <div class="card"><h4>📊 QR scan analytics</h4><p>See how many times your card was scanned — proof it works.</p></div>
+    <div class="card"><h4>🎨 20 premium templates</h4><p>Four categories, five designs each — a look for every person and brand.</p></div>
+    <div class="card"><h4>💬 MMK one-time payment</h4><p>Simple, transparent, local-payment proof workflow.</p></div>
+    <div class="card"><h4>💒 Wedding pages</h4><p>Digital invitations with story, photos, and milestones.</p></div>
+  </div>
+
+  <h3 class="sub">Brand voice &amp; tone</h3>
+  <div class="card gold">
+    <p><b>Voice:</b> warm · confident · local · modern. Burmese-first, English second.</p>
+    <p style="margin-top:6px"><b>Always include:</b> a clear benefit, a call-to-action, one hashtag cluster (Section 6), and a branded visual.</p>
+    <p style="margin-top:6px"><b>Never:</b> hard-sell without value, post without an image/video, ignore comments, spam DMs.</p>
+  </div>
+</div>
+
+<!-- ================= 3. CONTENT STRATEGY ================= -->
+<div class="page">
+  <div class="pagehead"><h2>3 · Content Strategy</h2><span class="no">SECTION 03</span></div>
+
+  <h3 class="sub">Six content pillars (60% educational, 25% showcase, 15% social proof)</h3>
+  <table>
+    <tr><th>Pillar</th><th>Message</th><th>Example posts</th></tr>
+    <tr><td><b>P1 Education</b></td><td>Why digital cards beat paper</td><td>"ဒီကဒ် ဘာကြောင့် paper card ထက် သာလဲ?" / Why QR cards?</td></tr>
+    <tr><td><b>P2 Product Showcase</b></td><td>Features &amp; templates in action</td><td>Template tours, NFC demo, QR demo, before/after</td></tr>
+    <tr><td><b>P3 Social Proof</b></td><td>Real users, real results</td><td>Testimonials, case studies, scan-count screenshots</td></tr>
+    <tr><td><b>P4 Use Cases</b></td><td>Who needs NEX CARD</td><td>Agent, barista, salon, clinic, engaged couple</td></tr>
+    <tr><td><b>P5 Behind the Scenes</b></td><td>Team, values, build journey</td><td>Office, design process, "we built this"</td></tr>
+    <tr><td><b>P6 Offers &amp; Promos</b></td><td>Launch deal, referrals</td><td>Launch discount, refer-a-friend, limited cards</td></tr>
+  </table>
+
+  <h3 class="sub">Format playbook per platform</h3>
+  <div class="grid2">
+    <div class="card"><h4>Facebook formats</h4>
+      <ul>
+        <li><span class="tag img">IMAGE</span> Single stat card / quote (Mon)</li>
+        <li><span class="tag car">CAROUSEL</span> 3–6 slides how-it-works (Wed)</li>
+        <li><span class="tag reel">REEL</span> Reuse TikTok video (Fri)</li>
+        <li><span class="tag story">STORY</span> Poll / countdown / quiz (Sun)</li>
+      </ul>
+    </div>
+    <div class="card"><h4>TikTok formats</h4>
+      <ul>
+        <li><span class="tag vid">DEMO</span> 15–25s screen record + voiceover</li>
+        <li><span class="tag vid">TRANSITION</span> Paper card → digital card flip</li>
+        <li><span class="tag vid">TALK</span> Face-to-camera tips in Burmese</li>
+        <li><span class="tag vid">TREND</span> Trending audio + product overlay</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="sub">Hook library (first 2 seconds / first line)</h3>
+  <div class="pillrow">
+    <span class="pill">"Paper cards ကုန်ပြီလား?" (Out of paper cards?)</span>
+    <span class="pill">"QR တစ်ခုတည်းနဲ့ အကုန်မျှဝေလို့ရတယ်"</span>
+    <span class="pill">"ဒီကဒ် ဘယ်တော့မှ မပျောက်ဘူး"</span>
+    <span class="pill">"NFC tap = instant connect"</span>
+    <span class="pill">"လက်ကဒ် ၅၀ စုနေစရာ မလိုတော့ဘူး"</span>
+    <span class="pill">"Wait, your card can do THIS?"</span>
+    <span class="pill">"ဖိတ်စာတွေ online နဲ့ဖြန့်မယ်"</span>
+  </div>
+
+  <h3 class="sub">Content calendar weekly rhythm (repeatable skeleton)</h3>
+  <table>
+    <tr><th>Day</th><th>Pillar</th><th>Facebook</th><th>TikTok</th></tr>
+    <tr><td>Mon</td><td>Education</td><td>Stat card + long caption</td><td>—</td></tr>
+    <tr><td>Tue</td><td>Showcase</td><td>—</td><td>Template demo / transition</td></tr>
+    <tr><td>Wed</td><td>Use Case</td><td>Carousel "who needs this"</td><td>—</td></tr>
+    <tr><td>Thu</td><td>Education</td><td>—</td><td>Burmese talk / tip video</td></tr>
+    <tr><td>Fri</td><td>Social Proof</td><td>Testimonial / case study + Reel</td><td>—</td></tr>
+    <tr><td>Sat</td><td>Offer / BTS</td><td>—</td><td>Trend / BTS / promo video</td></tr>
+    <tr><td>Sun</td><td>Engagement</td><td>Story poll + recap post</td><td>—</td></tr>
+  </table>
+</div>
+
+<!-- ================= 4. 60-DAY CALENDAR ================= -->
+<div class="page">
+  <div class="pagehead"><h2>4 · The 60-Day Calendar</h2><span class="no">SECTION 04</span></div>
+  <div class="note"><b>Legend:</b> <span class="tag pre">PRE</span> Pre-launch · <span class="tag gold">LCH</span> Launch · <span class="tag live">GRO</span> Growth · <span class="tag fb">FB</span> Facebook · <span class="tag tt">TT</span> TikTok. Script numbers refer to Section 5.</div>
+
+  <h3 class="sub">Phase 1 — Pre-Launch (Week 1–2 · Day 1–14)</h3>
+  <table>
+    <tr><th>Day</th><th>Phase</th><th>Platform</th><th>Post</th><th>Caption theme / hook</th></tr>
+    <tr><td>1</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span>+<span class="tag tt">TT</span></td><td>Brand teaser — animated logo reveal</td><td>"Something new is coming for Myanmar." → Script S1</td></tr>
+    <tr><td>2</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>POV video: hand full of paper cards</td><td>"Paper cards again? No more." → S2</td></tr>
+    <tr><td>3</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>Stat card: "1 lost card = lost client"</td><td>Problem post: why digital cards win → S3</td></tr>
+    <tr><td>4</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>Duet/POV "meeting new client" clip</td><td>Show the awkward paper-card moment → S2 variant</td></tr>
+    <tr><td>5</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>Carousel: "5 reasons you need a digital card"</td><td>Education carousel → S4</td></tr>
+    <tr><td>6</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>Countdown graphic (12 days)</td><td>Anticipation + "tap bio link to join waitlist"</td></tr>
+    <tr><td>7</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>Story poll: "Do you still carry paper cards?"</td><td>Engagement + data collection</td></tr>
+    <tr><td>8</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>Team intro / behind the scenes</td><td>BTS: "we built NEX CARD" → S5</td></tr>
+    <tr><td>9</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>QR teaser image (scan me)</td><td>"Scan this — what happens?" → S6</td></tr>
+    <tr><td>10</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>QR scan transition video</td><td>Screen-rec: scan QR → profile opens</td></tr>
+    <tr><td>11</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>Carousel: categories preview (4 cards)</td><td>"Name card, Portfolio, Business, Wedding" → S7</td></tr>
+    <tr><td>12</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>Countdown (6 days) + waitlist reminder</td><td>"Launching soon — reserve your card"</td></tr>
+    <tr><td>13</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>"First 50 users" early-bird post</td><td>Announce launch promo → S8</td></tr>
+    <tr><td>14</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>Final countdown video (launch tomorrow)</td><td>High energy, trending audio</td></tr>
+  </table>
+</div>
+
+<div class="page">
+  <div class="pagehead"><h2>4 · The 60-Day Calendar (cont.)</h2><span class="no">SECTION 04</span></div>
+  <h3 class="sub">Phase 2 — Launch (Week 3–4 · Day 15–28)</h3>
+  <table>
+    <tr><th>Day</th><th>Phase</th><th>Platform</th><th>Post</th><th>Caption theme / hook</th></tr>
+    <tr><td>15</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span>+<span class="tag tt">TT</span></td><td>🚀 LAUNCH DAY — product reveal</td><td>"NEX CARD is LIVE" + promo code → S9</td></tr>
+    <tr><td>16</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>Demo: create a card in 60 seconds</td><td>Screen-rec how-it-works → S10</td></tr>
+    <tr><td>17</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>Carousel: "How it works" 5 steps</td><td>Register → choose → pay → get card → share</td></tr>
+    <tr><td>18</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>Template tour 1: Name cards (Titanium/Prism)</td><td>Flip through 5 name-card designs → S11</td></tr>
+    <tr><td>19</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>NFC card unboxing video</td><td>Physical card reveal → S12</td></tr>
+    <tr><td>20</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>NFC tap demo on iPhone/Android</td><td>"Tap — done. That's it."</td></tr>
+    <tr><td>21</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>Pricing explainer post (MMK)</td><td>Transparent pricing + promo → S13</td></tr>
+    <tr><td>22</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>Before/after: paper → digital card flip</td><td>Visual wow + CTA</td></tr>
+    <tr><td>23</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>Template tour 2: Portfolio (Canvas/Studio)</td><td>Portfolio showcase → S14</td></tr>
+    <tr><td>24</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>QR code on a drink menu / receipt</td><td>Real-world QR placement idea</td></tr>
+    <tr><td>25</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>Early user testimonial #1</td><td>First social proof → S15</td></tr>
+    <tr><td>26</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>Wedding invite template tour</td><td>Celestial / Eternal wedding pages → S16</td></tr>
+    <tr><td>27</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>FAQ post (payment proof flow)</td><td>"How does MMK payment work?" → S17</td></tr>
+    <tr><td>28</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>Trend audio + launch promo reminder</td><td>"Offer ends this weekend"</td></tr>
+  </table>
+</div>
+
+<div class="page">
+  <div class="pagehead"><h2>4 · The 60-Day Calendar (cont.)</h2><span class="no">SECTION 04</span></div>
+  <h3 class="sub">Phase 3 — Growth (Week 5–8 · Day 29–56)</h3>
+  <table>
+    <tr><th>Day</th><th>Phase</th><th>Platform</th><th>Post</th><th>Caption theme / hook</th></tr>
+    <tr><td>29</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Business Ad template tour (Neon/Empire)</td><td>Shop owners' spotlight → S18</td></tr>
+    <tr><td>30</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Case study: agent uses NFC card</td><td>"ပွဲမှာ ကဒ်ပေးစရာမလို" story</td></tr>
+    <tr><td>31</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Tip: put QR on your table / menu</td><td>Educational placement tips → S19</td></tr>
+    <tr><td>32</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Showcase: scan analytics counter</td><td>"My card got scanned 87 times"</td></tr>
+    <tr><td>33</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Testimonial #2 + photo</td><td>Real user quote card</td></tr>
+    <tr><td>34</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Salon/shop use-case mini-doc</td><td>Biz card for a beauty salon</td></tr>
+    <tr><td>35</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Story quiz + engagement post</td><td>"What's your card style?" quiz</td></tr>
+    <tr><td>36</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Trend: "POV you meet me" + card pop-up</td><td>Entertainment + brand</td></tr>
+    <tr><td>37</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Wedding use-case carousel</td><td>"Digital invitation, no more printing" → S20</td></tr>
+    <tr><td>38</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Freelancer portfolio tutorial</td><td>"Put NEX CARD in your TikTok bio"</td></tr>
+    <tr><td>39</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Poll: "Which template is your fav?"</td><td>Community pick → viral vote</td></tr>
+    <tr><td>40</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>BTS: printing NFC cards</td><td>Factory/process content</td></tr>
+    <tr><td>41</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Reel: 3 ways to share your card</td><td>QR, NFC, link — recap</td></tr>
+    <tr><td>42</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Case study: job seeker got hired</td><td>"ဒီကဒ်နဲ့ interview ရတယ်"</td></tr>
+    <tr><td>43</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>1-month stats recap post</td><td>Reach + signups milestone → S21</td></tr>
+    <tr><td>44</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Trend audio + customer reaction clip</td><td>UGC feel</td></tr>
+    <tr><td>45</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Business hours / shop feature carousel</td><td>Deep-dive: Business Ad category</td></tr>
+    <tr><td>46</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>"How to add your card to phone wallet" tip</td><td>Practical value video</td></tr>
+    <tr><td>47</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Testimonial #3 (wedding couple)</td><td>Emotional proof</td></tr>
+    <tr><td>48</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Gift idea: buy a card for someone</td><td>Shareable / gifting angle</td></tr>
+    <tr><td>49</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Comparison: paper card vs NEX CARD</td><td>Side-by-side carousel → S22</td></tr>
+    <tr><td>50</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Refer-a-friend promo announcement</td><td>Virality mechanic → S23</td></tr>
+    <tr><td>51</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Studio/Forge portfolio spotlight</td><td>Creator audience</td></tr>
+    <tr><td>52</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Q&amp;A video: most asked questions</td><td>Authority + trust</td></tr>
+    <tr><td>53</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Customer photo wall (UGC roundup)</td><td>Community love post</td></tr>
+    <tr><td>54</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Trend: desk setup + card on desk</td><td>Lifestyle reach</td></tr>
+    <tr><td>55</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>2-month recap + "what's next" teaser</td><td>Milestone + roadmap → S24</td></tr>
+    <tr><td>56</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Thank-you video + continued promo</td><td>Gratitude + next offer</td></tr>
+  </table>
+  <div class="note"><b>Week 8 repeat loop (Day 57–60):</b> reuse the highest-performing posts from Weeks 1–7 as re-runs — re-share Day 15 (launch), Day 20 (NFC), Day 32 (analytics), Day 50 (referral).</div>
+</div>
+
+<!-- ================= 5. SCRIPTS ================= -->
+<div class="page">
+  <div class="pagehead"><h2>5 · Ready-to-Post Scripts</h2><span class="no">SECTION 05</span></div>
+  <p class="body lead">Full captions for Facebook and scripts for TikTok. Burmese is the primary caption; English is below for international reach. Post time for each script is indicated.</p>
+
+  <div class="script">
+    <div class="script-head"><span>S1 · Launch Teaser</span><span class="who">Day 1 · FB+TT</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">ဟဲလို မြန်မာပြည် 👋
+တစ်ခုခု အသစ် လာနေပြီ။
+Paper card တွေ လက်ထဲ စုပြီး ပျောက်သွားတာတွေ၊ ဖုန်းနံပါတ်တောင်း မေ့သွားတာတွေ — အဲ့ဒါတွေ အကုန် အဆုံးသတ်ဖို့ လာပြီ။
+NEX CARD — မင်းရဲ့ digital identity တစ်ခုတည်း။
+🚀 ၁၅ ရက်အတွင်း launch မယ်။
+👉 ဒီ post ကို share ပြီး သူငယ်ချင်းတွေကို အသိပေးလိုက်နော်။</div>
+      <div class="label">English</div>
+      <div class="en">Hello Myanmar 👋 Something new is coming. Tired of losing paper cards and forgotten phone numbers? That ends now. NEX CARD — your one digital identity. 🚀 Launching in 15 days. Share this to spread the word!</div>
+      <div class="label">Asset</div>
+      <div class="mm">Animated logo reveal, gold-on-black, 15s TikTok + cover image for FB.</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S2 · Paper-Card Problem (POV)</span><span class="who">Day 2 / 4 · TT</span></div>
+    <div class="script-body">
+      <div class="label">TikTok script (15s)</div>
+      <div class="mm">[Scene: hand full of crumpled paper cards]
+Text: "ဒီကဒ် ၅၀ ထဲက တစ်ကဒ်ပဲ အလုပ်ဖြစ်တာ"
+Voiceover: Paper cards တွေ ပေးစရာကုန်သွားလား? ပျောက်သွားရင် client ပါ ပျောက်တယ်။
+[Transition: card flips into digital card with QR]
+NEX CARD — တစ်ကြိမ် scan, ထာဝရ မှတ်ဉာဏ်။</div>
+      <div class="label">English</div>
+      <div class="en">POV: you're out of paper cards. Lose the card, lose the client. One scan on NEX CARD and you're never forgotten.</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S3 · Problem Stat Card</span><span class="who">Day 3 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">📊 တစ်နှစ်မှာ ဖောက်သည် ၁၀ ယောက် ဆုံးရှုံးနေလား?
+Paper business card ပျောက်သွားတာနဲ့ အဆက်အသွယ် ပြတ်သွားတတ်ပါတယ်။
+NEX CARD ဆိုရင်တော့ —
+✅ QR နဲ့ ၁ စက္ကန့်အတွင်း share
+✅ Phone ထဲမှာ အမြဲ ရှိနေ
+✅ Scan တိုင်း မှတ်တမ်း ရှိ
+"ကဒ် ပျောက်ရင် client ပါ ပျောက်" — ဒီတစ်ခါတော့ မပျောက်တော့ဘူး။</div>
+      <div class="label">English</div>
+      <div class="en">Lost one card, lost one client. With NEX CARD your contact never disappears — scan, save, done.</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S4 · 5 Reasons Carousel</span><span class="who">Day 5 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">5 reasons မင်း digital business card လိုတယ် 👇
+1️⃣ ဘယ်တော့မှ မပျောက် — phone ထဲ အမြဲရှိ
+2️⃣ ၁ စက္ကန့်နဲ့ share — QR or NFC
+3️⃣ Portfolio / Business page ပါ တွဲထည့်လို့ရ
+4️⃣ Wedding invitation တောင် လုပ်လို့ရ
+5️⃣ Scan analytics — ဘယ်သူ ကြည့်လဲ သိရ
+👉 Swipe ကြည့်ပြီး comment မှာ "digital" လို့ ရိုက်ထားနော်။</div>
+      <div class="label">Asset</div>
+      <div class="mm">5-slide carousel, numbered, gold on black.</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S5 · Behind the Scenes</span><span class="who">Day 8 · TT</span></div>
+    <div class="script-body">
+      <div class="label">TikTok script (20s)</div>
+      <div class="mm">[B-Roll: code on screen, designs, coffee, team laughing]
+Text: "ဒါက ကျွန်တော်တို့ သုံးလအတွင်း တည်ဆောက်ထားတာ"
+Voiceover: QR တွေ၊ NFC ကဒ်တွေ၊ wedding page တွေ — အကုန် မြန်မာဈေးနဲ့။
+NEX CARD ကို မြန်မာ အတွက် လုပ်ထားတာပါ။
+Comment "ဖွင့်" ဆိုရင် launch ရက်ကို DM ပေးမယ်။</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S6 · QR Teaser</span><span class="who">Day 9 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">🔍 ဒီ QR ကို scan ကြည့်ပါ…
+ဘာဖြစ်မယ်ဆိုတာ မင်း မမျှော်လင့်ဘူး။
+NEX CARD — ဒီ QR လေးတွေက မင်း ဆက်သွယ်ရေးအတွက် သော့တွေပါ။
+Launch ရက် မရောက်ခင် အကြိုကြည့်ဖို့ comment "QR" ရိုက်ထားနော်။</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S7 · Category Preview</span><span class="who">Day 11 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">NEX CARD နဲ့ ၄ မျိုး ဖန်တီးလို့ရတယ် ✨
+1️⃣ Digital Name Card — ပရော်ဖက်ရှင်နယ် တစ်ယောက်အတွက်
+2️⃣ Portfolio — အနုပညာရှင် / developer တွေအတွက်
+3️⃣ Business Ad — ဆိုင်တွေ / လုပ်ငန်းတွေအတွက်
+4️⃣ Wedding Invitation — ခနဲ့မင်္ဂလာပွဲတွေအတွက်
+ဘယ်ဟာ မင်းနဲ့ ကိုက်လဲ? Comment မှာ ပြောသွားနော် 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S8 · Early-Bird Promo</span><span class="who">Day 13 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">🎁 EARLY BIRD — ပထမဆုံး ၅၀ ယောက်
+Launch ဖြစ်တဲ့နေ့ ပထမဆုံး စာရင်းသွင်းသူ ၅၀ ကို —
+✅ Free QR code (premium template)
+✅ NFC card discount
+✅ ၆လ အတွင်း အဆင့်မြှင့်ခွင့်
+👉 ဒီ post ကို share + comment "ME" လို့ ရိုက်ထားပါ။
+Launch နေ့ကို မှတ်ထားနော် ⏰</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="pagehead"><h2>5 · Ready-to-Post Scripts (cont.)</h2><span class="no">SECTION 05</span></div>
+
+  <div class="script">
+    <div class="script-head"><span>S9 · Launch Day</span><span class="who">Day 15 · FB+TT</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">🚀 OFFICIALLY LIVE!
+NEX CARD — မြန်မာပြည်ရဲ့ digital identity platform ကို စတင်လိုက်ပါပြီ။
+ဒီနေ့ကစပြီး —
+🎯 Digital Name Card
+🎯 Portfolio
+🎯 Business Ad
+🎯 Wedding Invitation
+အကုန်လုံး မင်း ဖန်တီးလို့ရပြီ။
+🎁 LAUNCH CODE: <b>NEX50</b> (50% off first 50 users)
+👉 Link in bio / comment "link" ရိုက်ထားပါ!</div>
+      <div class="label">English</div>
+      <div class="en">We're LIVE! Create your digital name card, portfolio, business page or wedding invite today. Use code NEX50 for the first 50 users. Link in bio!</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S10 · 60-Second Demo</span><span class="who">Day 16 · TT</span></div>
+    <div class="script-body">
+      <div class="label">TikTok script (30s)</div>
+      <div class="mm">[Screen recording voiceover]
+Step 1: Sign up (10s)
+Step 2: Choose category + template (10s)
+Step 3: Add your info & photo (15s)
+Step 4: Get your QR + link (5s)
+"ဒါလောက်ပဲ — ၁ မိနစ်မပြည့်ဘူး။"
+ဘာမှ download စရာမလို — browser ထဲမှာပဲ။
+Save ပြီး နောက်မှ လုပ်ကြည့်ပါ ✅</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S11 · Name Card Template Tour</span><span class="who">Day 18 · TT</span></div>
+    <div class="script-body">
+      <div class="label">TikTok script (20s)</div>
+      <div class="mm">[Flip through: Titanium → Prism → Obsidian → Coral → Aurora]
+Text: "ဘယ် design က မင်းနဲ့ ကိုက်လဲ?"
+Titanium — executive look
+Prism — creative colors
+Obsidian — minimal black
+Coral — warm & friendly
+Aurora — colorful gradient
+Comment the number! 1-5 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S12 · NFC Card Unboxing</span><span class="who">Day 19 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">📦 NEX CARD NFC — unboxing!
+ဒီကဒ်လေး မင်း ဖုန်းနဲ့ tap လိုက်ရင် — မင်းရဲ့ digital profile ကို ဖွင့်ပေးတယ်။
+✅ Premium material
+✅ Tap-to-share
+✅ QR fallback ပါ ပါတယ်
+Physical card နဲ့ digital — နှစ်မျိုးလုံး လိုချင်လား?
+Comment "NFC" ရိုက်ထားပါ 🖤</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S13 · Pricing Post</span><span class="who">Day 21 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">💰 အမြဲ ရှင်းရှင်းလင်းလင်း ဈေးနှုန်း
+NEX CARD မှာ နှစ်စဉ် fee မရှိ၊ hidden charge မရှိ — one-time payment သာ။
+▫️ QR Only — သက်သာဆုံး
+▫️ NFC Card — tap-to-share
+▫️ NFC + QR — အပြည့်စုံဆုံး (အကြံပြု)
+Payment က bank / Viber transfer နဲ့ MMK နဲ့ ပေးရတယ်။ Admin က proof စစ်ပြီး approve လုပ်ပေးပါတယ် — လုံခြုံပြီး transparent။
+ဘယ် tier လဲ? Comment 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S14 · Portfolio Tour</span><span class="who">Day 23 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">🎨 Job seeker တွေ / freelancer တွေအတွက် —
+Portfolio template တွေကို ကြည့်ပါ။
+Canvas · Studio · Forge · Spectrum · Blueprint
+မင်းရဲ့ work တွေ၊ skills တွေ၊ testimonials တွေ ပါ ထည့်လို့ရတယ်။
+👉 CV နဲ့တွဲပြီး link လုပ်လိုက်ရင် — "wow" ရတယ်။
+Comment "portfolio" ရိုက်ပြီး ဥပမာ ကြည့်လိုက်နော် ✨</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S15 · Testimonial #1</span><span class="who">Day 25 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">⭐ ပထမဆုံး user တစ်ယောက်ရဲ့ အမြင်
+"အရင်က ကဒ်တွေ အမြဲ ပျောက်တယ်။ အခု NEX CARD ဆို QR နဲ့ ၁ စက္ကန့်အတွင်း client တွေကို share လို့ရတယ်။ တကယ် ဝမ်းသာတယ်။"
+— ကိုအောင်မြင့်, Sales Agent
+မင်းလည်း ဒီလိုပဲ ခံစားချင်လား? Join us 👉 Link in bio</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S16 · Wedding Invitation</span><span class="who">Day 26 · TT</span></div>
+    <div class="script-body">
+      <div class="label">TikTok script (25s)</div>
+      <div class="mm">[Show Celestial wedding page: names, date, gallery]
+Text: "မင်္ဂလာဖိတ်စာ print လုပ်စရာ မလိုတော့ဘူး 😍"
+Voiceover: ဖိတ်စာ တစ်စောင် QR နဲ့ — ဧည့်သည်အားလုံး ဖုန်းထဲမှာ။
+Photos, story, milestone, date — အကုန်ပါ။
+Save this for your big day 💍</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S17 · Payment FAQ</span><span class="who">Day 27 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">❓ "Payment က ဘယ်လို လုပ်ရလဲ?"
+1️⃣ Tier ရွေးပါ
+2️⃣ Bank / Viber transfer (MMK)
+3️⃣ Screenshot upload လုပ်ပါ
+4️⃣ Admin က ၂၄နာရီအတွင်း verify
+5️⃣ Approve ဖြစ်တာနဲ့ ချက်ချင်း edit လို့ရ
+အဆင့်တိုင်း transparent — စိတ်ချရတယ် ✅
+More questions? Comment below 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S18 · Business Ad Tour</span><span class="who">Day 29 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">🏪 ဆိုင်ရှင်တွေအတွက် —
+NEX CARD Business Ad page
+✅ မင်းရဲ့ services
+✅ Business hours
+✅ ဈေးနှုန်း / promos
+✅ Map + contact
+✅ QR ကို ဆိုင်တံခါးမှာ ကပ်ထားရုံပဲ
+Templates: Vault · Neon · Marquee · Empire · District
+"ဆိုင်လေးရှိလား?" — Comment "shop" 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S19 · QR Placement Tips</span><span class="who">Day 31 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">📍 QR ကို ဘယ်မှာ ထားမလဲ? ၅ နေရာ
+1️⃣ ဆိုင်တံခါး / window
+2️⃣ Menu / ဘီလ်ပေါ်
+3️⃣ စားပွဲပေါ် (table stand)
+4️⃣ မင်းရဲ့ TikTok / FB bio
+5️⃣ Product packaging
+QR တစ်ခုတည်းနဲ့ — "scan now, contact saved forever."
+NEX CARD နဲ့ မင်း QR ရယူလိုက်ပါ ✅</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S20 · Wedding Use-Case</span><span class="who">Day 37 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">💍 Digital wedding invitation — ဘာလို့ သုံးသင့်လဲ?
+✅ Print စရာမလို — money & time save
+✅ ဧည့်သည်အားလုံးကို ၁ လင့်နဲ့ ဖိတ်လို့ရ
+✅ Photos & story တွေ ထည့်လို့ရ
+✅ QR တစ်ခု — တစ်အိမ်လုံး ဖတ်လို့ရ
+Couple တွေ အတွက် NEX CARD Wedding template 🎀
+မင်္ဂလာပွဲ ရှိလား? Comment "wedding" 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S21 · 1-Month Stats</span><span class="who">Day 43 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">📈 ၁ လအတွင်း — ဒီလောက် ဖြစ်လာပြီ!
+✅ Users: 300+
+✅ Cards created: 60+
+✅ QR scans: 1,200+
+✅ Templates live: 20
+ဒါ စတင်နေတုန်းပဲ — မင်းလည်း အခု join လုပ်လိုက်ရင် early-bird လို့ သတ်မှတ်ခံရမယ် 🚀
+👉 Link in bio</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S22 · Paper vs Digital</span><span class="who">Day 49 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption (carousel)</div>
+      <div class="mm">Paper Card 🔁 NEX CARD
+• ပျောက်တယ် → ဘယ်တော့မှ မပျောက်
+• ၅၀ ကဒ်စုရတယ် → ၁ ကဒ်နဲ့ ပြီး
+• Update လို့မရ → ၁ မိနစ်နဲ့ update
+• Scan count မသိ → analytics ရှိ
+• Print စရိတ် → one-time, ပိုသက်သာ
+"အချိန် ကျော်သွားပြီ — digital ကို ပြောင်းလိုက်ပါ"</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S23 · Refer-a-Friend</span><span class="who">Day 50 · TT+FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">🤝 Refer a friend — နှစ်ယောက်လုံး အကျိုးခံစားရမယ်!
+မင်း referral link ကနေ သူငယ်ချင်း sign up လုပ်ရင် —
+🎁 မင်း — နောက်တစ်ကြိမ် 20% off
+🎁 သူငယ်ချင်း — welcome bonus
+"မင်းရဲ့ သူငယ်ချင်းတွေလည်း ဒါလိုတယ်လေ"
+👉 Comment "refer" ဆိုရင် link ပေးမယ်!</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S24 · 2-Month Recap</span><span class="who">Day 55 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook caption</div>
+      <div class="mm">🎉 နှစ်လ ပြည့် — ကျေးဇူးတင်ပါတယ်!
+NEX CARD ကို ယုံကြည်ပြီး သုံးပေးတဲ့ user တိုင်းကို ရင်ထဲက ကျေးဇူးတင်ပါတယ် 🙏
+ဒီနှစ်လအတွင်း —
+• 500+ users
+• 120+ cards
+• 3,000+ scans
+နောက်လတွေမှာ — NFC mass-production, wedding template အသစ်တွေ၊ နဲ့ business packages လာမယ်။
+Stay tuned ✨ မင်းလည်း ပါဝင်ချင်လား? Link in bio!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 6. HASHTAGS ================= -->
+<div class="page">
+  <div class="pagehead"><h2>6 · Hashtag Bank</h2><span class="no">SECTION 06</span></div>
+  <p class="body">Use 3–5 per post. Combine a <b>brand</b> tag + a <b>theme</b> tag + a <b>local</b> tag + a <b>broad</b> tag.</p>
+  <table>
+    <tr><th>Purpose</th><th>Hashtags</th></tr>
+    <tr><td><b>Brand</b></td><td><span class="pill">#NexCard</span> <span class="pill">#NexCardMyanmar</span> <span class="pill">#NexCardMM</span></td></tr>
+    <tr><td><b>Local</b></td><td><span class="pill">#မြန်မာ</span> <span class="pill">#MyanmarBusiness</span> <span class="pill">#DigitalMyanmar</span> <span class="pill">#MyanmarStartup</span></td></tr>
+    <tr><td><b>Theme — cards</b></td><td><span class="pill">#DigitalBusinessCard</span> <span class="pill">#DigitalNameCard</span> <span class="pill">#BusinessCard</span> <span class="pill">#NFCCard</span></td></tr>
+    <tr><td><b>Theme — tech</b></td><td><span class="pill">#QRCode</span> <span class="pill">#TapToShare</span> <span class="pill">#DigitalTransformation</span> <span class="pill">#NFC</span></td></tr>
+    <tr><td><b>Theme — career</b></td><td><span class="pill">#Freelancer</span> <span class="pill">#JobSeeker</span> <span class="pill">#Portfolio</span> <span class="pill">#CareerTips</span></td></tr>
+    <tr><td><b>Theme — business</b></td><td><span class="pill">#SME</span> <span class="pill">#SmallBusiness</span> <span class="pill">#ShopOwner</span> <span class="pill">#Entrepreneur</span></td></tr>
+    <tr><td><b>Theme — wedding</b></td><td><span class="pill">#WeddingInvitation</span> <span class="pill">#မင်္ဂလာပွဲ</span> <span class="pill">#WeddingIdeas</span></td></tr>
+    <tr><td><b>Broad reach</b></td><td><span class="pill">#Tech</span> <span class="pill">#Innovation</span> <span class="pill">#FYP</span> <span class="pill">#ForYou</span></td></tr>
+  </table>
+
+  <h3 class="sub">Recommended combinations (copy-paste)</h3>
+  <div class="grid2">
+    <div class="card"><h4>Name card post</h4><p>#NexCard #DigitalBusinessCard #မြန်မာ #NFCCard #FYP</p></div>
+    <div class="card"><h4>Portfolio post</h4><p>#NexCard #Portfolio #Freelancer #JobSeeker #DigitalMyanmar</p></div>
+    <div class="card"><h4>Business post</h4><p>#NexCard #SME #SmallBusiness #QRCode #ShopOwner</p></div>
+    <div class="card"><h4>Wedding post</h4><p>#NexCard #WeddingInvitation #မင်္ဂလာပွဲ #WeddingIdeas</p></div>
+  </div>
+</div>
+
+<!-- ================= 7. CREATIVE GUIDE ================= -->
+<div class="page">
+  <div class="pagehead"><h2>7 · Visual &amp; Creative Guide</h2><span class="no">SECTION 07</span></div>
+
+  <h3 class="sub">Brand visual rules</h3>
+  <table>
+    <tr><th>Element</th><th>Guideline</th></tr>
+    <tr><td>Colors</td><td>Gold <b>#d4af37</b> + black <b>#0d0d0f</b> primary. Navy/white for light-mode variants. Keep every post on-brand.</td></tr>
+    <tr><td>Fonts</td><td>Bold sans for headlines, clean sans for body. Burmese font must render correctly (support Zawgyi/Unicode as needed).</td></tr>
+    <tr><td>Logo</td><td>Top-left or center on every graphic. Use the official NEX CARD logo.</td></tr>
+    <tr><td>QR demo</td><td>Always show a real, scannable NEX CARD QR in demos (people WILL scan it).</td></tr>
+    <tr><td>Text overlay</td><td>TikTok: text bottom-third, readable, 2–4 words per screen.</td></tr>
+  </table>
+
+  <h3 class="sub">Asset checklist to prepare (batch-create Week 0)</h3>
+  <table>
+    <tr><th>Asset</th><th>Qty</th><th>Use</th></tr>
+    <tr><td>Branded template mockups (all 20 templates)</td><td>20</td><td>Template tours S11/S14/S16/S18</td></tr>
+    <tr><td>Stat/quote cards (gold on black)</td><td>15</td><td>S3, S21, engagement posts</td></tr>
+    <tr><td>How-it-works carousel (5 steps)</td><td>1 set</td><td>Day 17</td></tr>
+    <tr><td>Screen-record demo clips (signup → card)</td><td>3</td><td>S10, Day 32</td></tr>
+    <tr><td>NFC card unboxing / tap demo video</td><td>2</td><td>S12, Day 20</td></tr>
+    <tr><td>Brand story / BTS clips</td><td>3</td><td>S5, Day 40</td></tr>
+    <tr><td>Testimonial graphics (user photo + quote)</td><td>5</td><td>S15, Day 25/33/47</td></tr>
+    <tr><td>Launch promo banner + countdowns</td><td>6</td><td>Days 6/12/13/14</td></tr>
+  </table>
+
+  <h3 class="sub">TikTok filming tips</h3>
+  <ul class="checkbox">
+    <li>Shoot vertical 9:16, 1080×1920, bright lighting.</li>
+    <li>Hook in the first 2 seconds (see Hook Library in Section 3).</li>
+    <li>Add captions for muted viewers — most watch without sound.</li>
+    <li>Use trending audio but keep the message local and clear.</li>
+    <li>End every video with one CTA: "Link in bio" or "Comment ____".</li>
+  </ul>
+</div>
+
+<!-- ================= 8. KPIs ================= -->
+<div class="page">
+  <div class="pagehead"><h2>8 · Performance KPIs &amp; Tracking</h2><span class="no">SECTION 08</span></div>
+
+  <h3 class="sub">Weekly KPI targets (cumulative by end of each phase)</h3>
+  <table>
+    <tr><th>Metric</th><th>Pre-Launch (W1–2)</th><th>Launch (W3–4)</th><th>Growth (W5–8)</th></tr>
+    <tr><td>Facebook Page reach</td><td>5,000</td><td>20,000</td><td>60,000</td></tr>
+    <tr><td>Facebook engagement (reactions+comments+shares)</td><td>400</td><td>2,000</td><td>6,000</td></tr>
+    <tr><td>TikTok views</td><td>10,000</td><td>50,000</td><td>150,000</td></tr>
+    <tr><td>Profile visits (unique URL / QR)</td><td>—</td><td>400</td><td>1,200</td></tr>
+    <tr><td>Signups</td><td>100 (waitlist)</td><td>200</td><td>500</td></tr>
+    <tr><td>Paid cards (QR/NFC/NFC+QR)</td><td>—</td><td>25</td><td>60</td></tr>
+  </table>
+
+  <h3 class="sub">Tools to track</h3>
+  <div class="grid2">
+    <div class="card"><h4>📊 Native insights</h4><p>Facebook Page Insights + TikTok Analytics — reach, views, followers, top posts. Review every Sunday.</p></div>
+    <div class="card"><h4>🔗 NEX CARD dashboard</h4><p>Profile view count + QR scan count per user — use real numbers in "stats" posts (S21, S24).</p></div>
+  </div>
+
+  <h3 class="sub">Weekly review routine (30 min, every Sunday evening)</h3>
+  <ul class="checkbox">
+    <li>Record reach, engagement, and clicks for the week in a tracker sheet.</li>
+    <li>Identify the top 2 posts — clone their style next week.</li>
+    <li>Check the calendar — prepare the next week's assets.</li>
+    <li>Reply to all comments &amp; DMs within 24 hours.</li>
+    <li>Adjust: if TikTok views low → shorten videos &amp; use trending audio.</li>
+  </ul>
+</div>
+
+<!-- ================= 9. CHECKLIST ================= -->
+<div class="page">
+  <div class="pagehead"><h2>9 · Launch Checklist &amp; Promotion Mechanics</h2><span class="no">SECTION 09</span></div>
+
+  <h3 class="sub">Before launch (Week 0)</h3>
+  <ul class="checkbox">
+    <li>Create &amp; verify Facebook Page and TikTok account (@nexcard).</li>
+    <li>Set up bio link (FB) and bio link/website (TikTok) to the live landing page.</li>
+    <li>Create the landing page waitlist / early-access signup.</li>
+    <li>Prepare 20 template mockups + brand kit (logo, colors, fonts).</li>
+    <li>Batch-produce Week 1–2 assets (Section 7 checklist).</li>
+    <li>Add "Message" CTA button on Facebook (WhatsApp/Page DM).</li>
+  </ul>
+
+  <h3 class="sub">Launch promotions</h3>
+  <table>
+    <tr><th>Mechanic</th><th>How</th><th>When</th></tr>
+    <tr><td>Early-bird code NEX50</td><td>50% off first 50 users</td><td>Days 13–21</td></tr>
+    <tr><td>Refer-a-friend</td><td>20% off next purchase + welcome bonus</td><td>From Day 50</td></tr>
+    <tr><td>Share-to-win</td><td>Tag 3 friends in comments → free NFC upgrade draw</td><td>Weekly (Fri)</td></tr>
+    <tr><td>Paid boost</td><td>Boost top 3 organic posts, target: Myanmar, 18–45, interests: business/tech</td><td>From Day 15</td></tr>
+  </table>
+
+  <h3 class="sub">Community management rules</h3>
+  <ul class="checkbox">
+    <li>Reply to every comment within 24 hours — speed builds trust.</li>
+    <li>Never delete negative feedback — respond professionally and fix it.</li>
+    <li>Collect testimonials: after each approved card, ask for a 1-line review + photo.</li>
+    <li>Encourage UGC: "Show us your card" monthly challenge.</li>
+  </ul>
+
+  <div class="note"><b>Final tip.</b> Consistency beats intensity. Posting 4×/week on Facebook and 3×/week on TikTok for 8 weeks — using this calendar — will establish NEX CARD as the go-to digital identity brand in Myanmar. Track, adapt, and always end with a clear CTA.</div>
+</div>
+
+</body>
+</html>

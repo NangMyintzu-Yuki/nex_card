@@ -10,10 +10,9 @@ import {
   Briefcase,
   Calendar,
   MapPin,
-  Image,
+  Image as ImageIcon,
   Package,
   FileText,
-  ExternalLink,
 } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
 
@@ -31,165 +30,210 @@ const PLATFORM_LABELS: Record<string, string> = {
   telegram: "Telegram", discord: "Discord", website: "Website",
 };
 
+/** Editorial section heading: small-caps kicker + serif title */
+function MagazineHeader({ kicker, title, accentColor }: { kicker: string; title: string; accentColor: string }) {
+  return (
+    <div className="mb-10">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.35em] mb-3" style={{ color: accentColor }}>
+        {kicker}
+      </p>
+      <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight text-stone-900">
+        {title}
+      </h2>
+      <div className="mt-5 flex items-center gap-3">
+        <div className="h-px w-12" style={{ background: accentColor }} />
+        <div className="h-px flex-1 bg-stone-200" />
+      </div>
+    </div>
+  );
+}
+
 export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
   const {
     fullName, headline, bio, avatarUrl, projects, skills, socialLinks,
-    contacts, testimonials, resumeUrl, experience, services, gallery, availabilityNote,
+    contacts, testimonials, resumeUrl, experience, services, gallery,
   } = data;
 
-  return (
-    <main className="min-h-screen bg-[#06080f] text-white font-sans selection:bg-violet-500/30 selection:text-white relative overflow-x-hidden">
-      {/* Blueprint grid background */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.04]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px',
-        }} />
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-violet-500/10 to-transparent" />
-        <div className="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-violet-500/10 to-transparent" />
-      </div>
+  const initials = fullName
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
 
-      <div className="relative z-10 mx-auto max-w-5xl px-4 py-10 sm:px-8 sm:py-16 space-y-14">
+  return (
+    <main className="min-h-screen bg-[#faf9f7] text-stone-900 font-sans selection:bg-violet-200 selection:text-stone-900 relative overflow-x-hidden">
+      <div className="mx-auto max-w-4xl px-5 py-10 sm:px-8 sm:py-16">
+
+        {/* ── MASTHEAD ── */}
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-stone-300 pb-5 mb-12">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center justify-center gap-1.5 text-[11px] font-bold tracking-[0.25em] text-stone-900">
+              <span className="h-2 w-2 rounded-full" style={{ background: accentColor }} />
+              PORTFOLIO
+            </span>
+          </div>
+          <div className="flex items-center gap-5 text-[10px] font-semibold uppercase tracking-[0.25em] text-stone-400">
+            <span>© {new Date().getFullYear()}</span>
+            <span>Volume I</span>
+          </div>
+        </header>
 
         {/* ── HERO ── */}
-        <section className="grid gap-8 lg:grid-cols-12 items-center">
-          <div className="lg:col-span-7 space-y-5">
+        <section className="mb-20">
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-stone-400 mb-6">
+            — Featured Profile
+          </p>
+          <h1 className="font-serif text-5xl sm:text-7xl font-medium leading-[1.02] tracking-tight text-stone-900">
+            {fullName}
+          </h1>
+          <p className="mt-5 text-lg sm:text-2xl font-light italic text-stone-500 leading-snug">
+            {headline}
+          </p>
+
+          <div className="mt-10 grid gap-10 lg:grid-cols-12">
             {avatarUrl && (
-              <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-violet-500/30 mb-2">
-                <img src={avatarUrl} alt={fullName} className="h-full w-full object-cover" />
+              <div className="lg:col-span-5">
+                <figure>
+                  <div className="aspect-[4/5] overflow-hidden bg-stone-200">
+                    <img src={avatarUrl} alt={fullName}
+                      className="h-full w-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-700" />
+                  </div>
+                  <figcaption className="mt-2 flex items-center justify-between text-[10px] font-medium uppercase tracking-[0.2em] text-stone-400">
+                    <span>Portrait</span>
+                    <span>Plate 01</span>
+                  </figcaption>
+                </figure>
               </div>
             )}
-            <div>
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-[1.08]">
-                {fullName}
-              </h1>
-              <p className="mt-2 text-base sm:text-lg font-semibold" style={{ color: accentColor }}>
-                {headline}
-              </p>
-            </div>
-            <p className="text-sm text-slate-400 leading-relaxed max-w-xl">
-              {bio}
-            </p>
-            <div className="flex flex-wrap gap-2.5 pt-1">
-              {resumeUrl && (
-                <a href={resumeUrl} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold transition-all hover:opacity-80"
-                  style={{ background: accentColor, color: '#06080f' }}>
-                  <FileText className="h-3.5 w-3.5" /> Resume <ExternalLink className="h-3 w-3" />
-                </a>
-              )}
-              {contacts.map((c, i) => (
-                <a key={i} href={cHref(c.type, c.value)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/80 px-3.5 py-2.5 text-xs font-semibold text-slate-400 hover:border-slate-700 hover:text-white transition-all">
-                  {c.type === "email" ? <Mail className="h-3.5 w-3.5" /> :
-                   c.type === "phone" ? <Phone className="h-3.5 w-3.5" /> :
-                   <Globe className="h-3.5 w-3.5" />}
-                  <span>{c.label || c.value}</span>
-                </a>
-              ))}
-            </div>
-          </div>
 
-          <div className="lg:col-span-5 space-y-3">
-            {socialLinks.length > 0 && (
-              <div className="rounded-2xl border border-slate-800/50 bg-slate-900/30 p-5 backdrop-blur-sm">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-600 mb-3">Connect</p>
-                <div className="flex flex-wrap gap-2">
+            <div className={`${avatarUrl ? "lg:col-span-7" : "lg:col-span-12"} space-y-6`}>
+              <p className="font-serif text-lg leading-relaxed text-stone-700 first-letter:text-5xl first-letter:font-serif first-letter:leading-none first-letter:mr-1 first-letter:float-left first-letter:mt-1 first-letter:font-bold">
+                {bio}
+              </p>
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                {resumeUrl && (
+                  <a href={resumeUrl} target="_blank" rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold text-white transition-all hover:opacity-90"
+                    style={{ background: accentColor }}>
+                    <FileText className="h-3.5 w-3.5" /> Read the Full CV
+                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </a>
+                )}
+                {contacts.map((c, i) => (
+                  <a key={i} href={cHref(c.type, c.value)}
+                    className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-3 text-xs font-semibold text-stone-600 hover:border-stone-400 hover:text-stone-900 transition-all">
+                    {c.type === "email" ? <Mail className="h-3.5 w-3.5" /> :
+                     c.type === "phone" ? <Phone className="h-3.5 w-3.5" /> :
+                     <Globe className="h-3.5 w-3.5" />}
+                    <span>{c.label || c.value}</span>
+                  </a>
+                ))}
+              </div>
+
+              {socialLinks.length > 0 && (
+                <div className="flex flex-wrap gap-x-6 gap-y-2 pt-4 border-t border-stone-200">
                   {socialLinks.map((s, i) => (
                     <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
-                      className="rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-1.5 text-[11px] font-semibold text-slate-500 hover:text-white hover:border-slate-700 transition-all">
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-500 hover:text-stone-900 transition-colors">
+                      <span className="h-1 w-1 rounded-full" style={{ background: accentColor }} />
                       {PLATFORM_LABELS[s.platform] ?? s.label ?? s.platform}
                     </a>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </section>
 
         {/* ── EXPERIENCE ── */}
         {experience && experience.length > 0 && (
-          <section>
-            <div className="flex items-center gap-4 mb-7">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-              <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-700">
-                <Briefcase className="h-3 w-3" style={{ color: accentColor }} /> Experience
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-            </div>
-            <div className="space-y-5">
+          <section className="mb-20">
+            <MagazineHeader accentColor={accentColor} kicker="Chapter 01" title="Professional History" />
+            <div className="space-y-0">
               {experience.map((e, i) => (
                 <div key={i}
-                  className="rounded-xl border border-slate-800/40 bg-slate-900/20 p-5 hover:border-slate-700/40 transition-all">
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1">
-                    <h3 className="font-bold text-white text-sm">{e.role}</h3>
-                    <span className="text-sm text-slate-600">@ {e.company}</span>
+                  className="group grid gap-3 sm:grid-cols-12 py-7 border-b border-stone-200 first:pt-0 last:border-b-0">
+                  <div className="sm:col-span-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-stone-400">
+                      {e.startDate}{e.endDate ? ` — ${e.endDate}` : " — Present"}
+                    </p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-700 mb-2">
-                    <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {e.startDate}{e.endDate ? ` — ${e.endDate}` : " — Present"}</span>
-                    {e.location && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {e.location}</span>}
+                  <div className="sm:col-span-9">
+                    <h3 className="font-serif text-xl text-stone-900 transition-colors group-hover:opacity-70">
+                      {e.role}
+                    </h3>
+                    <p className="mt-0.5 text-sm font-semibold" style={{ color: accentColor }}>
+                      {e.company}
+                      {e.location && <span className="font-normal text-stone-400"> · {e.location}</span>}
+                    </p>
+                    {e.description && (
+                      <p className="mt-2 text-sm leading-relaxed text-stone-500 max-w-2xl">{e.description}</p>
+                    )}
                   </div>
-                  {e.description && <p className="text-xs text-slate-500 leading-relaxed">{e.description}</p>}
                 </div>
               ))}
             </div>
           </section>
         )}
 
-        {/* ── PROJECTS ── */}
+        {/* ── SELECTED WORKS ── */}
         {projects.length > 0 && (
-          <section>
-            <div className="flex items-center gap-4 mb-7">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-              <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-700">
-                <Package className="h-3 w-3" style={{ color: accentColor }} /> Projects
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-            </div>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {projects.map((p) => (
-                <div key={p.id}
-                  className="group rounded-xl border border-slate-800/40 bg-slate-900/20 overflow-hidden hover:border-slate-700/40 transition-all">
+          <section className="mb-20">
+            <MagazineHeader accentColor={accentColor} kicker="Chapter 02" title="Selected Works" />
+            <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2">
+              {projects.map((p, i) => (
+                <article key={p.id} className="group">
                   {p.coverImageUrl ? (
-                    <div className="relative aspect-video overflow-hidden bg-slate-900">
+                    <div className="aspect-[4/3] overflow-hidden bg-stone-200">
                       <img src={p.coverImageUrl} alt={p.title}
-                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#06080f] via-transparent to-transparent" />
+                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                     </div>
                   ) : (
-                    <div className="aspect-video flex items-center justify-center bg-slate-900/60">
-                      <Image className="h-7 w-7 text-slate-800" />
+                    <div className="aspect-[4/3] flex items-center justify-center bg-stone-100">
+                      <ImageIcon className="h-8 w-8 text-stone-300" />
                     </div>
                   )}
-                  <div className="p-4 space-y-2.5">
-                    <div className="flex flex-wrap gap-1">
-                      {p.tags.map((t, idx) => (
-                        <span key={idx} className="rounded-md border border-slate-800 bg-slate-900/60 px-2 py-0.5 text-[9px] font-semibold text-slate-600">
-                          {t}
-                        </span>
-                      ))}
+                  <div className="mt-4 flex items-start justify-between gap-4">
+                    <div>
+                      <div className="flex flex-wrap gap-2 mb-1.5">
+                        {p.tags.slice(0, 3).map((t, idx) => (
+                          <span key={idx} className="text-[10px] font-semibold uppercase tracking-[0.15em] text-stone-400">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                      <h3 className="font-serif text-xl text-stone-900 group-hover:opacity-70 transition-opacity">
+                        {p.title}
+                      </h3>
+                      {p.description && (
+                        <p className="mt-1.5 text-xs leading-relaxed text-stone-500 line-clamp-2">{p.description}</p>
+                      )}
                     </div>
-                    <h3 className="font-bold text-sm text-white">{p.title}</h3>
-                    {p.description && <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">{p.description}</p>}
-                    <div className="flex items-center gap-3 pt-1 text-[11px]">
+                    <span className="font-serif text-2xl font-light text-stone-300 shrink-0">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  {(p.liveUrl || p.caseStudyUrl) && (
+                    <div className="mt-3 flex items-center gap-5">
                       {p.liveUrl && (
                         <a href={p.liveUrl} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 font-semibold hover:opacity-70 transition-opacity"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.15em] hover:opacity-70 transition-opacity"
                           style={{ color: accentColor }}>
-                          Live <ArrowUpRight className="h-3 w-3" />
+                          View Project <ArrowUpRight className="h-3 w-3" />
                         </a>
                       )}
                       {p.caseStudyUrl && (
                         <a href={p.caseStudyUrl} target="_blank" rel="noopener noreferrer"
-                          className="text-slate-700 hover:text-slate-400 transition-colors">Case Study ↗</a>
+                          className="text-xs font-semibold uppercase tracking-[0.15em] text-stone-400 hover:text-stone-700 transition-colors">
+                          Case Study
+                        </a>
                       )}
                     </div>
-                  </div>
-                </div>
+                  )}
+                </article>
               ))}
             </div>
           </section>
@@ -197,46 +241,34 @@ export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
 
         {/* ── SERVICES ── */}
         {services && services.length > 0 && (
-          <section>
-            <div className="flex items-center gap-4 mb-7">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-              <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-700">
-                <Package className="h-3 w-3" style={{ color: accentColor }} /> Services
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <section className="mb-20">
+            <MagazineHeader accentColor={accentColor} kicker="Chapter 03" title="What I Offer" />
+            <div className="grid gap-x-8 gap-y-8 sm:grid-cols-2">
               {services.map((s, i) => (
-                <div key={i}
-                  className="rounded-xl border border-slate-800/30 bg-slate-900/10 p-5 hover:border-slate-700/30 transition-all">
-                  <h3 className="font-bold text-sm text-white mb-1.5">{s.title}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">{s.description}</p>
+                <div key={i} className="border-l-2 pl-5" style={{ borderColor: `${accentColor}55` }}>
+                  <p className="font-serif text-3xl font-light text-stone-200">{String(i + 1).padStart(2, "0")}</p>
+                  <h3 className="font-serif text-lg text-stone-900 mt-1">{s.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-stone-500">{s.description}</p>
                 </div>
               ))}
             </div>
           </section>
         )}
 
-        {/* ── SKILLS ── */}
+        {/* ── EXPERTISE ── */}
         {skills.length > 0 && (
-          <section>
-            <div className="flex items-center gap-4 mb-7">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-              <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-700">
-                <Image className="h-3 w-3" style={{ color: accentColor }} /> Skills
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <section className="mb-20">
+            <MagazineHeader accentColor={accentColor} kicker="Chapter 04" title="Areas of Expertise" />
+            <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
               {skills.map((g, i) => (
-                <div key={i} className="rounded-xl border border-slate-800/30 bg-slate-900/10 p-4">
-                  <p className="mb-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: `${accentColor}99` }}>
+                <div key={i}>
+                  <h3 className="text-xs font-bold uppercase tracking-[0.25em] mb-3" style={{ color: accentColor }}>
                     {g.category}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
+                  </h3>
+                  <div className="flex flex-wrap gap-x-4 gap-y-2">
                     {g.items.map((item, j) => (
-                      <span key={j}
-                        className="rounded-md border border-slate-800 bg-slate-900/60 px-2 py-0.5 text-[11px] text-slate-500">
+                      <span key={j} className="text-sm text-stone-600 flex items-center gap-2">
+                        <span className="h-1 w-1 rounded-full bg-stone-300" />
                         {item}
                       </span>
                     ))}
@@ -249,76 +281,74 @@ export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
 
         {/* ── GALLERY ── */}
         {gallery && gallery.length > 0 && (
-          <section>
-            <div className="flex items-center gap-4 mb-7">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-              <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-700">
-                <Image className="h-3 w-3" style={{ color: accentColor }} /> Gallery
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-            </div>
-            <div className="grid gap-2.5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+          <section className="mb-20">
+            <MagazineHeader accentColor={accentColor} kicker="Chapter 05" title="Portfolio Plates" />
+            <div className="columns-2 sm:columns-3 gap-3 [&>*]:mb-3">
               {gallery.map((img, i) => (
-                <div key={i} className="group relative aspect-square overflow-hidden rounded-lg bg-slate-900 border border-slate-800/30">
-                  <img src={img.url} alt={img.alt ?? `Gallery ${i + 1}`}
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all" />
+                <div key={i} className="break-inside-avoid overflow-hidden bg-stone-100 group">
+                  <img src={img.url} alt={img.alt ?? `Plate ${i + 1}`}
+                    className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                 </div>
               ))}
             </div>
           </section>
         )}
 
-        {/* ── TESTIMONIALS ── */}
+        {/* ── PRAISE ── */}
         {testimonials && testimonials.length > 0 && (
-          <section>
-            <div className="flex items-center gap-4 mb-7">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-              <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-700">
-                <Quote className="h-3 w-3" style={{ color: accentColor }} /> Testimonials
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              {testimonials.slice(0, 4).map((t, i) => (
-                <div key={i} className="rounded-xl border border-slate-800/30 bg-slate-900/10 p-5 flex flex-col justify-between">
-                  <p className="text-sm text-slate-400 italic leading-relaxed">&ldquo;{t.text}&rdquo;</p>
-                  <div className="mt-4 flex items-center gap-3 pt-3 border-t border-slate-800/40">
+          <section className="mb-20">
+            <MagazineHeader accentColor={accentColor} kicker="Chapter 06" title="In Their Words" />
+            <div className="space-y-10">
+              {testimonials.slice(0, 3).map((t, i) => (
+                <figure key={i} className="border-l-2 pl-6 sm:pl-10" style={{ borderColor: accentColor }}>
+                  <Quote className="h-6 w-6 mb-3" style={{ color: `${accentColor}55` }} />
+                  <blockquote className="font-serif text-xl sm:text-2xl leading-relaxed text-stone-800">
+                    &ldquo;{t.text}&rdquo;
+                  </blockquote>
+                  <figcaption className="mt-4 flex items-center gap-3">
                     {t.avatarUrl ? (
-                      <div className="relative h-8 w-8 overflow-hidden rounded-full border border-slate-700 shrink-0">
+                      <div className="relative h-10 w-10 overflow-hidden rounded-full border border-stone-300 shrink-0">
                         <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     ) : (
-                      <div className="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-white text-[10px] shrink-0">
+                      <div className="h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+                        style={{ background: accentColor }}>
                         {t.author.slice(0, 2).toUpperCase()}
                       </div>
                     )}
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-white truncate">{t.author}</p>
-                      <p className="text-[10px] text-slate-700 truncate">
+                    <div>
+                      <p className="text-sm font-bold text-stone-900">{t.author}</p>
+                      <p className="text-xs text-stone-400">
                         {t.role}{t.company && ` · ${t.company}`}
                       </p>
                     </div>
-                  </div>
-                </div>
+                  </figcaption>
+                </figure>
               ))}
             </div>
           </section>
         )}
 
-        {/* ── FOOTER ── */}
-        <footer className="border-t border-slate-800/40 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex flex-wrap gap-3">
-            {socialLinks.map((s, i) => (
-              <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
-                className="text-[11px] font-semibold text-slate-700 hover:text-slate-300 transition-colors">
-                {PLATFORM_LABELS[s.platform] ?? s.label ?? s.platform}
-              </a>
-            ))}
-          </div>
-          <div className="flex items-center gap-4 text-[10px] text-slate-800">
-            <span>© {new Date().getFullYear()} {fullName}</span>
-            <span className="font-mono tracking-widest">BLUEPRINT</span>
+        {/* ── COLOPHON ── */}
+        <footer className="border-t border-stone-300 pt-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div>
+              <p className="font-serif text-2xl text-stone-900">{fullName}</p>
+              <p className="mt-1 text-xs text-stone-500">{headline}</p>
+            </div>
+            <div className="flex flex-col items-start sm:items-end gap-3">
+              <div className="flex flex-wrap gap-x-5 gap-y-2">
+                {socialLinks.map((s, i) => (
+                  <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+                    className="text-xs font-semibold text-stone-500 hover:text-stone-900 transition-colors">
+                    {PLATFORM_LABELS[s.platform] ?? s.label ?? s.platform}
+                  </a>
+                ))}
+              </div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-stone-400">
+                Portfolio · {new Date().getFullYear()}
+              </p>
+            </div>
           </div>
         </footer>
 

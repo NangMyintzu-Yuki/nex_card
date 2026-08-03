@@ -10,16 +10,12 @@ import {
   Globe,
   Star,
   ChevronDown,
-  CheckCircle2,
+  Check,
   ArrowRight,
-  Sparkles,
-  Building2,
-  ExternalLink,
-  Send,
   Menu,
   X,
-  ArrowUpRight,
-  Layers,
+  ExternalLink,
+  Zap,
   Linkedin,
   Facebook,
   Instagram,
@@ -45,124 +41,54 @@ function cHref(type: string, value: string) {
 
 function ContactIcon({ type }: { type: string }) {
   switch (type.toLowerCase()) {
-    case "email":
-      return <Mail className="h-4 w-4" />;
-    case "phone":
-      return <Phone className="h-4 w-4" />;
-    case "website":
-      return <Globe className="h-4 w-4" />;
-    case "address":
-      return <MapPin className="h-4 w-4" />;
-    default:
-      return <Send className="h-4 w-4" />;
+    case "email": return <Mail className="h-4 w-4" />;
+    case "phone": return <Phone className="h-4 w-4" />;
+    case "website": return <Globe className="h-4 w-4" />;
+    case "address": return <MapPin className="h-4 w-4" />;
+    default: return <SendGlow />;
   }
 }
 
-/* Custom SVG Icons for platforms not available in standard Lucide sets */
-function TelegramIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.69-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.75 3.99-1.73 6.66-2.87 8.01-3.43 3.81-1.58 4.6-1.86 5.12-1.86.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.13-.03.22z" />
-    </svg>
-  );
-}
-
-function ViberIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19.38 4.62C17.42 2.66 14.82 1.58 12 1.58c-5.75 0-10.42 4.67-10.42 10.42 0 1.84.48 3.63 1.39 5.21L1.58 22.42l5.35-1.4c1.53.84 3.26 1.28 5.07 1.28 5.75 0 10.42-4.67 10.42-10.42 0-2.82-1.08-5.42-3.04-7.26zm-7.38 15.66c-1.58 0-3.13-.42-4.48-1.22l-.32-.19-3.33.87.89-3.24-.21-.33a8.38 8.38 0 0 1-1.28-4.48c0-4.65 3.78-8.43 8.43-8.43 2.25 0 4.37.88 5.96 2.47 1.59 1.59 2.47 3.71 2.47 5.96 0 4.65-3.78 8.43-8.43 8.43zm4.62-6.32c-.25-.13-1.5-.74-1.73-.82-.23-.08-.4-.13-.57.13-.17.25-.66.82-.81.99-.15.17-.3.19-.55.06-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.44-.06-.13-.57-1.37-.78-1.88-.2-.49-.41-.42-.57-.43-.15-.01-.32-.01-.49-.01-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.43 1.03 2.6.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.5-.61 1.71-1.2.21-.59.21-1.1.15-1.2-.06-.1-.23-.17-.48-.3z" />
-    </svg>
-  );
-}
-
-function TikTokIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.66a6.34 6.34 0 0 0 10.86 4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-3.04-1.12z" />
-    </svg>
-  );
+function SendGlow() {
+  return <Share2 className="h-4 w-4" />;
 }
 
 function SocialIcon({ platform = "", url = "" }: { platform?: string; url?: string }) {
   const target = (platform || url).toLowerCase();
-
-  if (target.includes("facebook") || target.includes("fb")) {
-    return <Facebook className="h-4 w-4" />;
-  }
-  if (target.includes("viber")) {
-    return <ViberIcon className="h-4 w-4" />;
-  }
-  if (target.includes("telegram") || target.includes("t.me")) {
-    return <TelegramIcon className="h-4 w-4" />;
-  }
-  if (target.includes("tiktok")) {
-    return <TikTokIcon className="h-4 w-4" />;
-  }
-  if (target.includes("linkedin")) {
-    return <Linkedin className="h-4 w-4" />;
-  }
-  if (target.includes("instagram")) {
-    return <Instagram className="h-4 w-4" />;
-  }
-  if (target.includes("twitter") || target.includes("x.com")) {
-    return <Twitter className="h-4 w-4" />;
-  }
-  if (target.includes("youtube") || target.includes("youtu.be")) {
-    return <Youtube className="h-4 w-4" />;
-  }
-
+  if (target.includes("facebook") || target.includes("fb")) return <Facebook className="h-4 w-4" />;
+  if (target.includes("linkedin")) return <Linkedin className="h-4 w-4" />;
+  if (target.includes("instagram")) return <Instagram className="h-4 w-4" />;
+  if (target.includes("twitter") || target.includes("x.com")) return <Twitter className="h-4 w-4" />;
+  if (target.includes("youtube") || target.includes("youtu.be")) return <Youtube className="h-4 w-4" />;
   return <Share2 className="h-4 w-4" />;
 }
 
-function getPlatformLabel(platform?: string, url?: string, fallbackLabel?: string) {
-  if (fallbackLabel && fallbackLabel.trim()) return fallbackLabel;
-  const target = (platform || url || "").toLowerCase();
-
-  if (target.includes("facebook") || target.includes("fb")) return "Facebook";
-  if (target.includes("viber")) return "Viber";
-  if (target.includes("telegram") || target.includes("t.me")) return "Telegram";
-  if (target.includes("tiktok")) return "TikTok";
-  if (target.includes("linkedin")) return "LinkedIn";
-  if (target.includes("instagram")) return "Instagram";
-  if (target.includes("twitter") || target.includes("x.com")) return "Twitter / X";
-  if (target.includes("youtube")) return "YouTube";
-
-  return platform || "Social Link";
+const STYLE = `
+@keyframes nc-ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
-
-function StarRating({ r }: { r: number }) {
-  return (
-    <div className="flex items-center gap-1">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={`h-4 w-4 ${
-            i < r
-              ? "fill-amber-400 text-amber-400"
-              : "fill-zinc-800 text-zinc-800"
-          }`}
-        />
-      ))}
-    </div>
-  );
+.animate-ticker { animation: nc-ticker 30s linear infinite; }
+@keyframes nc-flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.4; }
+  94% { opacity: 1; }
+  97% { opacity: 0.7; }
+  98% { opacity: 1; }
 }
+.animate-flicker { animation: nc-flicker 4s infinite; }
+`;
 
-export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
+export function NeonBusiness({ data, accentColor = "#22d3ee" }: BP) {
   const [hasMounted, setHasMounted] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
+  useEffect(() => { setHasMounted(true); }, []);
 
   if (!hasMounted) {
-    return (
-      <div 
-        className="min-h-screen w-full bg-zinc-950" 
-        style={{ backgroundColor: "#09090b" }} 
-      />
-    );
+    return <div className="min-h-screen w-full bg-[#05060d]" />;
   }
 
   const {
@@ -184,91 +110,82 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
     faq = [],
     address,
     industry,
+    founded,
   } = data || {};
 
+  const glow = (a = accentColor, v = "0.55") => `0 0 12px ${a}${v}, 0 0 40px ${a}${v}`;
+  const tickerItems = [
+    "OPEN FOR BUSINESS",
+    industry || "SERVING CUSTOMERS NOW",
+    `${services.length} SERVICES LIVE`,
+    founded ? `EST. ${founded}` : "READY WHEN YOU ARE",
+    primaryCtaLabel.toUpperCase(),
+  ];
+
   return (
-    <div 
-      className="relative min-h-screen w-full overflow-x-hidden bg-zinc-950 font-sans text-zinc-100 antialiased selection:bg-white selection:text-zinc-950"
+    <div
+      className="relative min-h-screen w-full overflow-x-hidden bg-[#05060d] font-sans text-white antialiased selection:bg-white/20 selection:text-white"
       suppressHydrationWarning
     >
-      {/* Background Ambient Glow */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[600px] overflow-hidden opacity-20">
-        <div
-          className="absolute -top-40 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full blur-[140px]"
-          style={{ background: accentColor }}
-        />
-      </div>
+      <style>{STYLE}</style>
 
-      {/* Grid Pattern Overlay */}
-      <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+      {/* Cyberpunk grid + scanlines */}
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-40"
+        style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)", backgroundSize: "56px 56px" }} />
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.04]"
+        style={{ backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, #fff 3px, #fff 4px)" }} />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[500px]"
+        style={{ background: `radial-gradient(ellipse 70% 60% at 50% -10%, ${accentColor}30, transparent)` }} />
 
       {/* ================= HEADER ================= */}
-      <header className="sticky top-0 z-50 w-full border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur-2xl">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#05060d]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-3">
             {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={businessName || "Business Logo"}
-                className="h-9 w-auto object-contain"
-              />
+              <img src={logoUrl} alt={businessName || "Logo"} className="h-9 w-auto object-contain" />
             ) : (
-              <div className="flex items-center gap-2">
-                <div 
-                  className="flex h-8 w-8 items-center justify-center rounded-lg font-extrabold text-zinc-950 shadow-lg"
-                  style={{ backgroundColor: accentColor }}
-                >
-                  {businessName ? businessName.charAt(0) : "B"}
-                </div>
-                <span className="text-lg font-bold tracking-tight text-white">
-                  {businessName}
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-md font-black text-[#05060d]"
+                  style={{ background: accentColor, boxShadow: glow() }}>
+                  {businessName ? businessName.charAt(0).toUpperCase() : "N"}
                 </span>
+                <span className="text-lg font-black uppercase tracking-tight text-white">{businessName}</span>
               </div>
             )}
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden items-center gap-8 text-xs font-semibold uppercase tracking-wider text-zinc-400 md:flex">
+          <nav className="hidden items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 md:flex">
             <a href="#about" className="transition-colors hover:text-white">About</a>
-            {whatWeDo.length > 0 && <a href="#approach" className="transition-colors hover:text-white">Approach</a>}
-            {services.length > 0 && <a href="#services" className="transition-colors hover:text-white">Services</a>}
+            {whatWeDo.length > 0 && <a href="#approach" className="transition-colors hover:text-white">Services</a>}
             {gallery.length > 0 && <a href="#gallery" className="transition-colors hover:text-white">Gallery</a>}
-            {history.length > 0 && <a href="#history" className="transition-colors hover:text-white">History</a>}
+            {history.length > 0 && <a href="#history" className="transition-colors hover:text-white">Timeline</a>}
             {testimonials.length > 0 && <a href="#testimonials" className="transition-colors hover:text-white">Reviews</a>}
             <a href="#contact" className="transition-colors hover:text-white">Contact</a>
           </nav>
 
           <div className="flex items-center gap-3">
-            <a
-              href={primaryCtaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl px-4 py-2.5 text-xs font-bold text-zinc-950 transition-all duration-300 hover:opacity-90 sm:px-5 sm:text-sm"
-              style={{ backgroundColor: accentColor }}
-            >
-              <span>{primaryCtaLabel}</span>
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+            <a href={primaryCtaUrl}
+              className="group inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] text-[#05060d] transition-all hover:brightness-110"
+              style={{ background: accentColor, boxShadow: glow() }}>
+              <Zap className="h-3.5 w-3.5 transition-transform group-hover:scale-125" />
+              {primaryCtaLabel}
             </a>
-
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-2 text-zinc-400 hover:text-white md:hidden"
-              aria-label="Toggle navigation menu"
-            >
+              className="rounded-lg border border-white/15 p-2 text-white/60 hover:text-white md:hidden"
+              aria-label="Toggle navigation menu">
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="border-b border-zinc-800 bg-zinc-950/95 px-6 py-6 backdrop-blur-2xl md:hidden">
-            <nav className="flex flex-col gap-4 text-sm font-semibold tracking-wide text-zinc-300">
+          <div className="border-b border-white/10 bg-[#05060d]/95 px-6 py-6 md:hidden">
+            <nav className="flex flex-col gap-4 text-sm font-bold uppercase tracking-wider text-white/70">
               <a href="#about" onClick={() => setMobileMenuOpen(false)} className="hover:text-white">About</a>
-              {whatWeDo.length > 0 && <a href="#approach" onClick={() => setMobileMenuOpen(false)} className="hover:text-white">Approach</a>}
-              {services.length > 0 && <a href="#services" onClick={() => setMobileMenuOpen(false)} className="hover:text-white">Services</a>}
+              {whatWeDo.length > 0 && <a href="#approach" onClick={() => setMobileMenuOpen(false)} className="hover:text-white">Services</a>}
               {gallery.length > 0 && <a href="#gallery" onClick={() => setMobileMenuOpen(false)} className="hover:text-white">Gallery</a>}
-              {history.length > 0 && <a href="#history" onClick={() => setMobileMenuOpen(false)} className="hover:text-white">History</a>}
+              {history.length > 0 && <a href="#history" onClick={() => setMobileMenuOpen(false)} className="hover:text-white">Timeline</a>}
               {testimonials.length > 0 && <a href="#testimonials" onClick={() => setMobileMenuOpen(false)} className="hover:text-white">Reviews</a>}
               <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="hover:text-white">Contact</a>
             </nav>
@@ -276,173 +193,134 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
         )}
       </header>
 
-      {/* ================= HERO SECTION ================= */}
-      <section className="relative z-10 px-4 pb-20 pt-12 sm:px-6 lg:px-8 lg:pb-32 lg:pt-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid items-center gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              {industry && (
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-300 backdrop-blur-md">
-                  <Sparkles className="h-3.5 w-3.5" style={{ color: accentColor }} />
-                  {industry}
-                </div>
-              )}
+      {/* ================= HERO ================= */}
+      <section className="relative z-10 px-4 pb-16 pt-16 text-center sm:px-6 sm:pt-24 lg:pb-24">
+        <div className="mx-auto max-w-5xl">
+          <div className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.3em]"
+            style={{ borderColor: `${accentColor}55`, color: accentColor, boxShadow: `inset 0 0 20px ${accentColor}15` }}>
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full" style={{ background: accentColor, boxShadow: glow() }} />
+            {industry || "Business"}
+          </div>
 
-              <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl">
-                {businessName}
-              </h1>
+          <h1 className="mt-8 text-5xl font-black uppercase leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl">
+            <span style={{ color: accentColor, textShadow: glow() }}>{businessName}</span>
+          </h1>
 
-              {tagline && (
-                <p className="mt-4 text-xl font-medium sm:text-2xl" style={{ color: accentColor }}>
-                  {tagline}
-                </p>
-              )}
+          {tagline && (
+            <p className="mx-auto mt-6 max-w-2xl text-lg font-medium text-white/70 sm:text-2xl">
+              {tagline}
+            </p>
+          )}
 
-              <p className="mt-6 max-w-2xl text-base leading-relaxed text-zinc-400 sm:text-lg">
-                {description}
-              </p>
+          {description && (
+            <p className="mx-auto mt-6 max-w-2xl text-sm leading-relaxed text-white/50 sm:text-base">
+              {description}
+            </p>
+          )}
 
-              <div className="mt-10 flex flex-wrap items-center gap-4">
-                <a
-                  href={primaryCtaUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold text-zinc-950 shadow-lg transition-all hover:opacity-90 active:scale-[0.98]"
-                  style={{
-                    backgroundColor: accentColor,
-                    boxShadow: `0 8px 24px -6px ${accentColor}60`,
-                  }}
-                >
-                  <span>{primaryCtaLabel}</span>
-                  <ArrowRight className="h-4 w-4" />
-                </a>
-
-                {contacts.filter((c) => c.type === "phone").slice(0, 1).map((c, i) => (
-                  <a
-                    key={i}
-                    href={`tel:${c.value}`}
-                    className="inline-flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/80 px-6 py-3.5 text-sm font-semibold text-zinc-200 backdrop-blur-md transition-all hover:border-zinc-700 hover:bg-zinc-800"
-                  >
-                    <Phone className="h-4 w-4" style={{ color: accentColor }} />
-                    <span>{c.value}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            <div className="lg:col-span-5">
-              <div className="relative mx-auto max-w-md lg:max-w-none">
-                <div
-                  className="absolute -inset-1.5 rounded-3xl opacity-30 blur-2xl"
-                  style={{ background: accentColor }}
-                />
-
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/90 shadow-2xl backdrop-blur-sm">
-                  {heroImageUrl ? (
-                    <img
-                      src={heroImageUrl}
-                      alt={businessName || "Business hero banner"}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full flex-col items-center justify-center p-8 text-center text-zinc-600">
-                      <Building2 className="mb-4 h-12 w-12 stroke-[1.5]" />
-                      <h3 className="text-xl font-bold text-white">{businessName}</h3>
-                      <p className="mt-1 text-xs text-zinc-400">{tagline}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <a href={primaryCtaUrl}
+              className="inline-flex items-center gap-2 rounded-lg px-8 py-4 text-xs font-black uppercase tracking-[0.2em] text-[#05060d] transition-all hover:brightness-110"
+              style={{ background: accentColor, boxShadow: glow() }}>
+              {primaryCtaLabel} <ArrowRight className="h-4 w-4" />
+            </a>
+            {contacts.filter((c) => c.type === "phone").slice(0, 1).map((c, i) => (
+              <a key={i} href={`tel:${c.value.replace(/\s/g, "")}`}
+                className="inline-flex items-center gap-2 rounded-lg border px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-white/70 transition-all hover:border-white/40 hover:text-white"
+                style={{ borderColor: `${accentColor}44` }}>
+                <Phone className="h-4 w-4" style={{ color: accentColor }} />
+                {c.value}
+              </a>
+            ))}
           </div>
         </div>
+
+        {heroImageUrl && (
+          <div className="mx-auto mt-14 max-w-6xl">
+            <div className="overflow-hidden rounded-xl border"
+              style={{ borderColor: `${accentColor}33`, boxShadow: `0 0 60px ${accentColor}22` }}>
+              <img src={heroImageUrl} alt={businessName || "Hero"} className="h-[380px] w-full object-cover" />
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* ================= ABOUT ================= */}
-      <section id="about" className="relative z-10 border-t border-zinc-800/60 bg-zinc-900/20 px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
-        <div className="mx-auto max-w-4xl text-center">
-          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: accentColor }}>
-            About Company
-          </span>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Who We Are
-          </h2>
-          <p className="mt-6 text-base leading-relaxed text-zinc-300 sm:text-lg">
-            {description}
-          </p>
+      {/* ================= TICKER ================= */}
+      <div className="relative z-10 overflow-hidden border-y border-white/10 bg-white/[0.02] py-3.5">
+        <div className="animate-ticker flex w-max gap-10 whitespace-nowrap">
+          {[...tickerItems, ...tickerItems].map((item, i) => (
+            <span key={i} className="flex items-center gap-10 text-xs font-black uppercase tracking-[0.3em] text-white/40">
+              {item}
+              <span style={{ color: accentColor, textShadow: glow() }}>✦</span>
+            </span>
+          ))}
+        </div>
+      </div>
 
-          {address && (
-            <div className="mt-8 inline-flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 px-5 py-3.5 text-sm text-zinc-300">
-              <MapPin className="h-5 w-5 shrink-0" style={{ color: accentColor }} />
-              <span>
-                {[address.street, address.city, address.state, address.zip].filter(Boolean).join(", ")}
-              </span>
+      {/* ================= ABOUT ================= */}
+      <section id="about" className="relative z-10 px-4 py-20 sm:px-6 lg:py-28">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: accentColor }}>
+              // About
+            </p>
+            <h2 className="mt-4 text-3xl font-black uppercase tracking-tight sm:text-5xl">
+              Who We <span style={{ color: accentColor, textShadow: glow() }}>Are</span>
+            </h2>
+            <div className="mt-6 h-1 w-20" style={{ background: `linear-gradient(90deg, ${accentColor}, transparent)` }} />
+            <p className="mt-6 text-sm leading-relaxed text-white/60 sm:text-base">{description}</p>
+
+            {address && (
+              <div className="mt-8 inline-flex items-center gap-3 rounded-lg border px-4 py-3 font-mono text-xs text-white/70"
+                style={{ borderColor: `${accentColor}33` }}>
+                <MapPin className="h-4 w-4" style={{ color: accentColor }} />
+                <span>{[address.street, address.city, address.state, address.zip].filter(Boolean).join(", ")}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="relative">
+            <div className="absolute -inset-2 rounded-2xl" style={{ boxShadow: `0 0 80px ${accentColor}22` }} />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-xl border"
+              style={{ borderColor: `${accentColor}33` }}>
+              {heroImageUrl ? (
+                <img src={heroImageUrl} alt={businessName || "About"} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-white/[0.02]">
+                  <span className="text-7xl font-black" style={{ color: `${accentColor}44`, textShadow: glow() }}>
+                    {businessName ? businessName.charAt(0).toUpperCase() : "N"}
+                  </span>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </section>
 
       {/* ================= WHAT WE DO ================= */}
-      {whatWeDo && whatWeDo.length > 0 && (
-        <section id="approach" className="relative z-10 border-t border-zinc-800/60 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="mx-auto max-w-7xl">
-            <div className="text-center">
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: accentColor }}>
-                Our Methodology
-              </span>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                What We Do
-              </h2>
-            </div>
+      {whatWeDo.length > 0 && (
+        <section id="approach" className="relative z-10 border-t border-white/10 px-4 py-20 sm:px-6 lg:py-28">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-center font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: accentColor }}>
+              // What We Do
+            </p>
+            <h2 className="mt-4 text-center text-3xl font-black uppercase tracking-tight sm:text-5xl">
+              Core <span style={{ color: accentColor, textShadow: glow() }}>Powers</span>
+            </h2>
 
-            <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {whatWeDo.map((item, i) => (
-                <div
-                  key={i}
-                  className="group relative rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-8 backdrop-blur-md transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-900/80"
-                >
-                  <div
-                    className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl text-zinc-950 shadow-lg font-bold text-xl"
-                    style={{ backgroundColor: accentColor }}
-                  >
-                    {item.iconName || <Layers className="h-5 w-5" />}
+                <div key={i}
+                  className="group rounded-xl border border-white/10 bg-white/[0.02] p-7 transition-all duration-300 hover:-translate-y-1"
+                  style={{ boxShadow: "none" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 40px ${accentColor}18`; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xl">{item.iconName || "⚡"}</span>
+                    <span className="font-mono text-xs text-white/30">{String(i + 1).padStart(2, "0")}</span>
                   </div>
-                  <h3 className="text-xl font-bold text-white">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-                    {item.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ================= GALLERY ================= */}
-      {gallery && gallery.length > 0 && (
-        <section id="gallery" className="relative z-10 border-t border-zinc-800/60 bg-zinc-900/20 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="mx-auto max-w-7xl">
-            <div className="text-center">
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: accentColor }}>
-                Portfolio
-              </span>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                Visual Showcase
-              </h2>
-            </div>
-
-            <div className="mt-16 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {gallery.slice(0, 9).map((img, i) => (
-                <div
-                  key={i}
-                  className="group relative aspect-square overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-lg"
-                >
-                  <img
-                    src={img.url}
-                    alt={img.alt || `Gallery image ${i + 1}`}
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <h3 className="mt-5 text-lg font-black uppercase tracking-tight">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/50">{item.description}</p>
                 </div>
               ))}
             </div>
@@ -451,89 +329,56 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
       )}
 
       {/* ================= SERVICES ================= */}
-      {services && services.length > 0 && (
-        <section id="services" className="relative z-10 border-t border-zinc-800/60 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="mx-auto max-w-7xl">
-            <div className="text-center">
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: accentColor }}>
-                Capabilities
-              </span>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                Our Services & Solutions
-              </h2>
-            </div>
+      {services.length > 0 && (
+        <section id="services" className="relative z-10 border-t border-white/10 px-4 py-20 sm:px-6 lg:py-28">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-center font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: accentColor }}>
+              // Services
+            </p>
+            <h2 className="mt-4 text-center text-3xl font-black uppercase tracking-tight sm:text-5xl">
+              Plans & <span style={{ color: accentColor, textShadow: glow() }}>Solutions</span>
+            </h2>
 
-            <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {services.map((s, i) => (
-                <div
-                  key={i}
-                  className={`relative flex flex-col justify-between rounded-2xl p-8 backdrop-blur-md transition-all duration-300 ${
-                    s.highlighted
-                      ? "border-2 bg-zinc-900/90 text-white shadow-2xl"
-                      : "border border-zinc-800/80 bg-zinc-900/40 text-zinc-100 hover:border-zinc-700 hover:bg-zinc-900/70"
-                  }`}
+                <div key={i}
+                  className="relative flex flex-col justify-between rounded-xl border bg-[#0a0c18] p-7 transition-all duration-300 hover:-translate-y-1"
                   style={{
-                    borderColor: s.highlighted ? accentColor : undefined,
-                  }}
-                >
+                    borderColor: s.highlighted ? accentColor : "rgba(255,255,255,0.10)",
+                    boxShadow: s.highlighted ? glow() : "none",
+                  }}>
+                  {s.highlighted && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-[0.25em] text-[#05060d]"
+                      style={{ background: accentColor, boxShadow: glow() }}>
+                      Hot
+                    </span>
+                  )}
                   <div>
-                    {s.highlighted && (
-                      <span
-                        className="absolute -top-3.5 right-6 rounded-full px-4 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-950 shadow-lg"
-                        style={{ backgroundColor: accentColor }}
-                      >
-                        Featured
-                      </span>
-                    )}
-
-                    {s.iconName && (
-                      <div className="mb-4 text-3xl">{s.iconName}</div>
-                    )}
-
-                    <h3 className="text-2xl font-bold text-white">{s.title}</h3>
-
+                    {s.iconName && <div className="mb-3 text-3xl">{s.iconName}</div>}
+                    <h3 className="text-xl font-black uppercase tracking-tight">{s.title}</h3>
                     {s.price && (
-                      <p className="mt-4 text-3xl font-extrabold tracking-tight" style={{ color: accentColor }}>
+                      <p className="mt-3 text-3xl font-black" style={{ color: accentColor, textShadow: glow("", "0.4") }}>
                         {s.price}
-                        {s.priceNote && (
-                          <span className="ml-2 text-xs font-normal text-zinc-400">
-                            {s.priceNote}
-                          </span>
-                        )}
+                        {s.priceNote && <span className="ml-2 text-xs font-medium text-white/40">{s.priceNote}</span>}
                       </p>
                     )}
-
-                    <p className="mt-4 text-sm leading-relaxed text-zinc-400">
-                      {s.description}
-                    </p>
-
+                    <p className="mt-4 text-sm leading-relaxed text-white/50">{s.description}</p>
                     {s.features && s.features.length > 0 && (
-                      <ul className="mt-6 space-y-3 border-t border-zinc-800/80 pt-6">
+                      <ul className="mt-6 space-y-2.5 border-t border-white/10 pt-5">
                         {s.features.map((f, j) => (
-                          <li key={j} className="flex items-start gap-3 text-xs text-zinc-300">
-                            <CheckCircle2
-                              className="mt-0.5 h-4 w-4 shrink-0"
-                              style={{ color: accentColor }}
-                            />
+                          <li key={j} className="flex items-start gap-2.5 text-xs text-white/70">
+                            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: accentColor }} />
                             <span>{f}</span>
                           </li>
                         ))}
                       </ul>
                     )}
                   </div>
-
-                  <div className="mt-8 pt-4">
-                    <a
-                      href={primaryCtaUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl py-3 text-xs font-bold text-zinc-950 transition-all hover:opacity-90"
-                      style={{ backgroundColor: accentColor }}
-                    >
-                      <span>Inquire Now</span>
-                      <ArrowUpRight className="h-4 w-4" />
-                    </a>
-                  </div>
+                  <a href={primaryCtaUrl}
+                    className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-lg border py-3 text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:brightness-110"
+                    style={{ borderColor: `${accentColor}66`, color: accentColor }}>
+                    Get Started <ArrowRight className="h-3.5 w-3.5" />
+                  </a>
                 </div>
               ))}
             </div>
@@ -541,36 +386,61 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
         </section>
       )}
 
-      {/* ================= HISTORY ================= */}
-      {history && history.length > 0 && (
-        <section id="history" className="relative z-10 border-t border-zinc-800/60 bg-zinc-900/20 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="mx-auto max-w-4xl">
-            <div className="text-center">
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: accentColor }}>
-                Milestones
-              </span>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                Our Story & Journey
-              </h2>
-            </div>
+      {/* ================= GALLERY ================= */}
+      {gallery.length > 0 && (
+        <section id="gallery" className="relative z-10 border-t border-white/10 px-4 py-20 sm:px-6 lg:py-28">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-center font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: accentColor }}>
+              // Gallery
+            </p>
+            <h2 className="mt-4 text-center text-3xl font-black uppercase tracking-tight sm:text-5xl">
+              Visual <span style={{ color: accentColor, textShadow: glow() }}>Feed</span>
+            </h2>
 
-            <div className="mt-16 space-y-8">
+            <div className="mt-14 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+              {gallery.slice(0, 9).map((img, i) => (
+                <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border border-white/10">
+                  <img src={img.url} alt={img.alt || `Gallery ${i + 1}`}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    style={{ background: `linear-gradient(to top, ${accentColor}40, transparent)` }} />
+                  <span className="absolute bottom-2 left-2 font-mono text-[10px] text-white/70 opacity-0 transition-opacity group-hover:opacity-100">
+                    IMG_{String(i + 1).padStart(3, "0")}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ================= HISTORY TIMELINE ================= */}
+      {history.length > 0 && (
+        <section id="history" className="relative z-10 border-t border-white/10 px-4 py-20 sm:px-6 lg:py-28">
+          <div className="mx-auto max-w-4xl">
+            <p className="text-center font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: accentColor }}>
+              // Timeline
+            </p>
+            <h2 className="mt-4 text-center text-3xl font-black uppercase tracking-tight sm:text-5xl">
+              Signal <span style={{ color: accentColor, textShadow: glow() }}>History</span>
+            </h2>
+
+            <div className="relative mt-16 pl-8">
+              <div className="absolute left-[7px] top-2 bottom-2 w-px"
+                style={{ background: `linear-gradient(to bottom, ${accentColor}, transparent)` }} />
               {history.map((h, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col gap-4 rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6 backdrop-blur-md sm:flex-row sm:items-start sm:gap-6"
-                >
-                  <div
-                    className="inline-flex h-12 w-16 shrink-0 items-center justify-center rounded-xl text-lg font-black text-zinc-950 shadow-md"
-                    style={{ backgroundColor: accentColor }}
-                  >
-                    {h.year}
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-white">{h.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-                      {h.description}
-                    </p>
+                <div key={i} className="relative mb-8">
+                  <span className="absolute -left-8 top-1.5 h-[15px] w-[15px] rounded-full border-2 bg-[#05060d]"
+                    style={{ borderColor: accentColor, boxShadow: glow("", "0.5") }} />
+                  <div className="rounded-lg border border-white/10 bg-white/[0.02] p-6">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="rounded px-2.5 py-1 font-mono text-xs font-black text-[#05060d]"
+                        style={{ background: accentColor, boxShadow: glow("", "0.4") }}>
+                        {h.year}
+                      </span>
+                      <h3 className="font-black uppercase tracking-tight">{h.title}</h3>
+                    </div>
+                    <p className="mt-2 text-sm leading-relaxed text-white/50">{h.description}</p>
                   </div>
                 </div>
               ))}
@@ -580,53 +450,40 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
       )}
 
       {/* ================= TESTIMONIALS ================= */}
-      {testimonials && testimonials.length > 0 && (
-        <section id="testimonials" className="relative z-10 border-t border-zinc-800/60 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="mx-auto max-w-7xl">
-            <div className="text-center">
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: accentColor }}>
-                Testimonials
-              </span>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                Client Success Stories
-              </h2>
-            </div>
+      {testimonials.length > 0 && (
+        <section id="testimonials" className="relative z-10 border-t border-white/10 px-4 py-20 sm:px-6 lg:py-28">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-center font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: accentColor }}>
+              // Reviews
+            </p>
+            <h2 className="mt-4 text-center text-3xl font-black uppercase tracking-tight sm:text-5xl">
+              Signal <span style={{ color: accentColor, textShadow: glow() }}>Testimonials</span>
+            </h2>
 
-            <div className="mt-16 grid gap-8 sm:grid-cols-2">
+            <div className="mt-16 grid gap-5 sm:grid-cols-2">
               {testimonials.slice(0, 4).map((t, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col justify-between rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-8 backdrop-blur-md"
-                >
+                <div key={i} className="flex flex-col justify-between rounded-xl border border-white/10 bg-white/[0.02] p-7">
                   <div>
-                    <StarRating r={t.rating || 5} />
-                    <p className="mt-4 text-base italic leading-relaxed text-zinc-300">
-                      &ldquo;{t.text}&rdquo;
-                    </p>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, s) => (
+                        <Star key={s} className={`h-3.5 w-3.5 ${s < (t.rating || 5) ? "fill-current text-white" : "text-white/20"}`}
+                          style={s < (t.rating || 5) ? { color: accentColor, filter: `drop-shadow(0 0 4px ${accentColor})` } : undefined} />
+                      ))}
+                    </div>
+                    <p className="mt-4 text-sm italic leading-relaxed text-white/70">&ldquo;{t.text}&rdquo;</p>
                   </div>
-
-                  <div className="mt-8 flex items-center gap-4 border-t border-zinc-800/80 pt-6">
+                  <div className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
                     {t.avatarUrl ? (
-                      <div className="relative h-11 w-11 overflow-hidden rounded-full border border-zinc-700">
-                        <img
-                          src={t.avatarUrl}
-                          alt={t.author || "Avatar"}
-                          className="absolute inset-0 h-full w-full object-cover"
-                        />
-                      </div>
+                      <img src={t.avatarUrl} alt={t.author || "Avatar"} className="h-10 w-10 rounded-full object-cover" />
                     ) : (
-                      <div
-                        className="flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold text-zinc-950 shadow-md"
-                        style={{ backgroundColor: accentColor }}
-                      >
-                        {t.author ? t.author.charAt(0) : "A"}
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full text-xs font-black text-[#05060d]"
+                        style={{ background: accentColor, boxShadow: glow("", "0.4") }}>
+                        {t.author ? t.author.charAt(0).toUpperCase() : "A"}
                       </div>
                     )}
                     <div>
-                      <p className="text-sm font-bold text-white">{t.author}</p>
-                      {t.platform && (
-                        <p className="text-xs text-zinc-500">{t.platform}</p>
-                      )}
+                      <p className="text-sm font-bold">{t.author}</p>
+                      {t.platform && <p className="font-mono text-[11px] text-white/40">{t.platform}</p>}
                     </div>
                   </div>
                 </div>
@@ -637,39 +494,30 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
       )}
 
       {/* ================= FAQ ================= */}
-      {faq && faq.length > 0 && (
-        <section className="relative z-10 border-t border-zinc-800/60 bg-zinc-900/20 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      {faq.length > 0 && (
+        <section className="relative z-10 border-t border-white/10 px-4 py-20 sm:px-6 lg:py-24">
           <div className="mx-auto max-w-3xl">
-            <div className="text-center">
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: accentColor }}>
-                FAQ
-              </span>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Frequently Asked Questions
-              </h2>
-            </div>
+            <p className="text-center font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: accentColor }}>
+              // FAQ
+            </p>
+            <h2 className="mt-4 text-center text-3xl font-black uppercase tracking-tight sm:text-4xl">
+              Decode <span style={{ color: accentColor, textShadow: glow() }}>Questions</span>
+            </h2>
 
-            <div className="mt-12 space-y-4">
+            <div className="mt-12 space-y-3">
               {faq.map((item, i) => {
                 const isOpen = openFaq === i;
                 return (
-                  <div
-                    key={i}
-                    className="overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md transition-all"
-                  >
+                  <div key={i} className="overflow-hidden rounded-lg border border-white/10 bg-white/[0.02]">
                     <button
                       onClick={() => setOpenFaq(isOpen ? null : i)}
-                      className="flex w-full items-center justify-between p-6 text-left text-base font-semibold text-white hover:bg-zinc-800/40"
-                    >
+                      className="flex w-full items-center justify-between px-6 py-5 text-left text-sm font-bold"
+                      style={{ color: isOpen ? accentColor : "white" }}>
                       <span>{item.question}</span>
-                      <ChevronDown
-                        className={`h-5 w-5 shrink-0 text-zinc-400 transition-transform duration-300 ${
-                          isOpen ? "rotate-180" : ""
-                        }`}
-                      />
+                      <ChevronDown className={`h-4 w-4 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
                     </button>
                     {isOpen && (
-                      <div className="border-t border-zinc-800/80 px-6 pb-6 pt-4 text-sm leading-relaxed text-zinc-400">
+                      <div className="border-t border-white/10 px-6 pb-6 pt-4 text-sm leading-relaxed text-white/50">
                         {item.answer}
                       </div>
                     )}
@@ -681,121 +529,83 @@ export function NeonBusiness({ data, accentColor = "#a3e635" }: BP) {
         </section>
       )}
 
-      {/* ================= CONTACT & HOURS ================= */}
-      <section id="contact" className="relative z-10 border-t border-zinc-800/60 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-6">
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: accentColor }}>
-                Get In Touch
-              </span>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                Connect With Us
-              </h2>
-              <p className="mt-4 text-base text-zinc-400">
-                Reach out directly through any of our channels or visit us during working hours.
-              </p>
+      {/* ================= CONTACT ================= */}
+      <section id="contact" className="relative z-10 border-t border-white/10 px-4 py-20 sm:px-6 lg:py-28">
+        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: accentColor }}>
+              // Contact
+            </p>
+            <h2 className="mt-4 text-3xl font-black uppercase tracking-tight sm:text-5xl">
+              Link <span style={{ color: accentColor, textShadow: glow() }}>Up</span>
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-white/50">
+              Reach us on any channel — we reply fast.
+            </p>
 
-              <div className="mt-8 space-y-4">
-                {contacts.map((c, i) => (
-                  <a
-                    key={i}
-                    href={cHref(c.type, c.value)}
-                    className="flex items-center gap-4 rounded-2xl border border-zinc-800/80 bg-zinc-900/50 p-4 text-sm font-medium text-zinc-200 transition-all hover:border-zinc-700 hover:bg-zinc-900"
-                  >
-                    <div
-                      className="flex h-10 w-10 items-center justify-center rounded-xl text-zinc-950 shadow-md"
-                      style={{ backgroundColor: accentColor }}
-                    >
-                      <ContactIcon type={c.type} />
-                    </div>
-                    <span>{c.value}</span>
+            <div className="mt-8 space-y-3">
+              {contacts.map((c, i) => (
+                <a key={i} href={cHref(c.type, c.value)}
+                  className="flex items-center gap-4 rounded-lg border border-white/10 bg-white/[0.02] px-5 py-4 text-sm text-white/70 transition-all hover:border-white/25 hover:text-white">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-[#05060d]"
+                    style={{ background: accentColor, boxShadow: glow("", "0.3") }}>
+                    <ContactIcon type={c.type} />
+                  </span>
+                  <span>{c.value}</span>
+                </a>
+              ))}
+            </div>
+
+            {socialLinks.length > 0 && (
+              <div className="mt-8 flex flex-wrap gap-2.5">
+                {socialLinks.map((s, i) => (
+                  <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white/60 transition-all hover:border-white/40 hover:text-white">
+                    <span style={{ color: accentColor }}>
+                      <SocialIcon platform={s.platform} url={s.url} />
+                    </span>
+                    <span>{s.label || s.platform}</span>
                   </a>
                 ))}
               </div>
-
-              {socialLinks && socialLinks.length > 0 && (
-                <div className="mt-10">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-4">
-                    Follow & Connect
-                  </h4>
-                  <div className="flex flex-wrap gap-3">
-                    {socialLinks.map((s, i) => {
-                      const label = getPlatformLabel(s.platform, s.url, s.label);
-                      return (
-                        <a
-                          key={i}
-                          href={s.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group inline-flex items-center gap-2.5 rounded-xl border border-zinc-800 bg-zinc-900/80 px-4 py-2.5 text-xs font-semibold text-zinc-300 backdrop-blur-md transition-all duration-200 hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
-                        >
-                          <span className="text-zinc-400 group-hover:text-white transition-colors">
-                            <SocialIcon platform={s.platform} url={s.url} />
-                          </span>
-                          <span>{label}</span>
-                          <ExternalLink className="h-3 w-3 text-zinc-500 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                        </a>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {businessHours && businessHours.length > 0 && (
-              <div className="lg:col-span-6">
-                <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/60 p-8 shadow-2xl backdrop-blur-md">
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-6 w-6" style={{ color: accentColor }} />
-                    <h3 className="text-xl font-bold text-white">
-                      Working Hours
-                    </h3>
-                  </div>
-
-                  <div className="mt-6 divide-y divide-zinc-800/80">
-                    {businessHours.map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between py-3 text-sm"
-                      >
-                        <span className="font-medium text-zinc-300">{h.day}</span>
-                        <span
-                          className={
-                            h.isClosed
-                              ? "font-normal text-zinc-500"
-                              : "font-semibold text-white"
-                          }
-                        >
-                          {h.isClosed ? "Closed" : `${h.open} – ${h.close}`}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
             )}
           </div>
+
+          {businessHours.length > 0 && (
+            <div>
+              <div className="rounded-xl border p-8" style={{ borderColor: `${accentColor}33`, boxShadow: `0 0 60px ${accentColor}15` }}>
+                <div className="flex items-center gap-3">
+                  <Clock className="h-5 w-5" style={{ color: accentColor, filter: `drop-shadow(0 0 6px ${accentColor})` }} />
+                  <h3 className="font-black uppercase tracking-wide">Open Channels</h3>
+                </div>
+                <div className="mt-6 divide-y divide-white/10">
+                  {businessHours.map((h, i) => (
+                    <div key={i} className="flex items-center justify-between py-3.5 text-sm">
+                      <span className="text-white/50">{h.day}</span>
+                      <span className={h.isClosed ? "text-white/25" : "font-bold"} style={h.isClosed ? {} : { color: accentColor }}>
+                        {h.isClosed ? "Closed" : `${h.open} — ${h.close}`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
       {/* ================= FOOTER ================= */}
-      <footer className="relative z-10 border-t border-zinc-800/80 bg-zinc-950 px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 sm:flex-row">
+      <footer className="relative z-10 border-t border-white/10 px-4 py-10 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 sm:flex-row">
           <div className="flex items-center gap-3">
             {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={businessName || "Footer Logo"}
-                className="h-7 w-auto object-contain"
-              />
+              <img src={logoUrl} alt={businessName || "Footer Logo"} className="h-7 w-auto object-contain" />
             ) : (
-              <span className="text-base font-bold text-white">{businessName}</span>
+              <span className="font-black uppercase tracking-tight">{businessName}</span>
             )}
           </div>
-
-          <p className="text-xs text-zinc-500">
-            © NEX CARD. All rights reserved.
+          <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-white/30">
+            © {new Date().getFullYear()} {businessName} · All rights reserved
           </p>
         </div>
       </footer>

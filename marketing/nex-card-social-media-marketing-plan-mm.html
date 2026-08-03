@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEX CARD — ရက် ၆၀ အတွင်း Facebook &amp; TikTok စျေးကွက်ရှာဖွေရေး အစီအစဉ်</title>
+<style>
+  :root {
+    --gold-1: #c9973a;
+    --gold-2: #d4af37;
+    --gold-3: #e4c56a;
+    --ink: #0d0d0f;
+    --ink-2: #1b1b1f;
+    --paper: #ffffff;
+    --paper-2: #f7f5ef;
+    --line: #e6e1d3;
+    --muted: #8a7a5a;
+    --fb: #1877f2;
+    --tt: #00f2ea;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Myanmar Text", "Pyidaungsu", "Noto Sans Myanmar", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: #1c1a17;
+    background: var(--paper);
+    font-size: 13px;
+    line-height: 1.75;
+  }
+  @page { size: A4; margin: 14mm 12mm 16mm 12mm; }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    height: 297mm;
+    background: radial-gradient(1200px 600px at 50% -10%, #26221a 0%, var(--ink) 55%, var(--ink) 100%);
+    color: #f5f1e6;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover .band { position: absolute; inset: 0; opacity: .5; pointer-events: none;
+    background:
+      radial-gradient(600px 300px at 85% 15%, rgba(212,175,55,.14), transparent 70%),
+      radial-gradient(500px 300px at 10% 90%, rgba(212,175,55,.10), transparent 70%); }
+  .cover-inner { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 20mm; }
+  .cover .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 26mm; }
+  .cover .logo-mark { width: 44px; height: 44px; border: 1.5px solid var(--gold-2); display: flex; align-items: center; justify-content: center; color: var(--gold-2); font-weight: 800; font-size: 20px; border-radius: 8px; }
+  .cover .logo-name { font-weight: 800; letter-spacing: 4px; font-size: 20px; color: #fff; }
+  .cover .logo-tag { font-size: 10px; letter-spacing: 2px; color: var(--gold-3); margin-top: 2px; }
+  .cover h1 { font-size: 40px; line-height: 1.35; font-weight: 800; letter-spacing: .5px; }
+  .cover h1 .gold { color: var(--gold-2); }
+  .cover .sub { margin-top: 18px; font-size: 15px; color: #c9c2b0; max-width: 145mm; line-height: 1.8; }
+  .cover .meta { margin-top: 26mm; display: flex; flex-wrap: wrap; gap: 8px; }
+  .cover .meta span { border: 1px solid rgba(212,175,55,.4); color: var(--gold-3); padding: 6px 12px; border-radius: 20px; font-size: 10px; letter-spacing: 1px; }
+  .cover .foot { position: absolute; bottom: 16mm; left: 20mm; right: 20mm; display: flex; justify-content: space-between; color: #6f685a; font-size: 10px; letter-spacing: 1.5px; border-top: 1px solid rgba(212,175,55,.25); padding-top: 12px; }
+
+  /* ---------- HEADINGS ---------- */
+  .kicker { color: var(--gold-1); font-weight: 700; letter-spacing: 3px; font-size: 10px; }
+  h2.sect { font-size: 22px; font-weight: 800; color: var(--ink); margin: 4px 0 2px; }
+  h3.sub { font-size: 14px; font-weight: 700; color: var(--ink-2); margin: 18px 0 6px; }
+  .rule { height: 3px; width: 56px; background: linear-gradient(90deg, var(--gold-1), var(--gold-3)); margin: 10px 0 16px; border-radius: 2px; }
+  p.body { color: #3c3a35; margin-bottom: 10px; }
+  .lead { font-size: 13px; }
+
+  /* ---------- TABLE ---------- */
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; }
+  th { background: var(--ink); color: #f5f1e6; text-align: left; font-size: 10.5px; letter-spacing: .5px; padding: 8px 9px; }
+  td { border: 1px solid var(--line); padding: 7px 9px; vertical-align: top; font-size: 12px; }
+  tr:nth-child(even) td { background: var(--paper-2); }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; letter-spacing: .5px; }
+  .tag.gold { background: #f4e9cd; color: #8a6a1c; }
+  .tag.fb { background: #e7f0ff; color: #0f5cc0; }
+  .tag.tt { background: #e0fbfa; color: #0b8d89; }
+  .tag.pre { background: #efe9f7; color: #5b3ea8; }
+  .tag.live { background: #e3f6ec; color: #137a46; }
+  .tag.vid { background: #fdeaea; color: #b3272b; }
+  .tag.img { background: #eef2f7; color: #33506f; }
+  .tag.car { background: #fdf3e0; color: #a15c00; }
+  .tag.reel { background: #e0fbfa; color: #0b8d89; }
+  .tag.story { background: #f1e7f7; color: #6d2d91; }
+
+  /* ---------- CARDS ---------- */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: var(--paper); }
+  .card.gold { border-left: 4px solid var(--gold-1); }
+  .card h4 { font-size: 12.5px; font-weight: 800; margin-bottom: 6px; }
+  .card p, .card li { font-size: 12px; color: #3c3a35; }
+  .card ul { padding-left: 16px; }
+  .card li { margin-bottom: 3px; }
+
+  /* ---------- SCRIPT BLOCK ---------- */
+  .script { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; page-break-inside: avoid; overflow: hidden; }
+  .script-head { background: var(--ink); color: #f5f1e6; padding: 9px 14px; font-weight: 700; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .script-head .who { color: var(--gold-3); font-weight: 600; font-size: 10px; letter-spacing: 1px; }
+  .script-body { padding: 12px 14px; }
+  .script-body .label { font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; color: var(--muted); margin: 8px 0 4px; }
+  .script-body .mm { color: #1c1a17; font-size: 12px; white-space: pre-line; }
+  .script-body .en { color: #6a675f; font-size: 11px; font-style: italic; white-space: pre-line; border-left: 2px solid var(--line); padding-left: 8px; }
+
+  .pillrow { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill { background: var(--paper-2); border: 1px solid var(--line); border-radius: 20px; padding: 4px 10px; font-size: 11.5px; color: #3c3a35; }
+
+  .note { background: #fdf8ea; border: 1px solid #ecd9a8; border-left: 4px solid var(--gold-1); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #5a4a22; margin: 10px 0; }
+  .pagehead { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 14px; }
+  .pagehead h2 { font-size: 20px; font-weight: 800; }
+  .pagehead .no { color: var(--gold-1); font-weight: 800; letter-spacing: 2px; }
+  .checkbox { list-style: none; }
+  .checkbox li { padding-left: 24px; position: relative; margin-bottom: 6px; }
+  .checkbox li::before { content: "☐"; position: absolute; left: 0; top: 0; color: var(--gold-1); font-size: 14px; }
+  .kpi-num { font-size: 26px; font-weight: 800; color: var(--ink); }
+  .kpi-sub { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+  .banner { background: linear-gradient(90deg, var(--ink), #2a2a30); color: #f5f1e6; border-radius: 10px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; margin: 14px 0; }
+  .banner .big { font-size: 20px; font-weight: 800; color: var(--gold-2); }
+  .banner .small { font-size: 11px; color: #c9c2b0; }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <div class="band"></div>
+  <div class="cover-inner">
+    <div class="logo">
+      <div class="logo-mark">N</div>
+      <div>
+        <div class="logo-name">NEX CARD</div>
+        <div class="logo-tag">ဒစ်ဂျစ်တယ် အထောက်အထား &amp; ချိတ်ဆက်မှု</div>
+      </div>
+    </div>
+    <h1>ရက် ၆၀ အတွင်း<br><span class="gold">Facebook &amp; TikTok လူမှုမီဒီယာ<br>စျေးကွက်ရှာဖွေရေး အစီအစဉ်</span></h1>
+    <p class="sub">Launch မတိုင်မီ ကြိုတင်ပြင်ဆင်မှု၊ Launch ရက်သတ္တပတ်နှင့် Launch အပြီး တိုးတက်မှုအတွက် ကွန်တင့် ပြက္ခဒိန် — NEX CARD သည် ပရော်ဖက်ရှင်နယ်များ၊ လုပ်ငန်းများနှင့် မင်္ဂလာပွဲများအတွက် ဒစ်ဂျစ်တယ် နေမက်ကဒ် ပလက်ဖောင်းဖြစ်သည်။ မြန်မာ + အင်္ဂလိပ် နှစ်ဘာသာ စာတန်းများ တင်ရန် အသင့်ဖြစ်ပြီးသား။</p>
+    <div class="meta">
+      <span>၈ ပတ်</span><span>၆၀ ရက်</span><span>Facebook + TikTok</span><span>Launch မတိုင်မီနှင့် အပြီး</span><span>MMK ဈေးကွက်</span>
+    </div>
+  </div>
+  <div class="foot">
+    <span>ပြင်ဆင်သူ - Digital Marketing</span>
+    <span>NEX CARD · လျှို့ဝှက်ချက်</span>
+  </div>
+</div>
+
+<!-- ================= CONTENTS ================= -->
+<div class="page">
+  <div class="pagehead"><h2>အကြောင်းအရာ များ</h2><span class="no">NC-MKT-001</span></div>
+  <table>
+    <tr><th style="width:12%">အပိုင်း</th><th>အကြောင်းအရာ</th></tr>
+    <tr><td>1</td><td>Executive Summary — ရည်မှန်းချက်များ၊ ပစ်မှတ် ပရိသတ်၊ ကျွန်ုပ်တို့ ရောင်းချနေသည့်အရာ</td></tr>
+    <tr><td>2</td><td>Brand &amp; Offer အကျဉ်းချုပ် — ထုတ်ကုန်များ၊ ဈေးနှုန်း အဆင့်များ (QR / NFC / NFC+QR)၊ template ကတ်တလောက်</td></tr>
+    <tr><td>3</td><td>Content Strategy — အကြောင်းအရာ မဏ္ဍိုင် ၆ ခု၊ တင်သည့် အကြိမ်ရေ၊ အကောင်းဆုံး အချိန်၊ ဖော်မက် လမ်းညွှန်</td></tr>
+    <tr><td>4</td><td>ရက် ၆၀ ပြက္ခဒိန် — နေ့စဉ် အချိန်ဇယား (Launch မတိုင်မီနှင့် အပြီး)</td></tr>
+    <tr><td>5</td><td>တင်ရန် အသင့်ဖြစ်ပြီးသား Script များ — Facebook စာတန်း အပြည့်အစုံနှင့် TikTok script (မြန်မာ + အင်္ဂလိပ်)</td></tr>
+    <tr><td>6</td><td>Hashtag ဘဏ်နှင့် စာတန်းများ — မဏ္ဍိုင်တစ်ခုစီအတွက် ပြန်သုံးနိုင်သော hashtag အစုများ</td></tr>
+    <tr><td>7</td><td>Visual &amp; Creative လမ်းညွှန် — ပို့စ်အမျိုးအစားတစ်ခုစီအတွက် လိုအပ်သော ဂရပ်ဖစ်/ဗီဒီယို ပစ္စည်းများ</td></tr>
+    <tr><td>8</td><td>စွမ်းဆောင်ရည် KPI နှင့် ခြေရာခံခြင်း — အပတ်စဉ် ဘာကို တိုင်းတာရမည်</td></tr>
+    <tr><td>9</td><td>Launch စစ်ဆေးစာရင်းနှင့် ပရိုမိုရှင်း စနစ်များ — promo၊ review၊ paid boost</td></tr>
+  </table>
+
+  <div class="note"><b>ဤစာတမ်းကို အသုံးပြုနည်း —</b> Section 4 သည် အဓိက ပြက္ခဒိန်ဖြစ်သည် — သတ်မှတ်ထားသော နေ့တွင် Section 5 မှ သက်ဆိုင်ရာ Facebook စာတန်း သို့မဟုတ် TikTok script ကို တင်ပါ။ Brand voice ကို တစ်သမတ်တည်း ထားပါ — နွေးထွေးမှု၊ ယုံကြည်စိတ်ချမှု၊ အကူအညီပေးတတ်မှုနှင့် ဒေသအရ (မြန်မာလို အဓိက၊ အင်္ဂလိပ်လို ဒုတိယ)။ အကြံပြုထားသော အချိန်များတွင် တင်ပြီး ပလက်ဖောင်း နှစ်ခုလုံးတွင် @nexcard ကို tag လုပ်ပါ။ Section 6 မှ hashtag အစုများကို သုံးပြီး reach တိုးချဲ့ပါ။</div>
+</div>
+
+<!-- ================= 1. EXEC SUMMARY ================= -->
+<div class="page">
+  <div class="pagehead"><h2>၁ · Executive Summary</h2><span class="no">SECTION 01</span></div>
+  <div class="banner">
+    <div>
+      <div class="small">ရက် ၆၀ အတွင်း အဓိက ရည်မှန်းချက်</div>
+      <div class="big">Profile ကြည့်ရှုမှု ၁,၂၀၀+ · အသုံးပြုသူအသစ် ၃၀၀+ · ကဒ် ရောင်းချမှု ၆၀+</div>
+    </div>
+    <div class="small" style="text-align:right">Facebook Reach + TikTok Views ဖြင့်<br>signup နှင့် QR/NFC ကဒ် ရောင်းချမှု မြှင့်တင်ရန်</div>
+  </div>
+
+  <h3 class="sub">ကျွန်ုပ်တို့ ရောင်းချနေသည့်အရာ</h3>
+  <p class="body">NEX CARD သည် မည်သူမဆို မျှဝေနိုင်သော ဒစ်ဂျစ်တယ် ကိုယ်ပိုင်လိပ်စာ စာမျက်နှာတစ်ခုကို ဖန်တီးနိုင်သည့် ပလက်ဖောင်းတစ်ခုဖြစ်သည် — <b>ဒစ်ဂျစ်တယ် နေမက်ကဒ်</b>၊ <b>ကိုယ်ပိုင် portfolio</b>၊ <b>လုပ်ငန်း ကြော်ငြာစာမျက်နှာ</b> သို့မဟုတ် <b>မင်္ဂလာ ဖိတ်စာ</b> — ထူးခြားသော URL နှင့် QR ကုဒ်ဖြင့် မျှဝေနိုင်သည်။ Premium စာမျက်နှာများသည် NFC ကဒ်များ (tap လုပ်ပြီး မျှဝေရန်) နှင့် premium templates များကို ဖွင့်ပေးပြီး MMK ဖြင့် တစ်ကြိမ်သာ ပေးချေရပြီး admin မှ ငွေပေးချေမှု အထောက်အထားကို စစ်ဆေး အတည်ပြုပါသည်။</p>
+
+  <h3 class="sub">ပစ်မှတ် ပရိသတ် (ပထမ မြန်မာ့ဈေးကွက်)</h3>
+  <div class="grid2">
+    <div class="card gold"><h4>🎯 ပရိသတ် ၁ — ပရော်ဖက်ရှင်နယ်များ</h4><p>အင်ဂျင်နီယာများ၊ ဒီဇိုင်နာများ၊ အလွတ်တန်း (freelancer) များ၊ အရောင်းကိုယ်စားလှယ်များ — စာရွက် ကဒ်များ ဝေငှနေသူများနှင့် မျှဝေနိုင်သော ဒစ်ဂျစ်တယ်ကဒ် + QR လိုအပ်သူများ။</p></div>
+    <div class="card"><h4>🎯 ပရိသတ် ၂ — SME နှင့် ဆိုင်ရှင်များ</h4><p>စားသောက်ဆိုင်များ၊ စကလုံများ၊ ဆေးခန်းများ၊ လက်လီရောင်းဝယ်သူများ — link တစ်ခုတည်းဖြင့် မိုဘိုင်း လုပ်ငန်းစာမျက်နှာ၊ အလုပ်ချိန်နှင့် ပရိုမိုရှင်းများ လိုအပ်သူများ။</p></div>
+    <div class="card"><h4>🎯 ပရိသတ် ၃ — စုံတွဲများနှင့် ပွဲစီစဉ်သူများ</h4><p>RSVP ပုံစံ milestones နှင့် ဓာတ်ပုံပြခန်းပါသော ဒစ်ဂျစ်တယ် မင်္ဂလာ ဖိတ်စာ လိုအပ်သော စေ့စပ်ထားသည့် စုံတွဲများ။</p></div>
+    <div class="card"><h4>🎯 ပရိသတ် ၄ — အလုပ်ရှာသူများနှင့် Creator များ</h4><p>CV / TikTok bio တွင် ချိတ်ဆက်ရန် portfolio စာမျက်နှာ လိုအပ်သော ဘွဲ့ရများနှင့် creator များ။</p></div>
+  </div>
+
+  <h3 class="sub">ကမ်ပိန်း အဆင့်များ</h3>
+  <table>
+    <tr><th>အဆင့်</th><th>ရက်သတ္တပတ်</th><th>အာရုံစိုက်ရမည့်အရာ</th><th>အဓိက ရည်မှန်းချက်</th></tr>
+    <tr><td><span class="tag pre">Launch မတိုင်မီ</span></td><td>W1–W2 (Day 1–14)</td><td>Teaser၊ ပညာရေး၊ waitlist၊ brand ဇာတ်လမ်း</td><td>စောင့်မျှော်မှု တည်ဆောက်ပြီး ကြိုတင် signup စုဆောင်းရန်</td></tr>
+    <tr><td><span class="tag gold">Launch</span></td><td>W3–W4 (Day 15–28)</td><td>ထုတ်ကုန် ဖွင့်ပြ၊ features၊ templates၊ promo</td><td>စိတ်ဝင်စားမှုကို ပထမဆုံး ပေးချေ အသုံးပြုသူများအဖြစ် ပြောင်းလဲရန်</td></tr>
+    <tr><td><span class="tag live">တိုးတက်မှု</span></td><td>W5–W8 (Day 29–56)</td><td>လူမှု သက်သေ၊ case study၊ offers၊ engagement</td><td>reach၊ signup နှင့် ပြန်လည် အသုံးပြုသူများ တိုးချဲ့ရန်</td></tr>
+  </table>
+
+  <h3 class="sub">တင်သည့် အကြိမ်ရေ (အပတ်စဉ် ပုံမှန်)</h3>
+  <table>
+    <tr><th>ပလက်ဖောင်း</th><th>တင်သည့် နေ့များ</th><th>အကောင်းဆုံး အချိန် (မြန်မာစံတော်ချိန်, UTC+6:30)</th><th>ပို့စ် အမျိုးအစား</th></tr>
+    <tr><td><b>Facebook</b></td><td>တနင်္လာ · ဗုဒ္ဓဟူး · သောကြာ · တနင်္ဂနွေ</td><td>ည ၇:၀၀–၈:၃၀ (အများဆုံး) · တနင်္ဂနွေ မနက် ၉–၁၁</td><td>Carousel၊ ပုံ + စာတန်း ရှည်၊ reels၊ polls၊ live</td></tr>
+    <tr><td><b>TikTok</b></td><td>အင်္ဂါ · ကြာသပတေး · စနေ (+ အပိုကြိမ်)</td><td>နေ့လည် ၁၂:၀၀–၁:၀၀ နှင့် ည ၇:၀၀–၉:၀၀</td><td>15–35s ဗီဒီယို၊ trending audio၊ before/after၊ သင်ခန်းစာ</td></tr>
+  </table>
+  <div class="note"><b>အခြေခံ စည်းမျဉ်း —</b> Facebook = ဆက်ဆံရေးနှင့် conversion (စာတန်းက ဇာတ်လမ်းကို သယ်ဆောင်သည်)။ TikTok = reach နှင့် အသိမှတ်ပြုမှု (ပထမ ၂ စက္ကန့်အတွင်း hook)။ အကြောင်းအရာ တစ်မျိုးတည်းကို ပလက်ဖောင်း နှစ်ခုလုံးတွင် ပြန်သုံးပါ၊ သို့သော် ပုံစံ ပြောင်းပါ။</div>
+</div>
+
+<!-- ================= 2. BRAND & OFFER ================= -->
+<div class="page">
+  <div class="pagehead"><h2>၂ · Brand &amp; Offer အကျဉ်းချုပ်</h2><span class="no">SECTION 02</span></div>
+
+  <h3 class="sub">ကျွန်ုပ်တို့ ရောင်းချသည့် အမျိုးအစား ၄ မျိုး</h3>
+  <table>
+    <tr><th>အမျိုးအစား</th><th>ဘယ်သူ့အတွက်လဲ</th><th>နမူနာ templates</th></tr>
+    <tr><td><b>ဒစ်ဂျစ်တယ် နေမက်ကဒ်</b></td><td>ပရော်ဖက်ရှင်နယ်များနှင့် freelancer များ — တစ်မျက်နှာ ကိုယ်ပိုင်လိပ်စာ</td><td>Titanium · Prism · Obsidian · Coral · Aurora</td></tr>
+    <tr><td><b>Portfolio</b></td><td>Creator များ၊ developer များ၊ အလုပ်ရှာသူများ — အလုပ်များ ပြသမှု</td><td>Canvas · Studio · Forge · Spectrum · Blueprint</td></tr>
+    <tr><td><b>လုပ်ငန်း ကြော်ငြာ</b></td><td>SME နှင့် ဆိုင်များ — ဝန်ဆောင်မှုများ၊ အလုပ်ချိန်၊ ပရိုမိုရှင်းများ</td><td>Vault · Neon · Marquee · Empire · District</td></tr>
+    <tr><td><b>မင်္ဂလာ ဖိတ်စာ</b></td><td>စုံတွဲများ — ဒစ်ဂျစ်တယ် ဖိတ်စာ၊ ပြခန်း၊ milestones</td><td>Rustic · Noir · Eternal · Celestial · Blossom</td></tr>
+  </table>
+
+  <h3 class="sub">ဈေးနှုန်း အဆင့်များ (တစ်ကြိမ်သာ၊ MMK)</h3>
+  <table>
+    <tr><th>အဆင့်</th><th>အသုံးပြုသူ ရရှိသည့်အရာ</th><th>ကြော်ငြာ ရှုထောင့်</th></tr>
+    <tr><td><b>QR Only</b></td><td>ဒစ်ဂျစ်တယ် စာမျက်နှာအတွက် QR ကုဒ်</td><td>"Scan ရတာ အလကား၊ မျှဝေရတာ ချက်ချင်း"</td></tr>
+    <tr><td><b>NFC ကဒ်</b></td><td>ရုပ်ပိုင်း NFC tap-to-share ကဒ်</td><td>"တစ်ခါ tap — မင်းရဲ့ identity တစ်ခုလုံး ပြောင်းသွားသည်"</td></tr>
+    <tr><td><b>NFC + QR</b></td><td>QR fallback ပါသော NFC ကဒ်</td><td>"ချိတ်ဆက်ရန် နည်းလမ်း နှစ်ဆ" — အထင်ကရ offer</td></tr>
+  </table>
+
+  <h3 class="sub">ကွန်တင့်တွင် အဓိက ပြသရမည့် features</h3>
+  <div class="grid2">
+    <div class="card"><h4>🔗 ထူးခြားသော URL / slug</h4><p>Profile တိုင်းတွင် သန့်ရှင်းသော link ရသည် (yourname.nexcard) — မင်းရဲ့ TikTok bio တွင် ထည့်ပါ။</p></div>
+    <div class="card"><h4>📱 NFC tap-to-share</h4><p>NFC ဖုန်း မှန်သမျှနဲ့ tap — profile ကို ချက်ချင်း ဖွင့်ပေးသည်။</p></div>
+    <div class="card"><h4>📊 QR scan analytics</h4><p>မင်းရဲ့ ကဒ် ဘယ်နှစ်ခါ scan ခံရလဲ ကြည့်လို့ရသည် — အလုပ်ဖြစ်ကြောင်း သက်သေ။</p></div>
+    <div class="card"><h4>🎨 Premium templates ၂၀</h4><p>အမျိုးအစား ၄ မျိုး၊ design ၅ ခုစီ — လူတိုင်းနဲ့ brand တိုင်းအတွက်။</p></div>
+    <div class="card"><h4>💬 MMK တစ်ကြိမ် ပေးချေမှု</h4><p>ရိုးရှင်း၊ ပွင့်လင်းသော ပြည်တွင်း ငွေပေးချေမှု အထောက်အထား လုပ်ငန်းစဉ်။</p></div>
+    <div class="card"><h4>💒 မင်္ဂလာပွဲ စာမျက်နှာများ</h4><p>ဇာတ်လမ်း၊ ဓာတ်ပုံနှင့် milestones ပါသော ဒစ်ဂျစ်တယ် ဖိတ်စာများ။</p></div>
+  </div>
+
+  <h3 class="sub">Brand voice နှင့် အသံသေရ</h3>
+  <div class="card gold">
+    <p><b>Voice —</b> နွေးထွေးမှု · ယုံကြည်မှု · ဒေသအရ · ခေတ်မီမှု။ မြန်မာလို အဓိက၊ အင်္ဂလိပ်လို ဒုတိယ။</p>
+    <p style="margin-top:6px"><b>အမြဲ ထည့်ရမည် —</b> ရှင်းလင်းသော အကျိုးကျေးဇူး၊ call-to-action တစ်ခု၊ hashtag အစုတစ်ခု (Section 6) နှင့် brand visual တစ်ခု။</p>
+    <p style="margin-top:6px"><b>ဘယ်တော့မှ —</b> တန်ဖိုး မပါဘဲ ရောင်းအား တွန်းခြင်း၊ ပုံ/ဗီဒီယို မပါဘဲ တင်ခြင်း၊ comment များကို လျစ်လျူရှုခြင်း၊ DM spam လုပ်ခြင်း။</p>
+  </div>
+</div>
+
+<!-- ================= 3. CONTENT STRATEGY ================= -->
+<div class="page">
+  <div class="pagehead"><h2>၃ · Content Strategy</h2><span class="no">SECTION 03</span></div>
+
+  <h3 class="sub">Content မဏ္ဍိုင် ၆ ခု (ပညာရေး ၆၀%၊ ပြသမှု ၂၅%၊ လူမှုသက်သေ ၁၅%)</h3>
+  <table>
+    <tr><th>မဏ္ဍိုင်</th><th>အဓိက စာတိုး</th><th>ဥပမာ ပို့စ်များ</th></tr>
+    <tr><td><b>P1 ပညာရေး</b></td><td>ဒစ်ဂျစ်တယ်ကဒ်က paper ထက် ဘာကြောင့် သာလဲ</td><td>"ဒီကဒ် ဘာကြောင့် paper card ထက် သာလဲ?" / Why QR cards?</td></tr>
+    <tr><td><b>P2 ထုတ်ကုန် ပြသမှု</b></td><td>features နှင့် templates လက်တွေ့ အလုပ်လုပ်ပုံ</td><td>Template tours၊ NFC demo၊ QR demo၊ before/after</td></tr>
+    <tr><td><b>P3 လူမှု သက်သေ</b></td><td>အသုံးပြုသူ အစစ်၊ ရလဒ် အစစ်</td><td>Testimonials၊ case studies၊ scan-count screenshots</td></tr>
+    <tr><td><b>P4 အသုံးပြုမှု ပုံစံများ</b></td><td>ဘယ်သူက NEX CARD လိုအပ်သလဲ</td><td>Agent၊ barista၊ salon၊ ဆေးခန်း၊ စေ့စပ်စုံတွဲ</td></tr>
+    <tr><td><b>P5 နောက်ကွယ်မှ မြင်ကွင်းများ</b></td><td>အဖွဲ့၊ တန်ဖိုးများ၊ တည်ဆောက်ရေး ခရီးစဉ်</td><td>ရုံး၊ design လုပ်ငန်းစဉ်၊ "ဒါကို ငါတို့ ဆောက်ခဲ့တာ"</td></tr>
+    <tr><td><b>P6 Offers နှင့် Promo</b></td><td>Launch deal၊ referrals</td><td>Launch discount၊ refer-a-friend၊ ကဒ် အရေအတွက် ကန့်သတ်</td></tr>
+  </table>
+
+  <h3 class="sub">ပလက်ဖောင်းအလိုက် ဖော်မက် လမ်းညွှန်</h3>
+  <div class="grid2">
+    <div class="card"><h4>Facebook ဖော်မက်များ</h4>
+      <ul>
+        <li><span class="tag img">IMAGE</span> စာရင်းဇယား/quote ကဒ် (တနင်္လာ)</li>
+        <li><span class="tag car">CAROUSEL</span> how-it-works ၃–၆ မျက်နှာ (ဗုဒ္ဓဟူး)</li>
+        <li><span class="tag reel">REEL</span> TikTok ဗီဒီယို ပြန်သုံး (သောကြာ)</li>
+        <li><span class="tag story">STORY</span> Poll / countdown / quiz (တနင်္ဂနွေ)</li>
+      </ul>
+    </div>
+    <div class="card"><h4>TikTok ဖော်မက်များ</h4>
+      <ul>
+        <li><span class="tag vid">DEMO</span> 15–25s screen record + voiceover</li>
+        <li><span class="tag vid">TRANSITION</span> Paper ကဒ် → ဒစ်ဂျစ်တယ်ကဒ် လှန်ခြင်း</li>
+        <li><span class="tag vid">TALK</span> မျက်နှာချင်းဆိုင် မြန်မာလို အကြံပြုချက်</li>
+        <li><span class="tag vid">TREND</span> Trending audio + ထုတ်ကုန် overlay</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="sub">Hook စုဆောင်းမှု (ပထမ ၂ စက္ကန့် / ပထမ စာကြောင်း)</h3>
+  <div class="pillrow">
+    <span class="pill">"Paper ကဒ်တွေ ကုန်ပြီလား?"</span>
+    <span class="pill">"QR တစ်ခုတည်းနဲ့ အကုန် မျှဝေလို့ရတယ်"</span>
+    <span class="pill">"ဒီကဒ် ဘယ်တော့မှ မပျောက်ဘူး"</span>
+    <span class="pill">"NFC tap = instant connect"</span>
+    <span class="pill">"လက်ကဒ် ၅၀ စုနေစရာ မလိုတော့ဘူး"</span>
+    <span class="pill">"Wait, your card can do THIS?"</span>
+    <span class="pill">"ဖိတ်စာတွေကို online နဲ့ ဖြန့်မယ်"</span>
+  </div>
+
+  <h3 class="sub">အပတ်စဉ် ကွန်တင့် ပုံမှန် စည်းချက် (ပြန်လုပ်နိုင်သော မူဘောင်)</h3>
+  <table>
+    <tr><th>နေ့</th><th>မဏ္ဍိုင်</th><th>Facebook</th><th>TikTok</th></tr>
+    <tr><td>တနင်္လာ</td><td>ပညာရေး</td><td>စာရင်းဇယား ကဒ် + စာတန်း ရှည်</td><td>—</td></tr>
+    <tr><td>အင်္ဂါ</td><td>ပြသမှု</td><td>—</td><td>Template demo / transition</td></tr>
+    <tr><td>ဗုဒ္ဓဟူး</td><td>အသုံးပြုမှု ပုံစံ</td><td>Carousel "ဘယ်သူက လိုသလဲ"</td><td>—</td></tr>
+    <tr><td>ကြာသပတေး</td><td>ပညာရေး</td><td>—</td><td>မြန်မာလို talk / အကြံပြု ဗီဒီယို</td></tr>
+    <tr><td>သောကြာ</td><td>လူမှု သက်သေ</td><td>Testimonial / case study + Reel</td><td>—</td></tr>
+    <tr><td>စနေ</td><td>Offer / BTS</td><td>—</td><td>Trend / BTS / promo ဗီဒီယို</td></tr>
+    <tr><td>တနင်္ဂနွေ</td><td>Engagement</td><td>Story poll + recap ပို့စ်</td><td>—</td></tr>
+  </table>
+</div>
+
+<!-- ================= 4. 60-DAY CALENDAR ================= -->
+<div class="page">
+  <div class="pagehead"><h2>၄ · ရက် ၆၀ ပြက္ခဒိန်</h2><span class="no">SECTION 04</span></div>
+  <div class="note"><b>သင်္ကေတများ —</b> <span class="tag pre">PRE</span> Launch မတိုင်မီ · <span class="tag gold">LCH</span> Launch · <span class="tag live">GRO</span> တိုးတက်မှု · <span class="tag fb">FB</span> Facebook · <span class="tag tt">TT</span> TikTok။ Script နံပါတ်များသည် Section 5 ကို ရည်ညွှန်းသည်။</div>
+
+  <h3 class="sub">အဆင့် ၁ — Launch မတိုင်မီ (အပတ် ၁–၂ · Day 1–14)</h3>
+  <table>
+    <tr><th>နေ့</th><th>အဆင့်</th><th>ပလက်ဖောင်း</th><th>ပို့စ်</th><th>စာတန်း အဓိကအကြောင်း / hook</th></tr>
+    <tr><td>1</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span>+<span class="tag tt">TT</span></td><td>Brand teaser — လိုဂို ကာတွန်း ဖော်ပြချက်</td><td>"မြန်မာပြည်အတွက် အသစ်တစ်ခု လာနေပြီ။" → Script S1</td></tr>
+    <tr><td>2</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>POV ဗီဒီယို — paper ကဒ် ပြည့်နေသည့် လက်</td><td>"Paper ကဒ်တွေ ထပ်လား? မလိုတော့ဘူး။" → S2</td></tr>
+    <tr><td>3</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>စာရင်းဇယား ကဒ် — "ကဒ် ၁ ခု ပျောက် = client ၁ ယောက် ပျောက်"</td><td>Problem ပို့စ် — ဒစ်ဂျစ်တယ်ကဒ်က ဘာကြောင့် သာလဲ → S3</td></tr>
+    <tr><td>4</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>Duet/POV "client အသစ်နှင့် တွေ့ဆုံခြင်း" clip</td><td>paper ကဒ် ပေးရသည့် အဆင်မပြေမှု ပြရန် → S2 ပုံစံကွဲ</td></tr>
+    <tr><td>5</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>Carousel — "ဒစ်ဂျစ်တယ်ကဒ် လိုအပ်သည့် အကြောင်းရင်း ၅ ချက်"</td><td>ပညာရေး carousel → S4</td></tr>
+    <tr><td>6</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>Countdown ဂရပ်ဖစ် (၁၂ ရက်)</td><td>စောင့်မျှော်မှု + "waitlist အတွက် bio link ကို tap လုပ်ပါ"</td></tr>
+    <tr><td>7</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>Story poll — "paper ကဒ်တွေ သယ်နေသေးလား?"</td><td>Engagement + အချက်အလက် စုဆောင်းမှု</td></tr>
+    <tr><td>8</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>အဖွဲ့ မိတ်ဆက် / နောက်ကွယ် မြင်ကွင်း</td><td>BTS — "NEX CARD ကို ငါတို့ တည်ဆောက်ခဲ့တယ်" → S5</td></tr>
+    <tr><td>9</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>QR teaser ပုံ (scan me)</td><td>"ဒါကို scan — ဘာဖြစ်မလဲ?" → S6</td></tr>
+    <tr><td>10</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>QR scan transition ဗီဒီယို</td><td>Screen-rec — QR scan → profile ဖွင့်ခြင်း</td></tr>
+    <tr><td>11</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>Carousel — အမျိုးအစား ၄ မျိုး ကြိုမြည်း (ကဒ် ၄ ခု)</td><td>"Name card, Portfolio, Business, Wedding" → S7</td></tr>
+    <tr><td>12</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>Countdown (၆ ရက်) + waitlist reminder</td><td>"မကြာခင် launch — မင်းရဲ့ကဒ် ကြိုယူထားပါ"</td></tr>
+    <tr><td>13</td><td><span class="tag pre">PRE</span></td><td><span class="tag fb">FB</span></td><td>"ပထမဆုံး အသုံးပြုသူ ၅၀" early-bird ပို့စ်</td><td>Launch promo ကြေညာချက် → S8</td></tr>
+    <tr><td>14</td><td><span class="tag pre">PRE</span></td><td><span class="tag tt">TT</span></td><td>နောက်ဆုံး countdown ဗီဒီယို (မနက်ဖြန် launch)</td><td>စိတ်လှုပ်ရှားမှု မြင့်၊ trending audio</td></tr>
+  </table>
+</div>
+
+<div class="page">
+  <div class="pagehead"><h2>၄ · ရက် ၆၀ ပြက္ခဒိန် (ဆက်လက်)</h2><span class="no">SECTION 04</span></div>
+  <h3 class="sub">အဆင့် ၂ — Launch (အပတ် ၃–၄ · Day 15–28)</h3>
+  <table>
+    <tr><th>နေ့</th><th>အဆင့်</th><th>ပလက်ဖောင်း</th><th>ပို့စ်</th><th>စာတန်း အဓိကအကြောင်း / hook</th></tr>
+    <tr><td>15</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span>+<span class="tag tt">TT</span></td><td>🚀 LAUNCH DAY — ထုတ်ကုန် ဖွင့်ပြချက်</td><td>"NEX CARD စတင်ပြီ" + promo code → S9</td></tr>
+    <tr><td>16</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>Demo — ကဒ် ၁ ခုကို စက္ကန့် ၆၀ အတွင်း ဖန်တီး</td><td>Screen-rec how-it-works → S10</td></tr>
+    <tr><td>17</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>Carousel — "ဘယ်လို အလုပ်လုပ်လဲ" အဆင့် ၅ ဆင့်</td><td>Register → choose → pay → get card → share</td></tr>
+    <tr><td>18</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>Template tour 1 — Name cards (Titanium/Prism)</td><td>Name-card design ၅ ခု လှန်ကြည့် → S11</td></tr>
+    <tr><td>19</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>NFC ကဒ် unboxing ဗီဒီယို</td><td>ရုပ်ပိုင်း ကဒ် ဖွင့်ပြမှု → S12</td></tr>
+    <tr><td>20</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>NFC tap demo (iPhone/Android)</td><td>"Tap — ပြီးပြီ။ ဒါပဲ။"</td></tr>
+    <tr><td>21</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>ဈေးနှုန်း ရှင်းပြချက် ပို့စ် (MMK)</td><td>ပွင့်လင်းသော ဈေးနှုန်း + promo → S13</td></tr>
+    <tr><td>22</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>Before/after — paper → ဒစ်ဂျစ်တယ်ကဒ် လှန်ခြင်း</td><td>မျက်စိ ကျေနပ်ဖွယ် + CTA</td></tr>
+    <tr><td>23</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>Template tour 2 — Portfolio (Canvas/Studio)</td><td>Portfolio ပြသမှု → S14</td></tr>
+    <tr><td>24</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>QR code ကို သောက်စရာ menu / ပြေစာပေါ်</td><td>လက်တွေ့ဘဝတွင် QR နေရာချထားမှု အကြံပြုချက်</td></tr>
+    <tr><td>25</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>အစောပိုင်း အသုံးပြုသူ testimonial #1</td><td>ပထမဆုံး လူမှု သက်သေ → S15</td></tr>
+    <tr><td>26</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>Wedding invite template tour</td><td>Celestial / Eternal wedding စာမျက်နှာများ → S16</td></tr>
+    <tr><td>27</td><td><span class="tag gold">LCH</span></td><td><span class="tag fb">FB</span></td><td>FAQ ပို့စ် (ငွေပေးချေမှု proof စနစ်)</td><td>"MMK ငွေပေးချေမှု ဘယ်လို အလုပ်လုပ်လဲ?" → S17</td></tr>
+    <tr><td>28</td><td><span class="tag gold">LCH</span></td><td><span class="tag tt">TT</span></td><td>Trending audio + launch promo reminder</td><td>"ဒီအပတ်နဲ့ offer ပြီးမယ်"</td></tr>
+  </table>
+</div>
+
+<div class="page">
+  <div class="pagehead"><h2>၄ · ရက် ၆၀ ပြက္ခဒိန် (ဆက်လက်)</h2><span class="no">SECTION 04</span></div>
+  <h3 class="sub">အဆင့် ၃ — တိုးတက်မှု (အပတ် ၅–၈ · Day 29–56)</h3>
+  <table>
+    <tr><th>နေ့</th><th>အဆင့်</th><th>ပလက်ဖောင်း</th><th>ပို့စ်</th><th>စာတန်း အဓိကအကြောင်း / hook</th></tr>
+    <tr><td>29</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Business Ad template tour (Neon/Empire)</td><td>ဆိုင်ရှင်များ spotlight → S18</td></tr>
+    <tr><td>30</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Case study — agent က NFC ကဒ် သုံးပုံ</td><td>"ပွဲမှာ ကဒ်ပေးစရာ မလိုတော့ဘူး" ဇာတ်လမ်း</td></tr>
+    <tr><td>31</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Tip — QR ကို စားပွဲ / menu ပေါ် ထားပါ</td><td>နေရာချထားမှု အကြံပြုချက်များ → S19</td></tr>
+    <tr><td>32</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Showcase — scan analytics counter</td><td>"ငါ့ကဒ် အကြိမ် ၈၀ scan ခံခဲ့ရတယ်"</td></tr>
+    <tr><td>33</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Testimonial #2 + ဓာတ်ပုံ</td><td>အသုံးပြုသူ အစစ် quote ကဒ်</td></tr>
+    <tr><td>34</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Salon/ဆိုင် use-case mini-documentary</td><td>အလှပြင်ဆိုင်အတွက် biz ကဒ်</td></tr>
+    <tr><td>35</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Story quiz + engagement ပို့စ်</td><td>"မင်းရဲ့ ကဒ်စတိုင်က ဘာလဲ?" quiz</td></tr>
+    <tr><td>36</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Trend — "POV မင်း ငါ့ကို တွေ့တယ်" + ကဒ် pop-up</td><td>ဖျော်ဖြေမှု + brand</td></tr>
+    <tr><td>37</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Wedding use-case carousel</td><td>"ဒစ်ဂျစ်တယ် ဖိတ်စာ၊ print မလိုတော့ဘူး" → S20</td></tr>
+    <tr><td>38</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Freelancer portfolio သင်ခန်းစာ</td><td>"NEX CARD ကို မင်းရဲ့ TikTok bio မှာ ထည့်ပါ"</td></tr>
+    <tr><td>39</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Poll — "ဘယ် template အကြိုက်ဆုံးလဲ?"</td><td>အသိုက်အဝန်း ရွေးချယ်မှု → viral မဲပေးမှု</td></tr>
+    <tr><td>40</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>BTS — NFC ကဒ် ပုံနှိပ်ခြင်း</td><td>စက်ရုံ/လုပ်ငန်းစဉ် ကွန်တင့်</td></tr>
+    <tr><td>41</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Reel — ကဒ် မျှဝေနည်း ၃ နည်း</td><td>QR၊ NFC၊ link — recap</td></tr>
+    <tr><td>42</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Case study — အလုပ်ရှာသူ အလုပ်ရရှိခဲ့</td><td>"ဒီကဒ်နဲ့ interview ရတယ်"</td></tr>
+    <tr><td>43</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>၁လ စာရင်းဇယား recap ပို့စ်</td><td>Reach + signups milestone → S21</td></tr>
+    <tr><td>44</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Trending audio + customer reaction clip</td><td>UGC ခံစားချက်</td></tr>
+    <tr><td>45</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Business hours / ဆိုင် feature carousel</td><td>Deep-dive — Business Ad အမျိုးအစား</td></tr>
+    <tr><td>46</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>"ကဒ်ကို phone wallet ထဲ ဘယ်လို ထည့်မလဲ" tip</td><td>လက်တွေ့ တန်ဖိုးရှိသော ဗီဒီယို</td></tr>
+    <tr><td>47</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Testimonial #3 (မင်္ဂလာ စုံတွဲ)</td><td>စိတ်ခံစားမှုဆိုင်ရာ သက်သေ</td></tr>
+    <tr><td>48</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Gift idea — တစ်ယောက်ယောက်အတွက် ကဒ် ဝယ်ပေးခြင်း</td><td>မျှဝေနိုင် / လက်ဆောင်ပေးနိုင် ရှုထောင့်</td></tr>
+    <tr><td>49</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>နှိုင်းယှဉ်မှု — paper ကဒ် vs NEX CARD</td><td>Side-by-side carousel → S22</td></tr>
+    <tr><td>50</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Refer-a-friend promo ကြေညာချက်</td><td>Virality စနစ် → S23</td></tr>
+    <tr><td>51</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Studio/Forge portfolio spotlight</td><td>Creator ပရိသတ်</td></tr>
+    <tr><td>52</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Q&amp;A ဗီဒီယို — အမေးများဆုံး မေးခွန်းများ</td><td>ယုံကြည်မှု + အာဏာ authority</td></tr>
+    <tr><td>53</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>Customer ဓာတ်ပုံ နံရံ (UGC roundup)</td><td>Community love ပို့စ်</td></tr>
+    <tr><td>54</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>Trend — desk setup + ကဒ်ကို desk ပေါ်</td><td>Lifestyle reach</td></tr>
+    <tr><td>55</td><td><span class="tag live">GRO</span></td><td><span class="tag fb">FB</span></td><td>၂လ recap + "ဘာဆက်လာမလဲ" teaser</td><td>Milestone + roadmap → S24</td></tr>
+    <tr><td>56</td><td><span class="tag live">GRO</span></td><td><span class="tag tt">TT</span></td><td>ကျေးဇူးတင်စကား ဗီဒီယို + ဆက်လက် promo</td><td>ကျေးဇူးသိမှု + နောက် offer</td></tr>
+  </table>
+  <div class="note"><b>အပတ် ၈ ပြန်လုပ်မှု (Day 57–60) —</b> W1–7 မှ စွမ်းဆောင်ရည် အမြင့်ဆုံး ပို့စ်များကို ပြန်လည် မျှဝေပါ — Day 15 (launch)၊ Day 20 (NFC)၊ Day 32 (analytics)၊ Day 50 (referral)။</div>
+</div>
+
+<!-- ================= 5. SCRIPTS ================= -->
+<div class="page">
+  <div class="pagehead"><h2>၅ · တင်ရန် အသင့်ဖြစ်ပြီးသား Script များ</h2><span class="no">SECTION 05</span></div>
+  <p class="body lead">Facebook အတွက် စာတန်း အပြည့်အစုံနှင့် TikTok အတွက် script များ။ မြန်မာလို အဓိက စာတန်းဖြစ်ပြီး နိုင်ငံတကာ reach အတွက် အင်္ဂလိပ်လို အောက်တွင် ဖော်ပြထားသည်။ script တစ်ခုချင်းစီအတွက် တင်ရမည့် အချိန်ကို ဖော်ပြထားသည်။</p>
+
+  <div class="script">
+    <div class="script-head"><span>S1 · Launch Teaser</span><span class="who">Day 1 · FB+TT</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">ဟဲလို မြန်မာပြည် 👋
+တစ်ခုခု အသစ် လာနေပြီ။
+Paper card တွေ လက်ထဲ စုပြီး ပျောက်သွားတာတွေ၊ ဖုန်းနံပါတ်တောင်း မေ့သွားတာတွေ — အဲ့ဒါတွေ အကုန် အဆုံးသတ်ဖို့ လာပြီ။
+NEX CARD — မင်းရဲ့ digital identity တစ်ခုတည်း။
+🚀 ၁၅ ရက်အတွင်း launch မယ်။
+👉 ဒီ post ကို share ပြီး သူငယ်ချင်းတွေကို အသိပေးလိုက်နော်။</div>
+      <div class="label">အင်္ဂလိပ်ဘာသာ</div>
+      <div class="en">Hello Myanmar 👋 Something new is coming. Tired of losing paper cards and forgotten phone numbers? That ends now. NEX CARD — your one digital identity. 🚀 Launching in 15 days. Share this to spread the word!</div>
+      <div class="label">ပစ္စည်း (Asset)</div>
+      <div class="mm">လိုဂို ကာတွန်း ဖော်ပြချက်၊ အနက်ရောင် ပေါ် ရွှေရောင်၊ TikTok 15s + FB အတွက် cover ပုံ။</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S2 · Paper-Card Problem (POV)</span><span class="who">Day 2 / 4 · TT</span></div>
+    <div class="script-body">
+      <div class="label">TikTok script (15s)</div>
+      <div class="mm">[Scene: hand full of crumpled paper cards]
+Text: "ဒီကဒ် ၅၀ ထဲက တစ်ကဒ်ပဲ အလုပ်ဖြစ်တာ"
+Voiceover: Paper cards တွေ ပေးစရာကုန်သွားလား? ပျောက်သွားရင် client ပါ ပျောက်တယ်။
+[Transition: card flips into digital card with QR]
+NEX CARD — တစ်ကြိမ် scan, ထာဝရ မှတ်ဉာဏ်။</div>
+      <div class="label">အင်္ဂလိပ်ဘာသာ</div>
+      <div class="en">POV: you're out of paper cards. Lose the card, lose the client. One scan on NEX CARD and you're never forgotten.</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S3 · Problem Stat Card</span><span class="who">Day 3 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">📊 တစ်နှစ်မှာ ဖောက်သည် ၁၀ ယောက် ဆုံးရှုံးနေလား?
+Paper business card ပျောက်သွားတာနဲ့ အဆက်အသွယ် ပြတ်သွားတတ်ပါတယ်။
+NEX CARD ဆိုရင်တော့ —
+✅ QR နဲ့ ၁ စက္ကန့်အတွင်း share
+✅ Phone ထဲမှာ အမြဲ ရှိနေ
+✅ Scan တိုင်း မှတ်တမ်း ရှိ
+"ကဒ် ပျောက်ရင် client ပါ ပျောက်" — ဒီတစ်ခါတော့ မပျောက်တော့ဘူး။</div>
+      <div class="label">အင်္ဂလိပ်ဘာသာ</div>
+      <div class="en">Lost one card, lost one client. With NEX CARD your contact never disappears — scan, save, done.</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S4 · 5 Reasons Carousel</span><span class="who">Day 5 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">5 reasons မင်း digital business card လိုတယ် 👇
+1️⃣ ဘယ်တော့မှ မပျောက် — phone ထဲ အမြဲရှိ
+2️⃣ ၁ စက္ကန့်နဲ့ share — QR or NFC
+3️⃣ Portfolio / Business page ပါ တွဲထည့်လို့ရ
+4️⃣ Wedding invitation တောင် လုပ်လို့ရ
+5️⃣ Scan analytics — ဘယ်သူ ကြည့်လဲ သိရ
+👉 Swipe ကြည့်ပြီး comment မှာ "digital" လို့ ရိုက်ထားနော်။</div>
+      <div class="label">ပစ္စည်း (Asset)</div>
+      <div class="mm">5-slide carousel၊ နံပါတ်တပ်၊ အနက်ရောင်ပေါ် ရွှေရောင်။</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S5 · Behind the Scenes</span><span class="who">Day 8 · TT</span></div>
+    <div class="script-body">
+      <div class="label">TikTok script (20s)</div>
+      <div class="mm">[B-Roll: code on screen, designs, coffee, team laughing]
+Text: "ဒါက ကျွန်တော်တို့ သုံးလအတွင်း တည်ဆောက်ထားတာ"
+Voiceover: QR တွေ၊ NFC ကဒ်တွေ၊ wedding page တွေ — အကုန် မြန်မာဈေးနဲ့။
+NEX CARD ကို မြန်မာ အတွက် လုပ်ထားတာပါ။
+Comment "ဖွင့်" ဆိုရင် launch ရက်ကို DM ပေးမယ်။</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S6 · QR Teaser</span><span class="who">Day 9 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">🔍 ဒီ QR ကို scan ကြည့်ပါ…
+ဘာဖြစ်မယ်ဆိုတာ မင်း မမျှော်လင့်ဘူး။
+NEX CARD — ဒီ QR လေးတွေက မင်း ဆက်သွယ်ရေးအတွက် သော့တွေပါ။
+Launch ရက် မရောက်ခင် အကြိုကြည့်ဖို့ comment "QR" ရိုက်ထားနော်။</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S7 · Category Preview</span><span class="who">Day 11 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">NEX CARD နဲ့ ၄ မျိုး ဖန်တီးလို့ရတယ် ✨
+1️⃣ Digital Name Card — ပရော်ဖက်ရှင်နယ် တစ်ယောက်အတွက်
+2️⃣ Portfolio — အနုပညာရှင် / developer တွေအတွက်
+3️⃣ Business Ad — ဆိုင်တွေ / လုပ်ငန်းတွေအတွက်
+4️⃣ Wedding Invitation — ခနဲ့မင်္ဂလာပွဲတွေအတွက်
+ဘယ်ဟာ မင်းနဲ့ ကိုက်လဲ? Comment မှာ ပြောသွားနော် 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S8 · Early-Bird Promo</span><span class="who">Day 13 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">🎁 EARLY BIRD — ပထမဆုံး ၅၀ ယောက်
+Launch ဖြစ်တဲ့နေ့ ပထမဆုံး စာရင်းသွင်းသူ ၅၀ ကို —
+✅ Free QR code (premium template)
+✅ NFC card discount
+✅ ၆လ အတွင်း အဆင့်မြှင့်ခွင့်
+👉 ဒီ post ကို share + comment "ME" လို့ ရိုက်ထားပါ။
+Launch နေ့ကို မှတ်ထားနော် ⏰</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="pagehead"><h2>၅ · Script များ (ဆက်လက်)</h2><span class="no">SECTION 05</span></div>
+
+  <div class="script">
+    <div class="script-head"><span>S9 · Launch Day</span><span class="who">Day 15 · FB+TT</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">🚀 OFFICIALLY LIVE!
+NEX CARD — မြန်မာပြည်ရဲ့ digital identity platform ကို စတင်လိုက်ပါပြီ။
+ဒီနေ့ကစပြီး —
+🎯 Digital Name Card
+🎯 Portfolio
+🎯 Business Ad
+🎯 Wedding Invitation
+အကုန်လုံး မင်း ဖန်တီးလို့ရပြီ။
+🎁 LAUNCH CODE: <b>NEX50</b> (50% off first 50 users)
+👉 Link in bio / comment "link" ရိုက်ထားပါ!</div>
+      <div class="label">အင်္ဂလိပ်ဘာသာ</div>
+      <div class="en">We're LIVE! Create your digital name card, portfolio, business page or wedding invite today. Use code NEX50 for the first 50 users. Link in bio!</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S10 · 60-Second Demo</span><span class="who">Day 16 · TT</span></div>
+    <div class="script-body">
+      <div class="label">TikTok script (30s)</div>
+      <div class="mm">[Screen recording voiceover]
+Step 1: Sign up (10s)
+Step 2: Choose category + template (10s)
+Step 3: Add your info & photo (15s)
+Step 4: Get your QR + link (5s)
+"ဒါလောက်ပဲ — ၁ မိနစ်မပြည့်ဘူး။"
+ဘာမှ download စရာမလို — browser ထဲမှာပဲ။
+Save ပြီး နောက်မှ လုပ်ကြည့်ပါ ✅</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S11 · Name Card Template Tour</span><span class="who">Day 18 · TT</span></div>
+    <div class="script-body">
+      <div class="label">TikTok script (20s)</div>
+      <div class="mm">[Flip through: Titanium → Prism → Obsidian → Coral → Aurora]
+Text: "ဘယ် design က မင်းနဲ့ ကိုက်လဲ?"
+Titanium — executive look
+Prism — creative colors
+Obsidian — minimal black
+Coral — warm & friendly
+Aurora — colorful gradient
+Comment the number! 1-5 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S12 · NFC Card Unboxing</span><span class="who">Day 19 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">📦 NEX CARD NFC — unboxing!
+ဒီကဒ်လေး မင်း ဖုန်းနဲ့ tap လိုက်ရင် — မင်းရဲ့ digital profile ကို ဖွင့်ပေးတယ်။
+✅ Premium material
+✅ Tap-to-share
+✅ QR fallback ပါ ပါတယ်
+Physical card နဲ့ digital — နှစ်မျိုးလုံး လိုချင်လား?
+Comment "NFC" ရိုက်ထားပါ 🖤</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S13 · Pricing Post</span><span class="who">Day 21 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">💰 အမြဲ ရှင်းရှင်းလင်းလင်း ဈေးနှုန်း
+NEX CARD မှာ နှစ်စဉ် fee မရှိ၊ hidden charge မရှိ — one-time payment သာ။
+▫️ QR Only — သက်သာဆုံး
+▫️ NFC Card — tap-to-share
+▫️ NFC + QR — အပြည့်စုံဆုံး (အကြံပြု)
+Payment က bank / Viber transfer နဲ့ MMK နဲ့ ပေးရတယ်။ Admin က proof စစ်ပြီး approve လုပ်ပေးပါတယ် — လုံခြုံပြီး transparent။
+ဘယ် tier လဲ? Comment 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S14 · Portfolio Tour</span><span class="who">Day 23 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">🎨 Job seeker တွေ / freelancer တွေအတွက် —
+Portfolio template တွေကို ကြည့်ပါ။
+Canvas · Studio · Forge · Spectrum · Blueprint
+မင်းရဲ့ work တွေ၊ skills တွေ၊ testimonials တွေ ပါ ထည့်လို့ရတယ်။
+👉 CV နဲ့တွဲပြီး link လုပ်လိုက်ရင် — "wow" ရတယ်။
+Comment "portfolio" ရိုက်ပြီး ဥပမာ ကြည့်လိုက်နော် ✨</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S15 · Testimonial #1</span><span class="who">Day 25 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">⭐ ပထမဆုံး user တစ်ယောက်ရဲ့ အမြင်
+"အရင်က ကဒ်တွေ အမြဲ ပျောက်တယ်။ အခု NEX CARD ဆို QR နဲ့ ၁ စက္ကန့်အတွင်း client တွေကို share လို့ရတယ်။ တကယ် ဝမ်းသာတယ်။"
+— ကိုအောင်မြင့်, Sales Agent
+မင်းလည်း ဒီလိုပဲ ခံစားချင်လား? Join us 👉 Link in bio</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S16 · Wedding Invitation</span><span class="who">Day 26 · TT</span></div>
+    <div class="script-body">
+      <div class="label">TikTok script (25s)</div>
+      <div class="mm">[Show Celestial wedding page: names, date, gallery]
+Text: "မင်္ဂလာဖိတ်စာ print လုပ်စရာ မလိုတော့ဘူး 😍"
+Voiceover: ဖိတ်စာ တစ်စောင် QR နဲ့ — ဧည့်သည်အားလုံး ဖုန်းထဲမှာ။
+Photos, story, milestone, date — အကုန်ပါ။
+Save this for your big day 💍</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S17 · Payment FAQ</span><span class="who">Day 27 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">❓ "Payment က ဘယ်လို လုပ်ရလဲ?"
+1️⃣ Tier ရွေးပါ
+2️⃣ Bank / Viber transfer (MMK)
+3️⃣ Screenshot upload လုပ်ပါ
+4️⃣ Admin က ၂၄နာရီအတွင်း verify
+5️⃣ Approve ဖြစ်တာနဲ့ ချက်ချင်း edit လို့ရ
+အဆင့်တိုင်း transparent — စိတ်ချရတယ် ✅
+More questions? Comment below 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S18 · Business Ad Tour</span><span class="who">Day 29 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">🏪 ဆိုင်ရှင်တွေအတွက် —
+NEX CARD Business Ad page
+✅ မင်းရဲ့ services
+✅ Business hours
+✅ ဈေးနှုန်း / promos
+✅ Map + contact
+✅ QR ကို ဆိုင်တံခါးမှာ ကပ်ထားရုံပဲ
+Templates: Vault · Neon · Marquee · Empire · District
+"ဆိုင်လေးရှိလား?" — Comment "shop" 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S19 · QR Placement Tips</span><span class="who">Day 31 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">📍 QR ကို ဘယ်မှာ ထားမလဲ? ၅ နေရာ
+1️⃣ ဆိုင်တံခါး / window
+2️⃣ Menu / ဘီလ်ပေါ်
+3️⃣ စားပွဲပေါ် (table stand)
+4️⃣ မင်းရဲ့ TikTok / FB bio
+5️⃣ Product packaging
+QR တစ်ခုတည်းနဲ့ — "scan now, contact saved forever."
+NEX CARD နဲ့ မင်း QR ရယူလိုက်ပါ ✅</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S20 · Wedding Use-Case</span><span class="who">Day 37 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">💍 Digital wedding invitation — ဘာလို့ သုံးသင့်လဲ?
+✅ Print စရာမလို — money & time save
+✅ ဧည့်သည်အားလုံးကို ၁ လင့်နဲ့ ဖိတ်လို့ရ
+✅ Photos & story တွေ ထည့်လို့ရ
+✅ QR တစ်ခု — တစ်အိမ်လုံး ဖတ်လို့ရ
+Couple တွေ အတွက် NEX CARD Wedding template 🎀
+မင်္ဂလာပွဲ ရှိလား? Comment "wedding" 👇</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S21 · 1-Month Stats</span><span class="who">Day 43 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">📈 ၁ လအတွင်း — ဒီလောက် ဖြစ်လာပြီ!
+✅ Users: 300+
+✅ Cards created: 60+
+✅ QR scans: 1,200+
+✅ Templates live: 20
+ဒါ စတင်နေတုန်းပဲ — မင်းလည်း အခု join လုပ်လိုက်ရင် early-bird လို့ သတ်မှတ်ခံရမယ် 🚀
+👉 Link in bio</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S22 · Paper vs Digital</span><span class="who">Day 49 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း (carousel)</div>
+      <div class="mm">Paper Card 🔁 NEX CARD
+• ပျောက်တယ် → ဘယ်တော့မှ မပျောက်
+• ၅၀ ကဒ်စုရတယ် → ၁ ကဒ်နဲ့ ပြီး
+• Update လို့မရ → ၁ မိနစ်နဲ့ update
+• Scan count မသိ → analytics ရှိ
+• Print စရိတ် → one-time, ပိုသက်သာ
+"အချိန် ကျော်သွားပြီ — digital ကို ပြောင်းလိုက်ပါ"</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S23 · Refer-a-Friend</span><span class="who">Day 50 · TT+FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">🤝 Refer a friend — နှစ်ယောက်လုံး အကျိုးခံစားရမယ်!
+မင်း referral link ကနေ သူငယ်ချင်း sign up လုပ်ရင် —
+🎁 မင်း — နောက်တစ်ကြိမ် 20% off
+🎁 သူငယ်ချင်း — welcome bonus
+"မင်းရဲ့ သူငယ်ချင်းတွေလည်း ဒါလိုတယ်လေ"
+👉 Comment "refer" ဆိုရင် link ပေးမယ်!</div>
+    </div>
+  </div>
+
+  <div class="script">
+    <div class="script-head"><span>S24 · 2-Month Recap</span><span class="who">Day 55 · FB</span></div>
+    <div class="script-body">
+      <div class="label">Facebook စာတန်း</div>
+      <div class="mm">🎉 နှစ်လ ပြည့် — ကျေးဇူးတင်ပါတယ်!
+NEX CARD ကို ယုံကြည်ပြီး သုံးပေးတဲ့ user တိုင်းကို ရင်ထဲက ကျေးဇူးတင်ပါတယ် 🙏
+ဒီနှစ်လအတွင်း —
+• 500+ users
+• 120+ cards
+• 3,000+ scans
+နောက်လတွေမှာ — NFC mass-production, wedding template အသစ်တွေ၊ နဲ့ business packages လာမယ်။
+Stay tuned ✨ မင်းလည်း ပါဝင်ချင်လား? Link in bio!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 6. HASHTAGS ================= -->
+<div class="page">
+  <div class="pagehead"><h2>၆ · Hashtag ဘဏ်</h2><span class="no">SECTION 06</span></div>
+  <p class="body">ပို့စ်တစ်ခုလျှင် ၃–၅ ခု သုံးပါ။ <b>brand</b> tag + <b>အကြောင်းအရာ</b> tag + <b>ဒေသခံ</b> tag + <b>ကျယ်ပြန့်</b> tag ကို ပေါင်းစပ်ပါ။</p>
+  <table>
+    <tr><th>ရည်ရွယ်ချက်</th><th>Hashtag များ</th></tr>
+    <tr><td><b>Brand</b></td><td><span class="pill">#NexCard</span> <span class="pill">#NexCardMyanmar</span> <span class="pill">#NexCardMM</span></td></tr>
+    <tr><td><b>ဒေသခံ</b></td><td><span class="pill">#မြန်မာ</span> <span class="pill">#MyanmarBusiness</span> <span class="pill">#DigitalMyanmar</span> <span class="pill">#MyanmarStartup</span></td></tr>
+    <tr><td><b>အကြောင်းအရာ — ကဒ်</b></td><td><span class="pill">#DigitalBusinessCard</span> <span class="pill">#DigitalNameCard</span> <span class="pill">#BusinessCard</span> <span class="pill">#NFCCard</span></td></tr>
+    <tr><td><b>အကြောင်းအရာ — နည်းပညာ</b></td><td><span class="pill">#QRCode</span> <span class="pill">#TapToShare</span> <span class="pill">#DigitalTransformation</span> <span class="pill">#NFC</span></td></tr>
+    <tr><td><b>အကြောင်းအရာ — အလုပ်အကိုင်</b></td><td><span class="pill">#Freelancer</span> <span class="pill">#JobSeeker</span> <span class="pill">#Portfolio</span> <span class="pill">#CareerTips</span></td></tr>
+    <tr><td><b>အကြောင်းအရာ — လုပ်ငန်း</b></td><td><span class="pill">#SME</span> <span class="pill">#SmallBusiness</span> <span class="pill">#ShopOwner</span> <span class="pill">#Entrepreneur</span></td></tr>
+    <tr><td><b>အကြောင်းအရာ — မင်္ဂလာပွဲ</b></td><td><span class="pill">#WeddingInvitation</span> <span class="pill">#မင်္ဂလာပွဲ</span> <span class="pill">#WeddingIdeas</span></td></tr>
+    <tr><td><b>ကျယ်ပြန့်သော reach</b></td><td><span class="pill">#Tech</span> <span class="pill">#Innovation</span> <span class="pill">#FYP</span> <span class="pill">#ForYou</span></td></tr>
+  </table>
+
+  <h3 class="sub">အကြံပြု ပေါင်းစပ်မှုများ (copy-paste)</h3>
+  <div class="grid2">
+    <div class="card"><h4>နေမက်ကဒ် ပို့စ်</h4><p>#NexCard #DigitalBusinessCard #မြန်မာ #NFCCard #FYP</p></div>
+    <div class="card"><h4>Portfolio ပို့စ်</h4><p>#NexCard #Portfolio #Freelancer #JobSeeker #DigitalMyanmar</p></div>
+    <div class="card"><h4>လုပ်ငန်း ပို့စ်</h4><p>#NexCard #SME #SmallBusiness #QRCode #ShopOwner</p></div>
+    <div class="card"><h4>မင်္ဂလာပွဲ ပို့စ်</h4><p>#NexCard #WeddingInvitation #မင်္ဂလာပွဲ #WeddingIdeas</p></div>
+  </div>
+</div>
+
+<!-- ================= 7. CREATIVE GUIDE ================= -->
+<div class="page">
+  <div class="pagehead"><h2>၇ · Visual &amp; Creative လမ်းညွှန်</h2><span class="no">SECTION 07</span></div>
+
+  <h3 class="sub">Brand visual စည်းမျဉ်းများ</h3>
+  <table>
+    <tr><th>အချက်</th><th>လမ်းညွှန်ချက်</th></tr>
+    <tr><td>အရောင်များ</td><td>ရွှေရောင် <b>#d4af37</b> + အနက် <b>#0d0d0f</b> အဓိက။ ပေါ့ပါးသော (light-mode) ပုံစံအတွက် နက်ပြာ/အဖြူ။ ပို့စ်တိုင်း brand နဲ့ လိုက်ဖက်အောင် ထားပါ။</td></tr>
+    <tr><td>Font များ</td><td>Headline အတွက် bold sans-serif၊ body အတွက် သန့်ရှင်းသော sans-serif။ မြန်မာစာ မှန်မှန်ကန်ကန် ပြရမည် (လိုအပ်ပါက Zawgyi/Unicode ထောက်ပံ့မှု)။</td></tr>
+    <tr><td>လိုဂို</td><td>ဂရပ်ဖစ်တိုင်း၏ ထိပ်ဘယ် သို့မဟုတ် အလယ်။ တရားဝင် NEX CARD လိုဂို သုံးပါ။</td></tr>
+    <tr><td>QR demo</td><td>Demo များတွင် အမြဲတမ်း အစစ်အမှန် scan လို့ရသော NEX CARD QR ကို ပြပါ (လူများက scan လုပ်ကြမည်)။</td></tr>
+    <tr><td>စာသား overlay</td><td>TikTok — စာသားကို အောက်သုံးပုံတစ်ပုံတွင် ရိုက်ပါ၊ ဖတ်ရလွယ်အောင်၊ စခရင်တစ်ခုလျှင် စကားလုံး ၂–၄ လုံး။</td></tr>
+  </table>
+
+  <h3 class="sub">ပြင်ဆင်ရမည့် ပစ္စည်းစာရင်း (အပတ် ၀ တွင် အစုလိုက် ဖန်တီးပါ)</h3>
+  <table>
+    <tr><th>ပစ္စည်း (Asset)</th><th>အရေအတွက်</th><th>အသုံးပြုပုံ</th></tr>
+    <tr><td>Branded template mockups (template ၂၀ လုံး)</td><td>20</td><td>Template tours S11/S14/S16/S18</td></tr>
+    <tr><td>စာရင်းဇယား/quote ကဒ်များ (အနက်ပေါ် ရွှေရောင်)</td><td>15</td><td>S3, S21, engagement ပို့စ်များ</td></tr>
+    <tr><td>How-it-works carousel (၅ အဆင့်)</td><td>1 set</td><td>Day 17</td></tr>
+    <tr><td>Screen-record demo clips (signup → ကဒ်)</td><td>3</td><td>S10, Day 32</td></tr>
+    <tr><td>NFC ကဒ် unboxing / tap demo ဗီဒီယို</td><td>2</td><td>S12, Day 20</td></tr>
+    <tr><td>Brand ဇာတ်လမ်း / BTS clips</td><td>3</td><td>S5, Day 40</td></tr>
+    <tr><td>Testimonial ဂရပ်ဖစ်များ (user ဓာတ်ပုံ + quote)</td><td>5</td><td>S15, Day 25/33/47</td></tr>
+    <tr><td>Launch promo banner + countdown များ</td><td>6</td><td>Days 6/12/13/14</td></tr>
+  </table>
+
+  <h3 class="sub">TikTok ရိုက်ကူးရေး အကြံပြုချက်များ</h3>
+  <ul class="checkbox">
+    <li>Vertical 9:16၊ 1080×1920၊ အလင်းရောင် ကောင်းကောင်းဖြင့် ရိုက်ပါ။</li>
+    <li>ပထမ ၂ စက္ကန့်အတွင်း hook ထည့်ပါ (Section 3 ရှိ Hook Library ကို ကြည့်ပါ)။</li>
+    <li>အသံဖွင့်မကြည့်သူများအတွက် စာတန်း (captions) ထည့်ပါ — အများစုက အသံမပါဘဲ ကြည့်ကြသည်။</li>
+    <li>Trending audio သုံးပါ၊ သို့သော် စာတိုးကို ဒေသအရ၊ ရှင်းရှင်းလင်းလင်း ထားပါ။</li>
+    <li>ဗီဒီယိုတိုင်းကို CTA တစ်ခုဖြင့် အဆုံးသတ်ပါ — "Link in bio" သို့မဟုတ် "Comment ____"။</li>
+  </ul>
+</div>
+
+<!-- ================= 8. KPIs ================= -->
+<div class="page">
+  <div class="pagehead"><h2>၈ · စွမ်းဆောင်ရည် KPI နှင့် ခြေရာခံခြင်း</h2><span class="no">SECTION 08</span></div>
+
+  <h3 class="sub">အပတ်စဉ် KPI ပစ်မှတ်များ (အဆင့်တစ်ခုစီ ကုန်ဆုံးချိန်တွင် စုစည်းမှု)</h3>
+  <table>
+    <tr><th>ညွှန်ကိန်း (Metric)</th><th>Launch မတိုင်မီ (W1–2)</th><th>Launch (W3–4)</th><th>တိုးတက်မှု (W5–8)</th></tr>
+    <tr><td>Facebook Page ရောက်ရှိမှု</td><td>5,000</td><td>20,000</td><td>60,000</td></tr>
+    <tr><td>Facebook အပြန်အလှန် တုံ့ပြန်မှု (reactions + comments + shares)</td><td>400</td><td>2,000</td><td>6,000</td></tr>
+    <tr><td>TikTok ကြည့်ရှုမှု</td><td>10,000</td><td>50,000</td><td>150,000</td></tr>
+    <tr><td>Profile ကြည့်ရှုမှု (URL / QR)</td><td>—</td><td>400</td><td>1,200</td></tr>
+    <tr><td>စာရင်းသွင်းမှု</td><td>100 (waitlist)</td><td>200</td><td>500</td></tr>
+    <tr><td>ပေးချေ ကဒ်များ (QR/NFC/NFC+QR)</td><td>—</td><td>25</td><td>60</td></tr>
+  </table>
+
+  <h3 class="sub">ခြေရာခံရန် ကိရိယာများ</h3>
+  <div class="grid2">
+    <div class="card"><h4>📊 ပလက်ဖောင်း အတွင်းပိုင်း (Native insights)</h4><p>Facebook Page Insights + TikTok Analytics — reach၊ views၊ followers၊ top posts။ တနင်္ဂနွေတိုင်း ပြန်လည် သုံးသပ်ပါ။</p></div>
+    <div class="card"><h4>🔗 NEX CARD dashboard</h4><p>user တစ်ဦးချင်းစီ၏ Profile ကြည့်ရှုမှု + QR scan အရေအတွက် — "stats" ပို့စ်များတွင် စစ်မှန်သော ဂဏန်းများ သုံးပါ (S21, S24)။</p></div>
+  </div>
+
+  <h3 class="sub">အပတ်စဉ် ပြန်လည် သုံးသပ်မှု လုပ်ရိုးလုပ်စဉ် (မိနစ် ၃၀၊ တနင်္ဂနွေ ညတိုင်း)</h3>
+  <ul class="checkbox">
+    <li>Tracker sheet တွင် အပတ်၏ reach၊ engagement နှင့် clicks များကို မှတ်တမ်းတင်ပါ။</li>
+    <li>အကောင်းဆုံး ပို့စ် ၂ ခုကို ဖော်ထုတ်ပါ — နောက်အပတ်တွင် ၎င်းတို့၏ ပုံစံကို အတုယူပါ။</li>
+    <li>ပြက္ခဒိန်ကို စစ်ဆေးပါ — နောက်အပတ်အတွက် ပစ္စည်းများကို ပြင်ဆင်ပါ။</li>
+    <li>comment နှင့် DM အားလုံးကို ၂၄ နာရီအတွင်း ပြန်ဖြေပါ။</li>
+    <li>ပြုပြင်ပါ — TikTok views နည်းပါက → ဗီဒီယို တိုစေပြီး trending audio သုံးပါ။</li>
+  </ul>
+</div>
+
+<!-- ================= 9. CHECKLIST ================= -->
+<div class="page">
+  <div class="pagehead"><h2>၉ · Launch စစ်ဆေးစာရင်းနှင့် ပရိုမိုရှင်း စနစ်များ</h2><span class="no">SECTION 09</span></div>
+
+  <h3 class="sub">Launch မတိုင်မီ (အပတ် ၀)</h3>
+  <ul class="checkbox">
+    <li>Facebook Page နှင့် TikTok account (@nexcard) ဖန်တီးပြီး verify လုပ်ပါ။</li>
+    <li>Bio link (FB) နှင့် bio link/website (TikTok) ကို live landing page နှင့် ချိတ်ဆက်ပါ။</li>
+    <li>Landing page waitlist / early-access signup ဖန်တီးပါ။</li>
+    <li>Template mockup ၂၀ + brand kit (logo, colors, fonts) ပြင်ဆင်ပါ။</li>
+    <li>W1–2 ပစ္စည်းများကို အစုလိုက် ထုတ်လုပ်ပါ (Section 7 စစ်ဆေးစာရင်း)။</li>
+    <li>Facebook တွင် "Message" CTA button ထည့်ပါ (WhatsApp/Page DM)။</li>
+  </ul>
+
+  <h3 class="sub">Launch ပရိုမိုရှင်းများ</h3>
+  <table>
+    <tr><th>စနစ်</th><th>နည်းလမ်း</th><th>အချိန်</th></tr>
+    <tr><td>Early-bird code NEX50</td><td>ပထမအသုံးပြုသူ ၅၀ အတွက် 50% off</td><td>Day 13–21</td></tr>
+    <tr><td>Refer-a-friend</td><td>နောက်ဝယ်ယူမှုအတွက် 20% off + welcome bonus</td><td>Day 50 မှစပြီး</td></tr>
+    <tr><td>Share-to-win</td><td>Comment တွင် သူငယ်ချင်း ၃ ယောက် tag → အခမဲ့ NFC upgrade မဲနှိုက်</td><td>အပတ်စဉ် (သောကြာ)</td></tr>
+    <tr><td>Paid boost</td><td>Top 3 organic ပို့စ်များကို boost — target: မြန်မာ၊ 18–45၊ စိတ်ဝင်စားမှု: business/tech</td><td>Day 15 မှစပြီး</td></tr>
+  </table>
+
+  <h3 class="sub">Community စီမံခန့်ခွဲမှု စည်းမျဉ်းများ</h3>
+  <ul class="checkbox">
+    <li>Comment တိုင်းကို ၂၄ နာရီအတွင်း ပြန်ဖြေပါ — မြန်ဆန်မှုက ယုံကြည်မှု တည်ဆောက်ပေးသည်။</li>
+    <li>အဆိုးမြင်သော feedback ကို ဘယ်တော့မှ မဖျက်ပါနှင့် — ပရော်ဖက်ရှင်နယ်ကျကျ ပြန်ဖြေပြီး ပြုပြင်ပေးပါ။</li>
+    <li>Testimonials စုဆောင်းပါ — approve ဖြစ်တိုင်း ၁ ကြောင်း review + ဓာတ်ပုံ မေးပါ။</li>
+    <li>UGC အားပေးပါ — "မင်းရဲ့ကဒ် ပြပါ" လစဉ် challenge။</li>
+  </ul>
+
+  <div class="note"><b>နောက်ဆုံး အကြံပြုချက် —</b> တသမတ်တည်း ဖြစ်ခြင်းက ပြင်းပြခြင်းထက် သာသည်။ Facebook တွင် တစ်ပတ် ၄ ကြိမ်၊ TikTok တွင် တစ်ပတ် ၃ ကြိမ် — ၈ ပတ်ကြာ ဤပြက္ခဒိန်အတိုင်း တင်ခြင်းဖြင့် NEX CARD ကို မြန်မာနိုင်ငံ၏ လူသိအများဆုံး ဒစ်ဂျစ်တယ် အထောက်အထား brand အဖြစ် တည်ထောင်နိုင်မည်။ စောင့်ကြည့်ပါ၊ ပြုပြင်ပါ၊ CTA ရှင်းရှင်းနဲ့ အမြဲ အဆုံးသတ်ပါ။</div>
+</div>
+
+</body>
+</html>
