@@ -297,8 +297,8 @@ function sortItems(items: MockRecord[], orderBy: MockRecord | undefined | null):
   });
 }
 
-function resolveJoins(item: MockRecord | null | undefined, db: DBData): MockRecord {
-  if (!item) return item;
+function resolveJoins(item: MockRecord | null | undefined, db: DBData): MockRecord | null {
+  if (!item) return null;
   const result = { ...item };
   
   if (result.viewCount !== undefined) {
@@ -374,7 +374,8 @@ const noOpHandler = {
         const query = args[0] || {};
         const filtered = collection
           .filter(item => matches(item, query.where))
-          .map(item => resolveJoins(item, db));
+          .map(item => resolveJoins(item, db))
+          .filter((item): item is MockRecord => item !== null);
         const sorted = sortItems(filtered, query.orderBy);
         const sliced = sorted.slice(query.skip || 0, query.skip ? (query.skip + (query.take || sorted.length)) : (query.take || sorted.length));
         return Promise.resolve(sliced);

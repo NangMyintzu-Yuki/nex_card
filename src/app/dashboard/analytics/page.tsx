@@ -182,7 +182,7 @@ export default async function AnalyticsPage() {
               const maxViews  = Number(profiles[0]?.viewCount ?? 1);
               const viewCount = Number(p.viewCount ?? 0);
               const pct       = maxViews > 0 ? Math.round((viewCount / maxViews) * 100) : 0;
-              const color     = CAT_COLORS[p.category?.slug] ?? "#6366f1";
+              const color     = CAT_COLORS[p.category?.slug ?? ""] ?? "#6366f1";
 
               return (
                 <div key={p.id} className="px-5 py-5">
@@ -204,7 +204,7 @@ export default async function AnalyticsPage() {
                         </span>
                       </div>
                       <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
-                        {p.template?.name ?? "Unknown"} · Updated {formatDate(p.updatedAt)}
+                        {p.template?.name ?? "Unknown"} · Updated {formatDate((p as Record<string, unknown>).updatedAt as string)}
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
