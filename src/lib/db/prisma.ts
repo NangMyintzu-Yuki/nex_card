@@ -502,13 +502,15 @@ const mockPrisma = new Proxy({}, {
   }
 }) as unknown as PrismaClient;
 
-if (process.env.NODE_ENV === "production" && !process.env.DATABASE_URL) {
+const isProductionBuild = process.env.NEXT_PHASE === "phase-production-build";
+
+if (process.env.NODE_ENV === "production" && !process.env.DATABASE_URL && !isProductionBuild) {
   throw new Error(
     "[NEX CARD] DATABASE_URL is required in production. Refusing to start with mock database."
   );
 }
 
-if (process.env.NODE_ENV === "production" && !realPrisma) {
+if (process.env.NODE_ENV === "production" && !realPrisma && !isProductionBuild) {
   throw new Error(
     "[NEX CARD] Prisma Client failed to initialize in production. Check DATABASE_URL and run prisma generate."
   );
