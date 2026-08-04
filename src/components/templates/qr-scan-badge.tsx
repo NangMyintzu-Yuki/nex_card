@@ -6,7 +6,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { QrCode, X, Smartphone } from "lucide-react";
+import { QrCode, X } from "lucide-react";
 
 interface QRScanBadgeProps {
   slug: string;

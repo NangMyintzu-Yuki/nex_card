@@ -2,7 +2,8 @@
 // GET /api/qr/[slug]?format=svg|png&size=256 — generates a QR code for a profile URL
 // Cached at CDN — revalidated when profile is updated
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import QRCode from "qrcode";
 import prisma from "@/lib/db/prisma";
 import { APP_URL } from "@/lib/env";
@@ -39,7 +40,6 @@ export async function GET(
 
   // The QR points to the /p/[slug] route (QR-optimised public profile)
   const profileUrl = `${APP_URL}/p/${slug}`;
-  const accentColor = profile.template.accentColor ?? "#6366f1";
 
   try {
     if (format === "png") {
@@ -55,7 +55,7 @@ export async function GET(
         errorCorrectionLevel: "H", // Highest — allows logo overlay
       });
 
-      return new NextResponse(buffer as any, {
+      return new NextResponse(buffer as Uint8Array, {
         status: 200,
         headers: {
           "Content-Type": "image/png",

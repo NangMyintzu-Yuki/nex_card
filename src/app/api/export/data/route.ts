@@ -1,11 +1,12 @@
 // src/app/api/export/data/route.ts
 // GET /api/export/data — exports the authenticated user's complete profile data as JSON
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const session = await getServerSession();
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized." }, { status: 401 });

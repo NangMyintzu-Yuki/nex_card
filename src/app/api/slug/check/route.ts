@@ -1,7 +1,8 @@
 // src/app/api/slug/check/route.ts
 // GET /api/slug/check?slug=alex-rivera — checks if a slug is available in real-time
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
 import { isValidSlug } from "@/lib/utils";
 import { isReservedSlug } from "@/lib/slugs/reserved";

@@ -40,35 +40,6 @@ function LogoMark({
   );
 }
 
-// ── Wordmark text — always matches theme brand color ────────────────────────
-function LogoText({
-  size,
-  isDark = true,
-}: {
-  size: number;
-  isDark?: boolean;
-}) {
-  const color = isDark ? "#d4af37" : "#2d6eb5";
-  const colorLight = isDark ? "#f0c050" : "#4a9fd4";
-
-  return (
-    <span
-      className="font-black tracking-widest leading-none select-none"
-      style={{
-        fontSize: size * 0.42,
-        backgroundImage: `linear-gradient(135deg, ${color}, ${colorLight})`,
-        backgroundColor: "transparent",
-        WebkitBackgroundClip: "text",
-        backgroundClip: "text",
-        color: "transparent",
-        WebkitTextFillColor: "transparent",
-      }}
-    >
-      NEX CARD
-    </span>
-  );
-}
-
 // ── Main exports ────────────────────────────────────────────────────────────
 
 /**

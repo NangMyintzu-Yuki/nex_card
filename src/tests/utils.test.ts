@@ -4,8 +4,6 @@ import {
   cn,
   toSlug,
   isValidSlug,
-  timeAgo,
-  formatDate,
   formatNumber,
   truncate,
   getInitials,

@@ -7,11 +7,7 @@ import {
   Phone,
   Globe,
   Quote,
-  Briefcase,
-  Calendar,
-  MapPin,
   Image as ImageIcon,
-  Package,
   FileText,
 } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
@@ -53,14 +49,6 @@ export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
     fullName, headline, bio, avatarUrl, projects, skills, socialLinks,
     contacts, testimonials, resumeUrl, experience, services, gallery,
   } = data;
-
-  const initials = fullName
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
 
   return (
     <main className="min-h-screen bg-[#faf9f7] text-stone-900 font-sans selection:bg-violet-200 selection:text-stone-900 relative overflow-x-hidden">
@@ -286,7 +274,7 @@ export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
             <div className="columns-2 sm:columns-3 gap-3 [&>*]:mb-3">
               {gallery.map((img, i) => (
                 <div key={i} className="break-inside-avoid overflow-hidden bg-stone-100 group">
-                  <img src={img.url} alt={img.alt ?? `Plate ${i + 1}`}
+                   <img src={img.url} alt={img.alt ?? `Plate ${i + 1}`}
                     className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                 </div>
               ))}
@@ -308,7 +296,7 @@ export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
                   <figcaption className="mt-4 flex items-center gap-3">
                     {t.avatarUrl ? (
                       <div className="relative h-10 w-10 overflow-hidden rounded-full border border-stone-300 shrink-0">
-                        <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
+                         <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     ) : (
                       <div className="h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"

@@ -1,7 +1,6 @@
 
-import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
-import { daysUntil, formatEventDateTime, formatShortDate, formatTime, formatWeddingDate } from "@/lib/helps";
+import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
 import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
 

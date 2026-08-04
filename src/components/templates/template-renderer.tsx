@@ -160,7 +160,7 @@ export function TemplateRenderer({
       return (
         <DigitalNameCardSwitch
           templateCode={templateCode}
-          data={parsedData as any}
+          data={parsedData as DigitalNameCardData}
           accentColor={accent}
         />
       );
@@ -168,7 +168,7 @@ export function TemplateRenderer({
       return (
         <PortfolioSwitch
           templateCode={templateCode}
-          data={parsedData as any}
+          data={parsedData as PortfolioData}
           accentColor={accent}
         />
       );
@@ -176,7 +176,7 @@ export function TemplateRenderer({
       return (
         <BusinessAdSwitch
           templateCode={templateCode}
-          data={parsedData as any}
+          data={parsedData as BusinessAdData}
           accentColor={accent}
         />
       );
@@ -184,7 +184,7 @@ export function TemplateRenderer({
       return (
         <WeddingSwitch
           templateCode={templateCode}
-          data={parsedData as any}
+          data={parsedData as WeddingInvitationData}
           accentColor={accent}
           publicSlug={publicSlug}
         />

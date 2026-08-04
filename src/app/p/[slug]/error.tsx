@@ -5,7 +5,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { AlertTriangle, RefreshCw, QrCode } from "lucide-react";
+import { RefreshCw, QrCode } from "lucide-react";
 
 export default function QRProfileError({
   error,

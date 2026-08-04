@@ -1,5 +1,6 @@
 // src/app/api/admin/audit/route.ts — recent audit log entries (admin only)
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 

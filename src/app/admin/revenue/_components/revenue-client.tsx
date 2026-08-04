@@ -3,8 +3,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  Download, Filter, Calendar, BarChart3, TrendingUp,
-  CreditCard, Smartphone, QrCode, ChevronDown, X, Loader2,
+  Download, Filter, BarChart3, TrendingUp,
+  CreditCard, Smartphone, QrCode, X, Loader2,
 } from "lucide-react";
 
 type Category = { id: string; name: string; slug: string };

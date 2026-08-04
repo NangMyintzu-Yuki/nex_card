@@ -10,10 +10,6 @@ function escapeVal(v: unknown): string {
   return `'${String(v).replace(/'/g, "''")}'`;
 }
 
-function colList(cols: string[]) {
-  return `(${cols.join(", ")})`;
-}
-
 function rowValues(cols: string[], row: Record<string, unknown>) {
   return `(${cols.map((c) => escapeVal(row[c])).join(", ")})`;
 }

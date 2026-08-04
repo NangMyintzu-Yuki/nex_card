@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { BusinessAdData } from "@/lib/validators/template-schemas";
 
 const AuroraNameCard = dynamic(() =>
   import("@/components/templates/digital-name-card/aurora").then((m) => ({
@@ -302,11 +303,11 @@ export function PreviewRenderer({
     case "portfolio-forge":       return <ForgePortfolio    data={SAMPLE_PORTFOLIO_DATA} accentColor={accent} />;
     case "portfolio-spectrum":    return <SpectrumPortfolio data={SAMPLE_PORTFOLIO_DATA} accentColor={accent} />;
     case "portfolio-blueprint":   return <BlueprintPortfolio data={SAMPLE_PORTFOLIO_DATA} accentColor={accent} />;
-    case "business-marquee":      return <MarqueeBusiness  data={SAMPLE_BUSINESS_DATA as any} accentColor={accent} />;
-    case "business-district":     return <DistrictBusiness data={SAMPLE_BUSINESS_DATA as any} accentColor={accent} />;
-    case "business-empire":       return <EmpireBusiness   data={SAMPLE_BUSINESS_DATA as any} accentColor={accent} />;
-    case "business-neon":         return <NeonBusiness     data={SAMPLE_BUSINESS_DATA as any} accentColor={accent} />;
-    case "business-vault":        return <VaultBusiness    data={SAMPLE_BUSINESS_DATA as any} accentColor={accent} />;
+    case "business-marquee":      return <MarqueeBusiness  data={SAMPLE_BUSINESS_DATA as BusinessAdData} accentColor={accent} />;
+    case "business-district":     return <DistrictBusiness data={SAMPLE_BUSINESS_DATA as BusinessAdData} accentColor={accent} />;
+    case "business-empire":       return <EmpireBusiness   data={SAMPLE_BUSINESS_DATA as BusinessAdData} accentColor={accent} />;
+    case "business-neon":         return <NeonBusiness     data={SAMPLE_BUSINESS_DATA as BusinessAdData} accentColor={accent} />;
+    case "business-vault":        return <VaultBusiness    data={SAMPLE_BUSINESS_DATA as BusinessAdData} accentColor={accent} />;
     case "wedding-eternal":       return <EternalWedding   data={SAMPLE_WEDDING_DATA} accentColor={accent} />;
     case "wedding-blossom":       return <BlossomWedding   data={SAMPLE_WEDDING_DATA} accentColor={accent} />;
     case "wedding-noir":          return <NoirWedding      data={SAMPLE_WEDDING_DATA} accentColor={accent} />;

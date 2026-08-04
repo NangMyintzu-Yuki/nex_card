@@ -1,4 +1,5 @@
 // src/app/admin/page.tsx — NEX CARD Admin Analytics Overview
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "@/lib/auth/session";
@@ -77,8 +78,8 @@ export default async function AdminOverviewPage() {
           <div className="flex items-center justify-between px-5 py-4 border-b"
             style={{ borderColor: "var(--nc-border)" }}>
             <h2 className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>Recent Users</h2>
-            <a href="/admin/users" className="text-xs font-semibold hover:underline"
-              style={{ color: "var(--nc-brand-2, #d4af37)" }}>View all →</a>
+            <Link href="/admin/users" className="text-xs font-semibold hover:underline"
+              style={{ color: "var(--nc-brand-2, #d4af37)" }}>View all →</Link>
           </div>
           <div className="divide-y" style={{ borderColor: "var(--nc-border)" }}>
             {recentUsers.map((u) => (

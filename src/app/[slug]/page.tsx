@@ -2,6 +2,7 @@
 // PUBLIC PROFILE RENDER ENGINE
 
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -134,18 +135,18 @@ export default async function PublicProfilePage({ params }: PageProps) {
             then save.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <a
+            <Link
               href={`/dashboard/edit/${slug}`}
               className="flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-bold text-black transition-all hover:bg-amber-400"
             >
               Edit &amp; Publish →
-            </a>
-            <a
+            </Link>
+            <Link
               href="/dashboard"
               className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:border-white/20"
             >
               Dashboard
-            </a>
+            </Link>
           </div>
           <p className="mt-6 text-xs text-neutral-700">NEX CARD</p>
         </div>

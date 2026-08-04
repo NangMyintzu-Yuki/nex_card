@@ -6,8 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Lock, Check, ArrowRight, ChevronRight, Sparkles,
-  AlertTriangle, ExternalLink, CreditCard, Upload, QrCode, Smartphone,
+  Lock, Check, ArrowRight, ChevronRight,
+  AlertTriangle, ExternalLink, Upload, QrCode, Smartphone,
   Package, Clock, CheckCircle, XCircle,
 } from "lucide-react";
 import {
@@ -193,7 +193,7 @@ export function OnboardingClient({
     FormData
   >(selectTemplateAction, { status: "idle" });
 
-  const [paymentFormState, submitPayment, paymentPending] = useActionState<
+  const [paymentFormState, submitPayment] = useActionState<
     SubmitPaymentState,
     FormData
   >(submitPaymentAction, { status: "idle" });
@@ -339,11 +339,6 @@ export function OnboardingClient({
       setSlug(generateSlugSuggestion(userId, cat?.slug.slice(0, 4) ?? "card"));
     }
     setStep("confirm");
-  };
-
-  const getBackStep = (): typeof step => {
-    const idx = steps.indexOf(step);
-    return idx > 0 ? steps[idx - 1] : "category";
   };
 
   // ── Render ────────────────────────────────────────────────────────────────

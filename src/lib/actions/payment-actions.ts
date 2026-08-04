@@ -132,7 +132,7 @@ export async function submitPaymentAction(
           data: {
             userId,
             userProfileId: profileId,
-            tier: tier as any,
+            tier: tier as "QR_ONLY" | "NFC_CARD" | "PHYSICAL_CARD",
             amount,
             method,
             transactionRef: transactionRef || null,

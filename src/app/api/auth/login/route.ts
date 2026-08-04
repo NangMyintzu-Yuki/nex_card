@@ -1,7 +1,8 @@
 // src/app/api/auth/login/route.ts
 // POST /api/auth/login — validates credentials, creates a session cookie
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { verifyPassword } from "@/lib/auth/hash";

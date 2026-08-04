@@ -1,7 +1,8 @@
 // src/app/api/auth/register/route.ts
 // POST /api/auth/register — creates a new user (and session unless email verify required)
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { hashPassword } from "@/lib/auth/hash";

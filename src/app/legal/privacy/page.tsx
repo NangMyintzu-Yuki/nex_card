@@ -1,3 +1,4 @@
+import Link from "next/link";
 import LegalLayout from "@/components/legal/legal-layout";
 
 const TOC = [
@@ -70,9 +71,9 @@ export default function PrivacyPolicyPage() {
         We use cookies and similar technologies for essential functionality,
         preferences, and analytics. You can manage cookie preferences through
         your browser settings. See our{" "}
-        <a href="/legal/cookies" style={{ color: "var(--nc-brand-2)" }}>
+        <Link href="/legal/cookies" style={{ color: "var(--nc-brand-2)" }}>
           Cookie Policy
-        </a>{" "}
+        </Link>{" "}
         for full details.
       </p>
 

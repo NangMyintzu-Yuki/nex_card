@@ -1,5 +1,6 @@
 // src/app/api/admin/backup/route.ts — Generate SQL backup, compress, and email
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { gzip } from "zlib";
 import { promisify } from "util";
 import { getServerSession } from "@/lib/auth/session";
@@ -9,7 +10,7 @@ import prisma from "@/lib/db/prisma";
 
 const gzipAsync = promisify(gzip);
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   const session = await getServerSession();
   if (!session?.user?.id || session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest) {
 }
 
 // GET — just generate and download (no email)
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   const session = await getServerSession();
   if (!session?.user?.id || session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -38,7 +38,7 @@ export default async function TemplatePreviewPage({
   searchParams: Promise<{ from?: string; categoryId?: string; templateId?: string }>;
 }) {
   const { templateCode } = await params;
-  const { from, categoryId, templateId } = await searchParams;
+  const { from } = await searchParams;
 
   const template = await prisma.template.findUnique({
     where: { codeIdentifier: templateCode },

@@ -12,7 +12,6 @@ import {
   Globe,
   X,
   Star,
-  Layers,
   Award,
   Linkedin,
   Github,
@@ -57,7 +56,6 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
     testimonials,
     resumeUrl,
     availability,
-    gallery
   } = data;
 
   const avail = availability ? AVAIL_MAP[availability] : null;
@@ -72,7 +70,6 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
     : projects.filter((p) => p.tags.includes(selectedCategory));
 
   function SocialIcon({ platform, className = "h-4 w-4" }: { platform: string; className?: string }) {
-    const c = "currentColor";
     const icons: Record<string, React.ReactNode> = {
       linkedin: <Linkedin className={className} />,
       github: <Github className={className} />,
@@ -409,7 +406,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
                   <div className="flex items-center gap-3 border-t border-zinc-800 pt-4">
                     {t.avatarUrl ? (
                       <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10">
-                        <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
+                         <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     ) : (
                       <div className="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-white text-xs">
@@ -488,11 +485,11 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
 
             {selectedItem.coverImageUrl && (
               <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-zinc-950">
-                <img
-                  src={selectedItem.coverImageUrl}
-                  alt={selectedItem.title}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+                 <img
+                   src={selectedItem.coverImageUrl}
+                   alt={selectedItem.title}
+                   className="absolute inset-0 h-full w-full object-cover"
+                 />
               </div>
             )}
 

@@ -1,5 +1,6 @@
 // src/app/api/auth/verify-email/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { consumeEmailToken } from "@/lib/auth/email-tokens";

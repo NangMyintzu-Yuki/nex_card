@@ -2,6 +2,7 @@
 // /p/[slug] — Public QR-scanned profile landing route
 
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -99,12 +100,12 @@ export default async function QRProfilePage({ params }: PageProps) {
             The owner needs to publish it before the QR code will work.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <a
+            <Link
               href="/"
               className="flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-indigo-400"
             >
               Go to NEX CARD
-            </a>
+            </Link>
           </div>
           <p className="mt-6 text-xs text-neutral-700">NEX CARD</p>
         </div>

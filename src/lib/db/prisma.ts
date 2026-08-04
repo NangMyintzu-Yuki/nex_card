@@ -151,13 +151,16 @@ const DEMO_NAME_CARD_DATA = {
   backgroundStyle: "mesh",
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MockRecord = Record<string, any>;
+
 interface DBData {
-  users: any[];
-  sessions: any[];
-  categories: any[];
-  templates: any[];
-  profiles: any[];
-  payments: any[];
+  users: MockRecord[];
+  sessions: MockRecord[];
+  categories: MockRecord[];
+  templates: MockRecord[];
+  profiles: MockRecord[];
+  payments: MockRecord[];
 }
 
 function loadDB(): DBData {
@@ -237,7 +240,7 @@ function saveDB(data: DBData) {
   }
 }
 
-function matches(item: any, where: any): boolean {
+function matches(item: MockRecord, where: MockRecord | undefined | null): boolean {
   if (!where) return true;
   for (const key of Object.keys(where)) {
     const val = where[key];
@@ -276,7 +279,7 @@ function matches(item: any, where: any): boolean {
   return true;
 }
 
-function sortItems(items: any[], orderBy: any): any[] {
+function sortItems(items: MockRecord[], orderBy: MockRecord | undefined | null): MockRecord[] {
   if (!orderBy) return items;
   return [...items].sort((a, b) => {
     for (const key of Object.keys(orderBy)) {
@@ -294,7 +297,7 @@ function sortItems(items: any[], orderBy: any): any[] {
   });
 }
 
-function resolveJoins(item: any, db: DBData): any {
+function resolveJoins(item: MockRecord | null | undefined, db: DBData): MockRecord {
   if (!item) return item;
   const result = { ...item };
   
@@ -360,9 +363,9 @@ function resolveJoins(item: any, db: DBData): any {
 // ── BUILD MOCK API INTERFACE ───────────────────────────────────────────────
 
 const noOpHandler = {
-  get(target: any, prop: string) {
+  get(target: MockRecord, prop: string) {
     if (prop === "then") return undefined;
-    return (...args: any[]) => {
+    return (...args: MockRecord[]) => {
       const db = loadDB();
       const collectionName = target._collectionName;
       const collection = db[collectionName as keyof DBData] || [];

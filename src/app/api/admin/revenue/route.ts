@@ -1,5 +1,6 @@
 // src/app/api/admin/revenue/route.ts — Revenue data API
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
 

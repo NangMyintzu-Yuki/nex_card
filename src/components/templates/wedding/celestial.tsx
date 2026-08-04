@@ -1,7 +1,6 @@
 
-import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
-import { daysUntil, formatEventDateTime, formatShortDate, formatTime, formatWeddingDate } from "@/lib/helps";
+import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
 import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
 
@@ -127,7 +126,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
                     {m.imageUrl && (
                       <div className="relative aspect-[4/3] mt-4 overflow-hidden rounded-xl border"
                         style={{ borderColor: `${accentColor}20` }}>
-                        <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover opacity-90" />
+                         <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover opacity-90" />
                       </div>
                     )}
                   </div>
@@ -147,7 +146,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
               {gallery.slice(0, 9).map((img, i) => (
                 <div key={i} className="relative aspect-square overflow-hidden rounded-xl border"
                   style={{ borderColor: `${accentColor}15` }}>
-                  <img src={img.url} alt={img.alt}
+                   <img src={img.url} alt={img.alt}
                     className="absolute inset-0 h-full w-full object-cover opacity-85 hover:opacity-100 hover:scale-105 transition-all duration-500" />
                 </div>
               ))}

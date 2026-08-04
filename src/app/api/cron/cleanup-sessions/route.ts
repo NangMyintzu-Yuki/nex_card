@@ -1,7 +1,8 @@
 // src/app/api/cron/cleanup-sessions/route.ts
 // Deletes expired sessions + email tokens. Protect with CRON_SECRET or REVALIDATION_SECRET.
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
 import { writeAuditLog } from "@/lib/audit";
 

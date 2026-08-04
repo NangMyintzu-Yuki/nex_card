@@ -16,7 +16,7 @@ interface TemplateShellProps {
  */
 export function TemplateShell({
   children,
-  slug,
+  slug: _slug,
   showBranding = true,
 }: TemplateShellProps) {
   return (

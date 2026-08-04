@@ -21,14 +21,6 @@ const VARIANT_STYLES: Record<Variant, string> = {
   outline:   "border border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10",
 };
 
-const LIGHT_VARIANT_STYLES: Record<Variant, string> = {
-  primary:   "bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20",
-  secondary: "bg-black/5 border border-black/10 text-gray-800 hover:bg-black/10 hover:border-black/20",
-  ghost:     "text-gray-500 hover:bg-black/5 hover:text-gray-800",
-  danger:    "bg-red-500/10 border border-red-500/20 text-red-600 hover:bg-red-500/20",
-  outline:   "border border-indigo-500/40 text-indigo-600 hover:bg-indigo-500/10",
-};
-
 const SIZE_STYLES: Record<Size, string> = {
   sm: "px-3 py-1.5 text-xs gap-1.5",
   md: "px-5 py-2.5 text-sm gap-2",

@@ -12,7 +12,7 @@ import {
   Briefcase,
   Calendar,
   MapPin,
-  Image,
+  Image as ImageIcon,
   Package,
 } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
@@ -198,7 +198,7 @@ export function SpectrumPortfolio({ data, accentColor = "#f59e0b" }: PP) {
                     </div>
                   ) : (
                     <div className="aspect-video flex items-center justify-center bg-zinc-900/80">
-                      <Image className="h-8 w-8 text-zinc-700" />
+                      <ImageIcon className="h-8 w-8 text-zinc-700" />
                     </div>
                   )}
                   <div className="p-5 space-y-3">
@@ -304,14 +304,14 @@ export function SpectrumPortfolio({ data, accentColor = "#f59e0b" }: PP) {
             <div className="flex items-center gap-3 mb-8">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
               <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-zinc-600">
-                <Image className="h-3.5 w-3.5" style={{ color: accentColor }} /> Gallery
+                <ImageIcon className="h-3.5 w-3.5" style={{ color: accentColor }} /> Gallery
               </span>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
             </div>
             <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
               {gallery.map((img, i) => (
                 <div key={i} className="group relative aspect-square overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800/50">
-                  <img src={img.url} alt={img.alt ?? `Gallery ${i + 1}`}
+                   <img src={img.url} alt={img.alt ?? `Gallery ${i + 1}`}
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all" />
                 </div>
@@ -340,7 +340,7 @@ export function SpectrumPortfolio({ data, accentColor = "#f59e0b" }: PP) {
                   <div className="flex items-center gap-3 pt-3 border-t border-zinc-800/60">
                     {t.avatarUrl ? (
                       <div className="relative h-9 w-9 overflow-hidden rounded-full border border-zinc-700 shrink-0">
-                        <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
+                         <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     ) : (
                       <div className="h-9 w-9 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-white text-xs shrink-0">

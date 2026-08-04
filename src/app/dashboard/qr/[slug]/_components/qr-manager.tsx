@@ -2,14 +2,13 @@
 "use client";
 
 import { useState, useActionState, useEffect, useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   QrCode, Lock, Download, Share2, ExternalLink,
   Eye, Smartphone, AlertTriangle, Check, Copy,
-  ArrowLeft, RefreshCw, Scan,
+  ArrowLeft, Scan,
 } from "lucide-react";
-import { generateQRAction, GenerateQRState } from "@/lib/actions/qr-action";
+import { generateQRAction, type GenerateQRState } from "@/lib/actions/qr-action";
 import { resolveThumbnailUrl } from "@/lib/thumbnails";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -72,7 +71,6 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [copied, setCopied]       = useState(false);
   const [qrSize, setQrSize]       = useState<256 | 512 | 1024>(512);
-  const [qrFormat, setQrFormat]   = useState<"svg" | "png">("svg");
   const [qrLoaded, setQrLoaded]   = useState(false);
   const [justGenerated, setJustGenerated] = useState(false);
   const [cacheBuster, setCacheBuster] = useState<string>("");
@@ -180,6 +178,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
                         <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
                       </div>
                     )}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       ref={qrImgRef}
                       src={`${qrApiUrl}?format=svg&size=512${cacheBuster}`}
@@ -478,11 +477,12 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
           {/* Profile card preview */}
           <div className="nc-card overflow-hidden rounded-2xl">
             <div className="relative aspect-video overflow-hidden">
-              <img
-                src={resolveThumbnailUrl(profile.template.thumbnailUrl, profile.template.name)}
-                alt={profile.template.name}
-                className="h-full w-full object-cover opacity-70"
-              />
+                 {/* eslint-disable-next-line @next/next/no-img-element */}
+                 <img
+                   src={resolveThumbnailUrl(profile.template.thumbnailUrl, profile.template.name)}
+                   alt={profile.template.name}
+                   className="h-full w-full object-cover opacity-70"
+                 />
               <div className="absolute inset-0 flex flex-col items-start justify-end gap-1 p-4" style={{ background: "linear-gradient(to top, var(--nc-bg), transparent)" }}>
                 <span className="text-xs" style={{ color: "var(--nc-text-2)" }}>{profile.category.name}</span>
                 <span className="text-sm font-bold" style={{ color: "var(--nc-text)" }}>{profile.template.name}</span>

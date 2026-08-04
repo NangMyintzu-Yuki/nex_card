@@ -178,7 +178,7 @@ export default async function AnalyticsPage() {
           </div>
         ) : (
           <div className="divide-y" style={{ borderColor: "var(--nc-border)" }}>
-            {profiles.map((p:any) => {
+            {profiles.map((p) => {
               const maxViews  = Number(profiles[0]?.viewCount ?? 1);
               const viewCount = Number(p.viewCount ?? 0);
               const pct       = maxViews > 0 ? Math.round((viewCount / maxViews) * 100) : 0;

@@ -1,7 +1,6 @@
 
-import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
-import { daysUntil, formatEventDateTime, formatShortDate, formatTime, formatWeddingDate } from "@/lib/helps";
+import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
 import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
 
@@ -111,7 +110,7 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
                   {m.location && <p className="mt-1 text-xs" style={{ color: "#a08060" }}>📍 {m.location}</p>}
                   {m.imageUrl && (
                     <div className="relative aspect-video mt-3 overflow-hidden rounded-xl">
-                      <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
+                       <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
                     </div>
                   )}
                 </div>

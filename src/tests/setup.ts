@@ -1,7 +1,7 @@
 // src/tests/setup.ts
 // Global test setup — runs before every test file
 
-import { beforeAll, afterAll, vi } from "vitest";
+import { vi } from "vitest";
 
 // Mock next/cache to prevent import errors outside Next.js runtime
 vi.mock("next/cache", () => ({
@@ -87,7 +87,7 @@ vi.mock("@/lib/db/prisma", () => ({
 }));
 
 vi.mock("@/lib/settings", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/settings")>();
+  const actual = (await importOriginal()) as Record<string, unknown>;
   return {
     ...actual,
     getSettings: vi.fn().mockResolvedValue({

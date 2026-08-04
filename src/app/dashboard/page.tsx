@@ -119,11 +119,12 @@ export default async function DashboardPage({
               className="nc-card nc-profile-card group overflow-hidden rounded-2xl transition-all">
               {/* Template preview strip */}
               <div className="relative h-32 w-full overflow-hidden" style={{ background: "var(--nc-bg-2)" }}>
-                <img
-                  src={resolveThumbnailUrl(profile.template.thumbnailUrl, profile.template.name)}
-                  alt={profile.template.name}
-                  className="h-full w-full object-cover opacity-80 transition-all duration-500 group-hover:scale-110 group-hover:opacity-100"
-                />
+                 {/* eslint-disable-next-line @next/next/no-img-element */}
+                 <img
+                   src={resolveThumbnailUrl(profile.template.thumbnailUrl, profile.template.name)}
+                   alt={profile.template.name}
+                   className="h-full w-full object-cover opacity-80 transition-all duration-500 group-hover:scale-110 group-hover:opacity-100"
+                 />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, var(--nc-bg), transparent)" }} />
                 <div className="absolute bottom-3 left-4 flex items-center gap-2">
                   <span className={`rounded-full px-2.5 py-1 text-xs font-bold backdrop-blur-sm ${

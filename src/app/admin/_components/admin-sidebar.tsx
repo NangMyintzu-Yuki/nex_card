@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3, Users, Layers, Settings, ArrowLeft, Menu, X, ChevronRight, CreditCard,
+  BarChart3, Users, Layers, Settings, Menu, X, ChevronRight, CreditCard,
   LogOut, TrendingUp,
 } from "lucide-react";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";

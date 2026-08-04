@@ -2,7 +2,8 @@
 // POST /api/revalidate — webhook endpoint to purge ISR cache by slug or tag
 // Protected by a shared secret token. Used by external systems (CMS, webhooks).
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { revalidateTag, revalidatePath } from "next/cache";
 import { z } from "zod";
 

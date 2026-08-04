@@ -10,7 +10,7 @@ export async function writeAuditLog(input: {
   meta?: Record<string, unknown>;
 }): Promise<void> {
   if (!process.env.DATABASE_URL) {
-    console.info("[audit]", input.action, input.targetType, input.targetId);
+    console.error("[audit]", input.action, input.targetType, input.targetId);
     return;
   }
 

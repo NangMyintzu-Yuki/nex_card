@@ -1,7 +1,8 @@
 // src/app/api/auth/logout/route.ts
 // POST /api/auth/logout — destroys the session and clears the cookie
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";

@@ -3,7 +3,8 @@
 
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { Clock, CheckCircle, XCircle, ExternalLink, User } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { formatDate } from "@/lib/utils";
@@ -34,7 +35,7 @@ export default async function AdminPaymentsPage({
 
   const { status } = await searchParams;
 
-  const where: any = {};
+  const where: Record<string, string> = {};
   if (status === "PENDING" || status === "APPROVED" || status === "REJECTED") {
     where.status = status;
   } else {
@@ -100,7 +101,7 @@ export default async function AdminPaymentsPage({
           { value: "APPROVED", label: "Approved" },
           { value: "REJECTED", label: "Rejected" },
         ].map((tab) => (
-          <a
+          <Link
             key={tab.value}
             href={`/admin/payments?status=${tab.value}`}
             className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
@@ -116,7 +117,7 @@ export default async function AdminPaymentsPage({
                 {tab.count}
               </span>
             )}
-          </a>
+          </Link>
         ))}
       </div>
 
@@ -144,6 +145,7 @@ export default async function AdminPaymentsPage({
                 {/* Screenshot preview */}
                 <div className="flex-shrink-0 lg:w-64">
                   <div className="relative h-48 w-full lg:h-full" style={{ background: "var(--nc-bg-2)" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={payment.screenshotUrl}
                       alt="Payment screenshot"

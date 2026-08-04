@@ -6,7 +6,6 @@
 // Rustic: Botanical warmth with decorative frame elements
 
 
-import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
@@ -121,7 +120,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
                 {p.photoUrl ? (
                   <div className="relative mb-4 h-44 w-44 overflow-hidden rounded-full border-4"
                     style={{ borderColor: `${gold}50`, boxShadow: `0 0 40px ${gold}20` }}>
-                    <img src={p.photoUrl} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
+                     <img src={p.photoUrl} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
                   </div>
                 ) : (
                   <div className="mb-4 flex h-44 w-44 items-center justify-center rounded-full border-4 text-5xl"
@@ -179,7 +178,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
                       {m.imageUrl && (
                         <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lg"
                           style={{ border: `1px solid ${gold}25` }}>
-                          <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
+                           <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
                         </div>
                       )}
                     </div>
@@ -204,7 +203,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
               {gallery.slice(0, 12).map((img, i) => (
                 <div key={i} className="mb-3 break-inside-avoid overflow-hidden rounded-xl shadow-sm">
                   <div className="relative aspect-square">
-                    <img src={img.url} alt={img.alt}
+                     <img src={img.url} alt={img.alt}
                       className="absolute inset-0 h-full w-full object-cover hover:scale-105 transition-transform duration-700" />
                   </div>
                   {img.caption && (

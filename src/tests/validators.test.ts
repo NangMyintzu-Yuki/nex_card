@@ -94,7 +94,8 @@ describe("PortfolioSchema", () => {
   });
 
   it("rejects missing bio", () => {
-    const { bio: _bio, ...rest } = validPortfolio;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { bio, ...rest } = validPortfolio;
     expect(PortfolioSchema.safeParse(rest).success).toBe(false);
   });
 

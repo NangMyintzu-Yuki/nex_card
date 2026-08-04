@@ -14,8 +14,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 export default function SettingsPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const brand2 = isDark ? "#d4af37" : "#2d6eb5";
-  const brand3 = isDark ? "#f0c050" : "#4a9fd4";
+
 
   const [profileState, profileAction, profilePending] = useActionState<UpdateProfileInfoState, FormData>(
     updateProfileInfoAction, { status: "idle" }
@@ -53,7 +52,7 @@ export default function SettingsPage() {
   const headerStyle = { borderBottom: "1px solid var(--nc-border)", padding: "1rem 1.5rem", display: "flex", alignItems: "center", gap: "0.625rem" };
   const inputCls   = "w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-colors nc-input";
 
-  function SectionHeader({ icon: Icon, label }: { icon: any; label: string }) {
+  function SectionHeader({ icon: Icon, label }: { icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; label: string }) {
     return (
       <div style={headerStyle}>
         <Icon className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />

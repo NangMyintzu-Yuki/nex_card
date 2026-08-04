@@ -44,7 +44,6 @@ export function ForgePortfolio({ data, accentColor = "#10b981" }: PP) {
     contacts,
     availability,
     resumeUrl,
-    gallery,
     testimonials
   } = data;
 

@@ -3,7 +3,6 @@
 
 import { useState, useRef, useEffect, useActionState, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   ExternalLink, Lock, Check, AlertCircle, Save,
   Eye, EyeOff, ChevronDown, ChevronUp, Plus, Trash2, QrCode,
@@ -438,7 +437,8 @@ function ImageUploadField({
       {value && (
         <div className="nc-card flex items-center gap-3 rounded-xl p-3">
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg" style={{ border: "1px solid var(--nc-border)" }}>
-            <img src={value} alt="Preview" className="h-full w-full object-cover" />
+             {/* eslint-disable-next-line @next/next/no-img-element */}
+             <img src={value} alt="Preview" className="h-full w-full object-cover" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs" style={{ color: "var(--nc-text-2)" }}>{value}</p>

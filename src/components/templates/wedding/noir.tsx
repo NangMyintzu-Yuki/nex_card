@@ -1,8 +1,7 @@
 
-import Link from "next/link";
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 
-import { daysUntil, formatEventDateTime, formatShortDate, formatTime, formatWeddingDate } from "@/lib/helps";
+import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
 import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
 interface WeddingProps { data: WeddingInvitationData; accentColor?: string; slug?: string; }
@@ -70,7 +69,7 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
                   </div>
                   {m.imageUrl && (
                     <div className={`relative aspect-[4/3] overflow-hidden ${i % 2 !== 0 ? "md:order-1" : ""}`}>
-                      <img src={m.imageUrl} alt={m.title}
+                       <img src={m.imageUrl} alt={m.title}
                         className="absolute inset-0 h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
                     </div>
                   )}
@@ -89,7 +88,7 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
             <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
               {gallery.slice(1, 10).map((img, i) => (
                 <div key={i} className="relative aspect-square overflow-hidden">
-                  <img src={img.url} alt={img.alt}
+                   <img src={img.url} alt={img.alt}
                     className="absolute inset-0 h-full w-full object-cover grayscale hover:grayscale-0 hover:scale-105 transition-all duration-700" />
                 </div>
               ))}

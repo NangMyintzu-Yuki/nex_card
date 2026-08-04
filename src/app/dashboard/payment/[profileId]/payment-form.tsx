@@ -59,7 +59,7 @@ function formatMMK(amount: number): string {
 
 export function PaymentForm({
   profileId,
-  templateName,
+  templateName: _templateName,
   prices,
   existingTier,
 }: {
