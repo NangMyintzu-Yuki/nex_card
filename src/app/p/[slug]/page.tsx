@@ -11,20 +11,24 @@ import {
 } from "@/lib/cache/profile-cache";
 import prisma from "@/lib/db/prisma";
 import type { CategorySlug } from "@/lib/validators/template-schemas";
-import { TemplateRenderer } from "@/components/templates/template-renderer";
 import { APP_URL } from "@/lib/env";
 import { SafeTemplateRenderer } from "./safe-renderer";
 
 export const revalidate = 3600;
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
-  const profiles = await prisma.userProfile.findMany({
-    where: { isPublished: true, qrLocked: true },
-    orderBy: { qrScanCount: "desc" },
-    take: 500,
-    select: { slug: true },
-  });
-  return profiles.map((p) => ({ slug: p.slug }));
+  try {
+    const profiles = await prisma.userProfile.findMany({
+      where: { isPublished: true, qrLocked: true },
+      orderBy: { qrScanCount: "desc" },
+      take: 500,
+      select: { slug: true },
+    });
+    return profiles.map((p) => ({ slug: p.slug }));
+  } catch (err) {
+    console.warn("Skipping static generation for /p/[slug] (database unavailable):", err);
+    return [];
+  }
 }
 
 export async function generateMetadata({

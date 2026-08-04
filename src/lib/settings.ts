@@ -1,7 +1,7 @@
 // src/lib/settings.ts — Platform settings (DB-backed with JSON file fallback)
 
 import { readFile, writeFile, mkdir } from "fs/promises";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { z } from "zod";
 
@@ -126,7 +126,6 @@ export async function updateSettings(
 export function getSettingsSyncFallback(): Settings {
   try {
     if (!existsSync(SETTINGS_PATH)) return { ...DEFAULTS };
-    const { readFileSync } = require("fs") as typeof import("fs");
     const raw = readFileSync(SETTINGS_PATH, "utf-8");
     return { ...DEFAULTS, ...JSON.parse(raw) };
   } catch {

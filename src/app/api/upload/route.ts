@@ -26,7 +26,7 @@ const PresignedUploadInput = z.object({
   fileSize: z.number().positive().max(8 * 1024 * 1024),
 });
 
-function useR2Presigned(): boolean {
+function isR2PresignedEnabled(): boolean {
   return (
     getStorageDriver() === "r2" &&
     process.env.STORAGE_R2_USE_PRESIGNED === "true"
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     const contentType = request.headers.get("content-type") ?? "";
 
     if (contentType.includes("application/json")) {
-      if (!useR2Presigned()) {
+      if (!isR2PresignedEnabled()) {
         return NextResponse.json(
           {
             error:

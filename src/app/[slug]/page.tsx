@@ -11,7 +11,6 @@ import {
 } from "@/lib/cache/profile-cache";
 import prisma from "@/lib/db/prisma";
 import type { CategorySlug } from "@/lib/validators/template-schemas";
-import { TemplateRenderer } from "@/components/templates/template-renderer";
 import { SafeTemplateRenderer } from "@/app/p/[slug]/safe-renderer";
 import { ProfileJsonLd } from "@/lib/seo/json-ld";
 import { APP_URL } from "@/lib/env";
@@ -19,14 +18,19 @@ import { APP_URL } from "@/lib/env";
 export const revalidate = 3600;
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
-  const profiles = await prisma.userProfile.findMany({
-    where: { isPublished: true },
-    orderBy: { viewCount: "desc" },
-    take: 200,
-    select: { slug: true },
-  });
+  try {
+    const profiles = await prisma.userProfile.findMany({
+      where: { isPublished: true },
+      orderBy: { viewCount: "desc" },
+      take: 200,
+      select: { slug: true },
+    });
 
-  return profiles.map((p) => ({ slug: p.slug }));
+    return profiles.map((p) => ({ slug: p.slug }));
+  } catch (err) {
+    console.warn("Skipping static generation for /[slug] (database unavailable):", err);
+    return [];
+  }
 }
 
 export async function generateMetadata({
