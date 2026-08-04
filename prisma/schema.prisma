@@ -6,6 +6,10 @@ generator client {
   previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
+prisma {
+  seed = "npx tsx prisma/seed.ts"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
