@@ -10,10 +10,19 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "localhost",
       },
-      // User-uploaded content via your storage provider
+      // R2 public bucket domains
+      {
+        protocol: "https",
+        hostname: "**.r2.dev",
+      },
       {
         protocol: "https",
         hostname: "**.r2.cloudflarestorage.com",
+      },
+      // R2 custom domain
+      {
+        protocol: "https",
+        hostname: "cdn.nexcard.wetechmm.com",
       },
       // Placeholder / seed images (legacy placehold.co URLs may still exist in DB)
       {
