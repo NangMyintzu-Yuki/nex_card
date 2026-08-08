@@ -13,6 +13,7 @@ import {
   Sparkles
 } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 
 interface PP {
   data: PortfolioData;
@@ -131,7 +132,7 @@ export function ForgePortfolio({ data, accentColor = "#10b981" }: PP) {
             {avatarUrl && (
               <div className="relative aspect-square w-full overflow-hidden rounded-3xl border border-white/10 bg-neutral-950 group">
                 <img
-                  src={avatarUrl}
+                  src={resolveImageUrl(avatarUrl)}
                   alt={fullName}
                   className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
@@ -195,7 +196,7 @@ export function ForgePortfolio({ data, accentColor = "#10b981" }: PP) {
                   {p.coverImageUrl && (
                     <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-neutral-950 mb-4">
                       <img
-                        src={p.coverImageUrl}
+                        src={resolveImageUrl(p.coverImageUrl)}
                         alt={p.title}
                         className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -337,7 +338,7 @@ export function ForgePortfolio({ data, accentColor = "#10b981" }: PP) {
                   <div className="mt-4 flex items-center gap-3 border-t border-white/5 pt-3">
                     {t.avatarUrl && (
                       <div className="relative h-8 w-8 overflow-hidden rounded-full border border-white/10">
-                        <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
+                        <img src={resolveImageUrl(t.avatarUrl)} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     )}
                     <div>

@@ -8,6 +8,7 @@ import { CheckCircle } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { formatDate } from "@/lib/utils";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 import { ApproveRejectButtons } from "./_components/approve-reject-buttons";
 
 export const metadata: Metadata = {
@@ -147,7 +148,7 @@ export default async function AdminPaymentsPage({
                   <div className="relative h-48 w-full lg:h-full" style={{ background: "var(--nc-bg-2)" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={payment.screenshotUrl}
+                      src={resolveImageUrl(payment.screenshotUrl)}
                       alt="Payment screenshot"
                       className="h-full w-full object-contain"
                     />

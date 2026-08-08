@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 
 interface PP {
   data: PortfolioData;
@@ -87,7 +88,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
           <a href="#" className="flex items-center gap-3 group">
             {avatarUrl && (
               <div className="relative h-9 w-9 overflow-hidden rounded-full ring-2 ring-white/10 group-hover:scale-105 transition-transform duration-300">
-                <img src={avatarUrl} alt={fullName} className="absolute inset-0 h-full w-full object-cover" />
+                <img src={resolveImageUrl(avatarUrl)} alt={fullName} className="absolute inset-0 h-full w-full object-cover" />
               </div>
             )}
             <span className="font-bold text-sm tracking-tight text-neutral-200 group-hover:text-white transition-colors">
@@ -136,7 +137,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
               />
               <div className="relative h-36 w-36 md:h-44 md:w-44 overflow-hidden rounded-[2rem] border border-white/10 bg-neutral-900 shadow-2xl">
                 <img
-                  src={avatarUrl}
+                  src={resolveImageUrl(avatarUrl)}
                   alt={fullName}
                   className="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                 />
@@ -234,7 +235,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
                   {p.coverImageUrl && (
                     <div className="relative aspect-video w-full overflow-hidden bg-neutral-950">
                       <img
-                        src={p.coverImageUrl}
+                        src={resolveImageUrl(p.coverImageUrl)}
                         alt={p.title}
                         className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                       />
@@ -353,7 +354,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
                       <div className="flex items-center gap-3">
                         {e.logoUrl && (
                           <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white">
-                            <img src={e.logoUrl} alt={e.company} className="absolute inset-0 h-full w-full object-contain p-1.5" />
+                            <img src={resolveImageUrl(e.logoUrl)} alt={e.company} className="absolute inset-0 h-full w-full object-contain p-1.5" />
                           </div>
                         )}
                         <div>
@@ -388,7 +389,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
                 <div key={i} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-neutral-900">
                   <div className="relative aspect-square">
                     <img
-                      src={img.url}
+                      src={resolveImageUrl(img.url)}
                       alt={img.alt || "Gallery image"}
                       className="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
                     />
@@ -422,7 +423,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
                   <div className="mt-6 flex items-center gap-3 border-t border-white/5 pt-4">
                     {t.avatarUrl && (
                       <div className="relative h-9 w-9 overflow-hidden rounded-full ring-2 ring-white/10">
-                        <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
+                         <img src={resolveImageUrl(t.avatarUrl)} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     )}
                     <div>

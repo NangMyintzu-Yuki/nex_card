@@ -2,6 +2,7 @@
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
 
 interface WeddingProps { data: WeddingInvitationData; accentColor?: string; slug?: string; }
@@ -62,7 +63,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingP
                     borderColor: `${accentColor}40`,
                   }}>
                   {p.photoUrl ? (
-                    <img src={p.photoUrl} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
+                    <img src={resolveImageUrl(p.photoUrl)} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-4xl"
                       style={{ background: `${accentColor}15` }}>
@@ -103,7 +104,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingP
                     {m.imageUrl && (
                       <div className="relative aspect-video mt-4 overflow-hidden rounded-2xl border-2"
                         style={{ borderColor: `${accentColor}20` }}>
-                        <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
+                        <img src={resolveImageUrl(m.imageUrl)} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     )}
                   </div>
@@ -124,7 +125,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingP
                 <div key={i} className="mb-3 break-inside-avoid overflow-hidden rounded-2xl border-2"
                   style={{ borderColor: `${accentColor}20` }}>
                   <div className="relative aspect-square">
-                    <img src={img.url} alt={img.alt} className="absolute inset-0 h-full w-full object-cover" />
+                    <img src={resolveImageUrl(img.url)} alt={img.alt} className="absolute inset-0 h-full w-full object-cover" />
                   </div>
                 </div>
               ))}

@@ -16,6 +16,7 @@ import {
   Package,
 } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 
 interface PP {
   data: PortfolioData;
@@ -134,7 +135,7 @@ export function SpectrumPortfolio({ data, accentColor = "#f59e0b" }: PP) {
                   <div className="absolute -inset-1 rounded-[32px] opacity-50 blur-xl transition-all duration-500 group-hover:opacity-80"
                     style={{ background: `linear-gradient(135deg, ${accentColor}, #a855f7, ${accentColor})` }} />
                   <div className="relative w-64 sm:w-72 aspect-square overflow-hidden rounded-[28px] border border-zinc-800 bg-zinc-900 shadow-2xl">
-                    <img src={avatarUrl} alt={fullName}
+                    <img src={resolveImageUrl(avatarUrl)} alt={fullName}
                       className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
                   </div>
                 </div>
@@ -192,7 +193,7 @@ export function SpectrumPortfolio({ data, accentColor = "#f59e0b" }: PP) {
                   className="group relative rounded-2xl border border-zinc-800/60 bg-zinc-900/40 overflow-hidden backdrop-blur-sm hover:border-zinc-700/60 transition-all duration-300">
                   {p.coverImageUrl ? (
                     <div className="relative aspect-video overflow-hidden bg-zinc-800/50">
-                      <img src={p.coverImageUrl} alt={p.title}
+                       <img src={resolveImageUrl(p.coverImageUrl)} alt={p.title}
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-transparent to-transparent" />
                     </div>
@@ -311,7 +312,7 @@ export function SpectrumPortfolio({ data, accentColor = "#f59e0b" }: PP) {
             <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
               {gallery.map((img, i) => (
                 <div key={i} className="group relative aspect-square overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800/50">
-                   <img src={img.url} alt={img.alt ?? `Gallery ${i + 1}`}
+                   <img src={resolveImageUrl(img.url)} alt={img.alt ?? `Gallery ${i + 1}`}
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all" />
                 </div>
@@ -340,7 +341,7 @@ export function SpectrumPortfolio({ data, accentColor = "#f59e0b" }: PP) {
                   <div className="flex items-center gap-3 pt-3 border-t border-zinc-800/60">
                     {t.avatarUrl ? (
                       <div className="relative h-9 w-9 overflow-hidden rounded-full border border-zinc-700 shrink-0">
-                         <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
+                         <img src={resolveImageUrl(t.avatarUrl)} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     ) : (
                       <div className="h-9 w-9 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-white text-xs shrink-0">

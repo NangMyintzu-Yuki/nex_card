@@ -3,6 +3,7 @@ import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 
 import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
 interface WeddingProps { data: WeddingInvitationData; accentColor?: string; slug?: string; }
 
@@ -24,7 +25,7 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
         {gallery.length > 0 && (
           <div className="absolute inset-0">
-            <img src={gallery[0].url} alt="Cover" className="absolute inset-0 h-full w-full object-cover grayscale opacity-35" />
+            <img src={resolveImageUrl(gallery[0].url)} alt="Cover" className="absolute inset-0 h-full w-full object-cover grayscale opacity-35" />
             <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0.85) 60%, #0a0a0a 100%)" }} />
           </div>
         )}
@@ -69,7 +70,7 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
                   </div>
                   {m.imageUrl && (
                     <div className={`relative aspect-[4/3] overflow-hidden ${i % 2 !== 0 ? "md:order-1" : ""}`}>
-                       <img src={m.imageUrl} alt={m.title}
+                       <img src={resolveImageUrl(m.imageUrl)} alt={m.title}
                         className="absolute inset-0 h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
                     </div>
                   )}
@@ -88,7 +89,7 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
             <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
               {gallery.slice(1, 10).map((img, i) => (
                 <div key={i} className="relative aspect-square overflow-hidden">
-                   <img src={img.url} alt={img.alt}
+                   <img src={resolveImageUrl(img.url)} alt={img.alt}
                     className="absolute inset-0 h-full w-full object-cover grayscale hover:grayscale-0 hover:scale-105 transition-all duration-700" />
                 </div>
               ))}

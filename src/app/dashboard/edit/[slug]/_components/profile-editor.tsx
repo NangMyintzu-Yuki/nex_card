@@ -11,6 +11,7 @@ import {
   updateProfileAction,
   type UpdateProfileState,
 } from "@/lib/actions/profile-actions";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -438,7 +439,7 @@ function ImageUploadField({
         <div className="nc-card flex items-center gap-3 rounded-xl p-3">
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg" style={{ border: "1px solid var(--nc-border)" }}>
              {/* eslint-disable-next-line @next/next/no-img-element */}
-             <img src={value} alt="Preview" className="h-full w-full object-cover" />
+             <img src={resolveImageUrl(value)} alt="Preview" className="h-full w-full object-cover" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs" style={{ color: "var(--nc-text-2)" }}>{value}</p>

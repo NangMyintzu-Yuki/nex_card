@@ -2,6 +2,7 @@
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
 
 interface WeddingProps { data: WeddingInvitationData; accentColor?: string; slug?: string; }
@@ -84,7 +85,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
                 <div className="relative h-44 w-44 overflow-hidden rounded-full mb-4"
                   style={{ border: `2px solid ${accentColor}40`, boxShadow: `0 0 30px ${accentColor}20` }}>
                   {p.photoUrl ? (
-                    <img src={p.photoUrl} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
+                    <img src={resolveImageUrl(p.photoUrl)} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-5xl"
                       style={{ background: `${accentColor}15` }}>
@@ -126,7 +127,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
                     {m.imageUrl && (
                       <div className="relative aspect-[4/3] mt-4 overflow-hidden rounded-xl border"
                         style={{ borderColor: `${accentColor}20` }}>
-                         <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover opacity-90" />
+                         <img src={resolveImageUrl(m.imageUrl)} alt={m.title} className="absolute inset-0 h-full w-full object-cover opacity-90" />
                       </div>
                     )}
                   </div>
@@ -146,7 +147,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
               {gallery.slice(0, 9).map((img, i) => (
                 <div key={i} className="relative aspect-square overflow-hidden rounded-xl border"
                   style={{ borderColor: `${accentColor}15` }}>
-                   <img src={img.url} alt={img.alt}
+                    <img src={resolveImageUrl(img.url)} alt={img.alt}
                     className="absolute inset-0 h-full w-full object-cover opacity-85 hover:opacity-100 hover:scale-105 transition-all duration-500" />
                 </div>
               ))}

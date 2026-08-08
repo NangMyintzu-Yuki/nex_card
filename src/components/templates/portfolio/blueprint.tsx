@@ -11,6 +11,7 @@ import {
   FileText,
 } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 
 interface PP { data: PortfolioData; accentColor?: string; }
 
@@ -85,7 +86,7 @@ export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
               <div className="lg:col-span-5">
                 <figure>
                   <div className="aspect-[4/5] overflow-hidden bg-stone-200">
-                    <img src={avatarUrl} alt={fullName}
+                    <img src={resolveImageUrl(avatarUrl)} alt={fullName}
                       className="h-full w-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-700" />
                   </div>
                   <figcaption className="mt-2 flex items-center justify-between text-[10px] font-medium uppercase tracking-[0.2em] text-stone-400">
@@ -176,7 +177,7 @@ export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
                 <article key={p.id} className="group">
                   {p.coverImageUrl ? (
                     <div className="aspect-[4/3] overflow-hidden bg-stone-200">
-                      <img src={p.coverImageUrl} alt={p.title}
+                      <img src={resolveImageUrl(p.coverImageUrl)} alt={p.title}
                         className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                     </div>
                   ) : (
@@ -274,7 +275,7 @@ export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
             <div className="columns-2 sm:columns-3 gap-3 [&>*]:mb-3">
               {gallery.map((img, i) => (
                 <div key={i} className="break-inside-avoid overflow-hidden bg-stone-100 group">
-                   <img src={img.url} alt={img.alt ?? `Plate ${i + 1}`}
+                   <img src={resolveImageUrl(img.url)} alt={img.alt ?? `Plate ${i + 1}`}
                     className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                 </div>
               ))}
@@ -296,7 +297,7 @@ export function BlueprintPortfolio({ data, accentColor = "#8b5cf6" }: PP) {
                   <figcaption className="mt-4 flex items-center gap-3">
                     {t.avatarUrl ? (
                       <div className="relative h-10 w-10 overflow-hidden rounded-full border border-stone-300 shrink-0">
-                         <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
+                         <img src={resolveImageUrl(t.avatarUrl)} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     ) : (
                       <div className="h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"

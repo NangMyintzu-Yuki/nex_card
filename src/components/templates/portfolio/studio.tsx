@@ -24,6 +24,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 
 interface PP {
   data: PortfolioData;
@@ -105,7 +106,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
           <div className="flex items-center gap-3">
             {avatarUrl && (
               <div className="relative h-10 w-10 overflow-hidden rounded-xl border border-white/10 shadow-md">
-                <img src={avatarUrl} alt={fullName} className="absolute inset-0 h-full w-full object-cover" />
+                 <img src={resolveImageUrl(avatarUrl)} alt={fullName} className="absolute inset-0 h-full w-full object-cover" />
               </div>
             )}
             <div>
@@ -185,10 +186,10 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
             {projects[0]?.coverImageUrl ? (
               <div className="relative group overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 shadow-2xl">
                 <div className="relative aspect-[4/3] w-full overflow-hidden">
-                  <img
-                    src={projects[0].coverImageUrl}
-                    alt={projects[0].title}
-                    className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                   <img
+                     src={resolveImageUrl(projects[0].coverImageUrl)}
+                     alt={projects[0].title}
+                     className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
                 </div>
@@ -256,7 +257,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
                     {p.coverImageUrl && (
                       <div className="relative aspect-[16/10] w-full overflow-hidden bg-zinc-950">
                         <img
-                          src={p.coverImageUrl}
+                          src={resolveImageUrl(p.coverImageUrl)}
                           alt={p.title}
                           className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                         />
@@ -406,7 +407,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
                   <div className="flex items-center gap-3 border-t border-zinc-800 pt-4">
                     {t.avatarUrl ? (
                       <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10">
-                         <img src={t.avatarUrl} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
+                          <img src={resolveImageUrl(t.avatarUrl)} alt={t.author} className="absolute inset-0 h-full w-full object-cover" />
                       </div>
                     ) : (
                       <div className="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-white text-xs">
@@ -485,8 +486,8 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
 
             {selectedItem.coverImageUrl && (
               <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-zinc-950">
-                 <img
-                   src={selectedItem.coverImageUrl}
+                   <img
+                   src={resolveImageUrl(selectedItem.coverImageUrl)}
                    alt={selectedItem.title}
                    className="absolute inset-0 h-full w-full object-cover"
                  />

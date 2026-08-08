@@ -2,6 +2,7 @@
 import type { WeddingInvitationData } from "@/lib/validators/template-schemas";
 import { daysUntil, formatShortDate, formatTime } from "@/lib/helps";
 import { formatDate } from "@/lib/utils";
+import { resolveImageUrl } from "@/lib/utils/image-url";
 import { WeddingRsvpForm, WeddingGuestbookForm } from "@/components/templates/wedding/rsvp-guestbook-forms";
 
 interface WeddingProps { data: WeddingInvitationData; accentColor?: string; slug?: string; }
@@ -76,7 +77,7 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
                 <div className="relative mb-4 h-40 w-40 overflow-hidden border-4"
                   style={{ borderRadius: "50% 50% 45% 55% / 55% 45% 55% 45%", borderColor: "#c9a96e80" }}>
                   {p.photoUrl ? (
-                    <img src={p.photoUrl} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
+                    <img src={resolveImageUrl(p.photoUrl)} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-4xl"
                       style={{ background: `${accentColor}15` }}>
@@ -110,7 +111,7 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
                   {m.location && <p className="mt-1 text-xs" style={{ color: "#a08060" }}>📍 {m.location}</p>}
                   {m.imageUrl && (
                     <div className="relative aspect-video mt-3 overflow-hidden rounded-xl">
-                       <img src={m.imageUrl} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
+                        <img src={resolveImageUrl(m.imageUrl)} alt={m.title} className="absolute inset-0 h-full w-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -130,7 +131,7 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
                 <div key={i} className="mb-3 break-inside-avoid overflow-hidden rounded-xl border-2 border-dashed"
                   style={{ borderColor: "#c9a96e40" }}>
                   <div className="relative aspect-square">
-                    <img src={img.url} alt={img.alt} className="absolute inset-0 h-full w-full object-cover" />
+                    <img src={resolveImageUrl(img.url)} alt={img.alt} className="absolute inset-0 h-full w-full object-cover" />
                   </div>
                 </div>
               ))}
