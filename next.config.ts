@@ -4,6 +4,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // ── Image optimization ──────────────────────────────────────────────────
   images: {
+    unoptimized: process.env.NODE_ENV === "production",
     remotePatterns: [
       // Local dev uploads
       {
