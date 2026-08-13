@@ -15,6 +15,7 @@ export interface GalleryImage {
   url: string;
   alt: string;
   caption?: string;
+  label?: string;
 }
 
 export interface ContactField {
@@ -273,6 +274,10 @@ export interface WeddingInvitationData {
     contactEmail?: string;
     contactPhone?: string;
     maxGuestsPerInvite?: number;
+    plusOneAllowed?: "true" | "false";
+    mealOptions?: string;
+    dietaryNotes?: string;
+    songRequest?: "true" | "false";
     note?: string;
   };
 

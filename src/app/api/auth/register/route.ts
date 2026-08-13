@@ -14,6 +14,7 @@ import {
 } from "@/lib/security/rate-limit";
 import { getSettings } from "@/lib/settings";
 import { createEmailToken } from "@/lib/auth/email-tokens";
+import { createVerificationCode } from "@/lib/auth/verification-codes";
 import { sendMail, isMailConfigured } from "@/lib/mail/mailer";
 import { verifyEmailHtml } from "@/lib/mail/templates";
 
@@ -103,15 +104,19 @@ export async function POST(request: NextRequest) {
         "VERIFY_EMAIL",
         24 * 60 * 60 * 1000
       );
-      if (token && isMailConfigured()) {
+      const code = await createVerificationCode(user.id, "register");
+
+      if (isMailConfigured()) {
         await sendMail({
           to: email,
           subject: "Verify your NEX CARD email",
-          html: verifyEmailHtml(name, token),
+          html: verifyEmailHtml(name, token ?? "", code),
         });
-      } else if (token) {
+      } else {
         console.warn(
-          "[Auth/Register] Email verify required but SMTP not configured. Token created for",
+          "[Auth/Register] Email verify required but SMTP not configured. Code:",
+          code,
+          "for",
           email
         );
       }

@@ -16,7 +16,7 @@ import {
   MAX_PROFILE_FILE_BYTES,
 } from "./constants";
 import { uploadToLocal } from "./providers/local";
-import { uploadToR2 } from "./providers/r2";
+import { uploadToR2, deleteFromR2 } from "./providers/r2";
 import { uploadToCloudinary } from "./providers/cloudinary";
 import { uploadToSupabase } from "./providers/supabase";
 import type { StorageConfig, UploadInput, UploadResult } from "./types";
@@ -44,6 +44,34 @@ export async function uploadFile(input: UploadInput): Promise<UploadResult> {
     default:
       return uploadToLocal(input);
   }
+}
+
+/**
+ * Extract the storage key from a public URL.
+ * Works for R2 URLs (cdn.nexcard.wetechmm.com, pub-xxx.r2.dev, r2.cloudflarestorage.com).
+ */
+export function extractKeyFromUrl(publicUrl: string): string | null {
+  try {
+    const url = new URL(publicUrl);
+    // Strip leading slash — keys are like uploads/{userId}/{folder}/{file}
+    return url.pathname.slice(1) || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Delete a file from the active storage driver.
+ * Currently only R2 is supported for deletion.
+ */
+export async function deleteFile(url: string): Promise<void> {
+  const driver = getStorageDriver();
+  if (driver !== "r2") return; // Only R2 deletion is implemented
+
+  const key = extractKeyFromUrl(url);
+  if (!key) return;
+
+  await deleteFromR2(key);
 }
 
 export function getStorageConfig(): StorageConfig {

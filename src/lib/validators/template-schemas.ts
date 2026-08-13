@@ -296,6 +296,10 @@ export const WeddingInvitationSchema = z.object({
       contactEmail: z.string().email().optional(),
       contactPhone: z.string().max(30).optional(),
       maxGuestsPerInvite: z.number().int().min(1).max(10).optional(),
+      plusOneAllowed: z.enum(["true", "false"]).optional(),
+      mealOptions: z.string().max(200).optional(),
+      dietaryNotes: z.string().max(200).optional(),
+      songRequest: z.enum(["true", "false"]).optional(),
       note: z.string().max(400).optional(),
     })
     .optional(),

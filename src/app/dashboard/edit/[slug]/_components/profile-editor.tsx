@@ -56,7 +56,7 @@ interface FieldSection {
 interface FieldDef {
   key: string;       // dot-notation path in the JSON, e.g. "contacts.0.value"
   label: string;
-  type: "text" | "textarea" | "url" | "email" | "tel" | "color" | "select" | "image-upload" | "array-contacts" | "array-social" | "array-skills" | "array-projects" | "array-experience" | "array-services" | "array-milestones" | "array-events" | "array-gallery" | "array-category-skills";
+  type: "text" | "textarea" | "url" | "email" | "tel" | "color" | "select" | "image-upload" | "audio-upload" | "datetime-local" | "array-contacts" | "array-social" | "array-skills" | "array-projects" | "array-experience" | "array-services" | "array-milestones" | "array-events" | "array-gallery" | "array-category-skills";
   placeholder?: string;
   maxLength?: number;
   required?: boolean;
@@ -189,24 +189,24 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
       fields: [
         { key: "partner1.name",     label: "Partner 1 Name",     type: "text", required: true, maxLength: 80 },
         { key: "partner1.nickname", label: "Partner 1 Nickname", type: "text", maxLength: 40 },
-        { key: "partner1.photoUrl", label: "Partner 1 Photo URL",type: "url"  },
+        { key: "partner1.photoUrl", label: "Partner 1 Photo",    type: "image-upload", placeholder: "https://...", hint: "Upload a photo or paste a URL" },
         { key: "partner1.bio",      label: "Partner 1 Bio",      type: "textarea", maxLength: 600 },
         { key: "partner2.name",     label: "Partner 2 Name",     type: "text", required: true, maxLength: 80 },
         { key: "partner2.nickname", label: "Partner 2 Nickname", type: "text", maxLength: 40 },
-        { key: "partner2.photoUrl", label: "Partner 2 Photo URL",type: "url"  },
+        { key: "partner2.photoUrl", label: "Partner 2 Photo",    type: "image-upload", placeholder: "https://...", hint: "Upload a photo or paste a URL" },
         { key: "partner2.bio",      label: "Partner 2 Bio",      type: "textarea", maxLength: 600 },
       ],
     },
     {
       id: "wedding", title: "Wedding Details",
       fields: [
-        { key: "weddingDate",   label: "Wedding Date & Time", type: "text",     placeholder: "2025-11-15T14:00:00+08:00", required: true },
+        { key: "weddingDate",   label: "Wedding Date & Time", type: "datetime-local", required: true },
         { key: "headline",      label: "Headline",            type: "text",     placeholder: "Together at last", maxLength: 200 },
         { key: "coupleMessage", label: "Message from the Couple", type: "textarea", maxLength: 1000 },
         { key: "hashtag",       label: "Wedding Hashtag",     type: "text",     placeholder: "AlexAndJordanForever", maxLength: 60 },
         { key: "songTitle",     label: "Song Title",          type: "text", maxLength: 120 },
         { key: "songArtist",    label: "Song Artist",         type: "text", maxLength: 120 },
-        { key: "spotifyUrl",    label: "Spotify URL",         type: "url" },
+        { key: "spotifyUrl",    label: "Background Music",    type: "audio-upload", placeholder: "https://...", hint: "Upload an audio file or paste a Spotify/embed URL" },
       ],
     },
     {
@@ -223,12 +223,19 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
     },
     {
       id: "rsvp", title: "RSVP",
+      description: "Industry best practice: collect attendance, dietary needs, meal choice, plus-one name, and song request in a single form.",
       fields: [
-        { key: "rsvp.formUrl",       label: "RSVP Form URL",     type: "url" },
-        { key: "rsvp.contactEmail",  label: "RSVP Contact Email",type: "email" },
-        { key: "rsvp.contactPhone",  label: "RSVP Contact Phone",type: "tel" },
-        { key: "rsvp.deadline",      label: "RSVP Deadline",     type: "text", placeholder: "2025-11-01T00:00:00+08:00" },
-        { key: "rsvp.note",          label: "RSVP Note",         type: "textarea", maxLength: 400 },
+        { key: "rsvp._enabled", label: "Enable RSVP", type: "select", options: ["false", "true"], hint: "Toggle on to include an RSVP form on your wedding page" },
+        { key: "rsvp.formUrl",           label: "RSVP Form URL",           type: "url" },
+        { key: "rsvp.contactEmail",      label: "RSVP Contact Email",      type: "email" },
+        { key: "rsvp.contactPhone",      label: "RSVP Contact Phone",      type: "tel" },
+        { key: "rsvp.deadline",          label: "RSVP Deadline",           type: "datetime-local" },
+        { key: "rsvp.maxGuestsPerInvite",label: "Max Guests per Invite",  type: "text", placeholder: "2", maxLength: 2 },
+        { key: "rsvp.plusOneAllowed",    label: "Allow Plus-One",          type: "select", options: ["true", "false"] },
+        { key: "rsvp.mealOptions",       label: "Meal Options",            type: "text", placeholder: "Chicken, Beef, Vegetarian, Vegan", maxLength: 200, hint: "Comma-separated meal choices for guests" },
+        { key: "rsvp.dietaryNotes",      label: "Dietary Notes Prompt",    type: "text", placeholder: "Any allergies or dietary needs?", maxLength: 200, hint: "Prompt shown to guests for dietary restrictions" },
+        { key: "rsvp.songRequest",       label: "Allow Song Requests",     type: "select", options: ["true", "false"] },
+        { key: "rsvp.note",              label: "RSVP Note",               type: "textarea", maxLength: 400 },
       ],
     },
   ],
@@ -343,6 +350,16 @@ function ImageUploadField({
   const [tab, setTab] = useState<"upload" | "url">("upload");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Delete old image from R2 when uploading a new one or clearing
+  function deleteOldImage(url: string) {
+    if (!url || !url.startsWith("http")) return;
+    fetch("/api/upload", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    }).catch(() => {});
+  }
+
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -376,8 +393,14 @@ function ImageUploadField({
       }
 
       const data = await res.json();
-      // Local storage returns publicUrl; payment flow returns url — accept both
-      onChange(data.publicUrl ?? data.url);
+      const newUrl = data.publicUrl ?? data.url;
+
+      // Delete old image from R2 after successful upload
+      if (value && value !== newUrl) {
+        deleteOldImage(value);
+      }
+
+      onChange(newUrl);
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed. Please try again.");
     } finally {
@@ -445,7 +468,7 @@ function ImageUploadField({
             <p className="truncate text-xs" style={{ color: "var(--nc-text-2)" }}>{value}</p>
             <p className="text-xs text-emerald-400 mt-0.5">✓ Image set</p>
           </div>
-          <button type="button" onClick={() => onChange("")}
+          <button type="button" onClick={() => { deleteOldImage(value); onChange(""); }}
             className="nc-btn-ghost shrink-0 rounded-lg px-2 py-1 text-xs hover:border-red-500/30 hover:text-red-400 transition-colors">
             Clear
           </button>
@@ -455,6 +478,111 @@ function ImageUploadField({
       {uploadError && (
         <p className="text-xs text-red-400">{uploadError}</p>
       )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AUDIO UPLOAD FIELD — Upload audio file or paste URL
+// ─────────────────────────────────────────────────────────────────────────────
+
+function AudioUploadField({
+  value,
+  onChange,
+  placeholder = "https://...",
+  hint,
+}: {
+  value: string;
+  onChange: (url: string) => void;
+  placeholder?: string;
+  hint?: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string>("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function deleteOldAudio(url: string) {
+    if (!url || !url.startsWith("http")) return;
+    fetch("/api/upload", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    }).catch(() => {});
+  }
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const ALLOWED = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/aac", "audio/flac", "audio/x-m4a", "audio/mp4"];
+    if (!ALLOWED.includes(file.type) && !file.name.match(/\.(mp3|wav|ogg|aac|flac|m4a)$/i)) {
+      setUploadError("Only MP3, WAV, OGG, AAC, FLAC, or M4A files are accepted.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError("File must be under 10 MB.");
+      return;
+    }
+
+    setUploading(true);
+    setUploadError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "gallery");
+
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Upload failed" }));
+        throw new Error(err.error ?? "Upload failed");
+      }
+
+      const data = await res.json();
+      const newUrl = data.publicUrl ?? data.url;
+      if (value && value !== newUrl) deleteOldAudio(value);
+      onChange(newUrl);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <input ref={inputRef} type="file" accept="audio/*,.mp3,.wav,.ogg,.aac,.flac,.m4a" onChange={handleFile} className="hidden" />
+        <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading}
+          className="nc-btn-ghost flex items-center gap-2 rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors disabled:opacity-50">
+          {uploading ? (
+            <><div className="h-3 w-3 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" /> Uploading…</>
+          ) : (
+            <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18V5l12-2v13M9 18c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3zM21 16c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z" /></svg> Upload Audio</>
+          )}
+        </button>
+        <input type="url" value={value} onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder} className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+      </div>
+      {hint && <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>{hint}</p>}
+      {value && (
+        <div className="nc-card flex items-center gap-3 rounded-xl p-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+            style={{ background: "var(--nc-brand-grad)", color: "var(--nc-brand-text)" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18V5l12-2v13M9 18c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3zM21 16c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z" /></svg>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs" style={{ color: "var(--nc-text-2)" }}>{value}</p>
+            <p className="text-xs text-emerald-400 mt-0.5">✓ Audio set</p>
+          </div>
+          <button type="button" onClick={() => { deleteOldAudio(value); onChange(""); }}
+            className="nc-btn-ghost shrink-0 rounded-lg px-2 py-1 text-xs hover:border-red-500/30 hover:text-red-400 transition-colors">
+            Clear
+          </button>
+        </div>
+      )}
+      {uploadError && <p className="text-xs text-red-400">{uploadError}</p>}
     </div>
   );
 }
@@ -605,23 +733,26 @@ function CategorySkillsEditor({ value, onChange }: { value: unknown[]; onChange:
 function GalleryEditor({ value, onChange }: { value: unknown[]; onChange: (v: unknown[]) => void }) {
   const images = (value as Array<Record<string, string>>) ?? [];
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {images.map((img, i) => (
-        <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <input value={img.url ?? ""} onChange={(e) => { const n = [...images]; n[i] = { ...n[i], url: e.target.value }; onChange(n); }}
-            placeholder="Image URL (https://...)" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
-          <div className="flex gap-2 items-center">
+        <div key={i} className="nc-card rounded-xl p-3 space-y-2">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Photo {i + 1}</span>
+            <button onClick={() => onChange(images.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+          </div>
+          <ImageUploadField value={img.url ?? ""} onChange={(url) => { const n = [...images]; n[i] = { ...n[i], url: url }; onChange(n); }}
+            placeholder="Upload image or paste URL" folder="gallery" />
+          <div className="grid gap-2 sm:grid-cols-2">
             <input value={img.alt ?? ""} onChange={(e) => { const n = [...images]; n[i] = { ...n[i], alt: e.target.value }; onChange(n); }}
-              placeholder="Alt text" className="flex-1 sm:w-36 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
-            <button onClick={() => onChange(images.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
+              placeholder="Alt text (e.g. 'First dance')" className="nc-input rounded-lg px-3 py-2 text-sm" />
+            <input value={img.label ?? ""} onChange={(e) => { const n = [...images]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
+              placeholder="Label (e.g. 'Ceremony')" className="nc-input rounded-lg px-3 py-2 text-sm" />
           </div>
         </div>
       ))}
-      <button onClick={() => onChange([...images, { url: "", alt: "" }])}
+      <button onClick={() => onChange([...images, { url: "", alt: "", label: "" }])}
         className="flex items-center gap-1.5 nc-btn-ghost rounded-lg border-dashed px-3 py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors">
-        <Plus className="h-3 w-3" /> Add Image
+        <Plus className="h-3 w-3" /> Add Photo
       </button>
     </div>
   );
@@ -637,21 +768,41 @@ function MilestonesEditor({ value, onChange }: { value: unknown[]; onChange: (v:
             <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Milestone {i + 1}</span>
             <button onClick={() => onChange(milestones.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
-          {[
-            { key: "date", placeholder: "Spring 2019 / 2019-04-12" },
-            { key: "title", placeholder: "How We Met" },
-            { key: "location", placeholder: "Kuala Lumpur, Malaysia" },
-            { key: "emoji", placeholder: "💕" },
-          ].map(({ key, placeholder }) => (
-            <input key={key} value={m[key] ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], [key]: e.target.value }; onChange(n); }}
-              placeholder={`${key.charAt(0).toUpperCase() + key.slice(1)} (${placeholder})`}
-              className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
-          ))}
-          <textarea value={m.story ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], story: e.target.value }; onChange(n); }}
-            placeholder="Tell the story of this milestone…" rows={3}
-            className="w-full nc-input rounded-lg px-3 py-2 text-sm resize-none" />
-          <input value={m.imageUrl ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], imageUrl: e.target.value }; onChange(n); }}
-            placeholder="Photo URL (optional)" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+          <div className="grid gap-2 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Date *</label>
+              <input type="date" value={m.date ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], date: e.target.value }; onChange(n); }}
+                className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Title *</label>
+              <input value={m.title ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], title: e.target.value }; onChange(n); }}
+                placeholder="How We Met" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Location</label>
+              <input value={m.location ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], location: e.target.value }; onChange(n); }}
+                placeholder="Kuala Lumpur, Malaysia" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Emoji</label>
+              <input value={m.emoji ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], emoji: e.target.value }; onChange(n); }}
+                placeholder="💕" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Story *</label>
+            <textarea value={m.story ?? ""} onChange={(e) => { const n = [...milestones]; n[i] = { ...n[i], story: e.target.value }; onChange(n); }}
+              placeholder="Tell the story of this milestone…" rows={3}
+              className="w-full nc-input rounded-lg px-3 py-2 text-sm resize-none" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Photo</label>
+            <ImageUploadField value={m.imageUrl ?? ""} onChange={(url) => { const n = [...milestones]; n[i] = { ...n[i], imageUrl: url }; onChange(n); }}
+              placeholder="Upload a photo or paste a URL" folder="gallery" />
+          </div>
         </div>
       ))}
       <button onClick={() => onChange([...milestones, { date: "", title: "", story: "" }])}
@@ -667,24 +818,52 @@ function EventsEditor({ value, onChange }: { value: unknown[]; onChange: (v: unk
   return (
     <div className="space-y-3">
       {events.map((e, i) => (
-        <div key={i} className="nc-card rounded-xl p-4 space-y-2">
+        <div key={i} className="nc-card rounded-xl p-4 space-y-3">
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Event {i + 1}</span>
             <button onClick={() => onChange(events.filter((_, j) => j !== i))} className="hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
-          {[
-            { key: "name",    placeholder: "Ceremony / Reception" },
-            { key: "date",    placeholder: "2025-11-15T14:00:00+08:00" },
-            { key: "venue",   placeholder: "The Grand Ballroom" },
-            { key: "address", placeholder: "123 Wedding Lane, KL" },
-            { key: "dressCode", placeholder: "Formal / Smart Casual" },
-            { key: "googleMapsUrl", placeholder: "https://maps.google.com/…" },
-            { key: "notes",   placeholder: "Additional notes…" },
-          ].map(({ key, placeholder }) => (
-            <input key={key} value={e[key] ?? ""} onChange={(ev) => { const n = [...events]; n[i] = { ...n[i], [key]: ev.target.value }; onChange(n); }}
-              placeholder={`${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')} (${placeholder})`}
-              className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
-          ))}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Event Name *</label>
+              <input value={e.name ?? ""} onChange={(ev) => { const n = [...events]; n[i] = { ...n[i], name: ev.target.value }; onChange(n); }}
+                placeholder="Ceremony / Reception" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Date & Time *</label>
+              <input type="datetime-local" value={(e.date ?? "").slice(0, 16)} onChange={(ev) => { const n = [...events]; n[i] = { ...n[i], date: ev.target.value ? new Date(ev.target.value).toISOString() : "" }; onChange(n); }}
+                className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Venue *</label>
+              <input value={e.venue ?? ""} onChange={(ev) => { const n = [...events]; n[i] = { ...n[i], venue: ev.target.value }; onChange(n); }}
+                placeholder="The Grand Ballroom" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Address *</label>
+              <input value={e.address ?? ""} onChange={(ev) => { const n = [...events]; n[i] = { ...n[i], address: ev.target.value }; onChange(n); }}
+                placeholder="123 Wedding Lane, KL" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Dress Code</label>
+              <input value={e.dressCode ?? ""} onChange={(ev) => { const n = [...events]; n[i] = { ...n[i], dressCode: ev.target.value }; onChange(n); }}
+                placeholder="Formal / Smart Casual" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Google Maps URL</label>
+              <input value={e.googleMapsUrl ?? ""} onChange={(ev) => { const n = [...events]; n[i] = { ...n[i], googleMapsUrl: ev.target.value }; onChange(n); }}
+                placeholder="https://maps.google.com/…" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium" style={{ color: "var(--nc-text-3)" }}>Notes</label>
+            <input value={e.notes ?? ""} onChange={(ev) => { const n = [...events]; n[i] = { ...n[i], notes: ev.target.value }; onChange(n); }}
+              placeholder="Additional notes…" className="w-full nc-input rounded-lg px-3 py-2 text-sm" />
+          </div>
         </div>
       ))}
       <button onClick={() => onChange([...events, { name: "", date: "", venue: "", address: "" }])}
@@ -947,9 +1126,13 @@ function ExperienceEditor({ value, onChange }: { value: unknown[]; onChange: (v:
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
-  const [formData, setFormData] = useState<Record<string, unknown>>(
-    (profile.dynamicJsonData as Record<string, unknown>) ?? {}
-  );
+  const [formData, setFormData] = useState<Record<string, unknown>>(() => {
+    const data = (profile.dynamicJsonData as Record<string, unknown>) ?? {};
+    if (data.rsvp && typeof data.rsvp === "object" && !(data.rsvp as Record<string, unknown>)._enabled) {
+      return { ...data, rsvp: { ...(data.rsvp as Record<string, unknown>), _enabled: "true" } };
+    }
+    return data;
+  });
   const [metaTitle, setMetaTitle] = useState(profile.metaTitle ?? "");
   const [metaDescription, setMetaDescription] = useState(profile.metaDescription ?? "");
   const [ogImageUrl, setOgImageUrl] = useState(profile.ogImageUrl ?? "");
@@ -977,7 +1160,15 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
   const getFieldValue = useCallback((key: string) => getNestedValue(formData, key), [formData]);
 
   const setFieldValue = useCallback((key: string, value: unknown) => {
-    setFormData((prev) => setNestedValue(prev, key, value));
+    setFormData((prev) => {
+      const next = setNestedValue(prev, key, value);
+      if (key === "rsvp._enabled" && value === "false") {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { rsvp, ...rest } = next;
+        return rest;
+      }
+      return next;
+    });
   }, []);
 
   const toggleSection = (id: string) => {
@@ -1054,6 +1245,13 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
         return <CategorySkillsEditor value={(val as unknown[]) ?? []} onChange={(v) => setFieldValue(field.key, v)} />;
       case "image-upload":
         return <ImageUploadField value={String(val ?? "")} onChange={(v) => setFieldValue(field.key, v)} placeholder={field.placeholder} />;
+      case "audio-upload":
+        return <AudioUploadField value={String(val ?? "")} onChange={(v) => setFieldValue(field.key, v)} placeholder={field.placeholder} hint={field.hint} />;
+      case "datetime-local":
+        return (
+          <input type="datetime-local" value={String(val ?? "").slice(0, 16)} onChange={(e) => setFieldValue(field.key, e.target.value ? new Date(e.target.value).toISOString() : "")}
+            className={base} />
+        );
       default:
         return (
           <div>
@@ -1174,18 +1372,24 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
 
               {isOpen && (
                 <div className="px-5 py-5 space-y-5">
-                  {section.fields.map((field) => (
-                    <div key={field.key}>
-                      <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>
-                        {field.label}
-                        {field.required && <span className="ml-1 text-red-400">*</span>}
-                      </label>
-                      {renderField(field)}
-                      {field.hint && (
-                        <p className="mt-1 text-xs" style={{ color: "var(--nc-text-3)" }}>{field.hint}</p>
-                      )}
-                    </div>
-                  ))}
+                  {section.fields.map((field) => {
+                    if (section.id === "rsvp" && field.key !== "rsvp._enabled") {
+                      const rsvpEnabled = getFieldValue("rsvp._enabled");
+                      if (rsvpEnabled !== "true") return null;
+                    }
+                    return (
+                      <div key={field.key}>
+                        <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>
+                          {field.label}
+                          {field.required && <span className="ml-1 text-red-400">*</span>}
+                        </label>
+                        {renderField(field)}
+                        {field.hint && (
+                          <p className="mt-1 text-xs" style={{ color: "var(--nc-text-3)" }}>{field.hint}</p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -1227,7 +1431,20 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
       {/* Save button */}
       <form action={submitAction} className="mt-8">
         <input type="hidden" name="profileId" value={profile.id} />
-        <input type="hidden" name="dynamicJsonData" value={JSON.stringify(formData)} />
+        <input type="hidden" name="dynamicJsonData" value={(() => {
+          const clean = { ...formData };
+          if (clean.rsvp && typeof clean.rsvp === "object") {
+            const r = { ...clean.rsvp } as Record<string, unknown>;
+            const enabled = r._enabled;
+            delete r._enabled;
+            if (enabled === "true" && Object.keys(r).length > 0) {
+              clean.rsvp = r;
+            } else {
+              delete clean.rsvp;
+            }
+          }
+          return JSON.stringify(clean);
+        })()} />
         <input type="hidden" name="metaTitle" value={metaTitle} />
         <input type="hidden" name="metaDescription" value={metaDescription} />
         <input type="hidden" name="ogImageUrl" value={ogImageUrl} />

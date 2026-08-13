@@ -1,116 +1,214 @@
-// src/app/verify-email/page.tsx
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
+import { ThemeProvider } from "@/lib/theme/theme-context";
+import { NexCardLogo } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { useTheme } from "@/lib/theme/theme-context";
 
-function VerifyBody() {
-  const params = useSearchParams();
-  const token = params.get("token");
-  const errorParam = params.get("error");
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-  const brand2 = isDark ? "#d4af37" : "#2d6eb5";
+function VerifyEmailContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const email = searchParams.get("email") ?? "";
 
-  const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
-    errorParam ? "error" : token ? "loading" : "idle"
-  );
-  const [message, setMessage] = useState(
-    errorParam
-      ? "This verification link is invalid or has expired."
-      : "Waiting for verification…"
-  );
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(60);
+  const [resendLoading, setResendLoading] = useState(false);
+  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    if (!token || errorParam) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/api/auth/verify-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token }),
-        });
-        const data = await res.json();
-        if (cancelled) return;
-        if (!res.ok) {
-          setStatus("error");
-          setMessage(data.message ?? "Verification failed.");
-          return;
-        }
-        setStatus("ok");
-        setMessage(data.message ?? "Email verified.");
-      } catch {
-        if (!cancelled) {
-          setStatus("error");
-          setMessage("Unable to verify email.");
-        }
+    if (resendTimer <= 0) return;
+    const t = setTimeout(() => setResendTimer((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendTimer]);
+
+  useEffect(() => {
+    inputsRef.current[0]?.focus();
+  }, []);
+
+  function handleChange(index: number, value: string) {
+    if (!/^\d*$/.test(value)) return;
+    const next = [...code];
+    next[index] = value.slice(-1);
+    setCode(next);
+    if (value && index < 5) {
+      inputsRef.current[index + 1]?.focus();
+    }
+  }
+
+  function handleKeyDown(index: number, e: React.KeyboardEvent) {
+    if (e.key === "Backspace" && !code[index] && index > 0) {
+      inputsRef.current[index - 1]?.focus();
+    }
+  }
+
+  function handlePaste(e: React.ClipboardEvent) {
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!pasted) return;
+    const next = pasted.split("").concat(Array(6).fill("")).slice(0, 6);
+    setCode(next);
+    const focusIdx = Math.min(pasted.length, 5);
+    inputsRef.current[focusIdx]?.focus();
+  }
+
+  async function handleVerify() {
+    const fullCode = code.join("");
+    if (fullCode.length !== 6) {
+      setError("Please enter the complete 6-digit code.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code: fullCode }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.message ?? "Verification failed.");
+        return;
       }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [token, errorParam]);
+      router.replace("/dashboard/onboarding");
+      router.refresh();
+    } catch {
+      setError("An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResend() {
+    setResendLoading(true);
+    try {
+      await fetch("/api/auth/resend-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      setResendTimer(60);
+      setCode(["", "", "", "", "", ""]);
+      inputsRef.current[0]?.focus();
+    } catch {
+      // silent
+    } finally {
+      setResendLoading(false);
+    }
+  }
+
+  const inputStyle = {
+    background: "var(--nc-bg-card)",
+    border: "1px solid var(--nc-border)",
+    color: "var(--nc-text)",
+    borderRadius: "0.75rem",
+    width: "3rem",
+    height: "3.5rem",
+    textAlign: "center" as const,
+    fontSize: "1.5rem",
+    fontWeight: 700,
+    outline: "none",
+    letterSpacing: "0.1em",
+  };
 
   return (
-    <div
-      className="rounded-2xl p-6 text-center sm:p-8"
-      style={{
-        background: "var(--nc-bg-card)",
-        border: "1px solid var(--nc-border)",
-      }}
-    >
-      <h1
-        className="text-xl font-black"
-        style={{ color: "var(--nc-text)" }}
-      >
-        Email verification
-      </h1>
-      <p
-        className="mt-3 text-sm"
-        style={{
-          color: status === "error" ? "#ef4444" : "var(--nc-text-2)",
-        }}
-      >
-        {status === "loading" ? "Verifying your email…" : message}
-      </p>
-      {(status === "ok" || status === "error" || status === "idle") && (
-        <Link
-          href="/login"
-          className="mt-6 inline-block text-sm font-bold hover:underline"
-          style={{ color: brand2 }}
-        >
-          Continue to sign in
+    <div className="flex min-h-screen flex-col" style={{ background: "var(--nc-bg)" }}>
+      <nav className="flex items-center justify-between px-6 py-4">
+        <Link href="/" className="flex items-center gap-2">
+          <NexCardLogo />
         </Link>
-      )}
+        <ThemeToggle />
+      </nav>
+
+      <main className="flex flex-1 items-center justify-center px-4">
+        <div className="w-full max-w-md space-y-8 rounded-2xl p-8"
+          style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)", boxShadow: "var(--nc-shadow)" }}>
+
+          <div className="text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full"
+              style={{ background: "var(--nc-brand-grad)" }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M22 7l-10 7L2 7" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-bold" style={{ color: "var(--nc-text)" }}>Verify your email</h1>
+            <p className="mt-2 text-sm" style={{ color: "var(--nc-text-2)" }}>
+              We sent a 6-digit code to<br />
+              <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{email}</span>
+            </p>
+          </div>
+
+          {error && (
+            <div className="rounded-xl border px-4 py-3 text-sm"
+              style={{ borderColor: "var(--nc-danger)", color: "var(--nc-danger)", background: "rgba(220,38,38,0.05)" }}>
+              {error}
+            </div>
+          )}
+
+          <div className="flex justify-center gap-3" onPaste={handlePaste}>
+            {code.map((digit, i) => (
+              <input
+                key={i}
+                ref={(el) => { inputsRef.current[i] = el; }}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleChange(i, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(i, e)}
+                style={inputStyle}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={handleVerify}
+            disabled={loading || code.join("").length !== 6}
+            className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition-all disabled:opacity-50"
+            style={{ background: "var(--nc-brand-grad)" }}>
+            {loading ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            ) : (
+              "Verify & Continue"
+            )}
+          </button>
+
+          <div className="text-center">
+            <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+              Didn&apos;t receive the code?{" "}
+              {resendTimer > 0 ? (
+                <span>Resend in {resendTimer}s</span>
+              ) : (
+                <button
+                  onClick={handleResend}
+                  disabled={resendLoading}
+                  className="font-semibold underline"
+                  style={{ color: "var(--nc-brand-2)" }}>
+                  {resendLoading ? "Sending…" : "Resend code"}
+                </button>
+              )}
+            </p>
+          </div>
+
+          <div className="text-center">
+            <Link href="/login" className="text-xs underline" style={{ color: "var(--nc-text-3)" }}>
+              ← Back to login
+            </Link>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
 
 export default function VerifyEmailPage() {
   return (
-    <main className="relative flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="absolute right-4 top-4">
-        <ThemeToggle size="sm" />
-      </div>
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex justify-center">
-          <NexCardLogoStatic className="h-10" />
-        </div>
-        <Suspense
-          fallback={
-            <p className="text-center text-sm" style={{ color: "var(--nc-text-3)" }}>
-              Loading…
-            </p>
-          }
-        >
-          <VerifyBody />
-        </Suspense>
-      </div>
-    </main>
+    <ThemeProvider>
+      <VerifyEmailContent />
+    </ThemeProvider>
   );
 }

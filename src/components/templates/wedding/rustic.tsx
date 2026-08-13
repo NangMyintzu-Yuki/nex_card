@@ -202,7 +202,13 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
     
       {slug && (
         <section className="px-6 py-16 text-center">
-          <WeddingRsvpForm slug={slug} accentColor={accentColor} />
+          {rsvp && (
+            <WeddingRsvpForm slug={slug} accentColor={accentColor}
+              mealOptions={rsvp?.mealOptions}
+              plusOneAllowed={rsvp?.plusOneAllowed === "true"}
+              allowSongRequest={rsvp?.songRequest === "true"}
+              dietaryPrompt={rsvp?.dietaryNotes} />
+          )}
           {allowWishes !== false && (
             <WeddingGuestbookForm slug={slug} accentColor={accentColor} title={wishesTitle ?? "Leave a wish"} />
           )}

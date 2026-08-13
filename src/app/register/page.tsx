@@ -64,7 +64,7 @@ export default function RegisterPage() {
       const data = await res.json();
       if (!res.ok) { setError(data.message ?? "Registration failed."); return; }
       if (data.requiresVerification) {
-        router.replace("/login?verify=1");
+        router.replace(`/verify-email?email=${encodeURIComponent(email)}`);
         return;
       }
       router.replace("/dashboard/onboarding");

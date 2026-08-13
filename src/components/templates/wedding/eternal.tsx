@@ -339,7 +339,13 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
     
       {slug && (
         <section className="px-6 py-16 text-center">
-          <WeddingRsvpForm slug={slug} accentColor={gold} />
+          {rsvp && (
+            <WeddingRsvpForm slug={slug} accentColor={gold}
+              mealOptions={data.rsvp?.mealOptions}
+              plusOneAllowed={data.rsvp?.plusOneAllowed === "true"}
+              allowSongRequest={data.rsvp?.songRequest === "true"}
+              dietaryPrompt={data.rsvp?.dietaryNotes} />
+          )}
           {allowWishes !== false && (
             <WeddingGuestbookForm slug={slug} accentColor={gold} title={wishesTitle ?? "Leave a wish"} />
           )}

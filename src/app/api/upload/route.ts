@@ -12,6 +12,7 @@ import {
   parseUploadFolder,
   maxBytesForFolder,
   ALLOWED_IMAGE_TYPES,
+  deleteFile,
 } from "@/lib/storage";
 import { generateR2PresignedUrl } from "@/lib/storage/providers/r2";
 import { detectImageMime } from "@/lib/security/image-magic";
@@ -79,6 +80,51 @@ export async function POST(request: NextRequest) {
     console.error("Upload error:", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Upload failed" },
+      { status: 500 }
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DELETE /api/upload — delete an image from storage
+// ─────────────────────────────────────────────────────────────────────────────
+
+const DeleteInput = z.object({
+  url: z.string().url("Must be a valid URL."),
+});
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const parsed = DeleteInput.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid request." },
+        { status: 400 }
+      );
+    }
+
+    // Security: only allow deleting files that belong to the requesting user
+    if (!parsed.data.url.includes(session.user.id)) {
+      return NextResponse.json(
+        { error: "You can only delete your own files." },
+        { status: 403 }
+      );
+    }
+
+    await deleteFile(parsed.data.url);
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("Delete error:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Delete failed" },
       { status: 500 }
     );
   }

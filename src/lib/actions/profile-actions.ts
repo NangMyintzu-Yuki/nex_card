@@ -13,6 +13,7 @@ import {
 } from "@/lib/validators/template-schemas";
 import { getServerSession } from "@/lib/auth/session";
 import { isReservedSlug } from "@/lib/slugs/reserved";
+import { deleteFile } from "@/lib/storage";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION: SELECT TEMPLATE DURING ONBOARDING (one-time lock)
@@ -220,6 +221,8 @@ export async function updateProfileAction(
       id: true,
       slug: true,
       paymentStatus: true,
+      dynamicJsonData: true,
+      ogImageUrl: true,
       category: { select: { slug: true } },
       template: { select: { isPremium: true } },
     },
@@ -237,6 +240,10 @@ export async function updateProfileAction(
         "Payment must be approved before editing or publishing a premium template. Complete payment or wait for admin approval.",
     };
   }
+
+  // Capture old data for R2 cleanup
+  const oldDynamicJson = profile.dynamicJsonData as Record<string, unknown>;
+  const oldOgImageUrl = profile.ogImageUrl;
 
   // Parse and validate the JSON against the category's schema
   let rawData: unknown;
@@ -275,6 +282,9 @@ export async function updateProfileAction(
       updatedAt: new Date(),
     },
   });
+
+  // Clean up old images from R2 storage
+  await cleanupOldImages(oldDynamicJson, validation.data as Record<string, unknown>, oldOgImageUrl, parsed.data.ogImageUrl);
 
   // Purge the public cache for this slug immediately
   await purgeProfileCache(profile.slug, session.user.id);
@@ -319,11 +329,18 @@ export async function deleteProfileAction(
 
   const profile = await prisma.userProfile.findFirst({
     where: { id: parsed.data.profileId, userId: session.user.id },
-    select: { id: true, slug: true },
+    select: { id: true, slug: true, dynamicJsonData: true, ogImageUrl: true },
   });
 
   if (!profile) {
     return { status: "error", message: "Profile not found." };
+  }
+
+  // Clean up all uploaded images from R2
+  const allUrls = extractImageUrls(profile.dynamicJsonData);
+  if (profile.ogImageUrl) allUrls.add(profile.ogImageUrl);
+  if (allUrls.size > 0) {
+    Promise.allSettled([...allUrls].map((url) => deleteFile(url))).catch(() => {});
   }
 
   await prisma.userProfile.delete({ where: { id: profile.id } });
@@ -378,4 +395,57 @@ function getEmptyDataForCategory(categorySlug: CategorySlug): object {
   };
 
   return defaults[categorySlug] ?? {};
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPER: Extract all image URLs from a template data object (recursively)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function extractImageUrls(obj: unknown): Set<string> {
+  const urls = new Set<string>();
+
+  function walk(val: unknown) {
+    if (typeof val === "string") {
+      // Only collect URLs that look like uploaded images (contain /uploads/ or are from known CDN)
+      if (
+        val.startsWith("http") &&
+        (val.includes("/uploads/") || val.includes("r2.dev"))
+      ) {
+        urls.add(val);
+      }
+    } else if (Array.isArray(val)) {
+      val.forEach(walk);
+    } else if (val && typeof val === "object") {
+      Object.values(val).forEach(walk);
+    }
+  }
+
+  walk(obj);
+  return urls;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPER: Delete images from R2 that exist in old data but not in new data
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function cleanupOldImages(
+  oldData: Record<string, unknown>,
+  newData: Record<string, unknown>,
+  oldOgUrl: string | null | undefined,
+  newOgUrl: string | null | undefined
+): Promise<void> {
+  const oldUrls = extractImageUrls(oldData);
+  const newUrls = extractImageUrls(newData);
+
+  // Also include ogImageUrl
+  if (oldOgUrl) oldUrls.add(oldOgUrl);
+  if (newOgUrl) newUrls.add(newOgUrl);
+
+  // Find URLs that were removed
+  const removedUrls = [...oldUrls].filter((u) => !newUrls.has(u));
+
+  if (removedUrls.length === 0) return;
+
+  // Delete removed images from R2 (fire-and-forget, don't block the response)
+  Promise.allSettled(removedUrls.map((url) => deleteFile(url))).catch(() => {});
 }

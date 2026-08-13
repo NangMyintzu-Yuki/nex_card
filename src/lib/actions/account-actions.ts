@@ -10,6 +10,7 @@ import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
 import { hashPassword, verifyPassword } from "@/lib/auth/hash";
 import { revalidatePath } from "next/cache";
+import { deleteFile } from "@/lib/storage";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION: Change password
@@ -117,6 +118,20 @@ export async function updateProfileInfoAction(
 
   if (!parsed.success) {
     return { status: "error", message: parsed.error.issues[0]?.message ?? "Validation failed." };
+  }
+
+  // Fetch current avatar to delete old one from storage
+  const currentUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { avatarUrl: true },
+  });
+
+  const newAvatarUrl = parsed.data.avatarUrl || null;
+  const oldAvatarUrl = currentUser?.avatarUrl;
+
+  // Delete old avatar from R2 if it changed or was cleared
+  if (oldAvatarUrl && oldAvatarUrl !== newAvatarUrl) {
+    deleteFile(oldAvatarUrl).catch(() => {});
   }
 
   await prisma.user.update({

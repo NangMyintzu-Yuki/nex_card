@@ -6,17 +6,33 @@ import { useEffect, useState } from "react";
 export function WeddingRsvpForm({
   slug,
   accentColor = "#c9a96e",
+  mealOptions,
+  plusOneAllowed = false,
+  allowSongRequest = false,
+  dietaryPrompt,
 }: {
   slug: string;
   accentColor?: string;
+  mealOptions?: string;
+  plusOneAllowed?: boolean;
+  allowSongRequest?: boolean;
+  dietaryPrompt?: string;
 }) {
   const [guestName, setGuestName] = useState("");
   const [email, setEmail] = useState("");
   const [attending, setAttending] = useState(true);
   const [guestCount, setGuestCount] = useState(1);
+  const [plusOneName, setPlusOneName] = useState("");
+  const [mealChoice, setMealChoice] = useState("");
+  const [dietary, setDietary] = useState("");
+  const [songRequest, setSongRequest] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [error, setError] = useState("");
+
+  const mealList = mealOptions
+    ? mealOptions.split(",").map((m) => m.trim()).filter(Boolean)
+    : [];
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -31,6 +47,10 @@ export function WeddingRsvpForm({
           email,
           attending,
           guestCount,
+          plusOneName: plusOneAllowed ? plusOneName : undefined,
+          mealChoice: mealList.length > 0 ? mealChoice : undefined,
+          dietary: dietary || undefined,
+          songRequest: allowSongRequest ? songRequest : undefined,
           message,
         }),
       });
@@ -43,6 +63,10 @@ export function WeddingRsvpForm({
       setStatus("ok");
       setGuestName("");
       setEmail("");
+      setPlusOneName("");
+      setMealChoice("");
+      setDietary("");
+      setSongRequest("");
       setMessage("");
     } catch {
       setStatus("error");
@@ -59,7 +83,7 @@ export function WeddingRsvpForm({
         required
         value={guestName}
         onChange={(e) => setGuestName(e.target.value)}
-        placeholder="Your name"
+        placeholder="Your full name"
         className={inputClass}
         style={{ borderColor: `${accentColor}55` }}
       />
@@ -90,21 +114,61 @@ export function WeddingRsvpForm({
         </label>
       </div>
       {attending && (
-        <input
-          type="number"
-          min={1}
-          max={20}
-          value={guestCount}
-          onChange={(e) => setGuestCount(Number(e.target.value) || 1)}
-          className={inputClass}
-          style={{ borderColor: `${accentColor}55` }}
-          placeholder="Guest count"
-        />
+        <>
+          <input
+            type="number"
+            min={1}
+            max={20}
+            value={guestCount}
+            onChange={(e) => setGuestCount(Number(e.target.value) || 1)}
+            className={inputClass}
+            style={{ borderColor: `${accentColor}55` }}
+            placeholder="Number of guests attending"
+          />
+          {plusOneAllowed && guestCount > 1 && (
+            <input
+              value={plusOneName}
+              onChange={(e) => setPlusOneName(e.target.value)}
+              placeholder="Plus-one full name"
+              className={inputClass}
+              style={{ borderColor: `${accentColor}55` }}
+            />
+          )}
+          {mealList.length > 0 && (
+            <select
+              value={mealChoice}
+              onChange={(e) => setMealChoice(e.target.value)}
+              required
+              className={inputClass}
+              style={{ borderColor: `${accentColor}55` }}>
+              <option value="" disabled>Select your meal</option>
+              {mealList.map((meal) => (
+                <option key={meal} value={meal}>{meal}</option>
+              ))}
+            </select>
+          )}
+          <input
+            value={dietary}
+            onChange={(e) => setDietary(e.target.value)}
+            placeholder={dietaryPrompt || "Dietary restrictions or allergies"}
+            className={inputClass}
+            style={{ borderColor: `${accentColor}55` }}
+          />
+          {allowSongRequest && (
+            <input
+              value={songRequest}
+              onChange={(e) => setSongRequest(e.target.value)}
+              placeholder="Song you'd love to dance to (optional)"
+              className={inputClass}
+              style={{ borderColor: `${accentColor}55` }}
+            />
+          )}
+        </>
       )}
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        placeholder="Message (optional)"
+        placeholder="Message for the couple (optional)"
         rows={3}
         className={inputClass}
         style={{ borderColor: `${accentColor}55` }}

@@ -84,6 +84,7 @@ model User {
   sessions          Session[]
   payments          Payment[]
   emailTokens       EmailToken[]
+  verificationCodes VerificationCode[]
 
   @@index([email])
   @@index([status])
@@ -299,6 +300,10 @@ model WeddingRsvp {
   phone        String?  @db.VarChar(40)
   attending    Boolean  @default(true)
   guestCount   Int      @default(1)
+  plusOneName  String?  @db.VarChar(120)
+  mealChoice   String?  @db.VarChar(120)
+  dietary      String?  @db.VarChar(240)
+  songRequest  String?  @db.VarChar(120)
   mealNote     String?  @db.VarChar(240)
   message      String?  @db.VarChar(500)
   createdAt    DateTime @default(now())
@@ -350,6 +355,23 @@ model EmailToken {
   @@index([type])
   @@index([expiresAt])
   @@map("email_tokens")
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String
+  purpose   String   @default("register")
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([code])
+  @@index([purpose])
+  @@map("verification_codes")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

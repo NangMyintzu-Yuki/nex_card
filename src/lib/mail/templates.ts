@@ -1,13 +1,20 @@
 // src/lib/mail/templates.ts
 import { appBaseUrl } from "./mailer";
 
-export function verifyEmailHtml(name: string, token: string): string {
+export function verifyEmailHtml(name: string, token: string, code?: string): string {
   const url = `${appBaseUrl()}/verify-email?token=${encodeURIComponent(token)}`;
+  const codeSection = code ? `
+      <div style="background:#f0f4ff;border:2px dashed #1a3a6b;border-radius:12px;padding:20px;text-align:center;margin:24px 0">
+        <p style="color:#333;font-size:13px;margin:0 0 8px">Your verification code:</p>
+        <p style="font-size:32px;font-weight:900;letter-spacing:8px;color:#1a3a6b;margin:0">${code}</p>
+        <p style="color:#999;font-size:11px;margin:8px 0 0">Expires in 5 minutes</p>
+      </div>` : "";
   return `
     <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px">
       <h2>Verify your email</h2>
       <p>Hi ${escapeHtml(name)},</p>
-      <p>Confirm your NEX CARD account by clicking the button below.</p>
+      <p>Confirm your NEX CARD account by entering the code below or clicking the button.</p>
+      ${codeSection}
       <p style="margin:28px 0">
         <a href="${url}" style="background:#1a3a6b;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">
           Verify email
