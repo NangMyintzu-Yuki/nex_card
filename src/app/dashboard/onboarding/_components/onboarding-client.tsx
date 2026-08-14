@@ -384,7 +384,6 @@ export function OnboardingClient({
             </div>
           </div>
         </div>
-      </div>
 
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-6">
 
