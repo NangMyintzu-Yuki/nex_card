@@ -93,8 +93,8 @@ npm run dev
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | `admin@nexcard.io` | `admin-change-me-in-prod` |
-| User | `demo@nexcard.io` | `demo-password-123` |
+| Admin | `admin@www.nexcard.wetechmm.com` | `admin-change-me-in-prod` |
+| User | `demo@www.nexcard.wetechmm.com` | `demo-password-123` |
 
 > Demo credentials only appear on the login page in `NODE_ENV=development`.
 
@@ -107,7 +107,7 @@ Copy `.env.example` → `.env.local` (local) or set in your hosting panel (produ
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATABASE_URL` | **Yes (prod)** | MySQL connection string |
-| `NEXT_PUBLIC_APP_URL` | **Yes** | Public URL, e.g. `https://nexcard.io` |
+| `NEXT_PUBLIC_APP_URL` | **Yes** | Public URL, e.g. `https://www.nexcard.wetechmm.com` |
 | `REVALIDATION_SECRET` | **Yes** | Secret for `/api/revalidate` webhook (≥32 chars) |
 | `CRON_SECRET` | **Yes (prod)** | Bearer token for `/api/cron/cleanup-sessions` (≥32 chars) |
 | `STORAGE_DRIVER` | No (default: `local`) | Laptop: `local`. Server: `r2` |
@@ -116,6 +116,7 @@ Copy `.env.example` → `.env.local` (local) or set in your hosting panel (produ
 | `ALLOW_LOCAL_STORAGE` | Local / Docker only | Required if production `NODE_ENV` uses `STORAGE_DRIVER=local` |
 | `CLOUDINARY_*` | If `STORAGE_DRIVER=cloudinary` | Cloudinary cloud name, API key, secret |
 | `SUPABASE_*` | If `STORAGE_DRIVER=supabase` | Supabase URL, service role key, bucket |
+| `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` | **Yes (launch)** | Required so registration verification emails send. Without SMTP, new users cannot log in. |
 | `NODE_ENV` | Auto | `development` / `production` / `test` |
 
 ### Generate secrets
@@ -277,7 +278,7 @@ If you add a deploy job later, store these as GitHub Secrets:
 | Secret | Value |
 |--------|-------|
 | `DATABASE_URL` | Production MySQL URL |
-| `NEXT_PUBLIC_APP_URL` | `https://nexcard.io` |
+| `NEXT_PUBLIC_APP_URL` | `https://www.nexcard.wetechmm.com` |
 | `REVALIDATION_SECRET` | Production secret |
 | `R2_*` | R2 credentials |
 
@@ -337,7 +338,7 @@ pm2 startup                # auto-start on reboot
 ```nginx
 server {
     listen 80;
-    server_name nexcard.io www.nexcard.io;
+    server_name www.nexcard.wetechmm.com www.www.nexcard.wetechmm.com;
 
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -371,14 +372,14 @@ location /api/auth/ {
 Cron (Bearer only — query `?secret=` is not accepted):
 
 ```bash
-curl -X POST https://nexcard.io/api/cron/cleanup-sessions \
+curl -X POST https://www.nexcard.wetechmm.com/api/cron/cleanup-sessions \
   -H "Authorization: Bearer $CRON_SECRET"
 ```
 
 Admins must enable TOTP at `/admin/security` before other admin pages work.
 
 ```bash
-sudo certbot --nginx -d nexcard.io -d www.nexcard.io
+sudo certbot --nginx -d www.nexcard.wetechmm.com -d www.www.nexcard.wetechmm.com
 ```
 
 ### Option B — Docker (standalone output)
@@ -439,7 +440,7 @@ A custom domain on the R2 bucket usually makes the **whole bucket** world-readab
 ```env
 STORAGE_DRIVER=local
 ALLOW_LOCAL_STORAGE=true
-NEXT_PUBLIC_APP_URL=https://nexcard.io
+NEXT_PUBLIC_APP_URL=https://www.nexcard.wetechmm.com
 ```
 
 | Path | Purpose | Public? |
@@ -464,7 +465,7 @@ R2_ACCOUNT_ID=...
 R2_ACCESS_KEY_ID=...
 R2_SECRET_ACCESS_KEY=...
 R2_BUCKET_NAME=nexcard-uploads
-R2_PUBLIC_URL=https://cdn.nexcard.io
+R2_PUBLIC_URL=https://cdn.www.nexcard.wetechmm.com
 # Recommended: second bucket with no custom domain
 R2_PRIVATE_BUCKET=nexcard-private
 ```
@@ -545,7 +546,7 @@ If `STORAGE_DRIVER` points to a driver that isn't fully configured, the app **fa
 ```json
 [
   {
-    "AllowedOrigins": ["https://nexcard.io", "http://localhost:3000"],
+    "AllowedOrigins": ["https://www.nexcard.wetechmm.com", "http://localhost:3000"],
     "AllowedMethods": ["GET", "PUT", "HEAD"],
     "AllowedHeaders": ["*"],
     "MaxAgeSeconds": 3600
@@ -553,7 +554,7 @@ If `STORAGE_DRIVER` points to a driver that isn't fully configured, the app **fa
 ]
 ```
 
-4. Connect custom domain `cdn.nexcard.io` to bucket (optional but recommended)
+4. Connect custom domain `cdn.www.nexcard.wetechmm.com` to bucket (optional but recommended)
 5. Add all `R2_*` vars to `.env.local` / server env
 
 </details>
@@ -576,7 +577,7 @@ NFC is **included** — not removed. Users on NFC tiers can program physical tag
 1. User selects **NFC Only** or **NFC + QR** tier during onboarding
 2. Payment approved by admin
 3. User goes to **Dashboard → NFC Setup** (`/dashboard/nfc`)
-4. Follows steps to write URL `https://nexcard.io/p/{slug}` to NFC tag
+4. Follows steps to write URL `https://www.nexcard.wetechmm.com/p/{slug}` to NFC tag
 5. Clicks **Mark NFC Tag as Programmed**
 6. Analytics shows NFC write count
 
@@ -600,10 +601,10 @@ npm run db:migrate:prod
 | Record | Type | Value |
 |--------|------|-------|
 | `@` | A | Your server IP |
-| `www` | CNAME | `nexcard.io` |
+| `www` | CNAME | `www.nexcard.wetechmm.com` |
 | `cdn` | CNAME | R2 public bucket domain |
 
-Set `NEXT_PUBLIC_APP_URL=https://nexcard.io` in production env.
+Set `NEXT_PUBLIC_APP_URL=https://www.nexcard.wetechmm.com` in production env.
 
 ---
 
@@ -625,8 +626,11 @@ ENVIRONMENT
 □ CRON_SECRET is unique (32+ random chars); cron uses Authorization: Bearer only
 □ STORAGE_DRIVER=r2 on the server (R2_* set); STORAGE_DRIVER=local on laptops
 □ R2_PRIVATE_BUCKET set, or a Cloudflare rule denies public GET on private/*
-□ KBZPay / WavePay / AYA Pay numbers set in Admin → Settings
+□ KBZPay / WavePay / AYA Pay numbers set in Admin → Settings (not 09-000000000)
+□ SMTP_HOST / SMTP_USER / SMTP_PASS / SMTP_FROM set — register always requires email verify
 □ Admin 2FA enabled at /admin/security
+□ Seed admin password changed; demo user disabled or deleted
+□ Pre-order mode: leave ON until template prices are final (Admin → Settings)
 □ NODE_ENV=production
 
 DATABASE
@@ -638,7 +642,7 @@ DATABASE
 SECURITY
 □ HTTPS enabled (SSL certificate)
 □ Demo credentials hidden on login page (auto in production)
-□ Rate limiting planned for auth endpoints
+□ Rate limiting on /api/auth (in-app; add Nginx limit_req if more than one Node process)
 □ Backup strategy for MySQL defined
 
 CI/CD
@@ -649,13 +653,24 @@ CI/CD
 POST-DEPLOY SMOKE TEST
 □ Landing page loads
 □ Register + login works
-□ Onboarding flow completes
-□ Payment upload + admin approval works
+□ Onboarding flow completes (pre-order reservation or paid screenshot)
+□ Payment upload + admin approval works (after pre-order mode is off)
 □ Profile publishes at /{slug}
 □ QR code generates
 □ NFC setup page accessible for NFC tiers
 □ Admin panel accessible
 ```
+
+### Pre-order mode (prices not final)
+
+Admin → Settings → **Pre-order mode** (default on).
+
+- Users pick QR / NFC / NFC+QR, claim a slug, and reserve a profile. No MMK and no screenshot.
+- Premium edit / QR / NFC stay locked until they pay after you publish prices.
+- **When prices are ready:** set amounts on Admin → Templates, then turn **Pre-order mode** off. Existing reserved profiles (`paymentStatus` empty) pay on Dashboard → Submit Payment.
+- Set real KBZPay / WavePay / AYA Pay numbers before turning pre-order off.
+- SMTP is required for launch even in pre-order mode (email verification).
+- Change the seed admin password, enable TOTP at `/admin/security`, and disable the demo user.
 
 ---
 
@@ -685,7 +700,7 @@ pm2 restart nexcard   # or your deploy method
 ### Purge ISR cache manually
 
 ```bash
-curl -X POST https://nexcard.io/api/revalidate \
+curl -X POST https://www.nexcard.wetechmm.com/api/revalidate \
   -H "Content-Type: application/json" \
   -d '{"secret":"YOUR_REVALIDATION_SECRET","type":"slug","value":"user-slug"}'
 ```

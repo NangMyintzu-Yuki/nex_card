@@ -23,14 +23,11 @@ const ThemeContext = createContext<ThemeContextValue>({
 });
 
 function applyThemeClass(theme: Theme) {
+  if (typeof document === "undefined") return;
   const root = document.documentElement;
-  if (theme === "dark") {
-    root.classList.add("nc-dark");
-    root.classList.remove("nc-light");
-  } else {
-    root.classList.add("nc-light");
-    root.classList.remove("nc-dark");
-  }
+  root.classList.toggle("nc-dark", theme === "dark");
+  root.classList.toggle("nc-light", theme === "light");
+  root.style.colorScheme = theme;
 }
 
 function readStoredTheme(): Theme {
@@ -47,10 +44,12 @@ function readStoredTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
-  const [mounted, setMounted] = useState(false);
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof document === "undefined") return "dark";
+    return document.documentElement.classList.contains("nc-light") ? "light" : "dark";
+  });
+  const [mounted, setMounted] = useState(true);
 
-  // Sync React state ↔ DOM ↔ localStorage on mount (fixes remount mismatch)
   useEffect(() => {
     const initial = readStoredTheme();
     setThemeState(initial);
@@ -73,7 +72,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setThemeState((prev) => (prev === "dark" ? "light" : "dark"));
+    setThemeState((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      applyThemeClass(next);
+      try {
+        localStorage.setItem("nexcard-theme", next);
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
   }, []);
 
   return (

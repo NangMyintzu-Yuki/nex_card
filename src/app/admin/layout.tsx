@@ -39,7 +39,7 @@ export default async function AdminLayout({
           }}
         />
 
-        <div className="flex-1 lg:pl-60">
+        <div className="flex-1 lg:pl-60 nc-page-enter">
           {children}
         </div>
       </div>

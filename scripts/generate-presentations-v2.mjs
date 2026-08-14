@@ -295,7 +295,7 @@ function buildUserGuide() {
 
   // Registration flow diagram
   let s = contentSlide(p, "Account Registration Flow", { accentColor: C.green });
-  flowDiagram(s, ["Visit\nnexcard.io", "Click\nGet Started", "Fill Form", "Verify\nEmail", "Dashboard!"], 1.8, C.green);
+  flowDiagram(s, ["Visit\nwww.nexcard.wetechmm.com", "Click\nGet Started", "Fill Form", "Verify\nEmail", "Dashboard!"], 1.8, C.green);
 
   // Add details below the flow
   bulletList(s, 0.5, 3.2, 4.3, [
@@ -489,7 +489,7 @@ function buildUserGuide() {
       }
     }
   }
-  txt(s, "nexcard.io/your-slug", { x: 0.5, y: 3.85, w: 3.0, h: 0.3, fontSize: 8, color: C.grayLight, align: "center" });
+  txt(s, "www.nexcard.wetechmm.com/your-slug", { x: 0.5, y: 3.85, w: 3.0, h: 0.3, fontSize: 8, color: C.grayLight, align: "center" });
 
   // Download options
   txt(s, "Download Options", { x: 4.0, y: 1.2, w: 5.5, h: 0.4, fontSize: 12, bold: true, color: C.gold });
@@ -830,7 +830,7 @@ function buildUserGuide() {
   // ═══════════════════════════════════════════════════════════════════════
   // CLOSING
   // ═══════════════════════════════════════════════════════════════════════
-  closingSlide(p, "Thank You", "NEX CARD — Your Digital Identity, Elevated\nnexcard.io");
+  closingSlide(p, "Thank You", "NEX CARD — Your Digital Identity, Elevated\nwww.nexcard.wetechmm.com");
 
   return p;
 }
@@ -859,7 +859,7 @@ function buildProjectFlow() {
   bar(s, 0.5, 1.2, 0.06, 1.0, C.gold);
   txt(s, "🚀", { x: 0.7, y: 1.3, w: 0.6, h: 0.6, fontSize: 28 });
   txt(s, "A platform to create, manage, and share digital identity pages", { x: 1.4, y: 1.25, w: 7.5, h: 0.5, fontSize: 14, bold: true, color: C.white });
-  txt(s, "Users get a unique URL: nexcard.io/{slug}  •  Shareable via QR, NFC, or direct link", { x: 1.4, y: 1.75, w: 7.5, h: 0.35, fontSize: 10, color: C.grayLight });
+  txt(s, "Users get a unique URL: www.nexcard.wetechmm.com/{slug}  •  Shareable via QR, NFC, or direct link", { x: 1.4, y: 1.75, w: 7.5, h: 0.35, fontSize: 10, color: C.grayLight });
 
   // Stats
   statCard(s, 0.5, 2.5, 1.7, 0.8, "20", "Templates", C.gold);
@@ -1293,7 +1293,7 @@ function buildProjectFlow() {
   // ═══════════════════════════════════════════════════════════════════════
   // CLOSING
   // ═══════════════════════════════════════════════════════════════════════
-  closingSlide(p, "Questions?", "NEX CARD — Your Digital Identity, Elevated\nnexcard.io • Built with Next.js, Prisma, Tailwind CSS");
+  closingSlide(p, "Questions?", "NEX CARD — Your Digital Identity, Elevated\nwww.nexcard.wetechmm.com • Built with Next.js, Prisma, Tailwind CSS");
 
   return p;
 }

@@ -26,6 +26,7 @@ type Settings = {
   wallet_kbzpay: string;
   wallet_wavepay: string;
   wallet_ayapay: string;
+  preorder_mode: boolean;
 };
 
 type Section = {
@@ -47,6 +48,7 @@ const SECTIONS: Section[] = [
       { key: "site_url", label: "Site URL", type: "url" },
       { key: "support_email", label: "Support Email", type: "email" },
       { key: "maintenance_mode", label: "Maintenance Mode", type: "toggle" },
+      { key: "preorder_mode", label: "Pre-order mode (hide prices, skip payment)", type: "toggle" },
     ],
   },
   {

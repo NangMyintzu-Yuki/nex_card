@@ -25,7 +25,7 @@ From your dashboard, start the onboarding wizard:
    | **NFC Only** | An NFC card (requires an NFC-capable phone to tap/share) |
    | **NFC + QR** | NFC card plus a QR code fallback |
 4. **Upload payment proof** (premium templates only) — see Section 3.
-5. **Confirm your slug** — this becomes your public link (`nexcard.io/your-name`). Slugs are unique.
+5. **Confirm your slug** — this becomes your public link (`www.nexcard.wetechmm.com/your-name`). Slugs are unique.
 
 > Free templates skip steps 3–4. You can start sharing immediately after confirming your slug.
 
@@ -76,7 +76,7 @@ Save your changes; the public profile updates automatically (cached for up to 1 
 1. Open **QR** for your profile from the dashboard.
 2. Click **Generate QR** — a permanent lock warning appears (your template/category freeze after this).
 3. Download as **SVG** (vector) or **PNG** (128/256/512/1024px).
-4. Share the QR code or your profile link (`nexcard.io/your-slug`).
+4. Share the QR code or your profile link (`www.nexcard.wetechmm.com/your-slug`).
 
 When someone scans your QR, they land on `/p/your-slug` and the scan is counted separately from regular views.
 

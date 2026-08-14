@@ -7,6 +7,7 @@ import { ArrowLeft, Lock } from "lucide-react";
 import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
 import { PaymentForm } from "./payment-form";
+import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Submit Payment — NEX CARD",
@@ -49,6 +50,9 @@ export default async function PaymentPage({
     select: { tier: true, status: true },
   });
 
+  const { preorder_mode: preorderMode } = await getSettings();
+  const pricesNotLive = preorderMode && existingPayment?.status !== "REJECTED";
+
   return (
     <div className="min-h-screen" style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
       <div className="mx-auto max-w-3xl px-4 py-8">
@@ -72,6 +76,19 @@ export default async function PaymentPage({
           </p>
         </div>
 
+        {pricesNotLive ? (
+          <div className="flex items-center gap-3 rounded-xl border px-5 py-4"
+            style={{ borderColor: "rgba(99,102,241,0.25)", background: "rgba(99,102,241,0.08)" }}>
+            <Lock className="h-5 w-5 shrink-0" style={{ color: "var(--nc-brand-1)" }} />
+            <div>
+              <p className="font-semibold" style={{ color: "var(--nc-brand-1)" }}>Prices not published yet</p>
+              <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-2)" }}>
+                Your card is reserved. We&apos;ll email you when package prices are live so you can pay from the dashboard.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
         {existingPayment?.status === "PENDING" && (
           <div className="mb-6 flex items-center gap-3 rounded-xl border px-5 py-4"
             style={{ borderColor: "rgba(251,191,36,0.2)", background: "rgba(251,191,36,0.08)" }}>
@@ -111,6 +128,8 @@ export default async function PaymentPage({
               existingTier={existingPayment?.tier}
             />
           </div>
+        )}
+          </>
         )}
       </div>
     </div>

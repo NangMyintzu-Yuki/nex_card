@@ -190,7 +190,7 @@ export async function GET(request: NextRequest) {
             fontFamily: "monospace",
           }}
         >
-          nexcard.io/{slug}
+          www.nexcard.wetechmm.com/{slug}
         </div>
 
         {/* Accent line */}

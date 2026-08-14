@@ -1334,7 +1334,7 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
             </div>
             <p className="text-xs ml-4" style={{ color: "var(--nc-text-2)" }}>
               {isPublished
-                ? <>nexcard.io/<strong className="text-indigo-400">{profile.slug}</strong> is accessible</>
+                ? <>www.nexcard.wetechmm.com/<strong className="text-indigo-400">{profile.slug}</strong> is accessible</>
                 : <>Toggle to <strong>Publish</strong> so your URL goes live</>
               }
             </p>

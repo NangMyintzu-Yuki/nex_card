@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ThemeProvider } from "@/lib/theme/theme-context";
@@ -156,7 +156,7 @@ function VerifyEmailContent() {
         <ThemeToggle />
       </nav>
 
-      <main className="flex flex-1 items-center justify-center px-4">
+      <main className="nc-page-enter flex flex-1 items-center justify-center px-4">
         <div className="w-full max-w-md space-y-8 rounded-2xl p-8"
           style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)", boxShadow: "var(--nc-shadow)" }}>
 
@@ -258,7 +258,15 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <ThemeProvider>
-      <VerifyEmailContent />
+      <Suspense
+        fallback={
+          <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--nc-bg)", color: "var(--nc-text-2)" }}>
+            Loading…
+          </div>
+        }
+      >
+        <VerifyEmailContent />
+      </Suspense>
     </ThemeProvider>
   );
 }

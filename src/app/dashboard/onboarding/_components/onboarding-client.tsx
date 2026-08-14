@@ -59,6 +59,7 @@ interface OnboardingClientProps {
   existingProfiles: ExistingProfile[];
   userId: string;
   initialCategoryId?: string;
+  preorderMode: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -164,6 +165,7 @@ export function OnboardingClient({
   existingProfiles,
   userId,
   initialCategoryId,
+  preorderMode,
 }: OnboardingClientProps) {
   const router = useRouter();
   const wallets = usePublicWallets();
@@ -210,7 +212,7 @@ export function OnboardingClient({
   useEffect(() => {
     if (formState.status === "success" && !profileCreated) {
       setProfileCreated(true);
-      if (isPremium && selectedTier && paymentScreenshotUrl) {
+      if (isPremium && selectedTier && paymentScreenshotUrl && !preorderMode) {
         const paymentFormData = new FormData();
         paymentFormData.append("profileId", formState.profileId);
         paymentFormData.append("tier", selectedTier);
@@ -221,11 +223,13 @@ export function OnboardingClient({
         );
         paymentFormData.append("screenshotUrl", paymentScreenshotUrl);
         submitPayment(paymentFormData);
+      } else if (isPremium && preorderMode) {
+        router.push(`/dashboard?reserved=true`);
       } else {
         router.push(`/dashboard?new=${formState.slug}`);
       }
     }
-  }, [formState, router, isPremium, selectedTier, paymentScreenshotUrl, selectedTemplate, profileCreated, submitPayment]);
+  }, [formState, router, isPremium, selectedTier, paymentScreenshotUrl, selectedTemplate, profileCreated, submitPayment, preorderMode]);
 
   // After payment submitted successfully, redirect
   useEffect(() => {
@@ -239,8 +243,14 @@ export function OnboardingClient({
 
   // Determine which steps to show
   const steps: Array<"category" | "template" | "pricing" | "payment" | "confirm"> = [
-    "category", "template", "pricing", "payment", "confirm"
+    "category",
+    "template",
   ];
+  if (isPremium) {
+    steps.push("pricing");
+    if (!preorderMode) steps.push("payment");
+  }
+  steps.push("confirm");
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
@@ -271,6 +281,10 @@ export function OnboardingClient({
 
   const handleProceedToPayment = () => {
     if (!selectedTier) return;
+    if (preorderMode) {
+      setStep("confirm");
+      return;
+    }
     setStep("payment");
   };
 
@@ -364,7 +378,7 @@ export function OnboardingClient({
                   className={step === s ? "font-semibold" : ""}
                   style={{ color: step === s ? "var(--nc-text)" : undefined }}
                 >
-                  {i + 1}. {STEP_LABELS[s]}
+                  {i + 1}. {s === "pricing" && preorderMode ? "Plan" : STEP_LABELS[s]}
                 </span>
               </span>
             ))}
@@ -610,7 +624,7 @@ export function OnboardingClient({
                   onClick={handleProceedToPricing}
                   className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
                 >
-                  Choose Pricing
+                  {isPremium ? (preorderMode ? "Choose Plan" : "Choose Pricing") : "Continue"}
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -638,7 +652,9 @@ export function OnboardingClient({
             </div>
 
             <p className="mb-6 sm:mb-8 text-sm" style={{ color: "var(--nc-text-2)" }}>
-              Select how you&apos;d like to use the <strong style={{ color: "var(--nc-text)" }}>{selectedTemplate.name}</strong> template.
+              {preorderMode
+                ? <>Reserve how you&apos;ll use the <strong style={{ color: "var(--nc-text)" }}>{selectedTemplate.name}</strong> template. Package prices will be announced soon.</>
+                : <>Select how you&apos;d like to use the <strong style={{ color: "var(--nc-text)" }}>{selectedTemplate.name}</strong> template.</>}
             </p>
 
             <div className="grid gap-4 sm:grid-cols-3 sm:gap-5">
@@ -690,7 +706,7 @@ export function OnboardingClient({
 
                     <div className="mt-4 mb-4">
                       <span className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>
-                        {formatMMK(price ?? 0)}
+                        {preorderMode ? "Price announced soon" : formatMMK(price ?? 0)}
                       </span>
                     </div>
 
@@ -714,7 +730,7 @@ export function OnboardingClient({
                   onClick={handleProceedToPayment}
                   className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
                 >
-                  Continue to Payment
+                  {preorderMode ? "Reserve this plan" : "Continue to Payment"}
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -725,7 +741,7 @@ export function OnboardingClient({
         {/* ══════════════════════════════════════════════════════════════
             STEP 4 — Payment screenshot upload (premium only)
         ══════════════════════════════════════════════════════════════ */}
-        {step === "payment" && selectedTemplate && selectedTier && (
+        {step === "payment" && !preorderMode && selectedTemplate && selectedTier && (
           <div className="mx-auto max-w-xl">
             <div className="mb-6 sm:mb-8 flex items-center gap-3">
               <button
@@ -928,7 +944,7 @@ export function OnboardingClient({
             <div className="mb-6 sm:mb-8">
               <button
                 type="button"
-                onClick={() => setStep(isPremium ? "payment" : "template")}
+                onClick={() => setStep(isPremium ? (preorderMode ? "pricing" : "payment") : "template")}
                 className="nc-btn-ghost text-sm transition-colors px-2 py-1"
               >
                 ← Back
@@ -978,7 +994,7 @@ export function OnboardingClient({
               </label>
               <div className="nc-input flex overflow-hidden rounded-xl focus-within:border-indigo-500/50 transition-colors">
                 <span className="flex items-center px-3 text-xs whitespace-nowrap sm:text-sm" style={{ borderRight: "1px solid var(--nc-border)", color: "var(--nc-text-3)" }}>
-                  nexcard.io/
+                  www.nexcard.wetechmm.com/
                 </span>
                 <input
                   id="slug-input"
@@ -1001,7 +1017,7 @@ export function OnboardingClient({
                   <p className="text-xs" style={{ color: "var(--nc-text-2)" }}>Checking availability…</p>
                 ) : slugAvailable === true ? (
                   <p className="text-xs text-emerald-400">
-                    ✓ nexcard.io/{slug} is available
+                    ✓ www.nexcard.wetechmm.com/{slug} is available
                   </p>
                 ) : slugAvailable === false ? (
                   <p className="text-xs text-red-400">✗ That slug is already taken</p>
@@ -1021,7 +1037,10 @@ export function OnboardingClient({
                 By confirming,{" "}
                 <strong style={{ color: "var(--nc-text)" }}>{selectedTemplate.name}</strong>{" "}
                 will be permanently locked to this profile. Your content, links, and
-                photos can still be edited anytime.
+                photos can still be edited anytime
+                {preorderMode && isPremium
+                  ? " after prices go live and your payment is approved."
+                  : "."}
               </p>
             </div>
 

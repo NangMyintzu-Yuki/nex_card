@@ -47,7 +47,7 @@ function getPaymentBucketName(): string {
 }
 
 function getPublicBaseUrl(): string {
-  return process.env.R2_PUBLIC_URL ?? "https://cdn.nexcard.io";
+  return process.env.R2_PUBLIC_URL ?? "https://cdn.www.nexcard.wetechmm.com";
 }
 
 function isPaymentFolder(folder: UploadInput["folder"]): boolean {

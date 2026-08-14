@@ -24,7 +24,7 @@ Create `.env.local` (or set in your host's environment). Required in production:
 DATABASE_URL=mysql://user:password@host:3306/nexcard
 
 # Public app URL (REQUIRED)
-NEXT_PUBLIC_APP_URL=https://nexcard.io
+NEXT_PUBLIC_APP_URL=https://www.nexcard.wetechmm.com
 
 # ISR revalidation webhook secret (REQUIRED)
 REVALIDATION_SECRET=<random-32-byte-hex>
@@ -34,7 +34,7 @@ R2_ACCOUNT_ID=<account-id>
 R2_ACCESS_KEY_ID=<access-key>
 R2_SECRET_ACCESS_KEY=<secret-key>
 R2_BUCKET_NAME=nexcard-uploads
-R2_PUBLIC_URL=https://cdn.nexcard.io
+R2_PUBLIC_URL=https://cdn.www.nexcard.wetechmm.com
 
 NODE_ENV=production
 ```

@@ -17,18 +17,19 @@ export const metadata: Metadata = {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string; pending?: string; paymentFailed?: string }>;
+  searchParams: Promise<{ new?: string; pending?: string; paymentFailed?: string; reserved?: string }>;
 }) {
   const session = await getServerSession();
   if (!session?.user?.id) redirect("/login");
   if (session.user.role === "ADMIN") redirect("/admin");
 
-  const { new: newSlug, pending, paymentFailed } = await searchParams;
+  const { new: newSlug, pending, paymentFailed, reserved } = await searchParams;
   const profiles = await getCachedUserProfiles(session.user.id);
   const { getSettings } = await import("@/lib/settings");
   const settings = await getSettings();
   const maxProfiles = settings.max_profiles_per_user;
   const canAddProfile = profiles.length < maxProfiles;
+  const preorderMode = settings.preorder_mode;
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
@@ -41,7 +42,7 @@ export default async function DashboardPage({
             <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-2)" }}>
               Your page is live at{" "}
               <span className="font-mono" style={{ color: "var(--nc-success)" }}>
-                nexcard.io/{newSlug}
+                www.nexcard.wetechmm.com/{newSlug}
               </span>
               . Now fill in your details.
             </p>
@@ -81,6 +82,21 @@ export default async function DashboardPage({
               <p className="font-semibold text-red-300">Payment Submission Failed</p>
               <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-2)" }}>
                 Your profile was created, but the payment couldn&apos;t be submitted. Please resubmit your payment screenshot below.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {reserved && (
+        <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4"
+          style={{ border: "1px solid rgba(99,102,241,0.25)", background: "rgba(99,102,241,0.08)" }}>
+          <div className="flex items-center gap-3">
+            <CheckCircle className="h-5 w-5 shrink-0" style={{ color: "var(--nc-brand-1)" }} />
+            <div>
+              <p className="font-semibold" style={{ color: "var(--nc-brand-1)" }}>Card reserved</p>
+              <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-2)" }}>
+                We&apos;ll email you when package prices are live. Then you can pay from this dashboard.
               </p>
             </div>
           </div>
@@ -186,14 +202,16 @@ export default async function DashboardPage({
                     {!profile.paymentStatus && (
                       <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs" style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)" }}>
                         <Upload className="h-3.5 w-3.5" style={{ color: "var(--nc-brand-1)" }} />
-                        <span className="font-semibold" style={{ color: "var(--nc-brand-1)" }}>Payment Required</span>
+                        <span className="font-semibold" style={{ color: "var(--nc-brand-1)" }}>
+                          {preorderMode ? "Reserved — prices announced soon" : "Payment Required"}
+                        </span>
                       </div>
                     )}
                   </div>
                 )}
 
                 {/* Resubmit / submit payment */}
-                {isPremiumTemplate && (profile.paymentStatus === "REJECTED" || !profile.paymentStatus) && (
+                {isPremiumTemplate && (profile.paymentStatus === "REJECTED" || (!profile.paymentStatus && !preorderMode)) && (
                   <div className="mt-3">
                     <Link
                       href={`/dashboard/payment/${profile.id}`}

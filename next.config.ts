@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "cdn.nexcard.io",
+        hostname: "cdn.www.nexcard.wetechmm.com",
       },
       // Seed / onboarding preview images
       {

@@ -17,7 +17,7 @@ export function DashboardShell({
   return (
     <div className="flex min-h-screen" style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
       {!hideSidebar && sidebar}
-      <div className={hideSidebar ? "flex-1" : "flex-1 lg:pl-64"}>
+      <div className={hideSidebar ? "flex-1 nc-page-enter" : "flex-1 lg:pl-64 nc-page-enter"}>
         {children}
       </div>
     </div>

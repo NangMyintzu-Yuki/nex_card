@@ -19,7 +19,7 @@ describe("POST /api/auth/register", () => {
     const res = await POST(
       jsonRequest("http://localhost/api/auth/register", "POST", {
         name: "Alex",
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         password: "short",
       })
     );
@@ -32,7 +32,7 @@ describe("POST /api/auth/register", () => {
     const res = await POST(
       jsonRequest("http://localhost/api/auth/register", "POST", {
         name: "Alex",
-        email: "existing@nexcard.io",
+        email: "existing@www.nexcard.wetechmm.com",
         password: "password123",
       })
     );
@@ -47,7 +47,7 @@ describe("POST /api/auth/register", () => {
     vi.mocked(prisma.user.create).mockResolvedValue({
       id: "user-new",
       name: "Alex",
-      email: "alex@nexcard.io",
+      email: "alex@www.nexcard.wetechmm.com",
       role: "USER",
     } as never);
     vi.mocked(prisma.emailToken.updateMany).mockResolvedValue({ count: 0 } as never);
@@ -58,7 +58,7 @@ describe("POST /api/auth/register", () => {
     const res = await POST(
       jsonRequest("http://localhost/api/auth/register", "POST", {
         name: "Alex Rivera",
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         password: "password123",
       })
     );

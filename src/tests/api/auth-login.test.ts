@@ -31,7 +31,7 @@ describe("POST /api/auth/login", () => {
 
     const res = await POST(
       jsonRequest("http://localhost/api/auth/login", "POST", {
-        email: "missing@nexcard.io",
+        email: "missing@www.nexcard.wetechmm.com",
         password: "secret123",
       })
     );
@@ -45,7 +45,7 @@ describe("POST /api/auth/login", () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       id: "user-1",
       name: "Suspended",
-      email: "suspended@nexcard.io",
+      email: "suspended@www.nexcard.wetechmm.com",
       hashedPassword: "hash",
       status: "SUSPENDED",
       role: "USER",
@@ -53,7 +53,7 @@ describe("POST /api/auth/login", () => {
 
     const res = await POST(
       jsonRequest("http://localhost/api/auth/login", "POST", {
-        email: "suspended@nexcard.io",
+        email: "suspended@www.nexcard.wetechmm.com",
         password: "secret123",
       })
     );
@@ -65,7 +65,7 @@ describe("POST /api/auth/login", () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       id: "user-1",
       name: "Alex",
-      email: "alex@nexcard.io",
+      email: "alex@www.nexcard.wetechmm.com",
       hashedPassword: "hash",
       status: "PENDING_VERIFICATION",
       role: "USER",
@@ -73,7 +73,7 @@ describe("POST /api/auth/login", () => {
 
     const res = await POST(
       jsonRequest("http://localhost/api/auth/login", "POST", {
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         password: "secret123",
       })
     );
@@ -87,7 +87,7 @@ describe("POST /api/auth/login", () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       id: "user-1",
       name: "Alex",
-      email: "alex@nexcard.io",
+      email: "alex@www.nexcard.wetechmm.com",
       hashedPassword: "hash",
       status: "ACTIVE",
       role: "USER",
@@ -96,7 +96,7 @@ describe("POST /api/auth/login", () => {
 
     const res = await POST(
       jsonRequest("http://localhost/api/auth/login", "POST", {
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         password: "wrong-password",
       })
     );
@@ -108,7 +108,7 @@ describe("POST /api/auth/login", () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       id: "user-1",
       name: "Alex",
-      email: "alex@nexcard.io",
+      email: "alex@www.nexcard.wetechmm.com",
       hashedPassword: "hash",
       status: "ACTIVE",
       role: "USER",
@@ -119,7 +119,7 @@ describe("POST /api/auth/login", () => {
 
     const res = await POST(
       jsonRequest("http://localhost/api/auth/login", "POST", {
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         password: "correct-password",
       })
     );
@@ -127,7 +127,7 @@ describe("POST /api/auth/login", () => {
     expect(res.status).toBe(200);
     const body = await readJson<{ success: boolean; user: { email: string } }>(res);
     expect(body.success).toBe(true);
-    expect(body.user.email).toBe("alex@nexcard.io");
+    expect(body.user.email).toBe("alex@www.nexcard.wetechmm.com");
     expect(prisma.session.create).toHaveBeenCalledOnce();
     expect(res.cookies.get("session_token")?.value).toBeTruthy();
   });

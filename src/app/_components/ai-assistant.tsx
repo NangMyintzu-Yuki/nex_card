@@ -32,7 +32,7 @@ const FAQ_EN: Record<string, string> = {
   "can i customize design":
     "Yes! You can customize accent colors, upload your own photos, add social links, and choose from multiple template designs. Each template has its own style options.",
   "how to register":
-    "Click 'Get Started Free' on the homepage, enter your name, email, and password. You'll be guided through onboarding to pick your first template.",
+    "Click 'Reserve your card' on the homepage, enter your name, email, and password. You'll be guided through onboarding to pick your first template.",
   "what is portfolio":
     "A Portfolio template lets you showcase your work, skills, experience, and projects. Perfect for developers, designers, artists, and professionals.",
   "wedding invitation":
@@ -63,7 +63,7 @@ const FAQ_MY: Record<string, string> = {
   "customize":
     "ဟုတ်ပါတယ်! Accent colors ပြောင်းလို့ရ၊ ဓာတ်ပုံတင်လို့ရ၊ social links ထည့်လို့ရပြီး template design တွေကိုလည်းရွေးချယ်လို့ရပါတယ်။",
   "register":
-    "Homepage မှာ 'Get Started Free' ကိုနှိပ်ပြီး name, email, password ဖြည့်ပါ။ Onboarding မှာ template ရွေးပေးပါလိမ့်မယ်။",
+    "Homepage မှာ 'Reserve your card' ကိုနှိပ်ပြီး name, email, password ဖြည့်ပါ။ Onboarding မှာ template ရွေးပေးပါလိမ့်မယ်။",
   "portfolio":
     "Portfolio template က သင့်အလုပ်၊ skills, experience, projects တွေကိုပြသဖို့ပါ။ Developers, designers, artists တွေအတွက်အကောင်းဆုံးပါ။",
   "wedding":

@@ -384,7 +384,45 @@ body {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Dark / Gold Theme (default) ────────────────────────────────────────── */
-:root,
+:root {
+  /* Dark fallback before the theme class is applied */
+  --nc-brand-1:       #c9973a;
+  --nc-brand-2:       #d4af37;
+  --nc-brand-3:       #e4c56a;
+  --nc-brand-grad:    linear-gradient(135deg, #c9973a, #d4af37);
+  --nc-brand-text:    #000;
+  --nc-bg:            #08080a;
+  --nc-bg-2:          #0d0d0f;
+  --nc-bg-3:          #111114;
+  --nc-bg-card:       rgba(255,255,255,0.03);
+  --nc-bg-hover:      rgba(255,255,255,0.05);
+  --nc-border:        rgba(255,255,255,0.08);
+  --nc-border-brand:  rgba(212,175,55,0.25);
+  --nc-line:          rgba(255,255,255,0.12);
+  --nc-text:          #f0ece5;
+  --nc-text-2:        #a09070;
+  --nc-text-3:        #8a7a5a;
+  --nc-text-muted:    #3d3420;
+  --nc-sidebar-bg:    #0a0a0c;
+  --nc-sidebar-border:rgba(212,175,55,0.12);
+  --nc-sidebar-item:  rgba(212,175,55,0.06);
+  --nc-sidebar-active:rgba(212,175,55,0.12);
+  --nc-shadow:        0 8px 32px rgba(0,0,0,0.6);
+  --nc-shadow-hover:  0 12px 40px rgba(0,0,0,0.7);
+  --nc-glow:          0 8px 28px rgba(212,175,55,0.35);
+  --nc-success:       #22c55e;
+  --nc-warning:       #f59e0b;
+  --nc-danger:        #ef4444;
+  --nc-info:          #d4af37;
+}
+
+html, body {
+  background: var(--nc-bg);
+  color: var(--nc-text);
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* ── Dark / Gold Theme (default) ────────────────────────────────────────── */
 .nc-dark {
   /* Brand */
   --nc-brand-1:       #c9973a;   /* deep gold — matches logo */
@@ -627,3 +665,115 @@ html.nc-light .bg-red-400,
 .nc-badge-success { background: rgba(34,197,94,0.1); color: var(--nc-success); border-color: rgba(34,197,94,0.25); }
 .nc-badge-danger { background: rgba(239,68,68,0.1); color: var(--nc-danger); border-color: rgba(239,68,68,0.25); }
 .nc-badge-warning { background: rgba(245,158,11,0.1); color: var(--nc-warning); border-color: rgba(245,158,11,0.25); }
+
+/* Landing scroll-in. Default is visible (no JS). JS adds .nc-wait to hide,
+   then .nc-in to play the animation. .nc-in always sets opacity: 1 so a
+   skipped animation cannot leave a section blank. */
+@keyframes nc-up {
+  from { opacity: 0; transform: translateY(36px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.nc-reveal {
+  opacity: 1;
+}
+.nc-reveal.nc-wait,
+.nc-stagger.nc-wait > .nc-reveal {
+  opacity: 0;
+  transform: translateY(36px);
+}
+.nc-reveal.nc-in,
+.nc-stagger.nc-in > .nc-reveal {
+  opacity: 1;
+  animation: nc-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.nc-stagger.nc-in > .nc-reveal:nth-child(1) { animation-delay: 0.05s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(2) { animation-delay: 0.12s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(3) { animation-delay: 0.19s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(4) { animation-delay: 0.26s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(5) { animation-delay: 0.33s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(6) { animation-delay: 0.4s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(7) { animation-delay: 0.47s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(8) { animation-delay: 0.54s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(9) { animation-delay: 0.61s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(10) { animation-delay: 0.68s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(11) { animation-delay: 0.75s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(12) { animation-delay: 0.82s; }
+.nc-stagger.nc-in > .nc-reveal:nth-child(n+13) { animation-delay: 0.89s; }
+
+.nc-hero-in {
+  animation: nc-up 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes nc-scene-swap {
+  from { opacity: 0.25; }
+  to { opacity: 1; }
+}
+.nc-scene-swap {
+  animation: nc-scene-swap 0.45s ease both;
+}
+
+@keyframes nc-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.nc-float {
+  animation: nc-float 5.5s ease-in-out infinite;
+}
+.nc-float-delay {
+  animation: nc-float 7s ease-in-out infinite reverse;
+}
+
+@keyframes nc-nfc-ring {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+.nc-nfc-ring {
+  animation: nc-nfc-ring 2.2s ease-out infinite;
+}
+
+@keyframes nc-scan {
+  0% { top: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.nc-scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  animation: nc-scan 2.6s linear infinite;
+}
+
+@keyframes nc-shine {
+  0% { transform: translateX(-130%) skewX(-16deg); }
+  100% { transform: translateX(230%) skewX(-16deg); }
+}
+.nc-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  animation: nc-shine 4.2s ease-in-out infinite;
+}
+
+.nc-card-lift {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.nc-card-lift:hover {
+  transform: translateY(-8px);
+}
+
+/* App-wide page enter — never starts fully hidden */
+@keyframes nc-page-enter {
+  from { opacity: 0.55; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.nc-page-enter {
+  animation: nc-page-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nc-page-enter {
+    animation: none;
+  }
+}

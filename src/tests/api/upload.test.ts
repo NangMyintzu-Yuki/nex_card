@@ -34,8 +34,8 @@ vi.mock("@/lib/storage/providers/r2", () => ({
 vi.mock("@/lib/env", () => ({
   getStorageDriver: vi.fn(),
   isR2Configured: vi.fn(),
-  APP_URL: "https://nexcard.io",
-  CDN_URL: "https://nexcard.io",
+  APP_URL: "https://www.nexcard.wetechmm.com",
+  CDN_URL: "https://www.nexcard.wetechmm.com",
 }));
 
 describe("POST /api/upload", () => {
@@ -50,7 +50,7 @@ describe("POST /api/upload", () => {
     });
     vi.mocked(uploadFile).mockResolvedValue({
       url: "/uploads/gallery/user-1-test.png",
-      publicUrl: "https://nexcard.io/uploads/gallery/user-1-test.png",
+      publicUrl: "https://www.nexcard.wetechmm.com/uploads/gallery/user-1-test.png",
       filename: "user-1-test.png",
       driver: "local",
     });
@@ -76,7 +76,7 @@ describe("POST /api/upload", () => {
       user: {
         id: "user-1",
         name: "Alex",
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         role: "USER",
         avatarUrl: null,
         totpEnabled: false,
@@ -104,7 +104,7 @@ describe("POST /api/upload", () => {
       user: {
         id: "user-1",
         name: "Alex",
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         role: "USER",
         avatarUrl: null,
         totpEnabled: false,
@@ -112,7 +112,7 @@ describe("POST /api/upload", () => {
     });
     vi.mocked(generateR2PresignedUrl).mockResolvedValue({
       uploadUrl: "https://r2.example/upload",
-      publicUrl: "https://cdn.nexcard.io/uploads/user-1/gallery/file.png",
+      publicUrl: "https://cdn.www.nexcard.wetechmm.com/uploads/user-1/gallery/file.png",
       key: "uploads/user-1/gallery/file.png",
     });
 
@@ -135,7 +135,7 @@ describe("POST /api/upload", () => {
       user: {
         id: "user-1",
         name: "Alex",
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         role: "USER",
         avatarUrl: null,
         totpEnabled: false,
@@ -171,7 +171,7 @@ describe("DELETE /api/upload", () => {
   const user = {
     id: "clhuser123456789012345",
     name: "Alex",
-    email: "alex@nexcard.io",
+    email: "alex@www.nexcard.wetechmm.com",
     role: "USER" as const,
     avatarUrl: null,
     totpEnabled: false,
@@ -187,7 +187,7 @@ describe("DELETE /api/upload", () => {
 
     const res = await DELETE(
       jsonRequest("http://localhost/api/upload", "DELETE", {
-        url: `https://cdn.nexcard.io/uploads/victim/payments/x.jpg?x=${user.id}`,
+        url: `https://cdn.www.nexcard.wetechmm.com/uploads/victim/payments/x.jpg?x=${user.id}`,
       })
     );
 
@@ -200,7 +200,7 @@ describe("DELETE /api/upload", () => {
 
     const res = await DELETE(
       jsonRequest("http://localhost/api/upload", "DELETE", {
-        url: `https://cdn.nexcard.io/uploads/${user.id}/gallery/abc.png`,
+        url: `https://cdn.www.nexcard.wetechmm.com/uploads/${user.id}/gallery/abc.png`,
       })
     );
 

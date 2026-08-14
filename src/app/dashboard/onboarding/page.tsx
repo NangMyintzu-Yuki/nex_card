@@ -7,6 +7,7 @@ import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { OnboardingClient } from "./_components/onboarding-client";
 import { resolveThumbnailUrl } from "@/lib/thumbnails";
+import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Choose Your Template — NEX CARD",
@@ -74,6 +75,8 @@ export default async function OnboardingPage({
     redirect("/dashboard");
   }
 
+  const { preorder_mode: preorderMode } = await getSettings();
+
   return (
     <OnboardingClient
       categories={categories.map((cat) => ({
@@ -87,6 +90,7 @@ export default async function OnboardingPage({
       existingProfiles={existingProfiles}
       userId={session.user.id}
       initialCategoryId={categoryId}
+      preorderMode={preorderMode}
     />
   );
 }

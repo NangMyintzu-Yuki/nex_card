@@ -27,7 +27,7 @@ const validCardJson = JSON.stringify({
   fullName: "Alex Rivera",
   jobTitle: "Designer",
   company: "NEX CARD",
-  contacts: [{ type: "email", value: "alex@nexcard.io" }],
+  contacts: [{ type: "email", value: "alex@www.nexcard.wetechmm.com" }],
   socialLinks: [],
 });
 
@@ -45,7 +45,7 @@ describe("updateProfileAction", () => {
         profileId: "clh3tqyxh0000qzrmn8k8x9y2",
         dynamicJsonData: validCardJson,
         isPublished: "false",
-        ogImageUrl: "https://nexcard.io/og.png",
+        ogImageUrl: "https://www.nexcard.wetechmm.com/og.png",
       })
     );
 
@@ -60,7 +60,7 @@ describe("updateProfileAction", () => {
       user: {
         id: "user-1",
         name: "Alex",
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         role: "USER",
         avatarUrl: null,
         totpEnabled: false,
@@ -81,7 +81,7 @@ describe("updateProfileAction", () => {
         profileId: "clh3tqyxh0000qzrmn8k8x9y2",
         dynamicJsonData: validCardJson,
         isPublished: "false",
-        ogImageUrl: "https://nexcard.io/og.png",
+        ogImageUrl: "https://www.nexcard.wetechmm.com/og.png",
       })
     );
 
@@ -97,7 +97,7 @@ describe("updateProfileAction", () => {
       user: {
         id: "user-1",
         name: "Alex",
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         role: "USER",
         avatarUrl: null,
         totpEnabled: false,
@@ -120,7 +120,7 @@ describe("updateProfileAction", () => {
         profileId: "clh3tqyxh0000qzrmn8k8x9y2",
         dynamicJsonData: validCardJson,
         isPublished: "true",
-        ogImageUrl: "https://nexcard.io/og.png",
+        ogImageUrl: "https://www.nexcard.wetechmm.com/og.png",
       })
     );
 

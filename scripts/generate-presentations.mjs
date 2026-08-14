@@ -278,7 +278,7 @@ function generateUserGuide() {
   );
 
   addContentSlide(pptx, "Account Registration", [
-    'Navigate to nexcard.io and click "Get Started Free"',
+    'Navigate to www.nexcard.wetechmm.com and click "Get Started Free"',
     "Enter your full name, email address, and password",
     "Verify your email via the confirmation link",
     "You are automatically logged in after verification",
@@ -344,7 +344,7 @@ function generateUserGuide() {
 
   addContentSlide(pptx, "Step 4 — Publish & Share", [
     { text: "Toggle the \"Publish Now\" switch to make your profile live", bold: true, color: COLORS.green },
-    "Your profile becomes accessible at: nexcard.io/{your-slug}",
+    "Your profile becomes accessible at: www.nexcard.wetechmm.com/{your-slug}",
     { text: "Unpublished profiles show \"Profile is a Draft\" page to visitors", indent: 1 },
     "Share via direct link, QR code, or NFC tag",
     "SEO metadata auto-generated from your profile data",
@@ -676,7 +676,7 @@ function generateUserGuide() {
 
   // ── Closing ──
   addClosingSlide(pptx, "Thank You",
-    "NEX CARD — Your Digital Identity, Elevated\nnexcard.io"
+    "NEX CARD — Your Digital Identity, Elevated\nwww.nexcard.wetechmm.com"
   );
 
   return pptx;
@@ -706,7 +706,7 @@ function generateProjectFlow() {
   addContentSlide(pptx, "What is NEX CARD?", [
     { text: "A platform to create, manage, and share digital identity pages", bold: true, color: COLORS.gold },
     "Users create personalized profiles (name cards, portfolios, business pages, wedding invites)",
-    "Each profile gets a unique URL: nexcard.io/{slug}",
+    "Each profile gets a unique URL: www.nexcard.wetechmm.com/{slug}",
     "Profiles shareable via QR code, NFC tap, or direct link",
     "20 premium templates with distinct design languages",
     "Target: professionals, businesses, event planners, freelancers",
@@ -807,11 +807,11 @@ function generateProjectFlow() {
     "6. User fills fields → real-time preview updates on right panel",
     { text: "7. User clicks Save → Server Action (updateProfile) persists to DB", bold: true, color: COLORS.green },
     "8. Cache invalidated: purgeProfileCache(slug, userId)",
-    { text: "9. Profile is now accessible at nexcard.io/{slug} (if published)", bold: true, color: COLORS.blue },
+    { text: "9. Profile is now accessible at www.nexcard.wetechmm.com/{slug} (if published)", bold: true, color: COLORS.blue },
   ]);
 
   addContentSlide(pptx, "Data Flow — Profile Viewing", [
-    { text: "1. Visitor navigates to nexcard.io/{slug}", bold: true, color: COLORS.gold },
+    { text: "1. Visitor navigates to www.nexcard.wetechmm.com/{slug}", bold: true, color: COLORS.gold },
     "2. [slug]/page.tsx Server Component executes",
     "3. getProfileBySlug(slug) checks ISR cache first",
     { text: "4. If cache hit → returns cached data (no DB query)", indent: 1, color: COLORS.green },
@@ -1013,7 +1013,7 @@ function generateProjectFlow() {
     "Migrations via prisma migrate deploy",
     { text: "File Storage: Cloudflare R2 (S3-compatible)", bold: true, color: COLORS.gold },
     "Avatar uploads, template thumbnails, payment screenshots",
-    "CDN: cdn.nexcard.io for production assets",
+    "CDN: cdn.www.nexcard.wetechmm.com for production assets",
     { text: "Email: Gmail SMTP via Nodemailer", bold: true, color: COLORS.gold },
     "Backup delivery, password reset, notifications",
     { text: "Cron: Vercel Cron Jobs", bold: true, color: COLORS.gold },
@@ -1023,7 +1023,7 @@ function generateProjectFlow() {
   addContentSlide(pptx, "Environment Variables", [
     { text: "Required Environment Variables:", bold: true, color: COLORS.gold },
     "DATABASE_URL — MySQL connection string",
-    "NEXT_PUBLIC_APP_URL — Base URL (https://nexcard.io)",
+    "NEXT_PUBLIC_APP_URL — Base URL (https://www.nexcard.wetechmm.com)",
     "SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS — Email config",
     "R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY — File storage",
     "R2_BUCKET_NAME — Cloudflare R2 bucket",
@@ -1058,7 +1058,7 @@ function generateProjectFlow() {
 
   // ── Closing ──
   addClosingSlide(pptx, "Questions?",
-    "NEX CARD — Your Digital Identity, Elevated\nnexcard.io | Built with Next.js, Prisma, and Tailwind CSS"
+    "NEX CARD — Your Digital Identity, Elevated\nwww.nexcard.wetechmm.com | Built with Next.js, Prisma, and Tailwind CSS"
   );
 
   return pptx;

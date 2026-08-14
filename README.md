@@ -31,8 +31,8 @@ npm run dev             # → http://localhost:3000
 ```
 
 **Demo credentials** (after `npm run db:seed`)
-- Admin: `admin@nexcard.io` / `admin-change-me-in-prod`
-- User:  `demo@nexcard.io`  / `demo-password-123`
+- Admin: `admin@www.nexcard.wetechmm.com` / `admin-change-me-in-prod`
+- User:  `demo@www.nexcard.wetechmm.com`  / `demo-password-123`
 
 > Change all passwords before production deployment.
 

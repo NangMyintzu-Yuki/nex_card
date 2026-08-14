@@ -57,7 +57,7 @@ describe("isOwnedPaymentScreenshotUrl", () => {
   it("rejects public CDN payment URL for new submissions", () => {
     expect(
       isOwnedPaymentScreenshotUrl(
-        `https://cdn.nexcard.io/uploads/${userId}/payments/abc.png`,
+        `https://cdn.www.nexcard.wetechmm.com/uploads/${userId}/payments/abc.png`,
         userId
       )
     ).toBe(false);
@@ -70,7 +70,7 @@ describe("isOwnedUploadTarget", () => {
   it("accepts R2 pathname owned by user", () => {
     expect(
       isOwnedUploadTarget(
-        `https://cdn.nexcard.io/uploads/${userId}/gallery/abc.png`,
+        `https://cdn.www.nexcard.wetechmm.com/uploads/${userId}/gallery/abc.png`,
         userId
       )
     ).toBe(true);
@@ -79,7 +79,7 @@ describe("isOwnedUploadTarget", () => {
   it("rejects query-string spoof", () => {
     expect(
       isOwnedUploadTarget(
-        `https://cdn.nexcard.io/uploads/victim/payments/x.jpg?x=${userId}`,
+        `https://cdn.www.nexcard.wetechmm.com/uploads/victim/payments/x.jpg?x=${userId}`,
         userId
       )
     ).toBe(false);

@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { getServerSession } from "@/lib/auth/session";
 import { MaintenanceGuard } from "./_components/maintenance-guard";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
+import { ThemeRoot } from "./_components/theme-root";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,7 +30,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://nexcard.io"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://www.nexcard.wetechmm.com"),
   title: {
     default: "NEX CARD — Your Digital Identity, Elevated",
     template: "%s — NEX CARD",
@@ -87,11 +88,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={`${inter.className} antialiased`} style={{ background: "var(--nc-bg)" }}>
         <RegisterServiceWorker />
-        {maintenanceOn && !isAdmin ? (
-          <MaintenanceGuard>{children}</MaintenanceGuard>
-        ) : (
-          children
-        )}
+        <ThemeRoot>
+          {maintenanceOn && !isAdmin ? (
+            <MaintenanceGuard>{children}</MaintenanceGuard>
+          ) : (
+            children
+          )}
+        </ThemeRoot>
       </body>
     </html>
   );

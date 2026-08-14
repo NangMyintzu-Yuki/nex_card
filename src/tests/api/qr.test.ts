@@ -42,7 +42,7 @@ describe("GET /api/qr/[slug]", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type")).toBe("image/svg+xml");
     expect(QRCode.toString).toHaveBeenCalledWith(
-      "https://nexcard.io/p/alex-rivera",
+      "https://www.nexcard.wetechmm.com/p/alex-rivera",
       expect.objectContaining({ type: "svg" })
     );
   });

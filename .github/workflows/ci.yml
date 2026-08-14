@@ -12,7 +12,7 @@ concurrency:
 
 env:
   NODE_ENV: test
-  NEXT_PUBLIC_APP_URL: https://nexcard.io
+  NEXT_PUBLIC_APP_URL: https://www.nexcard.wetechmm.com
   REVALIDATION_SECRET: ci-test-revalidation-secret
   CRON_SECRET: ci-test-cron-secret
 

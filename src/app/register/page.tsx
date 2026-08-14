@@ -83,7 +83,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="relative flex h-dvh flex-col items-center justify-center overflow-hidden px-3 py-4 sm:h-auto sm:min-h-screen sm:px-4 sm:py-12"
+    <main className="nc-page-enter relative flex h-dvh flex-col items-center justify-center overflow-hidden px-3 py-4 sm:h-auto sm:min-h-screen sm:px-4 sm:py-12"
       style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
 
       <div className="absolute top-3 right-3 sm:top-4 sm:right-4">

@@ -103,7 +103,7 @@ function generateSimpleUserGuide() {
   // Big simple explanation
   bar(s, 0.8, 2.1, 8.4, 1.4, C.darkCard);
   txt(s, "📱  Create a beautiful online card", { x: 1.2, y: 2.2, w: 7.5, h: 0.45, fontSize: 16, color: C.white });
-  txt(s, "🔗  Get a link like nexcard.io/your-name", { x: 1.2, y: 2.65, w: 7.5, h: 0.45, fontSize: 16, color: C.white });
+  txt(s, "🔗  Get a link like www.nexcard.wetechmm.com/your-name", { x: 1.2, y: 2.65, w: 7.5, h: 0.45, fontSize: 16, color: C.white });
   txt(s, "📲  Share via QR code, NFC tap, or just send the link", { x: 1.2, y: 3.1, w: 7.5, h: 0.45, fontSize: 16, color: C.white });
 
   bulletList(s, 0.8, 3.8, 8.4, [
@@ -124,7 +124,7 @@ function generateSimpleUserGuide() {
 
   // 3 steps with big numbers
   const regSteps = [
-    { n: 1, text: "Go to nexcard.io\nand click \"Get Started\"", color: C.gold },
+    { n: 1, text: "Go to www.nexcard.wetechmm.com\nand click \"Get Started\"", color: C.gold },
     { n: 2, text: "Enter your name,\nemail & password", color: C.green },
     { n: 3, text: "Check your email\nand click the link", color: C.blue },
   ];
@@ -316,7 +316,7 @@ function generateSimpleUserGuide() {
   // Your link
   bar(s, 1.5, 4.0, 7, 0.8, C.darkCard);
   txt(s, "🔗  Your link:", { x: 1.8, y: 4.05, w: 2, h: 0.35, fontSize: 11, color: C.gray });
-  txt(s, "nexcard.io/your-name", { x: 1.8, y: 4.35, w: 5, h: 0.35, fontSize: 14, bold: true, color: C.gold });
+  txt(s, "www.nexcard.wetechmm.com/your-name", { x: 1.8, y: 4.35, w: 5, h: 0.35, fontSize: 14, bold: true, color: C.gold });
 
   bulletList(s, 0.8, 5.05, 8.4, [
     "Share this link anywhere — it works on any phone or computer",
@@ -343,7 +343,7 @@ function generateSimpleUserGuide() {
       }
     }
   }
-  txt(s, "nexcard.io/your-name", { x: 0.5, y: 4.7, w: 3.5, h: 0.3, fontSize: 9, color: C.grayLight, align: "center" });
+  txt(s, "www.nexcard.wetechmm.com/your-name", { x: 0.5, y: 4.7, w: 3.5, h: 0.3, fontSize: 9, color: C.grayLight, align: "center" });
 
   // How to
   txt(s, "How to get your QR code:", { x: 4.5, y: 2.1, w: 5, h: 0.4, fontSize: 14, bold: true, color: C.gold });
@@ -506,7 +506,7 @@ function generateSimpleUserGuide() {
 
   // Help
   bar(s, 0.8, 5.15, 8.4, 0.4, C.goldDim);
-  txt(s, "Need help?  Visit nexcard.io/support  or  email support@nexcard.io", {
+  txt(s, "Need help?  Visit www.nexcard.wetechmm.com/support  or  email support@www.nexcard.wetechmm.com", {
     x: 0.8, y: 5.15, w: 8.4, h: 0.4, fontSize: 11, color: C.gold, align: "center", valign: "middle",
   });
 
@@ -522,7 +522,7 @@ function generateSimpleUserGuide() {
     x: 1, y: 3.1, w: 8, h: 0.8, fontSize: 14, color: C.gray, align: "center",
   });
   bar(s, 3.8, 4.2, 2.4, 0.5, C.gold);
-  txt(s, "nexcard.io", { x: 3.8, y: 4.2, w: 2.4, h: 0.5, fontSize: 16, bold: true, color: C.dark, align: "center" });
+  txt(s, "www.nexcard.wetechmm.com", { x: 3.8, y: 4.2, w: 2.4, h: 0.5, fontSize: 16, bold: true, color: C.dark, align: "center" });
 
   return p;
 }

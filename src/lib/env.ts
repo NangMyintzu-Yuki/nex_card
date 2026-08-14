@@ -7,7 +7,7 @@ import type { StorageDriver } from "@/lib/storage/types";
 export type { StorageDriver };
 
 export const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://nexcard.io";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.nexcard.wetechmm.com";
 
 const ALL_DRIVERS: StorageDriver[] = ["local", "r2", "cloudinary", "supabase"];
 
@@ -104,7 +104,7 @@ export function getCdnUrl(): string {
   const driver = getStorageDriver();
   switch (driver) {
     case "r2":
-      return process.env.R2_PUBLIC_URL ?? "https://cdn.nexcard.io";
+      return process.env.R2_PUBLIC_URL ?? "https://cdn.www.nexcard.wetechmm.com";
     case "cloudinary":
       return `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME ?? ""}`;
     case "supabase":
@@ -118,22 +118,26 @@ export function getCdnUrl(): string {
 export const CDN_URL =
   process.env.R2_PUBLIC_URL ??
   process.env.NEXT_PUBLIC_APP_URL ??
-  "https://nexcard.io";
+  "https://www.nexcard.wetechmm.com";
 
 // ── Production env fail-fast ────────────────────────────────────────────────
 
 const ProdEnvSchema = z.object({
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required in production"),
+  DATABASE_URL: z
+    .string({ required_error: "DATABASE_URL is required in production" })
+    .min(1, "DATABASE_URL is required in production"),
   NEXT_PUBLIC_APP_URL: z
-    .string()
+    .string({ required_error: "NEXT_PUBLIC_APP_URL is required in production" })
     .url("NEXT_PUBLIC_APP_URL must be a valid URL")
     .refine((u) => !u.includes("localhost") || process.env.ALLOW_LOCAL_STORAGE === "true", {
       message: "NEXT_PUBLIC_APP_URL must not be localhost in production unless ALLOW_LOCAL_STORAGE=true",
     }),
   REVALIDATION_SECRET: z
-    .string()
+    .string({ required_error: "REVALIDATION_SECRET is required in production" })
     .min(32, "REVALIDATION_SECRET must be at least 32 characters"),
-  CRON_SECRET: z.string().min(32, "CRON_SECRET must be at least 32 characters"),
+  CRON_SECRET: z
+    .string({ required_error: "CRON_SECRET is required in production" })
+    .min(32, "CRON_SECRET must be at least 32 characters"),
 });
 
 let validated = false;
@@ -156,7 +160,9 @@ export function validateEnv(): void {
       CRON_SECRET: process.env.CRON_SECRET,
     });
     if (!result.success) {
-      const msg = result.error.issues.map((i) => i.message).join("; ");
+      const msg = result.error.issues
+        .map((i) => `${i.path.join(".") || "env"}: ${i.message}`)
+        .join("; ");
       throw new Error(`[env] Production env validation failed: ${msg}`);
     }
 
@@ -167,21 +173,20 @@ export function validateEnv(): void {
     }
 
     // If backup email is partially configured, require full SMTP
-    const smtpHost = process.env.SMTP_HOST?.trim();
+    const smtpHost =
+      process.env.SMTP_HOST?.trim() || process.env.SYSTEM_MAIL_HOST?.trim();
     if (smtpHost) {
       const SmtpSchema = z.object({
-        SMTP_HOST: z.string().min(1),
-        SMTP_PORT: z.string().optional(),
-        SMTP_USER: z.string().min(1),
-        SMTP_PASS: z.string().min(1),
-        SMTP_FROM: z.string().email().optional(),
+        SMTP_USER: z.string().min(1, "SMTP_USER or SYSTEM_MAIL_USER is required"),
+        SMTP_PASS: z.string().min(1, "SMTP_PASS or SYSTEM_MAIL_PASSWORD is required"),
       });
       const smtp = SmtpSchema.safeParse({
-        SMTP_HOST: process.env.SMTP_HOST,
-        SMTP_PORT: process.env.SMTP_PORT,
-        SMTP_USER: process.env.SMTP_USER,
-        SMTP_PASS: process.env.SMTP_PASS,
-        SMTP_FROM: process.env.SMTP_FROM || undefined,
+        SMTP_USER:
+          process.env.SMTP_USER?.trim() || process.env.SYSTEM_MAIL_USER?.trim(),
+        SMTP_PASS:
+          process.env.SMTP_PASS?.trim() ||
+          process.env.SYSTEM_MAIL_PASS?.trim() ||
+          process.env.SYSTEM_MAIL_PASSWORD?.trim(),
       });
       if (!smtp.success) {
         throw new Error(

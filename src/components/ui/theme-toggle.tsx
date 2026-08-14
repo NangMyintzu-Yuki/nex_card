@@ -12,33 +12,14 @@ interface ThemeToggleProps {
 }
 
 export function ThemeToggle({ size = "md", showLabel = false, className = "" }: ThemeToggleProps) {
-  const { theme, toggleTheme, mounted } = useTheme();
-  const isDark = theme === "dark";
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme !== "light";
 
-  // Icons fill most of the knob — previous sm icons were ~8px and unreadably small
   const sizes = {
     sm: { pill: "h-9 w-16", dot: "h-7 w-7", icon: 16, label: "text-xs" },
     md: { pill: "h-10 w-[4.25rem]", dot: "h-8 w-8", icon: 18, label: "text-sm" },
     lg: { pill: "h-11 w-[4.75rem]", dot: "h-9 w-9", icon: 20, label: "text-base" },
   }[size];
-
-  // Avoid showing the wrong sun/moon before theme syncs from localStorage
-  if (!mounted) {
-    return (
-      <div
-        className={`inline-flex items-center gap-2 ${className}`}
-        aria-hidden
-      >
-        <div
-          className={`${sizes.pill} rounded-full opacity-40`}
-          style={{
-            background: "var(--nc-bg-3)",
-            border: "1.5px solid var(--nc-border)",
-          }}
-        />
-      </div>
-    );
-  }
 
   return (
     <button
@@ -46,10 +27,10 @@ export function ThemeToggle({ size = "md", showLabel = false, className = "" }: 
       onClick={toggleTheme}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       title={isDark ? "Switch to Light (Navy)" : "Switch to Dark (Gold)"}
-      className={`group inline-flex items-center gap-2 ${className}`}
+      className={`relative z-20 inline-flex shrink-0 items-center gap-2 ${className}`}
     >
-      <div
-        className={`relative ${sizes.pill} rounded-full transition-all duration-300`}
+      <span
+        className={`pointer-events-none relative ${sizes.pill} rounded-full transition-all duration-300`}
         style={{
           background: isDark
             ? "linear-gradient(135deg, #1a1008, #2d1f00)"
@@ -103,7 +84,7 @@ export function ThemeToggle({ size = "md", showLabel = false, className = "" }: 
             </svg>
           )}
         </div>
-      </div>
+      </span>
 
       {showLabel && (
         <span

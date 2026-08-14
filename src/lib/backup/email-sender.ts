@@ -24,7 +24,7 @@ function resolveSmtp() {
   const from =
     process.env.SMTP_FROM ||
     process.env.SYSTEM_MAIL_FROM ||
-    `"NEX CARD Backup" <noreply@nexcard.io>`;
+    `"NEX CARD Backup" <noreply@www.nexcard.wetechmm.com>`;
   const to = process.env.BACKUP_EMAIL_TO || process.env.SYSTEM_MAIL_TO;
   return { host, port, user, pass, from, to };
 }

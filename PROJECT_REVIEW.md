@@ -64,7 +64,7 @@ NEX CARD is a **well-structured, production-oriented** multi-tenant digital pres
 ### Core Product
 A SaaS platform where users create **shareable digital identity pages** with:
 - **20 templates** across 4 categories
-- **Custom URL slugs** (`nexcard.io/your-name`)
+- **Custom URL slugs** (`www.nexcard.wetechmm.com/your-name`)
 - **QR code generation** with permanent template lock
 - **Separate QR route** (`/p/slug`) for scan analytics
 - **Profile editor** with category-specific Zod validation
@@ -468,8 +468,8 @@ Phase 3 (Post-launch):
   "name": "Alex Rivera",
   "jobTitle": "Senior Product Designer",
   "worksFor": { "@type": "Organization", "name": "Rivera Design Co." },
-  "url": "https://nexcard.io/alex-rivera",
-  "image": "https://cdn.nexcard.io/avatars/alex.jpg",
+  "url": "https://www.nexcard.wetechmm.com/alex-rivera",
+  "image": "https://cdn.www.nexcard.wetechmm.com/avatars/alex.jpg",
   "sameAs": ["https://linkedin.com/in/alexrivera"]
 }
 ```
@@ -648,13 +648,13 @@ Phase 5: Load testing (k6) — 1000 concurrent profile views
 
 ```bash
 DATABASE_URL=mysql://user:pass@host:3306/nexcard     # REQUIRED in prod
-NEXT_PUBLIC_APP_URL=https://nexcard.io                # REQUIRED
+NEXT_PUBLIC_APP_URL=https://www.nexcard.wetechmm.com                # REQUIRED
 REVALIDATION_SECRET=<random-32-byte-hex>              # REQUIRED
 R2_ACCOUNT_ID=<cloudflare-account-id>                 # For uploads
 R2_ACCESS_KEY_ID=<r2-access-key>
 R2_SECRET_ACCESS_KEY=<r2-secret-key>
 R2_BUCKET_NAME=nexcard-uploads
-R2_PUBLIC_URL=https://cdn.nexcard.io
+R2_PUBLIC_URL=https://cdn.www.nexcard.wetechmm.com
 NODE_ENV=production
 ```
 

@@ -177,7 +177,7 @@ function loadDB(): DBData {
     users: [
       {
         id: "user-admin",
-        email: "admin@nexcard.io",
+        email: "admin@www.nexcard.wetechmm.com",
         name: "Admin",
         hashedPassword: sha256("admin-change-me-in-prod"),
         role: "ADMIN",
@@ -187,7 +187,7 @@ function loadDB(): DBData {
       },
       {
         id: "user-demo",
-        email: "demo@nexcard.io",
+        email: "demo@www.nexcard.wetechmm.com",
         name: "Alex Rivera",
         hashedPassword: sha256("demo-password-123"),
         role: "USER",

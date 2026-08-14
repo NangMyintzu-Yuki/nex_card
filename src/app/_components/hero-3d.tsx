@@ -1,403 +1,374 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "@/lib/theme/theme-context";
 
-const CARD_VARIANTS = [
+type Scene = {
+  id: string;
+  category: string;
+  name: string;
+  role: string;
+  slug: string;
+  phoneBg: string;
+};
+
+const SCENES: Scene[] = [
   {
-    name: "Aurora",
-    accent: "#6366f1",
-    bg: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    label: "Digital Name Card",
+    id: "card",
+    category: "Name card",
+    name: "NMZ",
+    role: "Full Stack Developer",
+    slug: "nmz",
+    phoneBg: "linear-gradient(180deg, #1a1520 0%, #0c0a10 100%)",
   },
   {
-    name: "Obsidian",
-    accent: "#f59e0b",
-    bg: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-    label: "Portfolio",
+    id: "portfolio",
+    category: "Portfolio",
+    name: "Maya Chen",
+    role: "Creative director",
+    slug: "maya-chen",
+    phoneBg: "linear-gradient(180deg, #0e1620 0%, #081018 100%)",
   },
   {
-    name: "Vault",
-    accent: "#d4af37",
-    bg: "linear-gradient(135deg, #d4af37 0%, #b8860b 100%)",
-    label: "Business Page",
+    id: "business",
+    category: "Business",
+    name: "District Studio",
+    role: "Yangon · 09:00–18:00",
+    slug: "district",
+    phoneBg: "linear-gradient(180deg, #12180e 0%, #0a0e08 100%)",
   },
   {
-    name: "Eternal",
-    accent: "#c9a96e",
-    bg: "linear-gradient(135deg, #c9a96e 0%, #a67c52 100%)",
-    label: "Wedding Invitation",
+    id: "wedding",
+    category: "Wedding",
+    name: "Hnin & Ko",
+    role: "12 · 12 · 2026",
+    slug: "hnin-and-ko",
+    phoneBg: "linear-gradient(180deg, #1a1410 0%, #100c0a 100%)",
   },
 ];
 
-const TAGLINES = [
-  "Your Digital Identity, Elevated.",
-  "Share Who You Are, Instantly.",
-  "One Link. Endless Possibilities.",
-  "Tap. Scan. Connect.",
-];
-
-function CardMockup({ variant, isFlipping }: { variant: typeof CARD_VARIANTS[0]; isFlipping: boolean }) {
+function NfcMark({ color }: { color: string }) {
   return (
-    <motion.div
-      className="relative"
-      style={{ perspective: "1200px" }}
-      animate={{ rotateY: isFlipping ? 180 : 0 }}
-      transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden>
+      <circle cx="14" cy="14" r="3" fill={color} />
+      <path d="M9 14a5 5 0 015-5" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M19 14a5 5 0 01-5 5" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M6.5 14a7.5 7.5 0 017.5-7.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.55" />
+      <path d="M21.5 14a7.5 7.5 0 01-7.5 7.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.55" />
+    </svg>
+  );
+}
+
+function MiniQr({ color }: { color: string }) {
+  const cells = [
+    1, 1, 1, 1, 1, 0, 1, 1, 1,
+    1, 0, 0, 0, 1, 0, 1, 0, 1,
+    1, 0, 1, 0, 1, 1, 0, 1, 0,
+    1, 0, 0, 0, 1, 0, 1, 1, 1,
+    1, 1, 1, 1, 1, 0, 0, 1, 0,
+    0, 0, 0, 0, 0, 1, 1, 0, 1,
+    1, 0, 1, 1, 0, 0, 1, 1, 1,
+    0, 1, 0, 1, 1, 1, 0, 0, 1,
+    1, 1, 0, 1, 0, 1, 1, 0, 1,
+  ];
+  return (
+    <div className="grid grid-cols-9 gap-[1.5px] p-1" style={{ background: color === "#0f1a2e" ? "#f5f7fb" : "#0a0908" }}>
+      {cells.map((on, i) => (
+        <div
+          key={i}
+          className="h-[3px] w-[3px] sm:h-[3.5px] sm:w-[3.5px]"
+          style={{ background: on ? color : "transparent" }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PhysicalCard({
+  scene,
+  isDark,
+}: {
+  scene: Scene;
+  isDark: boolean;
+}) {
+  const foil = isDark ? "#d4af37" : "#1a3a6b";
+  const mute = isDark ? "rgba(212,175,55,0.55)" : "rgba(26,58,107,0.55)";
+  const face = isDark
+    ? "linear-gradient(145deg, #1c1914 0%, #0e0d0b 55%, #16130f 100%)"
+    : "linear-gradient(145deg, #ffffff 0%, #f3f6fb 55%, #e8eef6 100%)";
+
+  return (
+    <div
+      className="nc-float relative aspect-[1.586/1] w-[280px] overflow-hidden rounded-xl sm:w-[320px]"
+      style={{
+        background: face,
+        border: `1px solid ${isDark ? "rgba(212,175,55,0.28)" : "rgba(26,58,107,0.22)"}`,
+        boxShadow: isDark
+          ? "0 24px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08)"
+          : "0 24px 48px rgba(26,58,107,0.14), inset 0 1px 0 #fff",
+      }}
     >
-      {/* Phone frame */}
       <div
-        className="relative mx-auto h-[380px] w-[260px] overflow-hidden rounded-[2.5rem] border-2 shadow-2xl"
-        style={{
-          borderColor: "rgba(255,255,255,0.15)",
-          boxShadow: `0 25px 80px ${variant.accent}40, 0 0 40px ${variant.accent}20`,
-        }}
+        className="pointer-events-none absolute inset-0 overflow-hidden opacity-50"
+        aria-hidden
       >
-        {/* Phone notch */}
-        <div className="absolute left-1/2 top-0 z-20 h-7 w-32 -translate-x-1/2 rounded-b-2xl bg-black" />
-
-        {/* Card content */}
         <div
-          className="absolute inset-0 flex flex-col items-center justify-center p-6"
-          style={{ background: variant.bg }}
-        >
-          {/* Avatar placeholder */}
-          <div className="mb-4 h-20 w-20 rounded-full border-2 border-white/30 bg-white/20 backdrop-blur-sm" />
-
-          {/* Name */}
-          <div className="mb-1 h-5 w-32 rounded-full bg-white/25" />
-          {/* Job title */}
-          <div className="mb-4 h-3 w-24 rounded-full bg-white/15" />
-
-          {/* Divider */}
-          <div className="mb-4 h-px w-20 bg-white/20" />
-
-          {/* Social links */}
-          <div className="flex gap-3">
-            {["#fff", "#fff", "#fff"].map((c, i) => (
-              <div
-                key={i}
-                className="h-9 w-9 rounded-full bg-white/15 backdrop-blur-sm"
-              />
-            ))}
-          </div>
-
-          {/* CTA button */}
-          <div className="mt-5 h-9 w-36 rounded-full bg-white/20 backdrop-blur-sm" />
-        </div>
-
-        {/* Shine overlay */}
-        <div
-          className="pointer-events-none absolute inset-0 z-10"
+          className="nc-shine"
           style={{
-            background:
-              "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.1) 45%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 55%, transparent 60%)",
+            background: isDark
+              ? "linear-gradient(90deg, transparent, rgba(212,175,55,0.28), transparent)"
+              : "linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent)",
           }}
         />
       </div>
 
-      {/* Reflection */}
-      <div
-        className="mx-auto mt-3 h-8 w-[200px] rounded-b-3xl opacity-20 blur-sm"
-        style={{ background: variant.bg }}
-      />
-    </motion.div>
-  );
-}
+      <div className="relative flex h-full flex-col justify-between p-4 sm:p-5">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[9px] font-bold tracking-[0.28em]" style={{ color: foil }}>
+              NEX CARD
+            </p>
+            <p
+              className="mt-3 text-lg font-semibold tracking-tight sm:text-xl"
+              style={{ color: isDark ? "#f0ece5" : "#0f1a2e" }}
+            >
+              {scene.name}
+            </p>
+            <p className="mt-0.5 text-[11px]" style={{ color: mute }}>
+              {scene.role}
+            </p>
+          </div>
+          <div className="relative">
+            <span
+              className="nc-nfc-ring pointer-events-none absolute -inset-2 rounded-full"
+              style={{ border: `1px solid ${foil}` }}
+            />
+            <span
+              className="nc-nfc-ring pointer-events-none absolute -inset-2 rounded-full"
+              style={{ border: `1px solid ${foil}`, animationDelay: "1.1s" }}
+            />
+            <NfcMark color={foil} />
+          </div>
+        </div>
 
-function FloatingOrb({ delay, x, y, size, color }: { delay: number; x: string; y: string; size: number; color: string }) {
-  return (
-    <motion.div
-      className="pointer-events-none absolute rounded-full blur-[80px]"
-      style={{ left: x, top: y, width: size, height: size, background: color, opacity: 0 }}
-      animate={{
-        opacity: [0, 0.15, 0],
-        scale: [0.8, 1.2, 0.8],
-        y: [0, -30, 0],
-      }}
-      transition={{
-        duration: 6,
-        delay,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
-    />
-  );
-}
-
-export default function Hero3D({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const [cardIndex, setCardIndex] = useState(0);
-  const [isFlipping, setIsFlipping] = useState(false);
-  const [taglineIndex, setTaglineIndex] = useState(0);
-
-  // Auto-rotate cards
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsFlipping(true);
-      setTimeout(() => {
-        setCardIndex((prev) => (prev + 1) % CARD_VARIANTS.length);
-        setIsFlipping(false);
-      }, 400);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Rotate taglines
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTaglineIndex((prev) => (prev + 1) % TAGLINES.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const words = TAGLINES[taglineIndex].split(" ");
-
-  return (
-    <section className="relative overflow-hidden px-6 py-20 text-center md:py-32">
-      {/* Animated background orbs */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <FloatingOrb delay={0} x="10%" y="20%" size={300} color="var(--nc-brand-grad)" />
-        <FloatingOrb delay={2} x="70%" y="10%" size={250} color="var(--nc-brand-grad)" />
-        <FloatingOrb delay={4} x="50%" y="60%" size={200} color="var(--nc-brand-grad)" />
+        <div className="flex items-end justify-between gap-3">
+          <p className="truncate font-mono text-[10px] tracking-wide" style={{ color: mute }}>
+            www.nexcard.wetechmm.com/{scene.slug}
+          </p>
+          <div className="relative overflow-hidden rounded-[3px]">
+            <MiniQr color={foil} />
+            <div
+              className="nc-scan-line pointer-events-none"
+              style={{ background: foil }}
+            />
+          </div>
+        </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Grid pattern */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        aria-hidden
-        style={{
-          backgroundImage:
-            "linear-gradient(var(--nc-text) 1px, transparent 1px), linear-gradient(90deg, var(--nc-text) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
+function PhonePreview({
+  scene,
+  isDark,
+}: {
+  scene: Scene;
+  isDark: boolean;
+}) {
+  const foil = isDark ? "#d4af37" : "#2d6eb5";
+  const screen = isDark ? scene.phoneBg : "linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)";
+  const ink = isDark ? "#f0ece5" : "#0f1a2e";
+  const mute = isDark ? "#a09070" : "#3d5a8a";
 
-      <div className="relative z-10 mx-auto max-w-6xl">
-        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16">
-          {/* Left — Text content */}
-          <div className="flex-1 text-center lg:text-left">
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="mb-8 inline-flex items-center gap-2 rounded-full border px-4 py-2"
-              style={{ borderColor: "var(--nc-border-brand)", background: "var(--nc-bg-card)" }}
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-                  style={{ background: "var(--nc-brand-2, #d4af37)" }} />
-                <span className="relative inline-flex h-2 w-2 rounded-full"
-                  style={{ background: "var(--nc-brand-2, #d4af37)" }} />
-              </span>
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--nc-text-2)" }}>
-                20 Premium Templates · QR · NFC
-              </span>
-            </motion.div>
-
-            {/* Animated headline */}
-            <h1 className="text-4xl font-black leading-tight tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl"
-              style={{ color: "var(--nc-text)" }}>
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={taglineIndex}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  className="block"
-                >
-                  {words.map((word, i) => (
-                    <motion.span
-                      key={`${taglineIndex}-${i}`}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.08, duration: 0.4 }}
-                      className="mr-[0.3em] inline-block"
-                    >
-                      {word === "Identity," || word === "Identity" ? (
-                        <span
-                          style={{
-                            backgroundImage: "var(--nc-brand-grad, linear-gradient(135deg,#d4af37,#f0c050))",
-                            backgroundColor: "transparent",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
-                            color: "transparent",
-                          }}
-                        >
-                          {word}
-                        </span>
-                      ) : word === "Instantly." || word === "Possibilities." || word === "Connect." ? (
-                        <span
-                          style={{
-                            backgroundImage: "var(--nc-brand-grad, linear-gradient(135deg,#d4af37,#f0c050))",
-                            backgroundColor: "transparent",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
-                            color: "transparent",
-                          }}
-                        >
-                          {word}
-                        </span>
-                      ) : (
-                        word
-                      )}
-                    </motion.span>
-                  ))}
-                </motion.span>
-              </AnimatePresence>
-            </h1>
-
-            {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="mx-auto mt-6 max-w-lg text-base leading-relaxed lg:mx-0 lg:text-lg"
-              style={{ color: "var(--nc-text-2)" }}
-            >
-              Create stunning digital name cards, portfolios, business pages, and wedding invitations.
-              Share instantly via link, QR code, or NFC tap.
-            </motion.p>
-
-            {/* CTA buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="mt-10 flex flex-wrap items-center justify-center gap-4 lg:justify-start"
-            >
-              <Link
-                href={isLoggedIn ? "/dashboard" : "/register"}
-                className="group relative overflow-hidden rounded-2xl px-8 py-4 text-base font-black transition-all hover:scale-[1.02] active:scale-[0.98]"
+  return (
+    <div
+      className="nc-float-delay relative h-[340px] w-[176px] overflow-hidden rounded-[1.85rem] sm:h-[380px] sm:w-[196px]"
+      style={{
+        background: isDark ? "#0a0a0c" : "#dce3ee",
+        border: `2px solid ${isDark ? "#2a2a2e" : "#c5d0e0"}`,
+        boxShadow: isDark
+          ? "0 28px 60px rgba(0,0,0,0.5)"
+          : "0 28px 60px rgba(26,58,107,0.16)",
+      }}
+    >
+      <div className="absolute left-1/2 top-1.5 z-10 h-4 w-16 -translate-x-1/2 rounded-full" style={{ background: isDark ? "#000" : "#9aabc0" }} />
+      <div className="absolute inset-[5px] overflow-hidden rounded-[1.55rem]" style={{ background: screen }}>
+        <div className="flex h-full flex-col items-center px-4 pt-8">
+          <div
+            className="flex h-14 w-14 items-center justify-center rounded-full text-sm font-bold"
+            style={{
+              background: "var(--nc-brand-grad)",
+              color: "var(--nc-brand-text)",
+            }}
+          >
+            {scene.name.includes(" ")
+              ? scene.name.split(" ").map((w) => w[0]).join("").slice(0, 2)
+              : scene.name.slice(0, 3)}
+          </div>
+          <p className="mt-3 text-center text-[13px] font-semibold" style={{ color: ink }}>
+            {scene.name}
+          </p>
+          <p className="mt-0.5 text-center text-[10px]" style={{ color: mute }}>
+            {scene.role}
+          </p>
+          <div className="mt-4 w-full space-y-1.5">
+            {["Save contact", "WhatsApp", "Instagram"].map((row) => (
+              <div
+                key={row}
+                className="rounded-lg px-2.5 py-1.5 text-[9px] font-medium"
                 style={{
-                  backgroundImage: "var(--nc-brand-grad)",
-                  color: "var(--nc-brand-text)",
-                  boxShadow: "var(--nc-glow)",
+                  background: isDark ? "rgba(255,255,255,0.06)" : "rgba(26,58,107,0.06)",
+                  color: mute,
                 }}
               >
-                <span className="relative z-10">
-                  {isLoggedIn ? "Go to Dashboard →" : "Create Your Card →"}
-                </span>
-                <div
-                  className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
-                  style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%)" }}
-                />
-              </Link>
-              <Link
-                href="/alex-rivera"
-                className="flex items-center gap-2 rounded-2xl border px-8 py-4 text-base font-semibold transition-all hover:opacity-80"
-                style={{ borderColor: "var(--nc-border)", color: "var(--nc-text-2)" }}
-              >
-                View Live Demo
-              </Link>
-            </motion.div>
+                {row}
+              </div>
+            ))}
+          </div>
+          <div
+            className="mt-auto mb-5 rounded-full px-3 py-1 text-[8px] font-bold uppercase tracking-[0.16em]"
+            style={{ color: foil, border: `1px solid ${foil}55` }}
+          >
+            {scene.category}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-            {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
-              className="mt-12 flex flex-wrap items-center justify-center gap-8 lg:justify-start"
+export default function Hero3D({
+  isLoggedIn,
+  preorderMode = false,
+}: {
+  isLoggedIn: boolean;
+  preorderMode?: boolean;
+}) {
+  const { theme } = useTheme();
+  const isDark = theme !== "light";
+  const [index, setIndex] = useState(0);
+  const scene = SCENES[index];
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setIndex((prev) => (prev + 1) % SCENES.length);
+    }, 4200);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!stageRef.current) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: y * -8, y: x * 10 });
+  };
+
+  return (
+    <section className="relative isolate overflow-hidden px-6 pb-16 pt-14 md:pb-24 md:pt-20">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px"
+        style={{ background: "var(--nc-border)" }}
+      />
+
+      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+        <div className="nc-hero-in">
+          <p
+            className="text-[11px] font-semibold uppercase tracking-[0.32em]"
+            style={{ color: "var(--nc-brand-2)" }}
+          >
+            NFC · QR · Link
+          </p>
+
+          <h1
+            className="mt-5 max-w-[14ch] text-[2.6rem] font-semibold leading-[1.08] tracking-tight sm:text-6xl lg:text-[4.25rem]"
+            style={{ color: "var(--nc-text)" }}
+          >
+            <span className="block">Tap the card.</span>
+            <span className="mt-1 block" style={{ color: "var(--nc-brand-2)" }}>
+              Open your page.
+            </span>
+          </h1>
+
+          <p
+            className="mt-6 max-w-md text-[15px] leading-relaxed sm:text-base"
+            style={{ color: "var(--nc-text-2)" }}
+          >
+            One physical card, one URL. Name card, portfolio, business page, or wedding invite — shared by tap, scan, or link.
+          </p>
+
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            <Link
+              href={isLoggedIn ? "/dashboard" : "/register"}
+              className="rounded-full px-7 py-3 text-sm font-bold transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              style={{
+                backgroundImage: "var(--nc-brand-grad)",
+                color: "var(--nc-brand-text)",
+                boxShadow: "var(--nc-glow)",
+              }}
             >
-              {[
-                ["20+", "Templates"],
-                ["QR", "Code Ready"],
-                ["NFC", "Tag Support"],
-                ["∞", "Customizable"],
-              ].map(([v, l], i) => (
-                <motion.div
-                  key={l}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.8 + i * 0.1, duration: 0.4 }}
-                  className="text-center"
-                >
-                  <p
-                    className="text-2xl font-black"
-                    style={{
-                      backgroundImage: "var(--nc-brand-grad)",
-                      backgroundColor: "transparent",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                      color: "transparent",
-                    }}
-                  >
-                    {v}
-                  </p>
-                  <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
-                    {l}
-                  </p>
-                </motion.div>
-              ))}
-            </motion.div>
+              {isLoggedIn ? "Go to Dashboard" : preorderMode ? "Reserve your card" : "Create your card"}
+            </Link>
+            <Link
+              href="/alex-rivera"
+              className="rounded-full border px-7 py-3 text-sm font-semibold transition-opacity hover:opacity-80"
+              style={{ borderColor: "var(--nc-border)", color: "var(--nc-text-2)" }}
+            >
+              View live demo
+            </Link>
           </div>
 
-          {/* Right — 3D Card mockup */}
-          <motion.div
-            initial={{ opacity: 0, x: 60, rotateY: -15 }}
-            animate={{ opacity: 1, x: 0, rotateY: 0 }}
-            transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
-            className="flex-1"
+          <ul className="mt-10 flex flex-wrap gap-2">
+            {SCENES.map((s, i) => {
+              const active = i === index;
+              return (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    onClick={() => setIndex(i)}
+                    className="rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors"
+                    style={{
+                      color: active ? "var(--nc-text)" : "var(--nc-text-3)",
+                      background: active ? "var(--nc-bg-card)" : "transparent",
+                      border: `1px solid ${active ? "var(--nc-border-brand)" : "var(--nc-border)"}`,
+                    }}
+                  >
+                    {s.category}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div
+          ref={stageRef}
+          onMouseMove={onMove}
+          onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+          className="nc-hero-in relative mx-auto flex min-h-[420px] w-full max-w-[520px] items-center justify-center lg:mx-0"
+          style={{ animationDelay: "0.18s" }}
+        >
+          <div
+            className="relative"
+            style={{
+              transformStyle: "preserve-3d",
+              transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+              transition: "transform 0.4s ease-out",
+            }}
           >
-            <CardMockup variant={CARD_VARIANTS[cardIndex]} isFlipping={isFlipping} />
-
-            {/* Card indicator dots */}
-            <div className="mt-6 flex items-center justify-center gap-2">
-              {CARD_VARIANTS.map((v, i) => (
-                <button
-                  key={v.name}
-                  onClick={() => {
-                    if (i !== cardIndex) {
-                      setIsFlipping(true);
-                      setTimeout(() => {
-                        setCardIndex(i);
-                        setIsFlipping(false);
-                      }, 400);
-                    }
-                  }}
-                  className="group relative h-2.5 rounded-full transition-all duration-300"
-                  style={{
-                    width: i === cardIndex ? 32 : 10,
-                    background: i === cardIndex ? v.accent : "var(--nc-text-3)",
-                    opacity: i === cardIndex ? 1 : 0.4,
-                  }}
-                  aria-label={`Show ${v.name} template`}
-                >
-                  {i === cardIndex && (
-                    <motion.div
-                      layoutId="activeDot"
-                      className="absolute inset-0 rounded-full"
-                      style={{ background: v.accent, opacity: 0.3 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    />
-                  )}
-                </button>
-              ))}
+            <div key={scene.id} className="nc-scene-swap relative h-[400px] w-[340px] sm:h-[440px] sm:w-[400px]">
+              <div className="absolute right-0 top-2 z-10">
+                <PhonePreview scene={scene} isDark={isDark} />
+              </div>
+              <div className="absolute bottom-8 left-0 z-20">
+                <PhysicalCard scene={scene} isDark={isDark} />
+              </div>
             </div>
-
-            {/* Current template label */}
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={cardIndex}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="mt-3 text-center text-sm font-semibold"
-                style={{ color: "var(--nc-text-2)" }}
-              >
-                {CARD_VARIANTS[cardIndex].label} —{" "}
-                <span style={{ color: CARD_VARIANTS[cardIndex].accent }}>
-                  {CARD_VARIANTS[cardIndex].name}
-                </span>
-              </motion.p>
-            </AnimatePresence>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

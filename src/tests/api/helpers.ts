@@ -41,7 +41,7 @@ export function mockSession(user: {
             user: {
               id: user.id,
               name: user.name ?? "Test User",
-              email: user.email ?? "test@nexcard.io",
+              email: user.email ?? "test@www.nexcard.wetechmm.com",
               role: user.role ?? "USER",
               avatarUrl: null,
               totpEnabled: false,

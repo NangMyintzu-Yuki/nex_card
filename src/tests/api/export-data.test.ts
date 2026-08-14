@@ -26,7 +26,7 @@ describe("GET /api/export/data", () => {
       user: {
         id: "user-1",
         name: "Alex",
-        email: "alex@nexcard.io",
+        email: "alex@www.nexcard.wetechmm.com",
         role: "USER",
         avatarUrl: null,
         totpEnabled: false,
@@ -36,7 +36,7 @@ describe("GET /api/export/data", () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       id: "user-1",
       name: "Alex",
-      email: "alex@nexcard.io",
+      email: "alex@www.nexcard.wetechmm.com",
       avatarUrl: null,
       role: "USER",
       status: "ACTIVE",
@@ -69,7 +69,7 @@ describe("GET /api/export/data", () => {
     const data = JSON.parse(text);
 
     expect(data.platform).toBe("NEX CARD");
-    expect(data.user.email).toBe("alex@nexcard.io");
+    expect(data.user.email).toBe("alex@www.nexcard.wetechmm.com");
     expect(data.profiles).toHaveLength(1);
     expect(data.profiles[0].viewCount).toBe("42");
     expect(res.headers.get("Content-Disposition")).toMatch(/nexcard-export/);

@@ -63,7 +63,7 @@ export async function sendMail(input: SendMailInput): Promise<{ messageId: strin
   const fromEmail =
     process.env.SMTP_FROM?.trim() ||
     smtpUser() ||
-    "noreply@nexcard.io";
+    "noreply@www.nexcard.wetechmm.com";
 
   const info = await getTransporter().sendMail({
     from: `"NEX CARD" <${fromEmail}>`,

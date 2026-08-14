@@ -23,8 +23,8 @@ describe("Phase B — settings & reserved slugs", () => {
   it("validates platform settings schema", () => {
     const parsed = SettingsSchema.safeParse({
       site_name: "NEX CARD",
-      site_url: "https://nexcard.io",
-      support_email: "support@nexcard.io",
+      site_url: "https://www.nexcard.wetechmm.com",
+      support_email: "support@www.nexcard.wetechmm.com",
       maintenance_mode: false,
       allow_registration: true,
       require_email_verify: false,
@@ -34,11 +34,12 @@ describe("Phase B — settings & reserved slugs", () => {
       enable_r2_uploads: true,
       isr_revalidate_sec: 3600,
       notify_new_user: true,
-      notify_email: "admin@nexcard.io",
+      notify_email: "admin@www.nexcard.wetechmm.com",
       wallet_account_name: "NEX CARD",
       wallet_kbzpay: "09-000000000",
       wallet_wavepay: "09-000000000",
       wallet_ayapay: "09-000000000",
+      preorder_mode: true,
     });
     expect(parsed.success).toBe(true);
   });
@@ -46,8 +47,8 @@ describe("Phase B — settings & reserved slugs", () => {
   it("rejects invalid max_profiles_per_user", () => {
     const parsed = SettingsSchema.safeParse({
       site_name: "NEX CARD",
-      site_url: "https://nexcard.io",
-      support_email: "support@nexcard.io",
+      site_url: "https://www.nexcard.wetechmm.com",
+      support_email: "support@www.nexcard.wetechmm.com",
       maintenance_mode: false,
       allow_registration: true,
       require_email_verify: false,
@@ -57,7 +58,7 @@ describe("Phase B — settings & reserved slugs", () => {
       enable_r2_uploads: true,
       isr_revalidate_sec: 3600,
       notify_new_user: true,
-      notify_email: "admin@nexcard.io",
+      notify_email: "admin@www.nexcard.wetechmm.com",
     });
     expect(parsed.success).toBe(false);
   });
