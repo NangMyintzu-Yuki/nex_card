@@ -61,7 +61,7 @@ export async function sendMail(input: SendMailInput): Promise<{ messageId: strin
   }
 
   const fromEmail =
-    process.env.SMTP_FROM?.trim() ||
+    process.env.SMTP_USER?.trim() ||
     smtpUser() ||
     "noreply@www.nexcard.wetechmm.com";
 

@@ -1260,7 +1260,7 @@ function buildProjectFlow() {
     ["VERCEL_CRON_SECRET", "Protects cron endpoint"],
     ["BACKUP_EMAIL", "Where dumps are sent"],
     ["R2_BUCKET_NAME", "Storage bucket"],
-    ["SMTP_FROM", "Sender email address"],
+    ["SMTP_USER", "Sender email address"],
     ["", ""],
   ], { headerColor: C.cyan, rowH: 0.3 });
 

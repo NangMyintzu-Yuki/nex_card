@@ -22,7 +22,7 @@ function resolveSmtp() {
   const user = process.env.SMTP_USER || process.env.SYSTEM_MAIL_USER;
   const pass = process.env.SMTP_PASS || process.env.SYSTEM_MAIL_PASS;
   const from =
-    process.env.SMTP_FROM ||
+    process.env.SMTP_USER ||
     process.env.SYSTEM_MAIL_FROM ||
     `"NEX CARD Backup" <noreply@www.nexcard.wetechmm.com>`;
   const to = process.env.BACKUP_EMAIL_TO || process.env.SYSTEM_MAIL_TO;

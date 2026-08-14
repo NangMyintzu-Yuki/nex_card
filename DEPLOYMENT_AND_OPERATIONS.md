@@ -116,7 +116,7 @@ Copy `.env.example` → `.env.local` (local) or set in your hosting panel (produ
 | `ALLOW_LOCAL_STORAGE` | Local / Docker only | Required if production `NODE_ENV` uses `STORAGE_DRIVER=local` |
 | `CLOUDINARY_*` | If `STORAGE_DRIVER=cloudinary` | Cloudinary cloud name, API key, secret |
 | `SUPABASE_*` | If `STORAGE_DRIVER=supabase` | Supabase URL, service role key, bucket |
-| `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` | **Yes (launch)** | Required so registration verification emails send. Without SMTP, new users cannot log in. |
+| `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` / `SMTP_USER` | **Yes (launch)** | Required so registration verification emails send. Without SMTP, new users cannot log in. |
 | `NODE_ENV` | Auto | `development` / `production` / `test` |
 
 ### Generate secrets
@@ -627,7 +627,7 @@ ENVIRONMENT
 □ STORAGE_DRIVER=r2 on the server (R2_* set); STORAGE_DRIVER=local on laptops
 □ R2_PRIVATE_BUCKET set, or a Cloudflare rule denies public GET on private/*
 □ KBZPay / WavePay / AYA Pay numbers set in Admin → Settings (not 09-000000000)
-□ SMTP_HOST / SMTP_USER / SMTP_PASS / SMTP_FROM set — register always requires email verify
+□ SMTP_HOST / SMTP_USER / SMTP_PASS / SMTP_USER set — register always requires email verify
 □ Admin 2FA enabled at /admin/security
 □ Seed admin password changed; demo user disabled or deleted
 □ Pre-order mode: leave ON until template prices are final (Admin → Settings)
