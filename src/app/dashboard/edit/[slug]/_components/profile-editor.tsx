@@ -1265,14 +1265,14 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
+    <div className="mx-auto max-w-3xl nc-page">
       {/* Header */}
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <Link href="/dashboard" className="nc-btn-ghost mb-2 inline-block text-xs transition-colors">
             ← Back to Profiles
           </Link>
-          <h1 className="text-xl font-black sm:text-2xl">
+          <h1 className="break-all text-xl font-black sm:text-2xl">
             Edit <span className="text-indigo-400">/{profile.slug}</span>
           </h1>
           <p className="mt-1 text-sm" style={{ color: "var(--nc-text-2)" }}>
@@ -1332,7 +1332,7 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
                 {isPublished ? "Live — anyone with the link can view this" : "Draft — your profile is hidden from the public"}
               </p>
             </div>
-            <p className="text-xs ml-4" style={{ color: "var(--nc-text-2)" }}>
+            <p className="ml-4 break-all text-xs" style={{ color: "var(--nc-text-2)" }}>
               {isPublished
                 ? <>www.nexcard.wetechmm.com/<strong className="text-indigo-400">{profile.slug}</strong> is accessible</>
                 : <>Toggle to <strong>Publish</strong> so your URL goes live</>

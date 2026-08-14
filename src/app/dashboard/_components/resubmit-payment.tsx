@@ -166,7 +166,7 @@ export function ResubmitPayment({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="overflow-hidden rounded-2xl nc-card">
-              <div className="flex items-center justify-between border-b px-6 py-5"
+              <div className="flex items-start justify-between gap-3 border-b px-4 py-4 sm:px-6 sm:py-5"
                 style={{ borderColor: "var(--nc-border)" }}>
                 <div>
                   <h3 className="text-lg font-black" style={{ color: "var(--nc-text)" }}>
@@ -186,7 +186,7 @@ export function ResubmitPayment({
                 </button>
               </div>
 
-              <div className="space-y-6 p-6">
+              <div className="space-y-6 p-4 sm:p-6">
                 {/* Tier selection */}
                 <div>
                   <p className="mb-3 text-sm font-bold" style={{ color: "var(--nc-text)" }}>Select Plan</p>
@@ -200,7 +200,7 @@ export function ResubmitPayment({
                           key={t.value}
                           type="button"
                           onClick={() => setSelectedTier(t.value)}
-                          className="flex items-center justify-between rounded-xl border-2 px-5 py-4 text-left transition-all"
+                          className="flex items-center justify-between gap-3 rounded-xl border-2 px-3 py-4 text-left transition-all sm:px-5"
                           style={
                             active
                               ? { borderColor: "var(--nc-brand-1)", background: "var(--nc-brand-1)10" }
@@ -225,7 +225,7 @@ export function ResubmitPayment({
                 {/* Payment method */}
                 <div>
                   <p className="mb-3 text-sm font-bold" style={{ color: "var(--nc-text)" }}>Payment Method</p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                     {(Object.keys(PAYMENT_METHODS) as Array<keyof typeof PAYMENT_METHODS>).map((key) => {
                       const pm = PAYMENT_METHODS[key];
                       const active = paymentMethod === key;
@@ -251,17 +251,17 @@ export function ResubmitPayment({
                   </div>
                   <div className="mt-4 rounded-xl border p-4 text-sm" style={{ borderColor: "var(--nc-brand-2)20", background: "var(--nc-brand-2)08" }}>
                     <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span style={{ color: "var(--nc-text-3)" }}>Account</span>
-                        <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{wallets.accountName}</span>
+                      <div className="flex justify-between gap-3">
+                        <span className="shrink-0" style={{ color: "var(--nc-text-3)" }}>Account</span>
+                        <span className="min-w-0 break-all text-right font-semibold" style={{ color: "var(--nc-text)" }}>{wallets.accountName}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: "var(--nc-text-3)" }}>Phone</span>
-                        <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "Set in Admin → Settings"}</span>
+                      <div className="flex justify-between gap-3">
+                        <span className="shrink-0" style={{ color: "var(--nc-text-3)" }}>Phone</span>
+                        <span className="min-w-0 break-all text-right font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "Set in Admin → Settings"}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span style={{ color: "var(--nc-text-3)" }}>Number</span>
-                        <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "—"}</span>
+                      <div className="flex justify-between gap-3">
+                        <span className="shrink-0" style={{ color: "var(--nc-text-3)" }}>Number</span>
+                        <span className="min-w-0 break-all text-right font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "—"}</span>
                       </div>
                     </div>
                   </div>

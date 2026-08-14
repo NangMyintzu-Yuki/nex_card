@@ -71,7 +71,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
   const filteredProjects = activeTab === "featured" ? projects.filter(p => p.featured) : projects;
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-indigo-500 selection:text-white font-sans antialiased relative overflow-hidden">
+    <main className="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-indigo-500 selection:text-white font-sans antialiased relative overflow-x-clip">
       
       {/* Background Glow Effect Animation */}
       <div 
@@ -92,7 +92,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
                 <img src={resolveImageUrl(avatarUrl)} alt={fullName} className="absolute inset-0 h-full w-full object-cover" />
               </div>
             )}
-            <span className="font-bold text-sm tracking-tight text-neutral-200 group-hover:text-white transition-colors">
+            <span className="max-w-[40vw] truncate font-bold text-sm tracking-tight text-neutral-200 group-hover:text-white transition-colors sm:max-w-none">
               {fullName}
             </span>
           </a>
@@ -115,7 +115,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
                 href={resumeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full px-5 py-2 text-xs font-bold text-white shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 hover:scale-[1.02] active:scale-95"
+                className="rounded-full px-3 py-2 text-xs font-bold text-white shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 hover:scale-[1.02] active:scale-95 sm:px-5"
                 style={{ background: accentColor }}
               >
                 Resume ↓
@@ -126,7 +126,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
       </header>
 
       {/* Hero Section */}
-      <section className="relative px-6 pt-24 pb-16 md:pt-32 md:pb-24">
+      <section className="relative px-4 pt-24 pb-16 sm:px-6 md:pt-32 md:pb-24">
         <div className="mx-auto max-w-5xl flex flex-col md:flex-row items-center gap-10">
           
           {/* Avatar Profile Frame */}
@@ -156,7 +156,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
               </div>
             )}
 
-            <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-6xl lg:text-7xl">
+            <h1 className="break-words text-3xl font-extrabold tracking-tight text-white sm:text-4xl md:text-6xl lg:text-7xl">
               {fullName}
             </h1>
             <p className="mt-3 text-lg font-semibold md:text-2xl" style={{ color: accentColor }}>
@@ -197,7 +197,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
 
       {/* Projects Showcase */}
       {projects.length > 0 && (
-        <section id="work" className="px-6 py-16 border-t border-white/5 bg-neutral-900/30">
+        <section id="work" className="px-4 py-16 sm:px-6 border-t border-white/5 bg-neutral-900/30">
           <div className="mx-auto max-w-5xl">
             <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
@@ -307,7 +307,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
 
       {/* Skills & Expertise */}
       {skills.length > 0 && (
-        <section id="skills" className="px-6 py-16 border-t border-white/5">
+        <section id="skills" className="px-4 py-16 sm:px-6 border-t border-white/5">
           <div className="mx-auto max-w-5xl">
             <h2 className="mb-8 text-3xl font-extrabold text-white tracking-tight">Skills & Expertise</h2>
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
@@ -338,7 +338,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
 
       {/* Experience Timeline */}
       {experience.length > 0 && (
-        <section id="experience" className="px-6 py-16 border-t border-white/5 bg-neutral-900/30">
+        <section id="experience" className="px-4 py-16 sm:px-6 border-t border-white/5 bg-neutral-900/30">
           <div className="mx-auto max-w-5xl">
             <h2 className="mb-10 text-3xl font-extrabold text-white tracking-tight">Experience</h2>
             <div className="relative border-l border-white/10 ml-4 space-y-8 pl-6 md:pl-8">
@@ -382,7 +382,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
 
       {/* Gallery Section */}
       {gallery && gallery.length > 0 && (
-        <section id="gallery" className="px-6 py-16 border-t border-white/5">
+        <section id="gallery" className="px-4 py-16 sm:px-6 border-t border-white/5">
           <div className="mx-auto max-w-5xl">
             <h2 className="mb-8 text-3xl font-extrabold text-white tracking-tight">Gallery</h2>
             <div className="columns-2 gap-4 sm:columns-3 md:columns-4 space-y-4">
@@ -405,7 +405,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
 
       {/* Testimonials */}
       {testimonials && testimonials.length > 0 && (
-        <section className="px-6 py-16 border-t border-white/5 bg-neutral-900/30">
+        <section className="px-4 py-16 sm:px-6 border-t border-white/5 bg-neutral-900/30">
           <div className="mx-auto max-w-5xl">
             <h2 className="mb-8 text-3xl font-extrabold text-white tracking-tight">Testimonials</h2>
             <div className="grid gap-6 md:grid-cols-2">
@@ -442,7 +442,7 @@ export function CanvasPortfolio({ data, accentColor = "#6366f1" }: PP) {
       )}
 
       {/* Modern Animated Footer */}
-      <footer id="contact" className="border-t border-white/10 px-6 py-16 bg-neutral-950 relative">
+      <footer id="contact" className="border-t border-white/10 px-4 py-16 sm:px-6 bg-neutral-950 relative">
         <div className="mx-auto max-w-5xl flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div>
             <h2 className="text-3xl font-black text-white tracking-tight">Let&apos;s build something together.</h2>

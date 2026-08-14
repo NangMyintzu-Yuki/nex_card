@@ -61,13 +61,20 @@ const nextConfig: NextConfig = {
   // ── Security headers ────────────────────────────────────────────────────
   async headers() {
     const isProd = process.env.NODE_ENV === "production";
+    // Webpack Fast Refresh uses eval() in `next dev`. Keep it out of production.
+    const scriptSrc = isProd
+      ? "script-src 'self' 'unsafe-inline'"
+      : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
+    const connectSrc = isProd
+      ? "connect-src 'self' https:"
+      : "connect-src 'self' https: http: ws: wss:";
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      scriptSrc,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https:",
+      connectSrc,
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",

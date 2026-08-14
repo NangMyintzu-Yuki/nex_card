@@ -30,7 +30,7 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
           </div>
         )}
 
-        <div className="relative z-20 text-center px-6 py-24">
+        <div className="relative z-20 text-center px-4 sm:px-6 py-24">
           {days !== null && (
             <p className="mb-5 text-xs uppercase tracking-[0.6em] text-white/30">{days} days</p>
           )}
@@ -56,7 +56,7 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
 
       {/* Love story — sparse, cinematic */}
       {loveHistory.length > 0 && (
-        <section className="px-6 py-20 border-t border-white/5">
+        <section className="px-4 sm:px-6 py-20 border-t border-white/5">
           <div className="mx-auto max-w-2xl">
             <p className="mb-12 text-center text-xs uppercase tracking-[0.6em] text-white/25">Our Story</p>
             <div className="space-y-14">
@@ -83,7 +83,7 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
 
       {/* Gallery — grayscale grid */}
       {gallery.length > 1 && (
-        <section className="border-t border-white/5 px-6 py-16">
+        <section className="border-t border-white/5 px-4 sm:px-6 py-16">
           <div className="mx-auto max-w-5xl">
             <p className="mb-8 text-center text-xs uppercase tracking-[0.6em] text-white/25">Gallery</p>
             <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
@@ -99,7 +99,7 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
       )}
 
       {/* Events */}
-      <section className="border-t border-white/5 px-6 py-20">
+      <section className="border-t border-white/5 px-4 sm:px-6 py-20">
         <div className="mx-auto max-w-2xl">
           <p className="mb-10 text-center text-xs uppercase tracking-[0.6em] text-white/25">The Ceremony</p>
           <div className="space-y-6">
@@ -126,7 +126,7 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
       </section>
 
       {rsvp && (
-        <section className="border-t border-white/5 px-6 py-20 text-center">
+        <section className="border-t border-white/5 px-4 sm:px-6 py-20 text-center">
           <p className="mb-6 text-xs uppercase tracking-[0.6em] text-white/25">RSVP</p>
           {rsvp.deadline && (
             <p className="mb-4 text-sm text-white/35">Please respond by {formatShortDate(rsvp.deadline)}</p>
@@ -140,12 +140,12 @@ export function NoirWedding({ data, accentColor = "#ffffff", slug }: WeddingProp
         </section>
       )}
 
-      <footer className="border-t border-white/5 px-6 py-8 text-center">
+      <footer className="border-t border-white/5 px-4 sm:px-6 py-8 text-center">
         <p className="text-xs text-white/15 uppercase tracking-widest">NEX CARD</p>
       </footer>
     
       {slug && (
-        <section className="px-6 py-16 text-center">
+        <section className="px-4 sm:px-6 py-16 text-center">
           {rsvp && (
             <WeddingRsvpForm slug={slug} accentColor={accentColor}
               mealOptions={rsvp?.mealOptions}

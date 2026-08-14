@@ -49,12 +49,12 @@ export function BackupSection() {
 
   return (
     <div className="nc-card overflow-hidden rounded-2xl" style={cardStyle}>
-      <div className="flex items-center gap-2.5 px-6 py-4" style={{ borderBottom: "1px solid var(--nc-border)" }}>
+      <div className="flex items-center gap-2.5 px-4 py-4 sm:px-6" style={{ borderBottom: "1px solid var(--nc-border)" }}>
         <Database className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />
         <h2 className="text-sm font-bold" style={{ color: "var(--nc-text)" }}>Database Backup</h2>
       </div>
 
-      <div className="px-6 py-5 space-y-4">
+      <div className="space-y-4 px-4 py-5 sm:px-6">
         <p className="text-xs leading-relaxed" style={{ color: "var(--nc-text-2)" }}>
           Export all database tables as a compressed SQL file. Email backup sends the <code className="rounded px-1 font-mono" style={{ background: "var(--nc-bg-hover)" }}>.sql.gz</code> file to your registered admin email.
         </p>

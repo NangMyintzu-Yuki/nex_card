@@ -103,7 +103,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
 
       {/* Sticky Business Navbar */}
       <header className="sticky top-0 z-40 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3">
             {avatarUrl && (
               <div className="relative h-10 w-10 overflow-hidden rounded-xl border border-white/10 shadow-md">
@@ -111,7 +111,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
               </div>
             )}
             <div>
-              <h1 className="font-extrabold text-sm tracking-wide text-white leading-tight">{fullName}</h1>
+              <h1 className="max-w-[40vw] truncate font-extrabold text-sm tracking-wide text-white leading-tight sm:max-w-none">{fullName}</h1>
               <p className="text-[10px] text-zinc-400 font-medium">Official Business Showcase</p>
             </div>
           </div>
@@ -141,7 +141,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
       </header>
 
       {/* Hero Section */}
-      <section className="relative px-6 pt-16 pb-20 md:pt-24 md:pb-28 border-b border-zinc-800/60">
+      <section className="relative px-4 pt-16 pb-20 sm:px-6 md:pt-24 md:pb-28 border-b border-zinc-800/60">
         <div className="mx-auto max-w-6xl grid md:grid-cols-12 gap-10 items-center">
           
           <div className="md:col-span-7 space-y-6">
@@ -216,7 +216,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
 
       {/* Products / Services Showcase */}
       {projects.length > 0 && (
-        <section id="products" className="px-6 py-20 bg-zinc-950">
+        <section id="products" className="px-4 py-20 sm:px-6 bg-zinc-950">
           <div className="mx-auto max-w-6xl space-y-8">
             
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-zinc-800/80 pb-6">
@@ -308,7 +308,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
 
       {/* Business Features / Skills Section */}
       {skills.length > 0 && (
-        <section className="px-6 py-16 border-t border-zinc-800/60 bg-zinc-900/30">
+        <section className="px-4 py-16 sm:px-6 border-t border-zinc-800/60 bg-zinc-900/30">
           <div className="mx-auto max-w-6xl">
             <div className="mb-10 text-center max-w-xl mx-auto">
               <h2 className="text-2xl sm:text-3xl font-black text-white">Why Choose Us</h2>
@@ -346,7 +346,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
 
       {/* Track Record / Experience */}
       {experience.length > 0 && (
-        <section className="px-6 py-16 border-t border-zinc-800/60">
+        <section className="px-4 py-16 sm:px-6 border-t border-zinc-800/60">
           <div className="mx-auto max-w-6xl">
             <h2 className="mb-8 text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
               <Award className="h-6 w-6 text-amber-400" />
@@ -384,7 +384,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
 
       {/* Customer Reviews / Testimonials */}
       {testimonials && testimonials.length > 0 && (
-        <section className="px-6 py-20 border-t border-zinc-800/60 bg-zinc-900/40">
+        <section className="px-4 py-20 sm:px-6 border-t border-zinc-800/60 bg-zinc-900/40">
           <div className="mx-auto max-w-6xl space-y-10">
             <div className="text-center max-w-lg mx-auto">
               <div className="inline-flex items-center gap-1 text-amber-400 mb-2">
@@ -430,7 +430,7 @@ export function StudioPortfolio({ data, accentColor = "#ec4899" }: PP) {
       )}
 
       {/* Footer & Order Contact Section */}
-      <footer className="border-t border-zinc-800/80 bg-zinc-950 px-6 py-16">
+      <footer className="border-t border-zinc-800/80 bg-zinc-950 px-4 py-16 sm:px-6">
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div className="space-y-3">
             <h2 className="text-2xl sm:text-3xl font-black text-white">Ready to place an order?</h2>

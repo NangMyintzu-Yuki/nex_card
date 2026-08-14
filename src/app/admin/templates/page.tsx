@@ -41,7 +41,7 @@ export default async function AdminTemplatesPage() {
   const totalTemplates = categories.reduce((acc, c) => acc + c.templates.length, 0);
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
+    <div className="mx-auto max-w-5xl nc-page">
       <div className="mb-8">
         <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>
           Templates

@@ -8,7 +8,7 @@ export default function AnalyticsError({
   reset: () => void;
 }) {
   return (
-    <div className="mx-auto max-w-5xl px-6 py-16 text-center">
+    <div className="mx-auto max-w-5xl nc-page text-center">
       <p className="text-sm" style={{ color: "var(--nc-text-3)" }}>
         Something went wrong loading analytics.
       </p>

@@ -37,12 +37,56 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  max-width: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Dashboard / admin page padding — leaves room for the mobile menu FAB */
+.nc-page {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 2rem;
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 640px) {
+  .nc-page {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 2.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .nc-page {
+    padding-bottom: 2.5rem;
+  }
+}
+
+.nc-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -704,6 +748,30 @@ html.nc-light .bg-red-400,
   animation: nc-up 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Scale the card+phone composition to the stage width on small phones */
+.nc-hero-stage {
+  container-type: inline-size;
+  aspect-ratio: 320 / 380;
+  overflow: hidden;
+}
+.nc-hero-stage-scale {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  transform-origin: top center;
+  transform: scale(min(1, calc(100cqi / 320)));
+}
+@media (min-width: 640px) {
+  .nc-hero-stage {
+    aspect-ratio: 400 / 440;
+    overflow: visible;
+  }
+  .nc-hero-stage-scale {
+    transform: none;
+  }
+}
+
 @keyframes nc-scene-swap {
   from { opacity: 0.25; }
   to { opacity: 1; }
@@ -721,6 +789,16 @@ html.nc-light .bg-red-400,
 }
 .nc-float-delay {
   animation: nc-float 7s ease-in-out infinite reverse;
+}
+@media (max-width: 639px) {
+  .nc-float,
+  .nc-float-delay {
+    animation-name: nc-float-sm;
+  }
+}
+@keyframes nc-float-sm {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
 @keyframes nc-nfc-ring {

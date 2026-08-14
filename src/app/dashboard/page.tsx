@@ -32,14 +32,14 @@ export default async function DashboardPage({
   const preorderMode = settings.preorder_mode;
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
+    <div className="mx-auto max-w-5xl nc-page">
       {/* New profile success banner */}
       {newSlug && (
-        <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4"
+        <div className="mb-6 flex flex-col gap-3 rounded-2xl px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
           style={{ border: "1px solid rgba(34,197,94,0.2)", background: "rgba(34,197,94,0.05)" }}>
-          <div>
+          <div className="min-w-0">
             <p className="font-semibold" style={{ color: "var(--nc-success)" }}>Profile created successfully!</p>
-            <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-2)" }}>
+            <p className="mt-0.5 break-all text-sm" style={{ color: "var(--nc-text-2)" }}>
               Your page is live at{" "}
               <span className="font-mono" style={{ color: "var(--nc-success)" }}>
                 www.nexcard.wetechmm.com/{newSlug}
@@ -48,7 +48,7 @@ export default async function DashboardPage({
             </p>
           </div>
           <Link href={`/${newSlug}`} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all"
+            className="flex shrink-0 items-center gap-1.5 self-start rounded-lg px-3 py-2 text-xs font-semibold transition-all"
             style={{ border: "1px solid rgba(34,197,94,0.3)", color: "var(--nc-success)" }}>
             <ExternalLink className="h-3.5 w-3.5" />
             View Live
@@ -58,7 +58,7 @@ export default async function DashboardPage({
 
       {/* Pending approval banner */}
       {pending && (
-        <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4"
+        <div className="mb-6 flex items-start gap-3 rounded-2xl px-4 py-4 sm:px-5"
           style={{ border: "1px solid rgba(251,191,36,0.2)", background: "rgba(251,191,36,0.05)" }}>
           <div className="flex items-center gap-3">
             <Clock className="h-5 w-5 shrink-0 text-amber-400" />
@@ -74,7 +74,7 @@ export default async function DashboardPage({
 
       {/* Payment failed banner */}
       {paymentFailed && (
-        <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4"
+        <div className="mb-6 flex items-start gap-3 rounded-2xl px-4 py-4 sm:px-5"
           style={{ border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)" }}>
           <div className="flex items-center gap-3">
             <XCircle className="h-5 w-5 shrink-0 text-red-400" />
@@ -89,7 +89,7 @@ export default async function DashboardPage({
       )}
 
       {reserved && (
-        <div className="mb-6 flex items-center justify-between rounded-2xl px-5 py-4"
+        <div className="mb-6 flex items-start gap-3 rounded-2xl px-4 py-4 sm:px-5"
           style={{ border: "1px solid rgba(99,102,241,0.25)", background: "rgba(99,102,241,0.08)" }}>
           <div className="flex items-center gap-3">
             <CheckCircle className="h-5 w-5 shrink-0" style={{ color: "var(--nc-brand-1)" }} />
@@ -162,10 +162,10 @@ export default async function DashboardPage({
 
               <div className="p-5">
                 <div className="flex items-start justify-between gap-3">
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>{profile.category.name}</p>
                     <p className="font-bold" style={{ color: "var(--nc-text)" }}>{profile.template.name}</p>
-                    <p className="mt-0.5 font-mono text-xs" style={{ color: "var(--nc-text-3)" }}>
+                    <p className="mt-0.5 break-all font-mono text-xs" style={{ color: "var(--nc-text-3)" }}>
                       /{profile.slug}
                     </p>
                     <div className="mt-2">

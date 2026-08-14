@@ -139,7 +139,10 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
       {/* Mobile toggle */}
       <button onClick={() => setOpen(true)}
         className="fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-xl lg:hidden"
-        style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
+        style={{
+          background: `linear-gradient(135deg, ${brand2}, ${brand3})`,
+          bottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
+        }}>
         <Menu className="h-5 w-5 text-white" />
       </button>
 
@@ -147,7 +150,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <aside className="absolute left-0 top-0 h-full w-64 flex-col flex shadow-2xl"
+          <aside className="absolute left-0 top-0 flex h-full w-[min(16rem,85vw)] flex-col shadow-2xl"
             style={{ background: "var(--nc-sidebar-bg)", borderRight: "1px solid var(--nc-sidebar-border)" }}>
             <NavContent />
           </aside>

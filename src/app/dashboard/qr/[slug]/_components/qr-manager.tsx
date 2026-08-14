@@ -126,7 +126,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-10">
+    <div className="mx-auto max-w-4xl nc-page">
       {/* Header */}
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -134,10 +134,10 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
             className="nc-btn-ghost mb-2 inline-flex items-center gap-1.5 text-xs transition-colors px-2 py-1">
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Profiles
           </Link>
-          <h1 className="text-2xl font-black flex items-center gap-2" style={{ color: "var(--nc-text)" }}>
-            <QrCode className="h-6 w-6" style={{ color: accentColor }} />
+          <h1 className="flex flex-wrap items-center gap-2 text-2xl font-black" style={{ color: "var(--nc-text)" }}>
+            <QrCode className="h-6 w-6 shrink-0" style={{ color: accentColor }} />
             QR Code
-            <span className="font-mono text-indigo-400">/{profile.slug}</span>
+            <span className="break-all font-mono text-base text-indigo-400 sm:text-lg">/{profile.slug}</span>
           </h1>
           <p className="mt-1 text-sm" style={{ color: "var(--nc-text-2)" }}>
             {profile.category.name} · {profile.template.name}
@@ -211,7 +211,7 @@ export function QRManager({ profile, appUrl }: QRManagerProps) {
               ) : (
                 /* Placeholder QR before generation */
                 <div className="flex flex-col items-center gap-4 text-center">
-                  <div className="relative flex h-[220px] w-[220px] items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed"
+                  <div className="relative flex h-[min(220px,70vw)] w-[min(220px,70vw)] max-w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed"
                     style={{ borderColor: `${accentColor}40`, background: `${accentColor}08` }}>
                     <div className="space-y-2">
                       <QrCode className="mx-auto h-16 w-16" style={{ color: `${accentColor}50` }} />

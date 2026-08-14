@@ -42,7 +42,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
       </div>
 
       {/* Cover */}
-      <section className="relative z-10 flex min-h-screen flex-col items-center justify-center text-center px-6 py-24">
+      <section className="relative z-10 flex min-h-screen flex-col items-center justify-center text-center px-4 sm:px-6 py-24">
         {days !== null && (
           <p className="mb-5 text-xs uppercase tracking-[0.5em] text-white/30">{days} days until forever</p>
         )}
@@ -78,7 +78,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
 
       {/* Portraits */}
       {(partner1.photoUrl || partner2.photoUrl) && (
-        <section className="relative z-10 border-t border-white/5 px-6 py-16">
+        <section className="relative z-10 border-t border-white/5 px-4 sm:px-6 py-16">
           <div className="mx-auto max-w-3xl flex flex-col md:flex-row gap-10 items-center justify-center">
             {[partner1, partner2].map((p, i) => (
               <div key={i} className="flex flex-col items-center text-center">
@@ -104,7 +104,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
 
       {/* Love story — constellation timeline */}
       {loveHistory.length > 0 && (
-        <section className="relative z-10 border-t border-white/5 px-6 py-20">
+        <section className="relative z-10 border-t border-white/5 px-4 sm:px-6 py-20">
           <div className="mx-auto max-w-2xl">
             <p className="mb-12 text-center text-xs uppercase tracking-[0.5em] text-white/25">Our Constellation</p>
             <div className="space-y-10">
@@ -140,7 +140,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
 
       {/* Gallery */}
       {gallery.length > 0 && (
-        <section className="relative z-10 border-t border-white/5 px-6 py-16">
+        <section className="relative z-10 border-t border-white/5 px-4 sm:px-6 py-16">
           <div className="mx-auto max-w-4xl">
             <p className="mb-8 text-center text-xs uppercase tracking-[0.5em] text-white/25">Gallery 🌙</p>
             <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
@@ -157,7 +157,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
       )}
 
       {/* Events */}
-      <section className="relative z-10 border-t border-white/5 px-6 py-16">
+      <section className="relative z-10 border-t border-white/5 px-4 sm:px-6 py-16">
         <div className="mx-auto max-w-2xl">
           <p className="mb-10 text-center text-xs uppercase tracking-[0.5em] text-white/25">The Ceremony 💫</p>
           <div className="space-y-5">
@@ -185,7 +185,7 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
       </section>
 
       {rsvp && (
-        <section className="relative z-10 border-t border-white/5 px-6 py-16 text-center">
+        <section className="relative z-10 border-t border-white/5 px-4 sm:px-6 py-16 text-center">
           <div className="mx-auto max-w-sm">
             <p className="mb-6 text-xs uppercase tracking-[0.5em] text-white/25">Join Us ✨</p>
             {rsvp.deadline && <p className="mb-4 text-sm text-white/40">Please reply by {formatShortDate(rsvp.deadline)}</p>}
@@ -200,12 +200,12 @@ export function CelestialWedding({ data, accentColor = "#a78bfa", slug }: Weddin
         </section>
       )}
 
-      <footer className="relative z-10 border-t border-white/5 px-6 py-8 text-center">
+      <footer className="relative z-10 border-t border-white/5 px-4 sm:px-6 py-8 text-center">
         <p className="text-xs text-white/15">NEX CARD ✦</p>
       </footer>
     
       {slug && (
-        <section className="px-6 py-16 text-center">
+        <section className="px-4 sm:px-6 py-16 text-center">
           {rsvp && (
             <WeddingRsvpForm slug={slug} accentColor={accentColor}
               mealOptions={rsvp?.mealOptions}

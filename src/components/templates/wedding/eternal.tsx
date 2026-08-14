@@ -39,7 +39,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
     <main style={{ background: bg, color: "#2d1e0f", fontFamily: "Georgia, 'Times New Roman', serif" }}>
 
       {/* ── Cover ──────────────────────────────────────────────────── */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-24 text-center">
+      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 sm:px-6 py-24 text-center">
         {gallery.length > 0 && (
           <div className="absolute inset-0">
             <img src={resolveImageUrl(gallery[0].url)} alt="Cover" className="absolute inset-0 h-full w-full object-cover opacity-20" />
@@ -114,7 +114,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
 
       {/* ── Portraits ─────────────────────────────────────────────── */}
       {(partner1.photoUrl || partner2.photoUrl) && (
-        <section className="px-6 py-16 border-y" style={{ borderColor: `${gold}20` }}>
+        <section className="px-4 sm:px-6 py-16 border-y" style={{ borderColor: `${gold}20` }}>
           <div className="mx-auto max-w-3xl flex flex-col md:flex-row gap-12 items-center justify-center">
             {[partner1, partner2].map((p, i) => (
               <div key={i} className="flex flex-col items-center text-center max-w-xs">
@@ -144,7 +144,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
 
       {/* ── Love story timeline ───────────────────────────────────── */}
       {loveHistory.length > 0 && (
-        <section className="px-6 py-20 border-b" style={{ borderColor: `${gold}15` }}>
+        <section className="px-4 sm:px-6 py-20 border-b" style={{ borderColor: `${gold}15` }}>
           <div className="mx-auto max-w-3xl">
             <div className="flex items-center justify-center gap-4 mb-12">
               <div className="h-px flex-1" style={{ background: `${gold}30` }} />
@@ -193,7 +193,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
 
       {/* ── Gallery ───────────────────────────────────────────────── */}
       {gallery.length > 1 && (
-        <section className="px-6 py-16 border-b" style={{ borderColor: `${gold}15` }}>
+        <section className="px-4 sm:px-6 py-16 border-b" style={{ borderColor: `${gold}15` }}>
           <div className="mx-auto max-w-5xl">
             <div className="flex items-center justify-center gap-4 mb-10">
               <div className="h-px flex-1" style={{ background: `${gold}25` }} />
@@ -218,7 +218,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
       )}
 
       {/* ── Events ────────────────────────────────────────────────── */}
-      <section className="px-6 py-20 border-b" style={{ borderColor: `${gold}15`, background: `${gold}06` }}>
+      <section className="px-4 sm:px-6 py-20 border-b" style={{ borderColor: `${gold}15`, background: `${gold}06` }}>
         <div className="mx-auto max-w-3xl">
           <div className="flex items-center justify-center gap-4 mb-12">
             <div className="h-px flex-1" style={{ background: `${gold}30` }} />
@@ -254,7 +254,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
 
       {/* ── RSVP ──────────────────────────────────────────────────── */}
       {rsvp && (
-        <section className="px-6 py-20 border-b text-center" style={{ borderColor: `${gold}15` }}>
+        <section className="px-4 sm:px-6 py-20 border-b text-center" style={{ borderColor: `${gold}15` }}>
           <div className="mx-auto max-w-md">
             <div className="flex items-center justify-center gap-4 mb-8">
               <div className="h-px flex-1" style={{ background: `${gold}30` }} />
@@ -294,7 +294,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
 
       {/* ── Gift registry ─────────────────────────────────────────── */}
       {giftRegistry && giftRegistry.length > 0 && (
-        <section className="px-6 py-12 text-center border-b" style={{ borderColor: `${gold}15` }}>
+        <section className="px-4 sm:px-6 py-12 text-center border-b" style={{ borderColor: `${gold}15` }}>
           <div className="mx-auto max-w-md">
             <p className="mb-4 text-xs uppercase tracking-[0.5em]" style={{ color: gold }}>Gift Registry</p>
             <div className="flex flex-wrap justify-center gap-3">
@@ -312,11 +312,11 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
 
       {/* ── Wishes ────────────────────────────────────────────────── */}
       {allowWishes && (
-        <section className="px-6 py-12 text-center border-b" style={{ borderColor: `${gold}15`, background: `${gold}06` }}>
+        <section className="px-4 sm:px-6 py-12 text-center border-b" style={{ borderColor: `${gold}15`, background: `${gold}06` }}>
           <div className="mx-auto max-w-md">
             <p className="text-2xl mb-2">{wishesTitle ?? "Leave Us a Wish"}</p>
             <p className="text-sm mb-5" style={{ color: "#7a5c3a" }}>Your kind words mean the world to us.</p>
-            <a href="#wishes" className="inline-block rounded-full border px-6 py-2.5 text-sm transition-all hover:opacity-70"
+            <a href="#wishes" className="inline-block rounded-full border px-4 sm:px-6 py-2.5 text-sm transition-all hover:opacity-70"
               style={{ borderColor: `${gold}40`, color: "#7a5c3a" }}>
               Write a Wish ✍️
             </a>
@@ -324,7 +324,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
         </section>
       )}
 
-      <footer className="px-6 py-12 text-center">
+      <footer className="px-4 sm:px-6 py-12 text-center">
         <div className="flex items-center justify-center gap-4 mb-4">
           <div className="h-px w-12" style={{ background: `${gold}30` }} />
           <svg width="16" height="16" viewBox="0 0 24 24" fill={gold} opacity="0.4">
@@ -338,7 +338,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
       </footer>
     
       {slug && (
-        <section className="px-6 py-16 text-center">
+        <section className="px-4 sm:px-6 py-16 text-center">
           {rsvp && (
             <WeddingRsvpForm slug={slug} accentColor={gold}
               mealOptions={data.rsvp?.mealOptions}

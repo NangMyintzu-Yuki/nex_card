@@ -34,7 +34,7 @@ export default async function NfcHubPage() {
   );
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10" style={{ color: "var(--nc-text)" }}>
+    <div className="mx-auto max-w-3xl nc-page" style={{ color: "var(--nc-text)" }}>
       <div className="mb-8">
         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl"
           style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}>
@@ -47,7 +47,7 @@ export default async function NfcHubPage() {
       </div>
 
       {nfcProfiles.length === 0 ? (
-        <div className="rounded-2xl px-6 py-12 text-center"
+        <div className="rounded-2xl px-4 py-12 text-center sm:px-6"
           style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
           <p className="text-sm" style={{ color: "var(--nc-text-2)" }}>
             No NFC-eligible profiles yet. Choose <strong>NFC Only</strong> or <strong>NFC + QR</strong> during onboarding.
@@ -62,10 +62,10 @@ export default async function NfcHubPage() {
         <div className="space-y-3">
           {nfcProfiles.map((p) => (
             <Link key={p.id} href={`/dashboard/nfc/${p.slug}`}
-              className="flex items-center justify-between rounded-2xl px-5 py-4 transition-all hover:opacity-90"
+              className="flex items-center justify-between gap-3 rounded-2xl px-4 py-4 transition-all hover:opacity-90 sm:px-5"
               style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
-              <div>
-                <p className="font-mono text-sm font-bold">/{p.slug}</p>
+              <div className="min-w-0">
+                <p className="truncate font-mono text-sm font-bold">/{p.slug}</p>
                 <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
                   {p.template.name} · {p.payment?.tier?.replace("_", " ")}
                   {p.nfcProgrammedAt && ` · Programmed ${new Date(p.nfcProgrammedAt).toLocaleDateString()}`}

@@ -26,7 +26,7 @@ export function TemplateShell({
 
       {/* ── NEX CARD attribution badge ────────────────────────────── */}
       {showBranding && (
-        <div className="fixed bottom-4 right-4 z-50">
+        <div className="fixed bottom-4 right-4 z-50" style={{ bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
           <Link
             href="/?ref=badge"
             target="_blank"

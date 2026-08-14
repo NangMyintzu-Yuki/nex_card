@@ -55,7 +55,7 @@ export default async function PaymentPage({
 
   return (
     <div className="min-h-screen" style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
-      <div className="mx-auto max-w-3xl px-4 py-8">
+      <div className="mx-auto max-w-3xl nc-page">
         <div className="mb-6">
           <Link
             href="/dashboard"

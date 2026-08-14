@@ -133,7 +133,7 @@ export function PaymentForm({
   if (availableTiers.length === 0) return null;
 
   return (
-    <div className="space-y-8 p-6 sm:p-8">
+    <div className="space-y-8 p-4 sm:p-8">
       {/* Tier selection */}
       <section>
         <h2 className="mb-4 text-lg font-bold" style={{ color: "var(--nc-text)" }}>1. Select Plan</h2>
@@ -147,7 +147,7 @@ export function PaymentForm({
                 key={t.value}
                 type="button"
                 onClick={() => setSelectedTier(t.value)}
-                className="flex items-center justify-between rounded-xl border-2 px-5 py-4 text-left transition-all"
+                className="flex items-center justify-between gap-3 rounded-xl border-2 px-3 py-4 text-left transition-all sm:px-5"
                 style={
                   active
                     ? { borderColor: "var(--nc-brand-1)", background: "var(--nc-brand-1)10" }
@@ -172,7 +172,7 @@ export function PaymentForm({
       {/* Payment method */}
       <section>
         <h2 className="mb-4 text-lg font-bold" style={{ color: "var(--nc-text)" }}>2. Payment Method</h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {(Object.keys(PAYMENT_METHODS) as Array<keyof typeof PAYMENT_METHODS>).map((key) => {
             const pm = PAYMENT_METHODS[key];
             const active = paymentMethod === key;
@@ -198,17 +198,17 @@ export function PaymentForm({
         </div>
         <div className="mt-4 rounded-xl border p-4 text-sm" style={{ borderColor: "var(--nc-brand-2)20", background: "var(--nc-brand-2)08" }}>
           <div className="space-y-2">
-            <div className="flex justify-between">
-              <span style={{ color: "var(--nc-text-3)" }}>Account</span>
-              <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{wallets.accountName || PAYMENT_METHODS[paymentMethod].accountName}</span>
+            <div className="flex justify-between gap-3">
+              <span className="shrink-0" style={{ color: "var(--nc-text-3)" }}>Account</span>
+              <span className="min-w-0 break-all text-right font-semibold" style={{ color: "var(--nc-text)" }}>{wallets.accountName || PAYMENT_METHODS[paymentMethod].accountName}</span>
             </div>
-            <div className="flex justify-between">
-              <span style={{ color: "var(--nc-text-3)" }}>Phone</span>
-              <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "Set in Admin → Settings"}</span>
+            <div className="flex justify-between gap-3">
+              <span className="shrink-0" style={{ color: "var(--nc-text-3)" }}>Phone</span>
+              <span className="min-w-0 break-all text-right font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "Set in Admin → Settings"}</span>
             </div>
-            <div className="flex justify-between">
-              <span style={{ color: "var(--nc-text-3)" }}>Number</span>
-              <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "—"}</span>
+            <div className="flex justify-between gap-3">
+              <span className="shrink-0" style={{ color: "var(--nc-text-3)" }}>Number</span>
+              <span className="min-w-0 break-all text-right font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "—"}</span>
             </div>
           </div>
           <p className="mt-3 text-xs" style={{ color: "var(--nc-text-3)" }}>

@@ -40,7 +40,7 @@ export function NfcManager({ profile, nfcUrl }: NfcManagerProps) {
     state.status === "success" ? state.nfcWriteCount : profile.nfcWriteCount;
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-10" style={{ color: "var(--nc-text)" }}>
+    <div className="mx-auto max-w-2xl nc-page" style={{ color: "var(--nc-text)" }}>
       <Link
         href="/dashboard"
         className="mb-6 inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
@@ -77,7 +77,7 @@ export function NfcManager({ profile, nfcUrl }: NfcManagerProps) {
 
       {hasNfcTier && isApproved && (
         <>
-          <div className="mb-6 rounded-2xl p-6"
+          <div className="mb-6 rounded-2xl p-4 sm:p-6"
             style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
             <h2 className="mb-4 text-sm font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>
               Programming Steps

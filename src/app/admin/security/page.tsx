@@ -73,10 +73,10 @@ export default function AdminSecurityPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg px-6 py-16">
-      <div className="mb-6 flex items-center gap-3">
-        <ShieldCheck className="h-6 w-6" style={{ color: "var(--nc-brand-1)" }} />
-        <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>
+    <div className="mx-auto max-w-lg nc-page">
+      <div className="mb-6 flex items-start gap-3">
+        <ShieldCheck className="mt-1 h-6 w-6 shrink-0" style={{ color: "var(--nc-brand-1)" }} />
+        <h1 className="text-xl font-black sm:text-2xl" style={{ color: "var(--nc-text)" }}>
           Admin two-factor authentication
         </h1>
       </div>

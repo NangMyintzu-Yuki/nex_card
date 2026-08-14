@@ -30,7 +30,7 @@ export default function LegalLayout({
         className="border-b"
         style={{ borderColor: "var(--nc-border)" }}
       >
-        <div className="mx-auto max-w-5xl px-6 py-10">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
           <Link
             href="/"
             className="mb-6 inline-flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-80"
@@ -52,7 +52,7 @@ export default function LegalLayout({
             Back to Home
           </Link>
           <h1
-            className="mt-4 text-4xl font-black tracking-tight md:text-5xl"
+            className="mt-4 text-3xl font-black tracking-tight sm:text-4xl md:text-5xl"
             style={{ color: "var(--nc-text)" }}
           >
             {title}
@@ -73,12 +73,12 @@ export default function LegalLayout({
       </header>
 
       {/* Body */}
-      <div className="mx-auto max-w-5xl px-6 py-12">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="flex flex-col gap-12 lg:flex-row">
           {/* Sticky TOC sidebar */}
           <aside className="shrink-0 lg:w-56">
             <nav
-              className="sticky top-24 hidden rounded-2xl border p-5 lg:block"
+              className="mb-8 rounded-2xl border p-4 lg:sticky lg:top-24 lg:mb-0 lg:block lg:p-5"
               style={{
                 background: "var(--nc-bg-card)",
                 borderColor: "var(--nc-border)",
@@ -90,12 +90,12 @@ export default function LegalLayout({
               >
                 On this page
               </h2>
-              <ul className="space-y-1.5">
+              <ul className="flex flex-wrap gap-1 lg:block lg:space-y-1.5">
                 {toc.map((item) => (
                   <li key={item.id}>
                     <a
                       href={`#${item.id}`}
-                      className="block rounded-lg px-3 py-1.5 text-sm transition-all duration-200 hover:translate-x-1"
+                      className="block rounded-lg px-3 py-1.5 text-sm transition-all duration-200 hover:translate-x-1 lg:hover:translate-x-1"
                       style={{ color: "var(--nc-text-2)" }}
                     >
                       {item.label}

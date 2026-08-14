@@ -178,6 +178,7 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
   const { theme } = useTheme();
   const isDark = theme !== "light";
   const [activeCategory, setActiveCategory] = useState("All");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const homeHref = isLoggedIn ? "/dashboard" : "/";
 
@@ -233,10 +234,10 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
         className="sticky top-0 z-50 border-b"
         style={{ background: "var(--nc-bg)", borderColor: "var(--nc-border)", backdropFilter: "blur(20px)" }}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href={homeHref} className="flex items-center gap-2.5">
-            <NexCardLogo size={36} isDark={isDark} />
-            <span className="text-lg font-black leading-none" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-4">
+          <Link href={homeHref} className="flex min-w-0 items-center gap-2">
+            <NexCardLogo size={32} isDark={isDark} />
+            <span className="truncate text-base font-black leading-none sm:text-lg" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
           </Link>
           <nav className="hidden items-center gap-8 md:flex">
             {["Features", "Templates", "How it Works"].map((l) => (
@@ -247,8 +248,8 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
               </a>
             ))}
           </nav>
-          <div className="flex items-center gap-3">
-            <ThemeToggle size="lg" />
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <ThemeToggle size="md" />
             {!isLoggedIn ? (
               <>
                 <Link href="/login"
@@ -257,25 +258,62 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
                   Sign In
                 </Link>
                 <Link href="/register"
-                  className="nc-btn-brand rounded-xl px-4 py-2 text-sm font-black transition-all hover:opacity-90">
-                  {preorderMode ? "Reserve your card" : "Get Started Free"}
+                  className="nc-btn-brand rounded-xl px-3 py-2 text-xs font-black transition-all hover:opacity-90 sm:px-4 sm:text-sm">
+                  {preorderMode ? "Reserve" : "Start"}
                 </Link>
               </>
             ) : (
               <Link href="/dashboard"
-                className="nc-btn-brand rounded-xl px-4 py-2 text-sm font-black transition-all hover:opacity-90">
+                className="nc-btn-brand rounded-xl px-3 py-2 text-xs font-black transition-all hover:opacity-90 sm:px-4 sm:text-sm">
                 Dashboard
               </Link>
             )}
+            <button
+              type="button"
+              className="flex h-10 w-10 items-center justify-center rounded-xl md:hidden"
+              style={{ border: "1px solid var(--nc-border)", color: "var(--nc-text)" }}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMenuOpen((o) => !o)}
+            >
+              {menuOpen ? (
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              ) : (
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" /></svg>
+              )}
+            </button>
           </div>
         </div>
+        {menuOpen && (
+          <div className="border-t px-4 py-3 md:hidden" style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg)" }}>
+            <nav className="flex flex-col gap-1">
+              {["Features", "Templates", "How it Works"].map((l) => (
+                <a
+                  key={l}
+                  href={`#${l.toLowerCase().replace(/\s/g, "-")}`}
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-xl px-3 py-3 text-sm font-semibold"
+                  style={{ color: "var(--nc-text)" }}
+                >
+                  {l}
+                </a>
+              ))}
+              {!isLoggedIn && (
+                <Link href="/login" onClick={() => setMenuOpen(false)}
+                  className="rounded-xl px-3 py-3 text-sm font-semibold sm:hidden"
+                  style={{ color: "var(--nc-text-2)" }}>
+                  Sign In
+                </Link>
+              )}
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <Hero3D isLoggedIn={isLoggedIn} preorderMode={preorderMode} />
 
       {/* ════════════════════════ SOCIAL PROOF BAR ════════════════════════ */}
-      <section className="relative border-y px-6 py-10"
+      <section className="relative border-y px-4 py-10 sm:px-6"
         style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg-2, var(--nc-bg))" }}>
         <div className="mx-auto max-w-5xl">
           <FadeIn>
@@ -305,7 +343,7 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
       </section>
 
       {/* ════════════════════════ FEATURES ══════════════════════════════════ */}
-      <section id="features" className="relative scroll-mt-24 px-6 py-28 overflow-hidden"
+      <section id="features" className="relative scroll-mt-24 overflow-hidden px-4 py-20 sm:px-6 sm:py-28"
         style={{ background: "var(--nc-bg)" }}>
         {/* Background decoration */}
         <div className="pointer-events-none absolute inset-0 opacity-[0.02]" aria-hidden
@@ -359,7 +397,7 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
       </section>
 
       {/* ════════════════════════ TEMPLATES ═════════════════════════════════ */}
-      <section id="templates" className="relative scroll-mt-24 px-6 py-24 md:py-28"
+      <section id="templates" className="relative scroll-mt-24 px-4 py-20 sm:px-6 md:py-28"
         style={{ background: "var(--nc-bg-2, var(--nc-bg))" }}>
         <div className="mx-auto max-w-6xl">
           <FadeIn className="mb-10 flex flex-col gap-6 md:mb-12 md:flex-row md:items-end md:justify-between">
@@ -439,7 +477,7 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
       </section>
 
       {/* ════════════════════════ HOW IT WORKS ══════════════════════════════ */}
-      <section id="how-it-works" className="relative scroll-mt-24 px-6 py-24 md:py-28"
+      <section id="how-it-works" className="relative scroll-mt-24 px-4 py-20 sm:px-6 md:py-28"
         style={{ background: "var(--nc-bg)" }}>
         <div className="mx-auto max-w-6xl">
           <FadeIn className="mb-14 max-w-xl">
@@ -489,7 +527,7 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
       {/* ════════════════════════ CTA ═══════════════════════════════════════ */}
       <section className="relative overflow-hidden"
         style={{ background: "var(--nc-bg)" }}>
-        <div className="relative px-6 py-32">
+        <div className="relative px-4 py-20 sm:px-6 sm:py-32">
           <div className="absolute inset-0 opacity-[0.06]" aria-hidden
             style={{ background: "var(--nc-brand-grad)" }} />
           <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px] animate-glow-orb" aria-hidden
@@ -512,7 +550,7 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
             </FadeIn>
             <FadeIn delay={0.3}>
               <Link href={isLoggedIn ? "/dashboard" : "/register"}
-                className="group/cta nc-btn-brand inline-flex items-center gap-3 rounded-2xl px-12 py-5 text-base font-black transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl active:scale-[0.98]"
+                className="group/cta nc-btn-brand inline-flex max-w-full items-center gap-3 rounded-2xl px-6 py-4 text-sm font-black transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl active:scale-[0.98] sm:px-12 sm:py-5 sm:text-base"
                 style={{ boxShadow: "0 12px 40px rgba(212,175,55,0.4)" }}>
                 {isLoggedIn ? "Go to Dashboard" : preorderMode ? "Pre-order your card" : "Create Your Card"}
                 <svg className="h-5 w-5 transition-transform duration-300 group-hover/cta:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -543,7 +581,7 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
       {/* ════════════════════════ FOOTER ════════════════════════════════════ */}
       <footer className="relative border-t"
         style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg)" }}>
-        <div className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <FadeIn>
             <div className="grid gap-12 md:grid-cols-4">
               {/* Brand column */}

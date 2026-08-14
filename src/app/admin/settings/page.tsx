@@ -153,7 +153,7 @@ export default function AdminSettingsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-3xl nc-page">
       {/* Header */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
@@ -214,14 +214,14 @@ export default function AdminSettingsPage() {
               <div>
                 {section.fields.map((field, idx) => (
                   <div key={field.key}
-                    className="flex items-center justify-between gap-4 px-6 py-4"
+                    className="flex flex-col items-stretch justify-between gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-6"
                     style={{ borderBottom: idx < section.fields.length - 1 ? "1px solid var(--nc-border)" : undefined }}>
                     <div className="min-w-0">
                       <p className="text-sm font-medium" style={{ color: "var(--nc-text)" }}>{field.label}</p>
                       <p className="mt-0.5 font-mono text-[11px]" style={{ color: "var(--nc-text-3)" }}>{field.key}</p>
                     </div>
 
-                    <div className="shrink-0">
+                    <div className="w-full min-w-0 sm:w-auto sm:max-w-xs sm:shrink-0">
                       {field.type === "toggle" ? (
                         <button
                           onClick={() => update(field.key, !settings[field.key] as never)}

@@ -363,25 +363,25 @@ export function OnboardingClient({
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="px-4 py-5 sm:px-6" style={{ borderBottom: "1px solid var(--nc-border)" }}>
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <div></div>
-          {/* <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="font-bold" style={{ color: "var(--nc-text)" }}>NEX CARD</span>
-          </Link> */}
-
-          {/* Step indicator */}
-          <div className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs" style={{ color: "var(--nc-text-3)" }}>
-            {steps.map((s, i) => (
-              <span key={s} className="flex items-center gap-1 sm:gap-2">
-                {i > 0 && <ChevronRight className="h-3 w-3 hidden sm:block" />}
-                <span
-                  className={step === s ? "font-semibold" : ""}
-                  style={{ color: step === s ? "var(--nc-text)" : undefined }}
-                >
-                  {i + 1}. {s === "pricing" && preorderMode ? "Plan" : STEP_LABELS[s]}
+        <div className="mx-auto flex max-w-5xl items-center justify-center sm:justify-end">
+            <p className="text-xs font-semibold sm:hidden" style={{ color: "var(--nc-text)" }}>
+              Step {Math.max(1, steps.indexOf(step) + 1)} of {steps.length}
+              {" · "}
+              {step === "pricing" && preorderMode ? "Plan" : STEP_LABELS[step]}
+            </p>
+            <div className="hidden items-center gap-2 text-xs sm:flex" style={{ color: "var(--nc-text-3)" }}>
+              {steps.map((s, i) => (
+                <span key={s} className="flex items-center gap-2">
+                  {i > 0 && <ChevronRight className="h-3 w-3" />}
+                  <span
+                    className={step === s ? "font-semibold" : ""}
+                    style={{ color: step === s ? "var(--nc-text)" : undefined }}
+                  >
+                    {i + 1}. {s === "pricing" && preorderMode ? "Plan" : STEP_LABELS[s]}
+                  </span>
                 </span>
-              </span>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -786,7 +786,7 @@ export function OnboardingClient({
             {/* Payment method selection */}
             <div className="mb-6">
               <p className="mb-3 text-sm font-semibold" style={{ color: "var(--nc-text)" }}>Select Payment Method</p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {(Object.keys(PAYMENT_METHODS) as Array<keyof typeof PAYMENT_METHODS>).map((key) => {
                   const pm = PAYMENT_METHODS[key];
                   const active = paymentMethod === key;
@@ -993,8 +993,11 @@ export function OnboardingClient({
                 Choose your public URL
               </label>
               <div className="nc-input flex overflow-hidden rounded-xl focus-within:border-indigo-500/50 transition-colors">
-                <span className="flex items-center px-3 text-xs whitespace-nowrap sm:text-sm" style={{ borderRight: "1px solid var(--nc-border)", color: "var(--nc-text-3)" }}>
+                <span className="hidden items-center px-3 text-xs whitespace-nowrap sm:flex sm:text-sm" style={{ borderRight: "1px solid var(--nc-border)", color: "var(--nc-text-3)" }}>
                   www.nexcard.wetechmm.com/
+                </span>
+                <span className="flex items-center px-3 text-xs sm:hidden" style={{ borderRight: "1px solid var(--nc-border)", color: "var(--nc-text-3)" }}>
+                  /
                 </span>
                 <input
                   id="slug-input"

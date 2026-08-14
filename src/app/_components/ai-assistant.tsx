@@ -200,7 +200,7 @@ export default function AiAssistant() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setOpen(!open)}
-        className="fixed bottom-20 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-lg"
+        className="fixed bottom-20 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full sm:right-6"
         style={{
           background: "var(--nc-brand-grad)",
           color: "var(--nc-brand-text)",
@@ -230,7 +230,7 @@ export default function AiAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-36 right-6 z-50 flex w-[340px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl shadow-2xl"
+            className="fixed bottom-36 right-3 z-50 flex w-[min(340px,calc(100%-1.5rem))] flex-col overflow-hidden rounded-2xl"
             style={{
               background: "var(--nc-bg-card)",
               border: "1px solid var(--nc-border)",

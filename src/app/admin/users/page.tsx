@@ -66,7 +66,7 @@ export default async function AdminUsersPage({
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
+    <div className="mx-auto max-w-6xl nc-page">
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Users</h1>

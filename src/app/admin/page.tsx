@@ -46,7 +46,7 @@ export default async function AdminOverviewPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10" style={{ color: "var(--nc-text)" }}>
+    <div className="mx-auto max-w-6xl nc-page" style={{ color: "var(--nc-text)" }}>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Admin Overview</h1>

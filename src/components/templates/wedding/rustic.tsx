@@ -17,7 +17,7 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
     <main style={{ background: "#faf6f0", color: "#2c1a0e", fontFamily: "Georgia, 'Times New Roman', serif" }}>
 
       {/* Cover — botanical frame */}
-      <section className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center text-center px-6 py-24 border-b-2 border-dashed" style={{ borderColor: "#c9a96e" }}>
+      <section className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center text-center px-4 sm:px-6 py-24 border-b-2 border-dashed" style={{ borderColor: "#c9a96e" }}>
         {/* Botanical corner decorations */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
           <div className="absolute top-0 left-0 text-[100px] opacity-[0.06] leading-none">🌿</div>
@@ -70,7 +70,7 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
 
       {/* Portraits */}
       {(partner1.photoUrl || partner2.photoUrl) && (
-        <section className="px-6 py-16 border-b-2 border-dashed" style={{ borderColor: "#c9a96e" }}>
+        <section className="px-4 sm:px-6 py-16 border-b-2 border-dashed" style={{ borderColor: "#c9a96e" }}>
           <div className="mx-auto max-w-2xl flex flex-col md:flex-row gap-10 items-center justify-center">
             {[partner1, partner2].map((p, i) => (
               <div key={i} className="flex flex-col items-center text-center">
@@ -96,7 +96,7 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
 
       {/* Love story */}
       {loveHistory.length > 0 && (
-        <section className="px-6 py-16 border-b-2 border-dashed" style={{ borderColor: "#c9a96e" }}>
+        <section className="px-4 sm:px-6 py-16 border-b-2 border-dashed" style={{ borderColor: "#c9a96e" }}>
           <div className="mx-auto max-w-2xl">
             <h2 className="text-center text-3xl mb-10">Our Journey 🌱</h2>
             <div className="space-y-6">
@@ -123,7 +123,7 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
 
       {/* Gallery */}
       {gallery.length > 0 && (
-        <section className="px-6 py-16 border-b-2 border-dashed" style={{ borderColor: "#c9a96e" }}>
+        <section className="px-4 sm:px-6 py-16 border-b-2 border-dashed" style={{ borderColor: "#c9a96e" }}>
           <div className="mx-auto max-w-4xl">
             <h2 className="text-center text-3xl mb-8">Gallery 🌾</h2>
             <div className="columns-2 gap-3 md:columns-3">
@@ -141,7 +141,7 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
       )}
 
       {/* Events */}
-      <section className="px-6 py-16 border-b-2 border-dashed" style={{ borderColor: "#c9a96e" }}>
+      <section className="px-4 sm:px-6 py-16 border-b-2 border-dashed" style={{ borderColor: "#c9a96e" }}>
         <div className="mx-auto max-w-2xl">
           <h2 className="text-center text-3xl mb-8">The Celebration 🎊</h2>
           <div className="space-y-4">
@@ -169,7 +169,7 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
       </section>
 
       {rsvp && (
-        <section className="px-6 py-16 text-center">
+        <section className="px-4 sm:px-6 py-16 text-center">
           <div className="mx-auto max-w-sm">
             <h2 className="text-3xl mb-4">RSVP 💌</h2>
             {rsvp.deadline && (
@@ -196,12 +196,12 @@ export function RusticWedding({ data, accentColor = "#65a30d", slug }: WeddingPr
         </section>
       )}
 
-      <footer className="border-t-2 border-dashed px-6 py-8 text-center" style={{ borderColor: "#c9a96e" }}>
+      <footer className="border-t-2 border-dashed px-4 sm:px-6 py-8 text-center" style={{ borderColor: "#c9a96e" }}>
         <p className="text-sm" style={{ color: "#a08060" }}>🌿 Made with NEX CARD 🌿</p>
       </footer>
     
       {slug && (
-        <section className="px-6 py-16 text-center">
+        <section className="px-4 sm:px-6 py-16 text-center">
           {rsvp && (
             <WeddingRsvpForm slug={slug} accentColor={accentColor}
               mealOptions={rsvp?.mealOptions}

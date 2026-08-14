@@ -3,7 +3,7 @@
 
 export default function DashboardLoading() {
   return (
-    <div className="mx-auto max-w-5xl animate-pulse px-6 py-10">
+    <div className="mx-auto max-w-5xl animate-pulse nc-page">
       {/* Header */}
       <div className="mb-8 flex items-start justify-between">
         <div className="space-y-2">

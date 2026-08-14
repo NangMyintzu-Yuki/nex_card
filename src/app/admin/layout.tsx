@@ -29,7 +29,7 @@ export default async function AdminLayout({
 
   return (
     <ThemeProvider>
-      <div className="flex min-h-screen" style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
+      <div className="flex min-h-screen min-w-0 overflow-x-clip" style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
         <AdminSidebar
           user={{
             id: session.user.id,
@@ -39,7 +39,7 @@ export default async function AdminLayout({
           }}
         />
 
-        <div className="flex-1 lg:pl-60 nc-page-enter">
+        <div className="min-w-0 flex-1 lg:pl-60 nc-page-enter">
           {children}
         </div>
       </div>

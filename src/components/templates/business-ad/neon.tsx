@@ -99,7 +99,7 @@ export function NeonBusiness({
           </>
         ) : null}
 
-        <div className="relative mx-auto flex min-h-[100svh] max-w-4xl flex-col justify-end px-6 pb-16 pt-28 sm:px-10 sm:pb-20">
+        <div className="relative mx-auto flex min-h-[100svh] max-w-4xl flex-col justify-end px-4 pb-16 pt-28 sm:px-10 sm:pb-20">
           <div className="n-fade flex items-center gap-4">
             {logoUrl ? (
               <div className="relative h-12 w-12 shrink-0">
@@ -147,7 +147,7 @@ export function NeonBusiness({
 
       <section id="tonight" className="relative border-t border-[#F4EDE4]/10">
         <div className="mx-auto grid max-w-5xl gap-0 lg:grid-cols-2">
-          <div className="border-b border-[#F4EDE4]/10 px-6 py-16 sm:px-10 lg:border-b-0 lg:border-r">
+          <div className="border-b border-[#F4EDE4]/10 px-4 py-16 sm:px-10 lg:border-b-0 lg:border-r">
             <p
               className="n-body text-[10px] font-medium uppercase tracking-[0.25em]"
               style={{ color: accent }}
@@ -158,7 +158,7 @@ export function NeonBusiness({
               {description}
             </p>
           </div>
-          <div className="px-6 py-16 sm:px-10">
+          <div className="px-4 py-16 sm:px-10">
             <p
               className="n-body text-[10px] font-medium uppercase tracking-[0.25em]"
               style={{ color: rose }}
@@ -187,7 +187,7 @@ export function NeonBusiness({
       </section>
 
       {services.length > 0 ? (
-        <section className="border-t border-[#F4EDE4]/10 px-6 py-16 sm:px-10 sm:py-20">
+        <section className="border-t border-[#F4EDE4]/10 px-4 py-16 sm:px-10 sm:py-20">
           <div className="mx-auto max-w-5xl">
             <p className="n-body text-[10px] font-medium uppercase tracking-[0.25em]" style={{ color: accent }}>
               On the list
@@ -222,7 +222,7 @@ export function NeonBusiness({
 
       {gallery && gallery.length > 0 ? (
         <section className="border-t border-[#F4EDE4]/10 py-16 sm:py-20">
-          <div className="mx-auto max-w-5xl px-6 sm:px-10">
+          <div className="mx-auto max-w-5xl px-4 sm:px-10">
             <p className="n-body mb-8 text-[10px] font-medium uppercase tracking-[0.25em]" style={{ color: rose }}>
               Atmosphere
             </p>
@@ -262,7 +262,7 @@ export function NeonBusiness({
       ) : null}
 
       {businessHours.length > 0 ? (
-        <section className="border-t border-[#F4EDE4]/10 px-6 py-14 sm:px-10">
+        <section className="border-t border-[#F4EDE4]/10 px-4 py-14 sm:px-10">
           <div className="mx-auto max-w-md text-center">
             <p className="n-body text-[10px] font-medium uppercase tracking-[0.25em]" style={{ color: accent }}>
               Doors
@@ -282,7 +282,7 @@ export function NeonBusiness({
       ) : null}
 
       {testimonials && testimonials.length > 0 ? (
-        <section className="border-t border-[#F4EDE4]/10 px-6 py-16 sm:px-10">
+        <section className="border-t border-[#F4EDE4]/10 px-4 py-16 sm:px-10">
           <div className="mx-auto max-w-3xl">
             {testimonials.map((t, i) => (
               <blockquote
@@ -308,7 +308,7 @@ export function NeonBusiness({
       ) : null}
 
       <footer className="border-t border-[#F4EDE4]/10 bg-[#070A10]">
-        <div className="mx-auto max-w-5xl px-6 py-14 sm:px-10 sm:py-16">
+        <div className="mx-auto max-w-5xl px-4 py-14 sm:px-10 sm:py-16">
           <div className="flex flex-col gap-10 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="n-display text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -338,7 +338,7 @@ export function NeonBusiness({
             <div className="flex flex-col items-start gap-6 sm:items-end">
               <a
                 href={primaryCtaUrl}
-                className="n-body inline-flex px-6 py-3 text-xs font-medium uppercase tracking-[0.18em] text-[#0A0E17] transition hover:opacity-90"
+                className="n-body inline-flex px-4 py-3 text-xs font-medium uppercase tracking-[0.18em] text-[#0A0E17] transition hover:opacity-90"
                 style={{ backgroundColor: accent }}
               >
                 {primaryCtaLabel}

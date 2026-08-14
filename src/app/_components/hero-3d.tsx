@@ -100,7 +100,7 @@ function PhysicalCard({
 
   return (
     <div
-      className="nc-float relative aspect-[1.586/1] w-[280px] overflow-hidden rounded-xl sm:w-[320px]"
+      className="nc-float relative aspect-[1.586/1] w-[220px] overflow-hidden rounded-xl sm:w-[320px]"
       style={{
         background: face,
         border: `1px solid ${isDark ? "rgba(212,175,55,0.28)" : "rgba(26,58,107,0.22)"}`,
@@ -183,7 +183,7 @@ function PhonePreview({
 
   return (
     <div
-      className="nc-float-delay relative h-[340px] w-[176px] overflow-hidden rounded-[1.85rem] sm:h-[380px] sm:w-[196px]"
+      className="nc-float-delay relative h-[248px] w-[128px] overflow-hidden rounded-[1.7rem] sm:h-[380px] sm:w-[196px] sm:rounded-[1.85rem]"
       style={{
         background: isDark ? "#0a0a0c" : "#dce3ee",
         border: `2px solid ${isDark ? "#2a2a2e" : "#c5d0e0"}`,
@@ -194,9 +194,9 @@ function PhonePreview({
     >
       <div className="absolute left-1/2 top-1.5 z-10 h-4 w-16 -translate-x-1/2 rounded-full" style={{ background: isDark ? "#000" : "#9aabc0" }} />
       <div className="absolute inset-[5px] overflow-hidden rounded-[1.55rem]" style={{ background: screen }}>
-        <div className="flex h-full flex-col items-center px-4 pt-8">
+        <div className="flex h-full flex-col items-center px-3 pt-7 sm:px-4 sm:pt-8">
           <div
-            className="flex h-14 w-14 items-center justify-center rounded-full text-sm font-bold"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-xs font-bold sm:h-14 sm:w-14 sm:text-sm"
             style={{
               background: "var(--nc-brand-grad)",
               color: "var(--nc-brand-text)",
@@ -260,7 +260,7 @@ export default function Hero3D({
   }, []);
 
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!stageRef.current) return;
+    if (!stageRef.current || window.matchMedia("(max-width: 639px)").matches) return;
     const rect = stageRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
@@ -268,14 +268,14 @@ export default function Hero3D({
   };
 
   return (
-    <section className="relative isolate overflow-hidden px-6 pb-16 pt-14 md:pb-24 md:pt-20">
+    <section className="relative isolate overflow-hidden px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-14 md:pb-24 md:pt-20">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-px"
         style={{ background: "var(--nc-border)" }}
       />
 
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
         <div className="nc-hero-in">
           <p
             className="text-[11px] font-semibold uppercase tracking-[0.32em]"
@@ -304,7 +304,7 @@ export default function Hero3D({
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <Link
               href={isLoggedIn ? "/dashboard" : "/register"}
-              className="rounded-full px-7 py-3 text-sm font-bold transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              className="rounded-full px-5 py-3 text-sm font-bold transition-transform hover:scale-[1.02] active:scale-[0.98] sm:px-7"
               style={{
                 backgroundImage: "var(--nc-brand-grad)",
                 color: "var(--nc-brand-text)",
@@ -349,23 +349,25 @@ export default function Hero3D({
           ref={stageRef}
           onMouseMove={onMove}
           onMouseLeave={() => setTilt({ x: 0, y: 0 })}
-          className="nc-hero-in relative mx-auto flex min-h-[420px] w-full max-w-[520px] items-center justify-center lg:mx-0"
+          className="nc-hero-in nc-hero-stage relative mx-auto w-full max-w-[320px] sm:max-w-[400px] lg:mx-0"
           style={{ animationDelay: "0.18s" }}
         >
-          <div
-            className="relative"
-            style={{
-              transformStyle: "preserve-3d",
-              transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-              transition: "transform 0.4s ease-out",
-            }}
-          >
-            <div key={scene.id} className="nc-scene-swap relative h-[400px] w-[340px] sm:h-[440px] sm:w-[400px]">
-              <div className="absolute right-0 top-2 z-10">
-                <PhonePreview scene={scene} isDark={isDark} />
-              </div>
-              <div className="absolute bottom-8 left-0 z-20">
-                <PhysicalCard scene={scene} isDark={isDark} />
+          <div className="nc-hero-stage-scale">
+            <div
+              className="relative h-[380px] w-[320px] sm:h-[440px] sm:w-[400px]"
+              style={{
+                transformStyle: "preserve-3d",
+                transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+                transition: "transform 0.4s ease-out",
+              }}
+            >
+              <div key={scene.id} className="nc-scene-swap relative h-full w-full">
+                <div className="absolute right-8 top-2 z-10 sm:right-0">
+                  <PhonePreview scene={scene} isDark={isDark} />
+                </div>
+                <div className="absolute bottom-5 left-0 z-20 sm:bottom-8">
+                  <PhysicalCard scene={scene} isDark={isDark} />
+                </div>
               </div>
             </div>
           </div>

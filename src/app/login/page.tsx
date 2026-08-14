@@ -95,12 +95,12 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="nc-page-enter relative flex h-dvh flex-col items-center justify-center overflow-hidden px-3 py-4 sm:h-auto sm:min-h-screen sm:px-4 sm:py-12"
+    <main className="nc-page-enter relative flex min-h-dvh flex-col items-center justify-center overflow-y-auto px-4 py-16 sm:px-4 sm:py-12"
       style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
 
       {/* Theme toggle top-right */}
       <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
-        <ThemeToggle size="md" showLabel />
+        <ThemeToggle size="md" />
       </div>
 
       <div className="w-full max-w-sm">

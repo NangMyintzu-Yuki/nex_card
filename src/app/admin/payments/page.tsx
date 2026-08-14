@@ -85,7 +85,7 @@ export default async function AdminPaymentsPage({
   const pendingCount = await prisma.payment.count({ where: { status: "PENDING" } });
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
+    <div className="mx-auto max-w-6xl nc-page">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Payment Approvals</h1>
@@ -95,7 +95,7 @@ export default async function AdminPaymentsPage({
       </div>
 
       {/* Filter tabs */}
-      <div className="mb-6 flex gap-2">
+      <div className="mb-6 flex flex-wrap gap-2">
         {[
           { value: "PENDING", label: "Pending", count: pendingCount },
           { value: "APPROVED", label: "Approved" },
@@ -157,8 +157,8 @@ export default async function AdminPaymentsPage({
                 {/* Details */}
                 <div className="flex-1 p-5">
                   <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-bold" style={{ color: "var(--nc-text)" }}>
                           {payment.user.name}
                         </h3>
@@ -169,7 +169,7 @@ export default async function AdminPaymentsPage({
                           {payment.status}
                         </span>
                       </div>
-                      <p className="text-sm" style={{ color: "var(--nc-text-2)" }}>{payment.user.email}</p>
+                      <p className="break-all text-sm" style={{ color: "var(--nc-text-2)" }}>{payment.user.email}</p>
                     </div>
 
                     <div className="text-right">
@@ -182,7 +182,7 @@ export default async function AdminPaymentsPage({
                     </div>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                     <div>
                       <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>Template</p>
                       <p className="font-semibold" style={{ color: "var(--nc-text)" }}>
@@ -197,7 +197,7 @@ export default async function AdminPaymentsPage({
                     </div>
                     <div>
                       <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>Profile Slug</p>
-                      <p className="font-mono text-xs" style={{ color: "var(--nc-text)" }}>
+                      <p className="break-all font-mono text-xs" style={{ color: "var(--nc-text)" }}>
                         /{payment.userProfile.slug}
                       </p>
                     </div>

@@ -44,7 +44,7 @@ export default function LegalPage() {
     <ThemeProvider>
       <div className="min-h-screen" style={{ background: "var(--nc-bg)", color: "var(--nc-text)" }}>
         <header className="border-b" style={{ borderColor: "var(--nc-border)" }}>
-          <div className="mx-auto max-w-4xl px-6 py-16 text-center">
+          <div className="mx-auto max-w-4xl px-4 py-12 text-center sm:px-6 sm:py-16">
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.3em]" style={{ color: "var(--nc-brand-2)" }}>
               Legal
             </p>
@@ -57,7 +57,7 @@ export default function LegalPage() {
           </div>
         </header>
 
-        <section className="mx-auto max-w-4xl px-6 py-16">
+        <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
           <div ref={cardsRef} className="sr-stagger grid gap-6 sm:grid-cols-3">
             {DOCUMENTS.map((doc) => (
               <Link

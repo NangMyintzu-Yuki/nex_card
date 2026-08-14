@@ -16,7 +16,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingP
     <main style={{ background: "#fef6f9", color: "#4a1530", fontFamily: "Georgia, serif" }}>
 
       {/* Decorative petal hero */}
-      <section className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center text-center px-6 py-24">
+      <section className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center text-center px-4 sm:px-6 py-24">
         {/* Corner botanical elements */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
           {["top-0 left-0 scale-100", "top-0 right-0 -scale-x-100", "bottom-0 left-0 -scale-y-100", "bottom-0 right-0 scale-[-1]"].map((pos, i) => (
@@ -53,7 +53,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingP
 
       {/* Portraits */}
       {(partner1.photoUrl || partner2.photoUrl) && (
-        <section className="px-6 pb-16 border-b" style={{ borderColor: `${accentColor}20` }}>
+        <section className="px-4 sm:px-6 pb-16 border-b" style={{ borderColor: `${accentColor}20` }}>
           <div className="mx-auto max-w-2xl flex flex-col md:flex-row gap-10 items-center justify-center">
             {[partner1, partner2].map((p, i) => (
               <div key={i} className="flex flex-col items-center gap-3 text-center">
@@ -82,7 +82,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingP
 
       {/* Love story */}
       {loveHistory.length > 0 && (
-        <section className="px-6 py-16 border-b" style={{ borderColor: `${accentColor}20` }}>
+        <section className="px-4 sm:px-6 py-16 border-b" style={{ borderColor: `${accentColor}20` }}>
           <div className="mx-auto max-w-2xl">
             <h2 className="text-center text-3xl mb-10">Our Story 🌸</h2>
             <div className="space-y-8">
@@ -117,7 +117,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingP
 
       {/* Gallery */}
       {gallery.length > 0 && (
-        <section className="px-6 py-16 border-b" style={{ borderColor: `${accentColor}20` }}>
+        <section className="px-4 sm:px-6 py-16 border-b" style={{ borderColor: `${accentColor}20` }}>
           <div className="mx-auto max-w-4xl">
             <h2 className="text-center text-3xl mb-8">Gallery 🌺</h2>
             <div className="columns-2 gap-3 md:columns-3">
@@ -135,7 +135,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingP
       )}
 
       {/* Events */}
-      <section className="px-6 py-16 border-b" style={{ borderColor: `${accentColor}20` }}>
+      <section className="px-4 sm:px-6 py-16 border-b" style={{ borderColor: `${accentColor}20` }}>
         <div className="mx-auto max-w-2xl">
           <h2 className="text-center text-3xl mb-8">The Day 💒</h2>
           <div className="space-y-4">
@@ -162,7 +162,7 @@ export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingP
       </section>
 
       {rsvp && (
-        <section className="px-6 py-16 text-center">
+        <section className="px-4 sm:px-6 py-16 text-center">
           <div className="mx-auto max-w-sm">
             <h2 className="text-3xl mb-4">RSVP 💌</h2>
             {rsvp.deadline && (
@@ -181,12 +181,12 @@ export function BlossomWedding({ data, accentColor = "#f472b6", slug }: WeddingP
         </section>
       )}
 
-      <footer className="border-t px-6 py-8 text-center" style={{ borderColor: `${accentColor}20` }}>
+      <footer className="border-t px-4 sm:px-6 py-8 text-center" style={{ borderColor: `${accentColor}20` }}>
         <p className="text-sm" style={{ color: "#8b3254" }}>🌸 Made with NEX CARD 🌸</p>
       </footer>
     
       {slug && (
-        <section className="px-6 py-16 text-center">
+        <section className="px-4 sm:px-6 py-16 text-center">
           {rsvp && (
             <WeddingRsvpForm slug={slug} accentColor={accentColor}
               mealOptions={rsvp?.mealOptions}

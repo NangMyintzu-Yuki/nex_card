@@ -49,7 +49,7 @@ export default function SettingsPage() {
   }
 
   const cardStyle  = { background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)", borderRadius: "1rem", overflow: "hidden" };
-  const headerStyle = { borderBottom: "1px solid var(--nc-border)", padding: "1rem 1.5rem", display: "flex", alignItems: "center", gap: "0.625rem" };
+  const headerStyle = { borderBottom: "1px solid var(--nc-border)", padding: "1rem 1rem", display: "flex", alignItems: "center", gap: "0.625rem" };
   const inputCls   = "w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-colors nc-input";
 
   function SectionHeader({ icon: Icon, label }: { icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; label: string }) {
@@ -62,7 +62,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-10" style={{ color: "var(--nc-text)" }}>
+    <div className="mx-auto max-w-2xl nc-page" style={{ color: "var(--nc-text)" }}>
       <div className="mb-8">
         <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Account Settings</h1>
         <p className="mt-1 text-sm" style={{ color: "var(--nc-text-2)" }}>
@@ -78,8 +78,8 @@ export default function SettingsPage() {
             <span className="text-base">🎨</span>
             <h2 className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>Theme Preference</h2>
           </div>
-          <div className="flex items-center justify-between p-6">
-            <div>
+          <div className="flex items-center justify-between gap-3 p-4 sm:p-6">
+            <div className="min-w-0">
               <p className="font-semibold text-sm mb-0.5" style={{ color: "var(--nc-text)" }}>
                 {isDark ? "Dark / Gold Mode" : "Light / Navy Mode"}
               </p>
@@ -89,14 +89,14 @@ export default function SettingsPage() {
                   : "White background with navy-blue NEX CARD branding"}
               </p>
             </div>
-            <ThemeToggle size="md" showLabel />
+            <ThemeToggle size="md" />
           </div>
         </div>
 
         {/* Profile info */}
         <div style={cardStyle}>
           <SectionHeader icon={User} label="Profile Information" />
-          <form action={profileAction} className="p-6 space-y-4">
+          <form action={profileAction} className="space-y-4 p-4 sm:p-6">
             {profileState.status === "success" && (
               <div className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5">
                 <Check className="h-4 w-4 shrink-0 text-emerald-400" />
@@ -133,7 +133,7 @@ export default function SettingsPage() {
         {/* Change password */}
         <div style={cardStyle}>
           <SectionHeader icon={Lock} label="Change Password" />
-          <form action={pwAction} className="p-6 space-y-4">
+          <form action={pwAction} className="space-y-4 p-4 sm:p-6">
             {pwState.status === "success" && (
               <div className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5">
                 <Check className="h-4 w-4 shrink-0 text-emerald-400" />
@@ -196,12 +196,12 @@ export default function SettingsPage() {
             <Download className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />
             <h2 className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>Export Your Data</h2>
           </div>
-          <div className="flex items-center justify-between gap-4 p-6">
-            <p className="text-sm" style={{ color: "var(--nc-text-2)" }}>
+          <div className="flex flex-col items-stretch gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-6">
+            <p className="min-w-0 text-sm" style={{ color: "var(--nc-text-2)" }}>
               Download all your profile data as a portable JSON file.
             </p>
             <button onClick={handleExport} disabled={exporting}
-              className="shrink-0 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all hover:opacity-80 disabled:opacity-50"
+              className="flex shrink-0 items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all hover:opacity-80 disabled:opacity-50"
               style={{ borderColor: "var(--nc-border)", color: "var(--nc-text-2)" }}>
               <Download className="h-3.5 w-3.5" />
               {exporting ? "Exporting…" : "Export JSON"}
@@ -215,7 +215,7 @@ export default function SettingsPage() {
             <AlertTriangle className="h-4 w-4 text-red-400" />
             <h2 className="font-bold text-sm text-red-400">Danger Zone</h2>
           </div>
-          <form action={deleteAction} className="p-6 space-y-4">
+          <form action={deleteAction} className="space-y-4 p-4 sm:p-6">
             {deleteState.status === "error" && (
               <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
                 {deleteState.message}

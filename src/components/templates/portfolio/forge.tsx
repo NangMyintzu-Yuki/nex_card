@@ -149,7 +149,7 @@ export function ForgePortfolio({ data, accentColor = "#10b981" }: PP) {
                     href={s.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-2xl border border-white/5 bg-white/5 px-3 py-2 text-xs text-neutral-300 hover:bg-white/10 hover:text-white transition-all flex-1 min-w-[110px] justify-center"
+                    className="flex items-center gap-2 rounded-2xl border border-white/5 bg-white/5 px-3 py-2 text-xs text-neutral-300 hover:bg-white/10 hover:text-white transition-all flex-1 min-w-0 justify-center"
                   >
                     <span>{s.label || s.platform}</span>
                   </a>

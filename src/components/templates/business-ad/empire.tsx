@@ -57,7 +57,7 @@ export function EmpireBusiness({
       `}</style>
 
       {/* Minimal top rule — not sticky glass nav */}
-      <div className="em-sans flex items-center justify-between border-b border-white/10 px-6 py-5 sm:px-12 lg:px-20">
+      <div className="em-sans flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-4 sm:px-6 sm:py-5 lg:px-20">
         <div className="flex items-center gap-4">
           {logoUrl && (
             <div className="relative h-8 w-24">
@@ -86,7 +86,7 @@ export function EmpireBusiness({
 
       {/* Editorial asymmetric hero */}
       <section className="mx-auto grid max-w-7xl gap-0 lg:grid-cols-2">
-        <div className="flex flex-col justify-center px-6 py-16 sm:px-12 lg:px-20 lg:py-24">
+        <div className="flex flex-col justify-center px-4 py-16 sm:px-12 lg:px-20 lg:py-24">
           <div className="mb-8 flex items-center gap-3">
             <span className="h-px w-10" style={{ background: accent }} />
             <span
@@ -96,7 +96,7 @@ export function EmpireBusiness({
               Manifesto
             </span>
           </div>
-          <h1 className="text-4xl leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+          <h1 className="break-words text-3xl leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
             {businessName}
           </h1>
           <p className="em-sans mt-6 max-w-md text-sm leading-relaxed text-white/55">
@@ -105,7 +105,7 @@ export function EmpireBusiness({
           <div className="em-sans mt-10 flex flex-wrap gap-4">
             <a
               href={primaryCtaUrl}
-              className="border px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#14110e]"
+              className="border px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#14110e]"
               style={{ background: accent, borderColor: accent }}
             >
               {primaryCtaLabel}
@@ -113,7 +113,7 @@ export function EmpireBusiness({
             {secondaryCtaLabel && secondaryCtaUrl && (
               <a
                 href={secondaryCtaUrl}
-                className="border border-white/20 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/70 hover:border-white/50"
+                className="border border-white/20 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/70 hover:border-white/50"
               >
                 {secondaryCtaLabel}
               </a>
@@ -159,13 +159,13 @@ export function EmpireBusiness({
       </div>
 
       {/* Long-form description */}
-      <section className="mx-auto max-w-3xl px-6 pb-20 text-center sm:px-12">
+      <section className="mx-auto max-w-3xl px-4 pb-20 text-center sm:px-12">
         <p className="text-xl leading-relaxed text-white/75 sm:text-2xl">{description}</p>
       </section>
 
       {/* Capabilities — numbered, wide margins */}
       {capabilities.length > 0 && (
-        <section className="border-t border-white/10 px-6 py-20 sm:px-12 lg:px-20">
+        <section className="border-t border-white/10 px-4 py-20 sm:px-12 lg:px-20">
           <div className="mx-auto max-w-5xl">
             <h2
               className="em-sans mb-14 text-[10px] font-semibold uppercase tracking-[0.4em]"
@@ -195,7 +195,7 @@ export function EmpireBusiness({
 
       {/* Full services if more detail needed */}
       {services.length > 0 && whatWeDo && whatWeDo.length > 0 && (
-        <section className="em-sans border-t border-white/10 px-6 py-16 sm:px-12 lg:px-20">
+        <section className="em-sans border-t border-white/10 px-4 py-16 sm:px-12 lg:px-20">
           <div className="mx-auto max-w-5xl">
             <h2
               className="mb-10 text-[10px] font-semibold uppercase tracking-[0.4em]"
@@ -222,7 +222,7 @@ export function EmpireBusiness({
 
       {/* Proof quotes */}
       {testimonials && testimonials.length > 0 && (
-        <section className="border-t border-white/10 px-6 py-20 sm:px-12">
+        <section className="border-t border-white/10 px-4 py-20 sm:px-12">
           <div className="mx-auto max-w-4xl space-y-16">
             {testimonials.slice(0, 3).map((t, i) => (
               <blockquote key={i} className="text-center">
@@ -241,7 +241,7 @@ export function EmpireBusiness({
 
       {/* History timeline */}
       {history && history.length > 0 && (
-        <section className="border-t border-white/10 px-6 py-20 sm:px-12 lg:px-20">
+        <section className="border-t border-white/10 px-4 py-20 sm:px-12 lg:px-20">
           <div className="mx-auto max-w-4xl">
             <h2
               className="em-sans mb-12 text-[10px] font-semibold uppercase tracking-[0.4em]"
@@ -268,7 +268,7 @@ export function EmpireBusiness({
 
       {/* FAQ */}
       {faq && faq.length > 0 && (
-        <section className="em-sans border-t border-white/10 px-6 py-16 sm:px-12">
+        <section className="em-sans border-t border-white/10 px-4 py-16 sm:px-12">
           <div className="mx-auto max-w-2xl">
             <h2
               className="mb-8 text-[10px] font-semibold uppercase tracking-[0.4em]"
@@ -296,7 +296,7 @@ export function EmpireBusiness({
       )}
 
       {/* Contact */}
-      <section className="border-t border-white/10 px-6 py-20 text-center sm:px-12">
+      <section className="border-t border-white/10 px-4 py-20 text-center sm:px-12">
         <h2 className="text-3xl sm:text-4xl">Begin a conversation</h2>
         <a
           href={primaryCtaUrl}
@@ -310,7 +310,7 @@ export function EmpireBusiness({
         )}
       </section>
 
-      <footer className="em-sans border-t border-white/10 px-6 py-10 sm:px-12">
+      <footer className="em-sans border-t border-white/10 px-4 py-10 sm:px-12">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 sm:flex-row sm:justify-between">
           <p className="font-serif text-sm">{businessName}</p>
           <div className="flex flex-col items-start gap-4 sm:items-end">

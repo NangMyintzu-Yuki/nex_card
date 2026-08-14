@@ -138,10 +138,7 @@ function VerifyEmailContent() {
     border: "1px solid var(--nc-border)",
     color: "var(--nc-text)",
     borderRadius: "0.75rem",
-    width: "3rem",
-    height: "3.5rem",
     textAlign: "center" as const,
-    fontSize: "1.5rem",
     fontWeight: 700,
     outline: "none",
     letterSpacing: "0.1em",
@@ -149,7 +146,7 @@ function VerifyEmailContent() {
 
   return (
     <div className="flex min-h-screen flex-col" style={{ background: "var(--nc-bg)" }}>
-      <nav className="flex items-center justify-between px-6 py-4">
+      <nav className="flex items-center justify-between px-4 py-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2">
           <NexCardLogo />
         </Link>
@@ -157,7 +154,7 @@ function VerifyEmailContent() {
       </nav>
 
       <main className="nc-page-enter flex flex-1 items-center justify-center px-4">
-        <div className="w-full max-w-md space-y-8 rounded-2xl p-8"
+        <div className="w-full max-w-md space-y-6 rounded-2xl p-4 sm:space-y-8 sm:p-8"
           style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)", boxShadow: "var(--nc-shadow)" }}>
 
           <div className="text-center">
@@ -197,7 +194,7 @@ function VerifyEmailContent() {
 
           {!tokenVerifying && (
           <>
-          <div className="flex justify-center gap-3" onPaste={handlePaste}>
+          <div className="flex justify-center gap-1.5 sm:gap-3" onPaste={handlePaste}>
             {code.map((digit, i) => (
               <input
                 key={i}
@@ -208,6 +205,7 @@ function VerifyEmailContent() {
                 value={digit}
                 onChange={(e) => handleChange(i, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(i, e)}
+                className="h-11 w-9 shrink-0 text-lg sm:h-14 sm:w-12 sm:text-2xl"
                 style={inputStyle}
               />
             ))}

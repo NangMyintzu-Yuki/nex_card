@@ -74,7 +74,7 @@ export default async function AnalyticsPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10" style={{ color: "var(--nc-text)" }}>
+    <div className="mx-auto max-w-5xl nc-page" style={{ color: "var(--nc-text)" }}>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Analytics</h1>
@@ -190,7 +190,7 @@ export default async function AnalyticsPage() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
                         <Link href={`/dashboard/edit/${p.slug}`}
-                          className="font-mono text-sm font-semibold hover:underline" style={{ color }}>
+                          className="break-all font-mono text-sm font-semibold hover:underline" style={{ color }}>
                           /{p.slug}
                         </Link>
                         <span className="rounded-full px-2 py-0.5 text-[10px] font-medium"
