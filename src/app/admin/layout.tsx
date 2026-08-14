@@ -3,6 +3,7 @@
 
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getServerSession } from "@/lib/auth/session";
 import { ThemeProvider } from "@/lib/theme/theme-context";
 import { AdminSidebar } from "./_components/admin-sidebar";
@@ -20,6 +21,11 @@ export default async function AdminLayout({
 
   if (!session?.user?.id) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/dashboard");
+
+  const pathname = (await headers()).get("x-pathname") ?? "";
+  if (!session.user.totpEnabled && !pathname.startsWith("/admin/security")) {
+    redirect("/admin/security");
+  }
 
   return (
     <ThemeProvider>

@@ -63,6 +63,12 @@ vi.mock("@/lib/db/prisma", () => ({
     },
     auditLog: { create: vi.fn(), findMany: vi.fn() },
     systemSetting: { findUnique: vi.fn(), upsert: vi.fn() },
+    verificationCode: {
+      findFirst: vi.fn(),
+      create: vi.fn(),
+      deleteMany: vi.fn(),
+      update: vi.fn(),
+    },
     profileAnalyticsEvent: { create: vi.fn(), findMany: vi.fn() },
     weddingRsvp: {
       create: vi.fn(),
@@ -96,7 +102,7 @@ vi.mock("@/lib/settings", async (importOriginal) => {
       support_email: "support@nexcard.io",
       maintenance_mode: false,
       allow_registration: true,
-      require_email_verify: false,
+      require_email_verify: true,
       max_profiles_per_user: 4,
       enable_og_images: true,
       enable_analytics: true,

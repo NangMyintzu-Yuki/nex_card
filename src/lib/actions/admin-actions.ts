@@ -275,16 +275,21 @@ export async function toggleUserStatusAction(
   const adminId = await requireAdmin();
   if (typeof adminId !== "string") return adminId;
 
-  const userId = formData.get("userId") as string;
-  const newStatus = formData.get("status") as string;
+  const parsed = z
+    .object({
+      userId: z.string().min(1).max(40),
+      status: z.enum(["ACTIVE", "SUSPENDED"]),
+    })
+    .safeParse({
+      userId: formData.get("userId"),
+      status: formData.get("status"),
+    });
 
-  if (!userId || !newStatus) {
+  if (!parsed.success) {
     return { status: "error", message: "Missing required fields." };
   }
 
-  if (newStatus !== "ACTIVE" && newStatus !== "SUSPENDED") {
-    return { status: "error", message: "Invalid status." };
-  }
+  const { userId, status: newStatus } = parsed.data;
 
   if (userId === adminId) {
     return { status: "error", message: "You cannot modify your own account." };
@@ -330,17 +335,23 @@ export async function toggleTemplateAction(
   const adminId = await requireAdmin();
   if (typeof adminId !== "string") return adminId;
 
-  const templateId = formData.get("templateId") as string;
-  const field = formData.get("field") as string;
-  const value = formData.get("value") as string;
+  const parsed = z
+    .object({
+      templateId: z.string().min(1).max(40),
+      field: z.enum(["isActive", "isPremium"]),
+      value: z.enum(["true", "false"]),
+    })
+    .safeParse({
+      templateId: formData.get("templateId"),
+      field: formData.get("field"),
+      value: formData.get("value"),
+    });
 
-  if (!templateId || !field || value === undefined) {
+  if (!parsed.success) {
     return { status: "error", message: "Missing required fields." };
   }
 
-  if (field !== "isActive" && field !== "isPremium") {
-    return { status: "error", message: "Invalid field." };
-  }
+  const { templateId, field, value } = parsed.data;
 
   try {
     await prisma.template.update({
@@ -374,15 +385,15 @@ const UpdatePricesInput = z.object({
   templateId: z.string().min(1),
   priceQrOnly: z.preprocess(
     (v) => (v === "" || v === null ? null : Number(v)),
-    z.number().nullable()
+    z.number().min(0).max(10_000_000).nullable()
   ),
   priceNfcCard: z.preprocess(
     (v) => (v === "" || v === null ? null : Number(v)),
-    z.number().nullable()
+    z.number().min(0).max(10_000_000).nullable()
   ),
   priceNfcQr: z.preprocess(
     (v) => (v === "" || v === null ? null : Number(v)),
-    z.number().nullable()
+    z.number().min(0).max(10_000_000).nullable()
   ),
 });
 

@@ -4,12 +4,16 @@
   "support_email": "nangmyintzu89@gmail.com",
   "maintenance_mode": false,
   "allow_registration": true,
-  "require_email_verify": false,
+  "require_email_verify": true,
   "max_profiles_per_user": 4,
   "enable_og_images": true,
   "enable_analytics": true,
   "enable_r2_uploads": true,
   "isr_revalidate_sec": 3600,
   "notify_new_user": true,
-  "notify_email": "nangmyintzu89@gmail.com"
+  "notify_email": "nangmyintzu89@gmail.com",
+  "wallet_account_name": "NEX CARD",
+  "wallet_kbzpay": "09-000000000",
+  "wallet_wavepay": "09-000000000",
+  "wallet_ayapay": "09-000000000"
 }

@@ -1,9 +1,9 @@
 // src/tests/api/upload.test.ts
 import { NextRequest } from "next/server";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { POST } from "@/app/api/upload/route";
+import { POST, DELETE } from "@/app/api/upload/route";
 import { getServerSession } from "@/lib/auth/session";
-import { uploadFile, getStorageConfig } from "@/lib/storage";
+import { uploadFile, getStorageConfig, deleteFile } from "@/lib/storage";
 import { generateR2PresignedUrl } from "@/lib/storage/providers/r2";
 import { getStorageDriver } from "@/lib/env";
 import { jsonRequest, readJson } from "./helpers";
@@ -14,6 +14,7 @@ vi.mock("@/lib/auth/session", () => ({
 
 vi.mock("@/lib/storage", () => ({
   uploadFile: vi.fn(),
+  deleteFile: vi.fn(),
   getStorageConfig: vi.fn().mockReturnValue({
     driver: "local",
     maxFileSizeMb: 8,
@@ -78,6 +79,7 @@ describe("POST /api/upload", () => {
         email: "alex@nexcard.io",
         role: "USER",
         avatarUrl: null,
+        totpEnabled: false,
       },
     });
     vi.mocked(getStorageDriver).mockReturnValue("local");
@@ -105,6 +107,7 @@ describe("POST /api/upload", () => {
         email: "alex@nexcard.io",
         role: "USER",
         avatarUrl: null,
+        totpEnabled: false,
       },
     });
     vi.mocked(generateR2PresignedUrl).mockResolvedValue({
@@ -135,6 +138,7 @@ describe("POST /api/upload", () => {
         email: "alex@nexcard.io",
         role: "USER",
         avatarUrl: null,
+        totpEnabled: false,
       },
     });
     vi.mocked(uploadFile).mockResolvedValue({
@@ -160,5 +164,47 @@ describe("POST /api/upload", () => {
     expect(body.publicUrl).toContain("cloudinary.com");
     expect(body.driver).toBe("cloudinary");
     expect(uploadFile).toHaveBeenCalledOnce();
+  });
+});
+
+describe("DELETE /api/upload", () => {
+  const user = {
+    id: "clhuser123456789012345",
+    name: "Alex",
+    email: "alex@nexcard.io",
+    role: "USER" as const,
+    avatarUrl: null,
+    totpEnabled: false,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(deleteFile).mockResolvedValue(undefined);
+  });
+
+  it("rejects query-string ownership spoof", async () => {
+    vi.mocked(getServerSession).mockResolvedValue({ user });
+
+    const res = await DELETE(
+      jsonRequest("http://localhost/api/upload", "DELETE", {
+        url: `https://cdn.nexcard.io/uploads/victim/payments/x.jpg?x=${user.id}`,
+      })
+    );
+
+    expect(res.status).toBe(403);
+    expect(deleteFile).not.toHaveBeenCalled();
+  });
+
+  it("deletes owned R2 object", async () => {
+    vi.mocked(getServerSession).mockResolvedValue({ user });
+
+    const res = await DELETE(
+      jsonRequest("http://localhost/api/upload", "DELETE", {
+        url: `https://cdn.nexcard.io/uploads/${user.id}/gallery/abc.png`,
+      })
+    );
+
+    expect(res.status).toBe(200);
+    expect(deleteFile).toHaveBeenCalledOnce();
   });
 });

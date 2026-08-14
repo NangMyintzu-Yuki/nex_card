@@ -10,6 +10,7 @@ export interface SessionUser {
   email: string;
   role: "ADMIN" | "USER";
   avatarUrl: string | null;
+  totpEnabled: boolean;
 }
 
 export interface Session {
@@ -44,6 +45,7 @@ export async function getServerSession(): Promise<Session | null> {
           role: true,
           avatarUrl: true,
           status: true,
+          totpEnabled: true,
         },
       },
     },
@@ -61,6 +63,7 @@ export async function getServerSession(): Promise<Session | null> {
       email: session.user.email,
       role: session.user.role,
       avatarUrl: session.user.avatarUrl,
+      totpEnabled: session.user.totpEnabled,
     },
   };
 }

@@ -4,6 +4,7 @@
 "use client";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
 import { AvatarZoom } from "@/components/templates/avatar-zoom";
+import { safeHref } from "@/lib/security/safe-href";
 
 interface Props {
   data: DigitalNameCardData;
@@ -60,7 +61,7 @@ const CT: Record<string, { label: string; emoji: string; href: (v: string) => st
   website: {
     label: "Website",
     emoji: "🌐",
-    href: (v) => (v.startsWith("http") ? v : `https://${v}`),
+    href: (v) => safeHref(v),
   },
   address: {
     label: "Address",

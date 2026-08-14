@@ -8,6 +8,7 @@ import {
   maybeCleanupRateLimits,
   rateLimit,
 } from "@/lib/security/rate-limit";
+import { rejectIfMaintenance } from "@/lib/security/maintenance";
 
 const Schema = z.object({
   author: z.string().min(1).max(120).trim(),
@@ -60,6 +61,9 @@ export async function POST(
       { status: 429 }
     );
   }
+
+  const blocked = rejectIfMaintenance("/api/public/guestbook");
+  if (blocked) return blocked;
 
   const { slug } = await params;
   const profile = await prisma.userProfile.findUnique({

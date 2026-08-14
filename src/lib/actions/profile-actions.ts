@@ -12,6 +12,7 @@ import {
   type CategorySlug,
 } from "@/lib/validators/template-schemas";
 import { getServerSession } from "@/lib/auth/session";
+import { isMaintenanceMode, MAINTENANCE_MESSAGE } from "@/lib/security/maintenance";
 import { isReservedSlug } from "@/lib/slugs/reserved";
 import { deleteFile } from "@/lib/storage";
 
@@ -41,6 +42,9 @@ export async function selectTemplateAction(
   const session = await getServerSession();
   if (!session?.user?.id) {
     return { status: "error", message: "You must be logged in." };
+  }
+  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+    return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
   const parsed = SelectTemplateInput.safeParse({
@@ -172,7 +176,7 @@ export async function selectTemplateAction(
 
 const UpdateProfileInput = z.object({
   profileId: z.string().cuid(),
-  dynamicJsonData: z.string().min(2), // Raw JSON string from form
+  dynamicJsonData: z.string().min(2).max(200_000),
   metaTitle: z.string().max(160).optional(),
   metaDescription: z.string().max(320).optional(),
   ogImageUrl: z.string().url().optional().or(z.literal("")),
@@ -192,6 +196,9 @@ export async function updateProfileAction(
   const session = await getServerSession();
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
+  }
+  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+    return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
   const parsed = UpdateProfileInput.safeParse({
@@ -314,6 +321,9 @@ export async function deleteProfileAction(
   const session = await getServerSession();
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
+  }
+  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+    return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
   const parsed = DeleteProfileInput.safeParse({

@@ -8,6 +8,7 @@ import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
 import { APP_URL } from "@/lib/env";
+import { isMaintenanceMode, MAINTENANCE_MESSAGE } from "@/lib/security/maintenance";
 
 const MarkNfcInput = z.object({
   profileId: z.string().cuid(),
@@ -29,6 +30,9 @@ export async function markNfcProgrammedAction(
   const session = await getServerSession();
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
+  }
+  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+    return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
   const parsed = MarkNfcInput.safeParse({ profileId: formData.get("profileId") });
@@ -121,6 +125,9 @@ export async function updateNfcFulfillmentAction(
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
   }
+  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+    return { status: "error", message: MAINTENANCE_MESSAGE };
+  }
 
   const parsed = FulfillmentInput.safeParse({
     profileId: formData.get("profileId"),
@@ -128,6 +135,10 @@ export async function updateNfcFulfillmentAction(
   });
   if (!parsed.success) {
     return { status: "error", message: "Invalid input." };
+  }
+
+  if (parsed.data.status === "SHIPPED" && session.user.role !== "ADMIN") {
+    return { status: "error", message: "Only admins can mark an NFC card as shipped." };
   }
 
   const profile = await prisma.userProfile.findFirst({

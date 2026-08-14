@@ -2,6 +2,7 @@
 "use client";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
 import { AvatarZoom } from "@/components/templates/avatar-zoom";
+import { safeHref } from "@/lib/security/safe-href";
 
 interface Props { data: DigitalNameCardData; accentColor?: string; }
 
@@ -26,7 +27,7 @@ const CT: Record<string,{emoji:string;href:(v:string)=>string}> = {
   whatsapp:{emoji:"💬",href:v=>`https://wa.me/${v.replace(/[^0-9+]/g,"")}`},
   viber:{emoji:"📲",href:v=>`viber://chat?number=${v.replace(/[^0-9+]/g,"")}`},
   telegram:{emoji:"✈️",href:v=>`https://t.me/${v.replace("@","")}`},
-  website:{emoji:"🌐",href:v=>v.startsWith("http")?v:`https://${v}`},
+  website:{emoji:"🌐",href:v=>safeHref(v)},
   address:{emoji:"📍",href:v=>`https://maps.google.com/?q=${encodeURIComponent(v)}`},
 };
 const SP_COLORS: Record<string,string>={linkedin:"#0077b5",twitter:"#ffffff",instagram:"#e1306c",facebook:"#1877f2",youtube:"#ff5555",tiktok:"#69c9d0",whatsapp:"#25d366",telegram:"#2aabee",viber:"#7360f2",discord:"#5865f2",website:"#a78bfa",behance:"#1769ff",dribbble:"#ea4c89",medium:"#ffffff"};

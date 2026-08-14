@@ -81,9 +81,7 @@ export default function CookiePolicyPage() {
         pages. We use only essential third-party services:
       </p>
       <ul>
-        <li><strong>Stripe:</strong> Payment processing. Stripe uses cookies to detect fraud and authenticate transactions. See{" "}
-          <span style={{ color: "var(--nc-brand-2)" }}>stripe.com/privacy</span>.
-        </li>
+        <li>We do not load third-party payment-processor cookies. MMK wallet payments are completed in KBZPay, WavePay, or AYA Pay, then proven with a screenshot you upload to NEX CARD.</li>
         <li><strong>Analytics:</strong> We use privacy-first analytics that do not use cookies that track you across sites. All data is aggregated and anonymized.</li>
       </ul>
       <p>

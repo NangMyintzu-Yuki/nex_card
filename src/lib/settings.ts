@@ -22,6 +22,10 @@ export type Settings = {
   isr_revalidate_sec: number;
   notify_new_user: boolean;
   notify_email: string;
+  wallet_account_name: string;
+  wallet_kbzpay: string;
+  wallet_wavepay: string;
+  wallet_ayapay: string;
 };
 
 export const SettingsSchema = z.object({
@@ -38,6 +42,10 @@ export const SettingsSchema = z.object({
   isr_revalidate_sec: z.number().int().min(60).max(86400),
   notify_new_user: z.boolean(),
   notify_email: z.string().email(),
+  wallet_account_name: z.string().min(1).max(80),
+  wallet_kbzpay: z.string().min(1).max(40),
+  wallet_wavepay: z.string().min(1).max(40),
+  wallet_ayapay: z.string().min(1).max(40),
 });
 
 const DEFAULTS: Settings = {
@@ -46,7 +54,7 @@ const DEFAULTS: Settings = {
   support_email: "support@nexcard.io",
   maintenance_mode: false,
   allow_registration: true,
-  require_email_verify: false,
+  require_email_verify: true,
   max_profiles_per_user: 4,
   enable_og_images: true,
   enable_analytics: true,
@@ -54,6 +62,10 @@ const DEFAULTS: Settings = {
   isr_revalidate_sec: 3600,
   notify_new_user: true,
   notify_email: "admin@nexcard.io",
+  wallet_account_name: "NEX CARD",
+  wallet_kbzpay: "09-000000000",
+  wallet_wavepay: "09-000000000",
+  wallet_ayapay: "09-000000000",
 };
 
 async function readFileSettings(): Promise<Settings> {

@@ -2,7 +2,6 @@
 // /p/[slug] — Public QR-scanned profile landing route
 
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -85,32 +84,12 @@ export default async function QRProfilePage({ params }: PageProps) {
   }
 
   if (!profile.isPublished) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-neutral-950 px-6 text-center text-white">
-        <div className="relative z-10 max-w-sm">
-          <div
-            className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl"
-            style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}
-          >
-            <span className="text-2xl">⚠️</span>
-          </div>
-          <h1 className="text-2xl font-black">Profile Not Published</h1>
-          <p className="mt-3 text-sm leading-relaxed text-neutral-500">
-            <strong className="text-white">/{slug}</strong> exists but is still a draft.
-            The owner needs to publish it before the QR code will work.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <Link
-              href="/"
-              className="flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-indigo-400"
-            >
-              Go to NEX CARD
-            </Link>
-          </div>
-          <p className="mt-6 text-xs text-neutral-700">NEX CARD</p>
-        </div>
-      </main>
-    );
+    const { getServerSession } = await import("@/lib/auth/session");
+    const session = await getServerSession();
+    const isOwner = session?.user?.id === profile.user.id;
+    if (!isOwner) {
+      notFound();
+    }
   }
 
   if (!profile.qrLocked) {

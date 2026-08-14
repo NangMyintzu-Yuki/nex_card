@@ -59,3 +59,5 @@ playwright/.cache/
 # User uploads (stored on server when STORAGE_DRIVER=local)
 public/uploads/**
 !public/uploads/.gitkeep
+data/private-uploads/**
+!data/private-uploads/payments/.gitkeep

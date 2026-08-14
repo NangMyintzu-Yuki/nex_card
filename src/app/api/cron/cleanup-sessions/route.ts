@@ -1,5 +1,5 @@
 // src/app/api/cron/cleanup-sessions/route.ts
-// Deletes expired sessions + email tokens. Protect with CRON_SECRET or REVALIDATION_SECRET.
+// Deletes expired sessions + email tokens. Protect with CRON_SECRET Bearer token.
 
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -7,13 +7,11 @@ import prisma from "@/lib/db/prisma";
 import { writeAuditLog } from "@/lib/audit";
 
 function authorize(req: NextRequest): boolean {
-  const expected =
-    process.env.CRON_SECRET?.trim() || process.env.REVALIDATION_SECRET?.trim();
+  const expected = process.env.CRON_SECRET?.trim();
   if (!expected) return false;
 
   const bearer = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  const query = req.nextUrl.searchParams.get("secret");
-  return bearer === expected || query === expected;
+  return Boolean(bearer && bearer === expected);
 }
 
 export async function POST(req: NextRequest) {
@@ -41,8 +39,4 @@ export async function POST(req: NextRequest) {
     sessionsDeleted: sessions.count,
     tokensDeleted: tokens.count,
   });
-}
-
-export async function GET(req: NextRequest) {
-  return POST(req);
 }

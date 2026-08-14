@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
 import { isOwnedPaymentScreenshotUrl } from "@/lib/security/payment-url";
+import { isMaintenanceMode, MAINTENANCE_MESSAGE } from "@/lib/security/maintenance";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -52,6 +53,9 @@ export async function submitPaymentAction(
     const session = await getServerSession();
     if (!session?.user?.id) {
       return { status: "error", message: "You must be logged in." };
+    }
+    if (isMaintenanceMode()) {
+      return { status: "error", message: MAINTENANCE_MESSAGE };
     }
     const userId = session.user.id;
 

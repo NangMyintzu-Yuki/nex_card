@@ -1,5 +1,6 @@
 // src/app/api/auth/2fa/setup/route.ts — Admin-only TOTP setup
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import {
@@ -8,11 +9,32 @@ import {
   verifyTotp,
 } from "@/lib/auth/totp";
 import { writeAuditLog } from "@/lib/audit";
+import {
+  clientIp,
+  maybeCleanupRateLimits,
+  rateLimit,
+} from "@/lib/security/rate-limit";
+
+const CodeSchema = z.object({
+  code: z.string().regex(/^\d{6}$/),
+});
+
+async function requireAdmin() {
+  const session = await getServerSession();
+  if (!session?.user?.id || session.user.role !== "ADMIN") return null;
+  return session;
+}
+
+function tooMany(req: Request) {
+  maybeCleanupRateLimits();
+  const ip = clientIp(req);
+  return rateLimit(`auth:2fa:${ip}`, 10, 15 * 60 * 1000);
+}
 
 /** GET — create/return pending secret + otpauth URL (does not enable yet) */
 export async function GET() {
-  const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  const session = await requireAdmin();
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -45,19 +67,30 @@ export async function GET() {
 
 /** POST { code } — verify first code and enable 2FA */
 export async function POST(req: Request) {
-  const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  const limited = tooMany(req);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: "Too many attempts." },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } }
+    );
+  }
+
+  const session = await requireAdmin();
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await req.json().catch(() => null);
-  const code = typeof body?.code === "string" ? body.code : "";
+  const parsed = CodeSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid code" }, { status: 400 });
+  }
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: { totpSecret: true },
   });
-  if (!user?.totpSecret || !verifyTotp(user.totpSecret, code)) {
+  if (!user?.totpSecret || !verifyTotp(user.totpSecret, parsed.data.code)) {
     return NextResponse.json({ error: "Invalid code" }, { status: 400 });
   }
 
@@ -76,35 +109,14 @@ export async function POST(req: Request) {
   return NextResponse.json({ success: true, enabled: true });
 }
 
-/** DELETE — disable 2FA (requires current code) */
-export async function DELETE(req: Request) {
-  const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+/** DELETE — admins cannot disable 2FA once enabled */
+export async function DELETE() {
+  const session = await requireAdmin();
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const body = await req.json().catch(() => null);
-  const code = typeof body?.code === "string" ? body.code : "";
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { totpSecret: true, totpEnabled: true },
-  });
-  if (!user?.totpEnabled || !user.totpSecret || !verifyTotp(user.totpSecret, code)) {
-    return NextResponse.json({ error: "Invalid code" }, { status: 400 });
-  }
-
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: { totpEnabled: false, totpSecret: null },
-  });
-
-  await writeAuditLog({
-    actorId: session.user.id,
-    action: "auth.2fa_disabled",
-    targetType: "User",
-    targetId: session.user.id,
-  });
-
-  return NextResponse.json({ success: true, enabled: false });
+  return NextResponse.json(
+    { error: "Admin two-factor authentication cannot be disabled." },
+    { status: 403 }
+  );
 }

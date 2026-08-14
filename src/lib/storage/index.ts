@@ -2,8 +2,8 @@
 // Pluggable upload storage — switch providers via STORAGE_DRIVER in .env
 //
 // Supported drivers:
-//   local       → public/uploads/ on your VPS (default, no external service)
-//   r2          → Cloudflare R2 (S3-compatible)
+//   local       → public/uploads/ on disk; payment proofs in data/private-uploads/
+//   r2          → Cloudflare R2 (S3-compatible); proofs via GetObject
 //   cloudinary  → Cloudinary CDN
 //   supabase    → Supabase Storage
 //
@@ -15,10 +15,12 @@ import {
   MAX_PAYMENT_FILE_BYTES,
   MAX_PROFILE_FILE_BYTES,
 } from "./constants";
-import { uploadToLocal } from "./providers/local";
-import { uploadToR2, deleteFromR2 } from "./providers/r2";
+import { uploadToLocal, readLocalPaymentFile } from "./providers/local";
+import { uploadToR2, deleteFromR2, getR2Object } from "./providers/r2";
 import { uploadToCloudinary } from "./providers/cloudinary";
 import { uploadToSupabase } from "./providers/supabase";
+import { paymentStorageKey } from "@/lib/security/payment-url";
+import { uploadKeyFromUrl } from "@/lib/security/upload-ownership";
 import type { StorageConfig, UploadInput, UploadResult } from "./types";
 
 export type { StorageDriver, UploadFolder, UploadInput, UploadResult, StorageConfig } from "./types";
@@ -51,13 +53,7 @@ export async function uploadFile(input: UploadInput): Promise<UploadResult> {
  * Works for R2 URLs (cdn.nexcard.wetechmm.com, pub-xxx.r2.dev, r2.cloudflarestorage.com).
  */
 export function extractKeyFromUrl(publicUrl: string): string | null {
-  try {
-    const url = new URL(publicUrl);
-    // Strip leading slash — keys are like uploads/{userId}/{folder}/{file}
-    return url.pathname.slice(1) || null;
-  } catch {
-    return null;
-  }
+  return uploadKeyFromUrl(publicUrl);
 }
 
 /**
@@ -66,12 +62,44 @@ export function extractKeyFromUrl(publicUrl: string): string | null {
  */
 export async function deleteFile(url: string): Promise<void> {
   const driver = getStorageDriver();
-  if (driver !== "r2") return; // Only R2 deletion is implemented
+  if (driver !== "r2") return;
 
   const key = extractKeyFromUrl(url);
   if (!key) return;
 
   await deleteFromR2(key);
+}
+
+export async function readPaymentObject(
+  stored: string
+): Promise<{ buffer: Buffer; contentType: string } | null> {
+  const key = paymentStorageKey(stored);
+  if (!key) return null;
+
+  const driver = getStorageDriver();
+
+  if (driver === "r2") {
+    const fromR2 = await getR2Object(key);
+    if (fromR2) return fromR2;
+  }
+
+  // Local private + leftover public/uploads/payments, and R2 fallback for mixed deploys
+  const filename = key.startsWith("private/payments/")
+    ? key.slice("private/payments/".length).split("/").pop()
+    : key.startsWith("uploads/payments/")
+      ? key.slice("uploads/payments/".length)
+      : null;
+
+  if (filename && !filename.includes("/")) {
+    const local = await readLocalPaymentFile(filename);
+    if (local) return local;
+  }
+
+  if (driver !== "r2") {
+    return getR2Object(key).catch(() => null);
+  }
+
+  return null;
 }
 
 export function getStorageConfig(): StorageConfig {

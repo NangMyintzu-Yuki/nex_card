@@ -14,6 +14,7 @@ import {
   ALLOWED_IMAGE_TYPES,
   deleteFile,
 } from "@/lib/storage";
+import { isOwnedUploadTarget } from "@/lib/security/upload-ownership";
 import { generateR2PresignedUrl } from "@/lib/storage/providers/r2";
 import { detectImageMime } from "@/lib/security/image-magic";
 import {
@@ -21,6 +22,7 @@ import {
   maybeCleanupRateLimits,
   rateLimit,
 } from "@/lib/security/rate-limit";
+import { rejectIfMaintenance } from "@/lib/security/maintenance";
 
 const PresignedUploadInput = z.object({
   contentType: z.string().min(1),
@@ -36,6 +38,10 @@ function isR2PresignedEnabled(): boolean {
 }
 
 export async function GET() {
+  const session = await getServerSession();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   return NextResponse.json(getStorageConfig());
 }
 
@@ -53,6 +59,9 @@ export async function POST(request: NextRequest) {
         }
       );
     }
+
+    const blocked = rejectIfMaintenance("/api/upload");
+    if (blocked) return blocked;
 
     const session = await getServerSession();
     if (!session?.user?.id) {
@@ -110,8 +119,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Security: only allow deleting files that belong to the requesting user
-    if (!parsed.data.url.includes(session.user.id)) {
+    if (!isOwnedUploadTarget(parsed.data.url, session.user.id)) {
       return NextResponse.json(
         { error: "You can only delete your own files." },
         { status: 403 }

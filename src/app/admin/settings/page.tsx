@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import {
-  Settings, Globe, Zap, Shield, Bell, Save, Loader2,
+  Settings, Globe, Zap, Shield, Bell, Wallet, Save, Loader2,
   CheckCircle, AlertCircle, AlertTriangle,
 } from "lucide-react";
 import { BackupSection } from "../_components/backup-section";
@@ -22,6 +22,10 @@ type Settings = {
   isr_revalidate_sec: number;
   notify_new_user: boolean;
   notify_email: string;
+  wallet_account_name: string;
+  wallet_kbzpay: string;
+  wallet_wavepay: string;
+  wallet_ayapay: string;
 };
 
 type Section = {
@@ -50,7 +54,7 @@ const SECTIONS: Section[] = [
     icon: Shield,
     fields: [
       { key: "allow_registration", label: "Allow New Registrations", type: "toggle" },
-      { key: "require_email_verify", label: "Require Email Verification", type: "toggle" },
+      { key: "require_email_verify", label: "Email verification (required for all new accounts)", type: "toggle" },
       { key: "max_profiles_per_user", label: "Max Profiles Per User", type: "number" },
     ],
   },
@@ -62,6 +66,16 @@ const SECTIONS: Section[] = [
       { key: "enable_analytics", label: "Enable View Analytics", type: "toggle" },
       { key: "enable_r2_uploads", label: "Enable R2 File Uploads", type: "toggle" },
       { key: "isr_revalidate_sec", label: "ISR Revalidation (seconds)", type: "number" },
+    ],
+  },
+  {
+    section: "Payments (MMK wallets)",
+    icon: Wallet,
+    fields: [
+      { key: "wallet_account_name", label: "Payee account name", type: "text" },
+      { key: "wallet_kbzpay", label: "KBZPay number", type: "text" },
+      { key: "wallet_wavepay", label: "WavePay number", type: "text" },
+      { key: "wallet_ayapay", label: "AYA Pay number", type: "text" },
     ],
   },
   {

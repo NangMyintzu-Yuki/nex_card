@@ -11,12 +11,15 @@ import {
 import { createEmailToken } from "@/lib/auth/email-tokens";
 import { sendMail, isMailConfigured } from "@/lib/mail/mailer";
 import { resetPasswordHtml } from "@/lib/mail/templates";
+import { rejectIfMaintenance } from "@/lib/security/maintenance";
 
 const Schema = z.object({
   email: z.string().email().toLowerCase().trim(),
 });
 
 export async function POST(request: NextRequest) {
+  const blocked = rejectIfMaintenance(request.nextUrl.pathname);
+  if (blocked) return blocked;
   try {
     maybeCleanupRateLimits();
     const ip = clientIp(request);

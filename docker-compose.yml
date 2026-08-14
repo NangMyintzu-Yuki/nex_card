@@ -38,14 +38,17 @@ services:
     environment:
       DATABASE_URL: mysql://nexcard:nexcard@mysql:3306/nexcard
       NEXT_PUBLIC_APP_URL: http://localhost:3000
-      REVALIDATION_SECRET: change-me-in-production
-      CRON_SECRET: change-me-in-production
+      # Secrets: set via a local .env / host environment — do not commit real values
+      REVALIDATION_SECRET: ${REVALIDATION_SECRET}
+      CRON_SECRET: ${CRON_SECRET}
       ALLOW_LOCAL_STORAGE: "true"
       STORAGE_DRIVER: local
       NODE_ENV: production
     volumes:
       - nexcard_uploads:/app/public/uploads
+      - nexcard_private_uploads:/app/data/private-uploads
 
 volumes:
   nexcard_mysql:
   nexcard_uploads:
+  nexcard_private_uploads:

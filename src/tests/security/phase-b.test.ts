@@ -35,6 +35,10 @@ describe("Phase B — settings & reserved slugs", () => {
       isr_revalidate_sec: 3600,
       notify_new_user: true,
       notify_email: "admin@nexcard.io",
+      wallet_account_name: "NEX CARD",
+      wallet_kbzpay: "09-000000000",
+      wallet_wavepay: "09-000000000",
+      wallet_ayapay: "09-000000000",
     });
     expect(parsed.success).toBe(true);
   });

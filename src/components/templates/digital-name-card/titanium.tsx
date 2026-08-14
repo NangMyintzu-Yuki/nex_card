@@ -2,6 +2,7 @@
 "use client";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
 import { AvatarZoom } from "@/components/templates/avatar-zoom";
+import { safeHref } from "@/lib/security/safe-href";
 
 interface Props { data: DigitalNameCardData; accentColor?: string; }
 
@@ -25,7 +26,7 @@ const CT: Record<string,{emoji:string;label:string;href:(v:string)=>string}> = {
   whatsapp:{emoji:"💬",label:"WhatsApp",href:v=>`https://wa.me/${v.replace(/[^0-9+]/g,"")}`},
   viber:{emoji:"📲",label:"Viber",href:v=>`viber://chat?number=${v.replace(/[^0-9+]/g,"")}`},
   telegram:{emoji:"✈️",label:"Telegram",href:v=>`https://t.me/${v.replace("@","")}`},
-  website:{emoji:"🌐",label:"Website",href:v=>v.startsWith("http")?v:`https://${v}`},
+  website:{emoji:"🌐",label:"Website",href:v=>safeHref(v)},
   address:{emoji:"📍",label:"Address",href:v=>`https://maps.google.com/?q=${encodeURIComponent(v)}`},
 };
 const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address"];

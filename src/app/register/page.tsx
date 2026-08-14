@@ -63,12 +63,7 @@ export default function RegisterPage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message ?? "Registration failed."); return; }
-      if (data.requiresVerification) {
-        router.replace(`/verify-email?email=${encodeURIComponent(email)}`);
-        return;
-      }
-      router.replace("/dashboard/onboarding");
-      router.refresh();
+      router.replace(`/verify-email?email=${encodeURIComponent(email)}`);
     } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
@@ -103,7 +98,7 @@ export default function RegisterPage() {
           <div className="text-center">
             <h1 className="text-lg font-black sm:text-2xl" style={{ color: "var(--nc-text)" }}>Create your account</h1>
             <p className="mt-0.5 text-[11px] sm:text-sm" style={{ color: "var(--nc-text-2)" }}>
-              Join NEX CARD — it&apos;s free
+              Join NEX CARD — we&apos;ll email you a verification code
             </p>
           </div>
         </div>

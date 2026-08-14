@@ -44,6 +44,7 @@ export function mockSession(user: {
               email: user.email ?? "test@nexcard.io",
               role: user.role ?? "USER",
               avatarUrl: null,
+              totpEnabled: false,
             },
           }
         : null

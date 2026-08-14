@@ -11,10 +11,13 @@ function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const email = searchParams.get("email") ?? "";
+  const token = searchParams.get("token") ?? "";
 
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tokenVerifying, setTokenVerifying] = useState(Boolean(token));
   const [resendTimer, setResendTimer] = useState(60);
   const [resendLoading, setResendLoading] = useState(false);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
@@ -28,6 +31,35 @@ function VerifyEmailContent() {
   useEffect(() => {
     inputsRef.current[0]?.focus();
   }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    setTokenVerifying(true);
+    fetch("/api/auth/verify-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    })
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (res.ok) {
+          router.replace("/login?verified=1");
+          return;
+        }
+        setError(data.message ?? "This verification link is invalid or has expired.");
+        setTokenVerifying(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setError("Unable to verify email. Please try the code instead.");
+        setTokenVerifying(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token, router]);
 
   function handleChange(index: number, value: string) {
     if (!/^\d*$/.test(value)) return;
@@ -92,6 +124,7 @@ function VerifyEmailContent() {
       });
       setResendTimer(60);
       setCode(["", "", "", "", "", ""]);
+      setInfo("If this email is registered, a new code has been sent.");
       inputsRef.current[0]?.focus();
     } catch {
       // silent
@@ -137,8 +170,14 @@ function VerifyEmailContent() {
             </div>
             <h1 className="text-xl font-bold" style={{ color: "var(--nc-text)" }}>Verify your email</h1>
             <p className="mt-2 text-sm" style={{ color: "var(--nc-text-2)" }}>
-              We sent a 6-digit code to<br />
-              <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{email}</span>
+              {tokenVerifying
+                ? "Confirming your email…"
+                : (
+                  <>
+                    We sent a 6-digit code to<br />
+                    <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{email || "your inbox"}</span>
+                  </>
+                )}
             </p>
           </div>
 
@@ -149,6 +188,15 @@ function VerifyEmailContent() {
             </div>
           )}
 
+          {info && (
+            <div className="rounded-xl border px-4 py-3 text-sm"
+              style={{ borderColor: "var(--nc-brand-2)", color: "var(--nc-text)", background: "var(--nc-brand-2)10" }}>
+              {info}
+            </div>
+          )}
+
+          {!tokenVerifying && (
+          <>
           <div className="flex justify-center gap-3" onPaste={handlePaste}>
             {code.map((digit, i) => (
               <input
@@ -193,6 +241,8 @@ function VerifyEmailContent() {
               )}
             </p>
           </div>
+          </>
+          )}
 
           <div className="text-center">
             <Link href="/login" className="text-xs underline" style={{ color: "var(--nc-text-3)" }}>

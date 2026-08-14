@@ -16,11 +16,20 @@ export function middleware(request: NextRequest) {
 
   if (isProtected && !sessionToken) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
+    const safe =
+      pathname.startsWith("/dashboard") || pathname.startsWith("/admin")
+        ? pathname
+        : "/dashboard";
+    loginUrl.searchParams.set("callbackUrl", safe);
     return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.next();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", pathname);
+
+  return NextResponse.next({
+    request: { headers: requestHeaders },
+  });
 }
 
 export const config = {

@@ -11,6 +11,7 @@ import { getServerSession } from "@/lib/auth/session";
 import { hashPassword, verifyPassword } from "@/lib/auth/hash";
 import { revalidatePath } from "next/cache";
 import { deleteFile } from "@/lib/storage";
+import { isMaintenanceMode, MAINTENANCE_MESSAGE } from "@/lib/security/maintenance";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION: Change password
@@ -18,7 +19,7 @@ import { deleteFile } from "@/lib/storage";
 
 const ChangePasswordInput = z.object({
   currentPassword: z.string().min(1, "Current password is required."),
-  newPassword:     z.string().min(8, "New password must be at least 8 characters.").max(128),
+  newPassword:     z.string().min(8, "New password must be at least 8 characters.").max(72),
   confirmPassword: z.string().min(1),
 });
 
@@ -33,6 +34,9 @@ export async function changePasswordAction(
 ): Promise<ChangePasswordState> {
   const session = await getServerSession();
   if (!session?.user?.id) return { status: "error", message: "Unauthorized." };
+  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+    return { status: "error", message: MAINTENANCE_MESSAGE };
+  }
 
   const parsed = ChangePasswordInput.safeParse({
     currentPassword: formData.get("currentPassword"),
@@ -110,6 +114,9 @@ export async function updateProfileInfoAction(
 ): Promise<UpdateProfileInfoState> {
   const session = await getServerSession();
   if (!session?.user?.id) return { status: "error", message: "Unauthorized." };
+  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+    return { status: "error", message: MAINTENANCE_MESSAGE };
+  }
 
   const parsed = UpdateProfileInfoInput.safeParse({
     name:      formData.get("name"),
@@ -169,6 +176,9 @@ export async function deleteAccountAction(
 ): Promise<DeleteAccountState> {
   const session = await getServerSession();
   if (!session?.user?.id) return { status: "error", message: "Unauthorized." };
+  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+    return { status: "error", message: MAINTENANCE_MESSAGE };
+  }
 
   // Prevent admins from deleting their own account through the UI
   const user = await prisma.user.findUnique({

@@ -8,6 +8,7 @@ import { jsonRequest, readJson } from "./helpers";
 vi.mock("@/lib/auth/hash", () => ({
   hashPassword: vi.fn(),
   verifyPassword: vi.fn(),
+  dummyPasswordCheck: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe("POST /api/auth/login", () => {
@@ -58,6 +59,28 @@ describe("POST /api/auth/login", () => {
     );
 
     expect(res.status).toBe(403);
+  });
+
+  it("returns 403 and requiresVerification for unverified accounts", async () => {
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      id: "user-1",
+      name: "Alex",
+      email: "alex@nexcard.io",
+      hashedPassword: "hash",
+      status: "PENDING_VERIFICATION",
+      role: "USER",
+    } as never);
+
+    const res = await POST(
+      jsonRequest("http://localhost/api/auth/login", "POST", {
+        email: "alex@nexcard.io",
+        password: "secret123",
+      })
+    );
+
+    expect(res.status).toBe(403);
+    const body = await readJson<{ requiresVerification: boolean }>(res);
+    expect(body.requiresVerification).toBe(true);
   });
 
   it("returns 401 for wrong password", async () => {

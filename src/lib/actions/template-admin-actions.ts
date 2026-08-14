@@ -37,9 +37,9 @@ export async function toggleTemplateField(
 
 const PricesSchema = z.object({
   templateId: z.string().min(1),
-  priceQrOnly: z.number().nullable(),
-  priceNfcCard: z.number().nullable(),
-  priceNfcQr: z.number().nullable(),
+  priceQrOnly: z.number().min(0).max(10_000_000).nullable(),
+  priceNfcCard: z.number().min(0).max(10_000_000).nullable(),
+  priceNfcQr: z.number().min(0).max(10_000_000).nullable(),
 });
 
 function parsePrice(raw: FormDataEntryValue | null): number | null {

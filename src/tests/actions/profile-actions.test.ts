@@ -63,6 +63,7 @@ describe("updateProfileAction", () => {
         email: "alex@nexcard.io",
         role: "USER",
         avatarUrl: null,
+        totpEnabled: false,
       },
     });
 
@@ -99,6 +100,7 @@ describe("updateProfileAction", () => {
         email: "alex@nexcard.io",
         role: "USER",
         avatarUrl: null,
+        totpEnabled: false,
       },
     });
 

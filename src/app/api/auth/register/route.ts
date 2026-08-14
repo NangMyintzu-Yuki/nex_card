@@ -1,12 +1,11 @@
 // src/app/api/auth/register/route.ts
-// POST /api/auth/register — creates a new user (and session unless email verify required)
+// POST /api/auth/register — creates a pending user and emails a verification code
 
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { hashPassword } from "@/lib/auth/hash";
-import { randomBytes } from "crypto";
 import {
   clientIp,
   maybeCleanupRateLimits,
@@ -21,10 +20,8 @@ import { verifyEmailHtml } from "@/lib/mail/templates";
 const RegisterSchema = z.object({
   name: z.string().min(2).max(80).trim(),
   email: z.string().email().toLowerCase().trim(),
-  password: z.string().min(8).max(128),
+  password: z.string().min(8).max(72),
 });
-
-const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,6 +39,12 @@ export async function POST(request: NextRequest) {
     }
 
     const settings = await getSettings();
+    if (settings.maintenance_mode) {
+      return NextResponse.json(
+        { message: "The site is under maintenance. Please try again later." },
+        { status: 503 }
+      );
+    }
     if (!settings.allow_registration) {
       return NextResponse.json(
         { message: "Registration is currently closed." },
@@ -74,7 +77,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const requireVerify = settings.require_email_verify;
     const hashedPassword = await hashPassword(password);
 
     const user = await prisma.user.create({
@@ -83,8 +85,8 @@ export async function POST(request: NextRequest) {
         email,
         hashedPassword,
         role: "USER",
-        status: requireVerify ? "PENDING_VERIFICATION" : "ACTIVE",
-        emailVerifiedAt: requireVerify ? null : new Date(),
+        status: "PENDING_VERIFICATION",
+        emailVerifiedAt: null,
       },
       select: { id: true, name: true, email: true, role: true },
     });
@@ -98,65 +100,34 @@ export async function POST(request: NextRequest) {
       }).catch((err) => console.error("[Auth/Register] notify failed", err));
     }
 
-    if (requireVerify) {
-      const token = await createEmailToken(
-        user.id,
-        "VERIFY_EMAIL",
-        24 * 60 * 60 * 1000
-      );
-      const code = await createVerificationCode(user.id, "register");
+    const token = await createEmailToken(
+      user.id,
+      "VERIFY_EMAIL",
+      24 * 60 * 60 * 1000
+    );
+    const code = await createVerificationCode(user.id, "register");
 
-      if (isMailConfigured()) {
-        await sendMail({
-          to: email,
-          subject: "Verify your NEX CARD email",
-          html: verifyEmailHtml(name, token ?? "", code),
-        });
-      } else {
-        console.warn(
-          "[Auth/Register] Email verify required but SMTP not configured. Code:",
-          code,
-          "for",
-          email
-        );
-      }
-
-      return NextResponse.json(
-        {
-          success: true,
-          requiresVerification: true,
-          message:
-            "Account created. Check your email to verify before signing in.",
-        },
-        { status: 201 }
+    if (isMailConfigured()) {
+      await sendMail({
+        to: email,
+        subject: "Verify your NEX CARD email",
+        html: verifyEmailHtml(name, token ?? "", code),
+      });
+    } else {
+      console.warn(
+        "[Auth/Register] SMTP is not configured — verification email was not sent."
       );
     }
 
-    const sessionToken = randomBytes(32).toString("hex");
-    const expires = new Date(Date.now() + SESSION_DURATION_MS);
-
-    await prisma.session.create({
-      data: {
-        userId: user.id,
-        sessionToken,
-        expires,
+    return NextResponse.json(
+      {
+        success: true,
+        requiresVerification: true,
+        message:
+          "Account created. Check your email for a verification code before signing in.",
       },
-    });
-
-    const response = NextResponse.json(
-      { success: true, user },
       { status: 201 }
     );
-
-    response.cookies.set("session_token", sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      expires,
-      path: "/",
-    });
-
-    return response;
   } catch (error) {
     console.error("[Auth/Register]", error);
     return NextResponse.json(

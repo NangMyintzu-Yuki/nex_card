@@ -108,9 +108,12 @@ Copy `.env.example` → `.env.local` (local) or set in your hosting panel (produ
 |----------|----------|-------------|
 | `DATABASE_URL` | **Yes (prod)** | MySQL connection string |
 | `NEXT_PUBLIC_APP_URL` | **Yes** | Public URL, e.g. `https://nexcard.io` |
-| `REVALIDATION_SECRET` | **Yes** | Secret for `/api/revalidate` webhook |
-| `STORAGE_DRIVER` | No (default: `local`) | `local` \| `r2` \| `cloudinary` \| `supabase` |
-| `R2_*` | If `STORAGE_DRIVER=r2` | Cloudflare R2 credentials |
+| `REVALIDATION_SECRET` | **Yes** | Secret for `/api/revalidate` webhook (≥32 chars) |
+| `CRON_SECRET` | **Yes (prod)** | Bearer token for `/api/cron/cleanup-sessions` (≥32 chars) |
+| `STORAGE_DRIVER` | No (default: `local`) | Laptop: `local`. Server: `r2` |
+| `R2_*` | If `STORAGE_DRIVER=r2` | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL` |
+| `R2_PRIVATE_BUCKET` | Recommended with R2 | Separate bucket with **no** custom domain for payment proofs |
+| `ALLOW_LOCAL_STORAGE` | Local / Docker only | Required if production `NODE_ENV` uses `STORAGE_DRIVER=local` |
 | `CLOUDINARY_*` | If `STORAGE_DRIVER=cloudinary` | Cloudinary cloud name, API key, secret |
 | `SUPABASE_*` | If `STORAGE_DRIVER=supabase` | Supabase URL, service role key, bucket |
 | `NODE_ENV` | Auto | `development` / `production` / `test` |
@@ -350,6 +353,30 @@ server {
 }
 ```
 
+Rate limits in this app are in-memory. If you run **more than one Node process**, add Nginx `limit_req` (auth is the hot path):
+
+```nginx
+limit_req_zone $binary_remote_addr zone=nexcard_auth:10m rate=10r/m;
+
+location /api/auth/ {
+    limit_req zone=nexcard_auth burst=5 nodelay;
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+Cron (Bearer only — query `?secret=` is not accepted):
+
+```bash
+curl -X POST https://nexcard.io/api/cron/cleanup-sessions \
+  -H "Authorization: Bearer $CRON_SECRET"
+```
+
+Admins must enable TOTP at `/admin/security` before other admin pages work.
+
 ```bash
 sudo certbot --nginx -d nexcard.io -d www.nexcard.io
 ```
@@ -401,36 +428,35 @@ pm2 restart nexcard
 
 ## 9. File Storage (Uploads)
 
-You do **not** need Cloudflare R2. For Myanmar (or anywhere VPN is required for Cloudflare), use **local storage** on your VPS — it is free and needs no VPN.
+**Laptop:** `STORAGE_DRIVER=local` — gallery/avatars/logos stay in `public/uploads/`. Payment proofs go to `data/private-uploads/` (not served as static files).
 
-### Recommended: Local storage (VPS) — FREE, no VPN
+**Server:** `STORAGE_DRIVER=r2` — gallery/avatars stay on the public CDN (`R2_PUBLIC_URL`). Payment proofs are **never** given a public URL; the app streams them via `GET /api/payments/proof/{paymentId}` (owner or ADMIN, `Cache-Control: private, no-store`).
 
-Set in `.env.local` / production env:
+A custom domain on the R2 bucket usually makes the **whole bucket** world-readable. Putting proofs under `uploads/{userId}/payments/` on that same public bucket is not enough.
+
+### Local storage (`STORAGE_DRIVER=local`)
 
 ```env
 STORAGE_DRIVER=local
+ALLOW_LOCAL_STORAGE=true
 NEXT_PUBLIC_APP_URL=https://nexcard.io
 ```
 
-How it works:
-- All uploads (payment screenshots + profile images) save to `public/uploads/` on your server
-- Files are served at `https://nexcard.io/uploads/avatars/...` etc.
-- **Requires a VPS** with persistent disk (DigitalOcean, Linode, AWS EC2, local Myanmar host)
-- **Does NOT work on Vercel/serverless** (disk is ephemeral)
+| Path | Purpose | Public? |
+|------|---------|---------|
+| `public/uploads/avatars/` | Profile avatars | Yes |
+| `public/uploads/gallery/` | Gallery images | Yes |
+| `public/uploads/logos/` | Business logos | Yes |
+| `public/uploads/og-images/` | Custom OG images | Yes |
+| `data/private-uploads/payments/` | Payment screenshot proofs | No — streamed via proof API |
 
-| Folder | Purpose |
-|--------|---------|
-| `public/uploads/payments/` | Payment screenshot proofs |
-| `public/uploads/avatars/` | Profile avatar images |
-| `public/uploads/gallery/` | Gallery images |
-| `public/uploads/logos/` | Business logos |
-| `public/uploads/og-images/` | Custom OG images |
+If you still have leftover files in `public/uploads/payments/`, move them into `data/private-uploads/payments/` and update `Payment.screenshotUrl` to the new storage key.
 
-**Backup:** Include `public/uploads/` in your server backup routine.
+**Backup:** Include both `public/uploads/` and `data/private-uploads/` in your server backup routine.
 
 ---
 
-### Optional: Cloudflare R2 (only if accessible without VPN)
+### Cloudflare R2 (production server)
 
 ```env
 STORAGE_DRIVER=r2
@@ -439,7 +465,16 @@ R2_ACCESS_KEY_ID=...
 R2_SECRET_ACCESS_KEY=...
 R2_BUCKET_NAME=nexcard-uploads
 R2_PUBLIC_URL=https://cdn.nexcard.io
+# Recommended: second bucket with no custom domain
+R2_PRIVATE_BUCKET=nexcard-private
 ```
+
+- Gallery/avatars: `PutObject` to the public bucket; DB stores `${R2_PUBLIC_URL}/{key}`.
+- Payment proofs: key `private/payments/{userId}/{uuid}.ext`. DB stores the **object key** (or `r2://…`), never a CDN URL.
+- If `R2_PRIVATE_BUCKET` is unset, proofs fall back to the main bucket + `private/` prefix. Add a Cloudflare Transform Rule / WAF to **deny public GET on `private/*`**.
+- Keep `STORAGE_R2_USE_PRESIGNED` off. Never presign `folder=payments`.
+
+Existing public R2 payment URLs in the DB still work for **ADMIN** until you copy those objects to `private/payments/…` and update rows.
 
 ---
 
@@ -480,8 +515,8 @@ Only set `STORAGE_DRIVER` and the env block for your chosen provider. Unused pro
 
 | Driver | Required env vars |
 |--------|-------------------|
-| `local` | *(none)* |
-| `r2` | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL` |
+| `local` | `ALLOW_LOCAL_STORAGE=true` in production |
+| `r2` | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`; optional `R2_PRIVATE_BUCKET` |
 | `cloudinary` | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` |
 | `supabase` | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET` |
 
@@ -493,9 +528,10 @@ If `STORAGE_DRIVER` points to a driver that isn't fully configured, the app **fa
 
 | Endpoint | Request | Response |
 |----------|---------|----------|
-| **Upload** (all drivers) | `POST /api/upload` FormData: `file`, `folder` | `{ url, publicUrl, filename?, key?, driver }` |
-| **Config** | `GET /api/upload` | `{ driver, maxFileSizeMb, maxPaymentFileSizeMb, allowedTypes }` |
-| **R2 presigned** (optional) | `POST /api/upload` JSON when `STORAGE_R2_USE_PRESIGNED=true` | `{ uploadUrl, publicUrl, key }` |
+| **Upload** (all drivers) | `POST /api/upload` FormData: `file`, `folder` | `{ url, publicUrl, filename?, key?, driver }` — `folder=payments` returns a storage key, not a CDN URL |
+| **Config** | `GET /api/upload` (session required) | `{ driver, maxFileSizeMb, maxPaymentFileSizeMb, allowedTypes }` |
+| **Proof** | `GET /api/payments/proof/{id}` (owner or ADMIN) | Binary image, `Cache-Control: private, no-store` |
+| **R2 presigned** (optional) | `POST /api/upload` JSON when `STORAGE_R2_USE_PRESIGNED=true` | `{ uploadUrl, publicUrl, key }` — never for `folder=payments` |
 
 ### Legacy R2-only section (reference)
 
@@ -586,7 +622,11 @@ ENVIRONMENT
 □ DATABASE_URL set and tested (MySQL reachable)
 □ NEXT_PUBLIC_APP_URL matches production domain
 □ REVALIDATION_SECRET is unique (32+ random chars)
-□ R2_* configured if using image uploads
+□ CRON_SECRET is unique (32+ random chars); cron uses Authorization: Bearer only
+□ STORAGE_DRIVER=r2 on the server (R2_* set); STORAGE_DRIVER=local on laptops
+□ R2_PRIVATE_BUCKET set, or a Cloudflare rule denies public GET on private/*
+□ KBZPay / WavePay / AYA Pay numbers set in Admin → Settings
+□ Admin 2FA enabled at /admin/security
 □ NODE_ENV=production
 
 DATABASE

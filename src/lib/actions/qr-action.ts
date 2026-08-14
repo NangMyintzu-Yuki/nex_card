@@ -8,6 +8,7 @@ import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
 import { purgeProfileCache } from "@/lib/cache/profile-cache";
+import { isMaintenanceMode, MAINTENANCE_MESSAGE } from "@/lib/security/maintenance";
 
 export type GenerateQRState =
   | { status: "idle" }
@@ -32,6 +33,9 @@ export async function generateQRAction(
   const session = await getServerSession();
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
+  }
+  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+    return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
   const parsed = GenerateQRInput.safeParse({ profileId: formData.get("profileId") });

@@ -11,6 +11,7 @@ import {
   type BusinessAdProps,
 } from "./_shared";
 import { SocialIconLinks } from "./_social-links";
+import { districtBody, districtDisplay } from "./_district-fonts";
 
 export function DistrictBusiness({
   data,
@@ -49,11 +50,12 @@ export function DistrictBusiness({
   const offers = services.filter((s) => s.highlighted);
 
   return (
-    <main className="min-h-screen w-full max-w-full overflow-x-clip bg-[#F8FAFB] text-[#0C1A1A] antialiased">
+    <main
+      className={`${districtDisplay.variable} ${districtBody.variable} min-h-screen w-full max-w-full overflow-x-clip bg-[#F8FAFB] text-[#0C1A1A] antialiased`}
+    >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
-        .d-display { font-family: 'DM Sans', system-ui, sans-serif; }
-        .d-body { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
+        .d-display { font-family: var(--font-district-display), system-ui, sans-serif; }
+        .d-body { font-family: var(--font-district-body), system-ui, sans-serif; }
         @keyframes d-rise {
           from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: translateY(0); }

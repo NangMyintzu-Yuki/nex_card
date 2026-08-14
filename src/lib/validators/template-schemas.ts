@@ -7,6 +7,24 @@ import { z } from "zod";
 // SHARED PRIMITIVE SCHEMAS
 // ─────────────────────────────────────────────────────────────────────────────
 
+function httpsUrl() {
+  return z.preprocess((val) => {
+    if (typeof val !== "string" || val.trim() === "") return val;
+    const v = val.trim();
+    if (v.startsWith("https://")) return v;
+    if (v.startsWith("http://")) {
+      try {
+        const u = new URL(v);
+        if (u.hostname === "localhost" || u.hostname === "127.0.0.1") return v;
+      } catch {
+        return v;
+      }
+      return `https://${v.slice("http://".length)}`;
+    }
+    return `https://${v}`;
+  }, z.string().url().optional().or(z.literal("")));
+}
+
 const SocialLinkSchema = z.object({
   platform: z.enum([
     "linkedin", "github", "twitter", "instagram", "facebook",
@@ -14,37 +32,39 @@ const SocialLinkSchema = z.object({
     "viber", "snapchat", "discord", "twitch", "pinterest",
     "behance", "dribbble", "medium", "devto", "stackoverflow",
   ]),
-  // Preprocess: auto-add https:// if missing so bare URLs like "linkedin.com/in/alex" pass
-  url: z.preprocess(
-    (val) => {
-      if (typeof val !== "string" || val.trim() === "") return val;
-      const v = val.trim();
-      if (v.startsWith("http://") || v.startsWith("https://")) return v;
-      return `https://${v}`;
-    },
-    z.string().url("Must be a valid URL (e.g. https://linkedin.com/in/yourname)")
-  ),
-  label: z.string().optional(),
+  url: httpsUrl(),
+  label: z.string().max(40).optional(),
 });
 
 const GalleryImageSchema = z.object({
-  url: z.string().url(),
-  alt: z.string(),
-  caption: z.string().optional(),
+  url: z.string().url().max(2048),
+  alt: z.string().max(200),
+  caption: z.string().max(200).optional(),
 });
 
 const ContactFieldSchema = z.object({
   type: z.enum(["email", "phone", "address", "website", "whatsapp", "viber", "telegram", "skype"]),
-  // Allow values like "example.com" without https://
   value: z.preprocess(
-    (val) => {
-      if (typeof val !== "string") return val;
-      return val.trim();
-    },
-    z.string().min(1)
+    (val) => (typeof val === "string" ? val.trim() : val),
+    z.string().min(1).max(200)
   ),
-  label: z.string().optional(),
+  label: z.string().max(40).optional(),
   isPrimary: z.boolean().optional(),
+}).superRefine((data, ctx) => {
+  if (data.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.value)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Invalid email", path: ["value"] });
+  }
+  if (data.type === "website") {
+    const href = data.value.startsWith("http") ? data.value : `https://${data.value}`;
+    try {
+      const u = new URL(href);
+      if (u.protocol !== "https:" && !(u.protocol === "http:" && (u.hostname === "localhost" || u.hostname === "127.0.0.1"))) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Website must be https", path: ["value"] });
+      }
+    } catch {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Invalid website URL", path: ["value"] });
+    }
+  }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -88,13 +108,13 @@ export type DigitalNameCardData = z.infer<typeof DigitalNameCardSchema>;
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PortfolioProjectSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).max(80),
   title: z.string().min(1).max(120),
   description: z.string().max(600).optional().default(""),
   tags: z.array(z.string().max(30)).max(8).optional().default([]),
   coverImageUrl: z.string().url().optional().or(z.literal("")),
-  liveUrl: z.preprocess((v) => { if (typeof v !== "string" || v.trim() === "") return ""; const s = v.trim(); return s.startsWith("http") ? s : `https://${s}`; }, z.string().url().optional().or(z.literal(""))),
-  repoUrl: z.preprocess((v) => { if (typeof v !== "string" || v.trim() === "") return ""; const s = v.trim(); return s.startsWith("http") ? s : `https://${s}`; }, z.string().url().optional().or(z.literal(""))),
+  liveUrl: httpsUrl(),
+  repoUrl: httpsUrl(),
   year: z.number().int().min(1990).max(2100).optional(),
   caseStudyUrl: z.string().url().optional().or(z.literal("")),
   featured: z.boolean().optional(),

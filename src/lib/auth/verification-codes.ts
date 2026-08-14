@@ -1,9 +1,11 @@
+// src/lib/auth/verification-codes.ts
+import { randomInt } from "crypto";
 import prisma from "@/lib/db/prisma";
 
 const CODE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function generateCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return randomInt(100000, 1000000).toString();
 }
 
 export async function createVerificationCode(
@@ -26,10 +28,16 @@ export async function createVerificationCode(
 
 export async function verifyCode(
   code: string,
-  purpose: string = "register"
+  purpose: string,
+  userId: string
 ): Promise<{ userId: string } | null> {
   const record = await prisma.verificationCode.findFirst({
-    where: { code, purpose, usedAt: null },
+    where: {
+      userId,
+      code,
+      purpose,
+      usedAt: null,
+    },
     orderBy: { createdAt: "desc" },
   });
 

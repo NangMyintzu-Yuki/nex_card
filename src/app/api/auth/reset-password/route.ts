@@ -11,13 +11,16 @@ import {
   rateLimit,
 } from "@/lib/security/rate-limit";
 import { writeAuditLog } from "@/lib/audit";
+import { rejectIfMaintenance } from "@/lib/security/maintenance";
 
 const Schema = z.object({
   token: z.string().min(20).max(128),
-  password: z.string().min(8).max(128),
+  password: z.string().min(8).max(72),
 });
 
 export async function POST(request: NextRequest) {
+  const blocked = rejectIfMaintenance(request.nextUrl.pathname);
+  if (blocked) return blocked;
   try {
     maybeCleanupRateLimits();
     const ip = clientIp(request);

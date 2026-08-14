@@ -8,6 +8,7 @@ import {
   CheckCircle, XCircle, Clock, Loader2, Banknote,
 } from "lucide-react";
 import { submitPaymentAction, type SubmitPaymentState } from "@/lib/actions/payment-actions";
+import { usePublicWallets } from "@/lib/payments/use-public-wallets";
 
 interface Prices {
   priceQrOnly: number | null;
@@ -19,24 +20,18 @@ const PAYMENT_METHODS = {
   KBZPay: {
     label: "KBZPay",
     accountName: "NEX CARD",
-    accountNumber: "09-123456789",
-    phone: "09 123 456 789",
     details: "KBZPay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
     deepLinkHint: "Open the KBZPay app → Transfer → enter the account above, then upload your screenshot.",
   },
   WavePay: {
     label: "WavePay",
     accountName: "NEX CARD",
-    accountNumber: "09-555123456",
-    phone: "09 555 123 456",
     details: "WavePay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
     deepLinkHint: "Open WavePay → Send Money → use the number above, then upload your transfer screenshot.",
   },
   AYAPay: {
     label: "AYA Pay",
     accountName: "NEX CARD",
-    accountNumber: "09-987654321",
-    phone: "09 987 654 321",
     details: "AYA Pay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
     deepLinkHint: "Complete the transfer in AYA Pay, then upload the confirmation screenshot.",
   },
@@ -71,6 +66,7 @@ export function PaymentForm({
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const wallets = usePublicWallets();
   const [paymentMethod, setPaymentMethod] = useState<keyof typeof PAYMENT_METHODS>("KBZPay");
   const [transactionRef, setTransactionRef] = useState("");
   const [selectedTier, setSelectedTier] = useState<
@@ -105,6 +101,7 @@ export function PaymentForm({
     try {
       const fd = new FormData();
       fd.append("file", file);
+      fd.append("folder", "payments");
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
       if (res.ok && data.url) {
@@ -203,15 +200,15 @@ export function PaymentForm({
           <div className="space-y-2">
             <div className="flex justify-between">
               <span style={{ color: "var(--nc-text-3)" }}>Account</span>
-              <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].accountName}</span>
+              <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{wallets.accountName || PAYMENT_METHODS[paymentMethod].accountName}</span>
             </div>
             <div className="flex justify-between">
               <span style={{ color: "var(--nc-text-3)" }}>Phone</span>
-              <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].phone}</span>
+              <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "Set in Admin → Settings"}</span>
             </div>
             <div className="flex justify-between">
               <span style={{ color: "var(--nc-text-3)" }}>Number</span>
-              <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].accountNumber}</span>
+              <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "—"}</span>
             </div>
           </div>
           <p className="mt-3 text-xs" style={{ color: "var(--nc-text-3)" }}>

@@ -1,7 +1,10 @@
-// src/lib/auth/email-tokens.ts
-import { randomBytes } from "crypto";
+import { createHash, randomBytes } from "crypto";
 import prisma from "@/lib/db/prisma";
 import type { EmailTokenType } from "@prisma/client";
+
+function sha256(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
 
 export async function createEmailToken(
   userId: string,
@@ -12,14 +15,13 @@ export async function createEmailToken(
   const expiresAt = new Date(Date.now() + ttlMs);
 
   try {
-    // Invalidate prior unused tokens of same type
     await prisma.emailToken.updateMany({
       where: { userId, type, usedAt: null },
       data: { usedAt: new Date() },
     });
 
     await prisma.emailToken.create({
-      data: { userId, token, type, expiresAt },
+      data: { userId, token: sha256(token), type, expiresAt },
     });
 
     return token;
@@ -34,9 +36,10 @@ export async function consumeEmailToken(
   type: EmailTokenType
 ): Promise<{ userId: string } | null> {
   try {
+    const hashed = sha256(token);
     const row = await prisma.emailToken.findFirst({
       where: {
-        token,
+        token: hashed,
         type,
         usedAt: null,
         expiresAt: { gt: new Date() },

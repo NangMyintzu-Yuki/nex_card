@@ -5,6 +5,7 @@ import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
+  GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "crypto";
@@ -37,12 +38,20 @@ function getR2Client(): S3Client {
   return r2Client;
 }
 
-function getBucketName(): string {
+function getPublicBucketName(): string {
   return process.env.R2_BUCKET_NAME ?? "nexcard-uploads";
+}
+
+function getPaymentBucketName(): string {
+  return process.env.R2_PRIVATE_BUCKET?.trim() || getPublicBucketName();
 }
 
 function getPublicBaseUrl(): string {
   return process.env.R2_PUBLIC_URL ?? "https://cdn.nexcard.io";
+}
+
+function isPaymentFolder(folder: UploadInput["folder"]): boolean {
+  return folder === "payments";
 }
 
 export async function uploadToR2(input: UploadInput): Promise<UploadResult> {
@@ -54,15 +63,18 @@ export async function uploadToR2(input: UploadInput): Promise<UploadResult> {
   }
 
   const ext = extensionFromContentType(input.contentType);
-  const key = `uploads/${input.userId}/${input.folder}/${randomUUID()}.${ext}`;
+  const payment = isPaymentFolder(input.folder);
+  const key = payment
+    ? `private/payments/${input.userId}/${randomUUID()}.${ext}`
+    : `uploads/${input.userId}/${input.folder}/${randomUUID()}.${ext}`;
 
   await getR2Client().send(
     new PutObjectCommand({
-      Bucket: getBucketName(),
+      Bucket: payment ? getPaymentBucketName() : getPublicBucketName(),
       Key: key,
       Body: input.buffer,
       ContentType: input.contentType,
-      CacheControl: "public, max-age=31536000, immutable",
+      CacheControl: payment ? "private, no-store" : "public, max-age=31536000, immutable",
       Metadata: {
         userId: input.userId,
         uploadedAt: new Date().toISOString(),
@@ -70,8 +82,16 @@ export async function uploadToR2(input: UploadInput): Promise<UploadResult> {
     })
   );
 
-  const publicUrl = `${getPublicBaseUrl()}/${key}`;
+  if (payment) {
+    return {
+      url: key,
+      publicUrl: "",
+      key,
+      driver: "r2",
+    };
+  }
 
+  const publicUrl = `${getPublicBaseUrl()}/${key}`;
   return {
     url: publicUrl,
     publicUrl,
@@ -87,13 +107,16 @@ export async function generateR2PresignedUrl(
   folder: UploadInput["folder"],
   expiresInSeconds = 300
 ): Promise<{ uploadUrl: string; publicUrl: string; key: string }> {
+  if (folder === "payments") {
+    throw new Error("Payment screenshots cannot use presigned uploads.");
+  }
   assertAllowedContentType(contentType);
 
   const ext = extensionFromContentType(contentType);
   const key = `uploads/${userId}/${folder}/${randomUUID()}.${ext}`;
 
   const command = new PutObjectCommand({
-    Bucket: getBucketName(),
+    Bucket: getPublicBucketName(),
     Key: key,
     ContentType: contentType,
     CacheControl: "public, max-age=31536000, immutable",
@@ -111,10 +134,33 @@ export async function generateR2PresignedUrl(
 }
 
 export async function deleteFromR2(key: string): Promise<void> {
+  const privateObject = key.startsWith("private/");
   await getR2Client().send(
     new DeleteObjectCommand({
-      Bucket: getBucketName(),
+      Bucket: privateObject ? getPaymentBucketName() : getPublicBucketName(),
       Key: key,
     })
   );
+}
+
+export async function getR2Object(
+  key: string
+): Promise<{ buffer: Buffer; contentType: string } | null> {
+  const privateObject = key.startsWith("private/");
+  try {
+    const result = await getR2Client().send(
+      new GetObjectCommand({
+        Bucket: privateObject ? getPaymentBucketName() : getPublicBucketName(),
+        Key: key,
+      })
+    );
+    if (!result.Body) return null;
+    const bytes = await result.Body.transformToByteArray();
+    return {
+      buffer: Buffer.from(bytes),
+      contentType: result.ContentType || "application/octet-stream",
+    };
+  } catch {
+    return null;
+  }
 }

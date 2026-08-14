@@ -27,7 +27,7 @@ export function BackupSection() {
   async function downloadBackup() {
     setDownloadStatus("loading");
     try {
-      const res = await fetch("/api/admin/backup");
+      const res = await fetch("/api/admin/backup?download=1", { method: "POST" });
       if (!res.ok) throw new Error("Download failed");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);

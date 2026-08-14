@@ -33,7 +33,7 @@ export default function PrivacyPolicyPage() {
       <ul>
         <li><strong>Account Information:</strong> Name, email address, password, and profile details when you register.</li>
         <li><strong>Card Content:</strong> Contact information, social links, business details, photos, and portfolio materials you add to your cards.</li>
-        <li><strong>Payment Information:</strong> Billing details processed securely through our third-party payment processor (Stripe). We do not store credit card numbers.</li>
+        <li><strong>Payment Information:</strong> We collect a screenshot of your MMK wallet transfer (KBZPay, WavePay, AYA Pay, or similar) as proof of payment. Screenshots are stored privately and can be viewed only by you and NEX CARD administrators. We do not process credit cards and we do not use Stripe. Proofs are retained while your account and payment record exist, then deleted with your account data.</li>
         <li><strong>Communications:</strong> Messages you send us through support channels or feedback forms.</li>
       </ul>
 

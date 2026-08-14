@@ -18,6 +18,7 @@ import {
   submitPaymentAction,
   type SubmitPaymentState,
 } from "@/lib/actions/payment-actions";
+import { usePublicWallets } from "@/lib/payments/use-public-wallets";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -120,16 +121,14 @@ const TIER_INFO = {
 const PAYMENT_METHODS = {
   KBZPay: {
     label: "KBZPay",
-    accountName: "NEX CARD",
-    accountNumber: "09-123456789",
-    phone: "09 123 456 789",
     details: "KBZPay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
+  },
+  WavePay: {
+    label: "WavePay",
+    details: "WavePay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
   },
   AYAPay: {
     label: "AYA Pay",
-    accountName: "NEX CARD",
-    accountNumber: "09-987654321",
-    phone: "09 987 654 321",
     details: "AYA Pay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
   },
 };
@@ -167,6 +166,7 @@ export function OnboardingClient({
   initialCategoryId,
 }: OnboardingClientProps) {
   const router = useRouter();
+  const wallets = usePublicWallets();
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>(
     initialCategoryId ?? ""
@@ -283,6 +283,7 @@ export function OnboardingClient({
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("folder", "payments");
 
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
@@ -802,15 +803,15 @@ export function OnboardingClient({
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span style={{ color: "var(--nc-text-2)" }}>Account Name</span>
-                  <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].accountName}</span>
+                  <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{wallets.accountName}</span>
                 </div>
                 <div className="flex justify-between">
                   <span style={{ color: "var(--nc-text-2)" }}>Phone Number</span>
-                  <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].phone}</span>
+                  <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "Set in Admin → Settings"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span style={{ color: "var(--nc-text-2)" }}>Account Number</span>
-                  <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{PAYMENT_METHODS[paymentMethod].accountNumber}</span>
+                  <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "—"}</span>
                 </div>
               </div>
               <p className="mt-3 text-xs" style={{ color: "var(--nc-text-3)" }}>

@@ -5,8 +5,11 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
+import { rejectIfMaintenance } from "@/lib/security/maintenance";
 
 export async function GET(_request: NextRequest) {
+  const blocked = rejectIfMaintenance("/api/export/data");
+  if (blocked) return blocked;
   const session = await getServerSession();
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized." }, { status: 401 });

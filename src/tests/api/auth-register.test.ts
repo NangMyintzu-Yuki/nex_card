@@ -42,7 +42,7 @@ describe("POST /api/auth/register", () => {
     expect(body.message).toMatch(/already exists/i);
   });
 
-  it("creates user, session, and cookie on success", async () => {
+  it("creates a pending user and requires email verification", async () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
     vi.mocked(prisma.user.create).mockResolvedValue({
       id: "user-new",
@@ -50,7 +50,10 @@ describe("POST /api/auth/register", () => {
       email: "alex@nexcard.io",
       role: "USER",
     } as never);
-    vi.mocked(prisma.session.create).mockResolvedValue({} as never);
+    vi.mocked(prisma.emailToken.updateMany).mockResolvedValue({ count: 0 } as never);
+    vi.mocked(prisma.emailToken.create).mockResolvedValue({} as never);
+    vi.mocked(prisma.verificationCode.deleteMany).mockResolvedValue({ count: 0 } as never);
+    vi.mocked(prisma.verificationCode.create).mockResolvedValue({} as never);
 
     const res = await POST(
       jsonRequest("http://localhost/api/auth/register", "POST", {
@@ -61,11 +64,22 @@ describe("POST /api/auth/register", () => {
     );
 
     expect(res.status).toBe(201);
-    const body = await readJson<{ success: boolean; user: { id: string } }>(res);
+    const body = await readJson<{
+      success: boolean;
+      requiresVerification: boolean;
+    }>(res);
     expect(body.success).toBe(true);
-    expect(body.user.id).toBe("user-new");
+    expect(body.requiresVerification).toBe(true);
     expect(hashPassword).toHaveBeenCalledWith("password123");
-    expect(prisma.session.create).toHaveBeenCalledOnce();
-    expect(res.cookies.get("session_token")?.value).toBeTruthy();
+    expect(prisma.user.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: "PENDING_VERIFICATION",
+          emailVerifiedAt: null,
+        }),
+      })
+    );
+    expect(prisma.session.create).not.toHaveBeenCalled();
+    expect(res.cookies.get("session_token")?.value).toBeFalsy();
   });
 });

@@ -11,6 +11,7 @@ import {
   type BusinessAdProps,
 } from "./_shared";
 import { SocialIconLinks } from "./_social-links";
+import { neonBody, neonDisplay } from "./_neon-fonts";
 
 export function NeonBusiness({
   data,
@@ -45,11 +46,12 @@ export function NeonBusiness({
   const tonight = featured.length > 0 ? featured : services.slice(0, 2);
 
   return (
-    <main className="min-h-screen w-full max-w-full overflow-x-clip bg-[#0A0E17] text-[#F4EDE4] antialiased">
+    <main
+      className={`${neonDisplay.variable} ${neonBody.variable} min-h-screen w-full max-w-full overflow-x-clip bg-[#0A0E17] text-[#F4EDE4] antialiased`}
+    >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap');
-        .n-display { font-family: 'Cormorant Garamond', Georgia, serif; }
-        .n-body { font-family: 'Outfit', system-ui, sans-serif; }
+        .n-display { font-family: var(--font-neon-display), Georgia, serif; }
+        .n-body { font-family: var(--font-neon-body), system-ui, sans-serif; }
         @keyframes n-fade {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }

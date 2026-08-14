@@ -3,9 +3,11 @@
 
 /**
  * Accepts storage shapes used by this app:
- * - Local:  /uploads/payments/{userId}-{timestamp}-{uuid}.ext
- * - Absolute same path on APP_URL
- * - R2/CDN: .../uploads/{userId}/payments/{uuid}.ext
+ * - Private local:  private/payments/{userId}-{timestamp}-{uuid}.ext
+ * - Private R2:     private/payments/{userId}/{uuid}.ext
+ * - Legacy local:   /uploads/payments/{userId}-{timestamp}-{uuid}.ext
+ *
+ * Public CDN payment URLs are rejected for new submissions.
  */
 export function isOwnedPaymentScreenshotUrl(
   url: string,
@@ -20,31 +22,48 @@ export function isOwnedPaymentScreenshotUrl(
   let pathname = trimmed;
   try {
     if (/^https?:\/\//i.test(trimmed)) {
-      const parsed = new URL(trimmed);
-      if (!["http:", "https:"].includes(parsed.protocol)) return false;
-      pathname = parsed.pathname;
+      // New submissions must not use a public CDN URL for proofs
+      return false;
     }
   } catch {
     return false;
   }
 
-  // Local disk pattern: /uploads/payments/{userId}-...
-  const localPattern = new RegExp(
-    `^/uploads/payments/${escapedId}-[A-Za-z0-9._-]+$`
-  );
-  if (localPattern.test(pathname)) return true;
+  if (pathname.startsWith("/")) pathname = pathname.slice(1);
 
-  // Object-store pattern: /uploads/{userId}/payments/...
-  const objectPattern = new RegExp(
-    `^/uploads/${escapedId}/payments/[A-Za-z0-9._-]+$`
+  const privateLocal = new RegExp(
+    `^private/payments/${escapedId}-[A-Za-z0-9._-]+$`
   );
-  if (objectPattern.test(pathname)) return true;
+  if (privateLocal.test(pathname)) return true;
 
-  // Some CDNs omit leading uploads/ — still require userId + payments
-  const loose = new RegExp(
-    `/(?:uploads/)?${escapedId}/payments/[A-Za-z0-9._-]+$`
+  const privateR2 = new RegExp(
+    `^private/payments/${escapedId}/[A-Za-z0-9._-]+$`
   );
-  if (loose.test(pathname)) return true;
+  if (privateR2.test(pathname)) return true;
+
+  // Legacy local disk (pre-hardening)
+  const localLegacy = new RegExp(
+    `^uploads/payments/${escapedId}-[A-Za-z0-9._-]+$`
+  );
+  if (localLegacy.test(pathname)) return true;
 
   return false;
+}
+
+/** Normalize a stored screenshot value to a storage key (no leading slash). */
+export function paymentStorageKey(raw: string): string | null {
+  if (!raw || raw.length > 2048) return null;
+  if (raw.includes("..") || raw.includes("\\")) return null;
+
+  let pathname = raw.trim();
+  try {
+    if (/^https?:\/\//i.test(pathname)) {
+      const parsed = new URL(pathname);
+      pathname = parsed.pathname;
+    }
+  } catch {
+    return null;
+  }
+  if (pathname.startsWith("/")) pathname = pathname.slice(1);
+  return pathname || null;
 }

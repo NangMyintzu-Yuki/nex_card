@@ -31,6 +31,7 @@ describe("markNfcProgrammedAction", () => {
         email: "alex@nexcard.io",
         role: "USER",
         avatarUrl: null,
+        totpEnabled: false,
       },
     });
 
@@ -62,6 +63,7 @@ describe("markNfcProgrammedAction", () => {
         email: "alex@nexcard.io",
         role: "USER",
         avatarUrl: null,
+        totpEnabled: false,
       },
     });
 

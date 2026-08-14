@@ -2,6 +2,7 @@
 // Tiny non-visual helpers shared by business-ad templates (no shared chrome)
 
 import type { BusinessAdData } from "@/lib/validators/template-schemas";
+import { safeHref } from "@/lib/security/safe-href";
 
 export type BusinessAdProps = {
   data: BusinessAdData;
@@ -23,9 +24,9 @@ export function contactHref(type: string, value: string): string {
     case "telegram":
       return `https://t.me/${val.replace("@", "")}`;
     case "website":
-      return val.startsWith("http") ? val : `https://${val}`;
+      return safeHref(val.startsWith("http") ? val : `https://${val}`);
     default:
-      return val.startsWith("http") ? val : "#";
+      return safeHref(val);
   }
 }
 

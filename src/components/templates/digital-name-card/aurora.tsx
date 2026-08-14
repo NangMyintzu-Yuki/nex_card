@@ -5,6 +5,7 @@
 import { useState } from "react";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
 import { AvatarZoom } from "@/components/templates/avatar-zoom";
+import { safeHref } from "@/lib/security/safe-href";
 
 interface Props { data: DigitalNameCardData; accentColor?: string; }
 
@@ -66,7 +67,7 @@ const CT: Record<string, { label: string; emoji: string; href: (v: string) => st
   viber:    { label: "Viber",    emoji: "📲", href: v => `viber://chat?number=${v.replace(/[^0-9+]/g, "")}` },
   telegram: { label: "Telegram", emoji: "✈️",  href: v => v.startsWith("@") ? `https://t.me/${v.slice(1)}` : `https://t.me/${v}` },
   skype:    { label: "Skype",    emoji: "💻", href: v => `skype:${v}?chat` },
-  website:  { label: "Website",  emoji: "🌐", href: v => v.startsWith("http") ? v : `https://${v}` },
+  website:  { label: "Website",  emoji: "🌐", href: v => safeHref(v) },
   address:  { label: "Address",  emoji: "📍", href: v => `https://maps.google.com/?q=${encodeURIComponent(v)}` },
 };
 

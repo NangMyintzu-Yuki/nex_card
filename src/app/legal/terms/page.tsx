@@ -93,8 +93,8 @@ export default function TermsOfServicePage() {
       <h2 id="paid-services">7. Paid Services</h2>
       <ul>
         <li>Certain features require a paid subscription or one-time payment.</li>
-        <li>All payments are processed through our third-party payment processor (Stripe).</li>
-        <li>Prices are displayed in your local currency and include applicable taxes unless stated otherwise.</li>
+        <li>Payments are MMK wallet transfers (KBZPay, WavePay, AYA Pay, or similar). You submit a screenshot as proof; we do not process credit cards and we do not use Stripe.</li>
+        <li>Prices are displayed in MMK unless stated otherwise.</li>
         <li>Subscriptions automatically renew unless cancelled before the renewal date.</li>
         <li>Refund requests are handled on a case-by-case basis within 14 days of purchase.</li>
         <li>We reserve the right to change pricing with 30 days' notice.</li>

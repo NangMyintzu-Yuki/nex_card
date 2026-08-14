@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
-import { verifyPassword } from "@/lib/auth/hash";
+import { verifyPassword, dummyPasswordCheck } from "@/lib/auth/hash";
 import { randomBytes } from "crypto";
 import {
   clientIp,
@@ -15,7 +15,7 @@ import {
 
 const LoginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1),
+  password: z.string().min(1).max(72),
   totpCode: z.string().regex(/^\d{6}$/).optional(),
 });
 
@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
     const invalidMessage = "Invalid email or password.";
 
     if (!user) {
+      await dummyPasswordCheck(password);
       return NextResponse.json({ message: invalidMessage }, { status: 401 });
     }
 
@@ -80,7 +81,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           message:
-            "Please verify your email before signing in. Check your inbox for the link.",
+            "Please verify your email before signing in. Check your inbox for the code.",
+          requiresVerification: true,
         },
         { status: 403 }
       );

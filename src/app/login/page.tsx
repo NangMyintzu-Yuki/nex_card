@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useTheme } from "@/lib/theme/theme-context";
+import { safeCallbackUrl } from "@/lib/security/callback-url";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,7 +33,9 @@ export default function LoginPage() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.authenticated) {
-          router.replace(data.user?.role === "ADMIN" ? "/admin" : "/dashboard");
+          const params = new URLSearchParams(window.location.search);
+          const fallback = data.user?.role === "ADMIN" ? "/admin" : "/dashboard";
+          router.replace(safeCallbackUrl(params.get("callbackUrl"), fallback));
         }
       })
       .catch(() => {});
@@ -61,10 +64,16 @@ export default function LoginPage() {
           setError("Enter the 6-digit code from your authenticator app.");
           return;
         }
+        if (data.requiresVerification) {
+          router.replace(`/verify-email?email=${encodeURIComponent(email)}`);
+          return;
+        }
         setError(data.message ?? "Login failed.");
         return;
       }
-      const dest = data.user?.role === "ADMIN" ? "/admin" : "/dashboard";
+      const params = new URLSearchParams(window.location.search);
+      const fallback = data.user?.role === "ADMIN" ? "/admin" : "/dashboard";
+      const dest = safeCallbackUrl(params.get("callbackUrl"), fallback);
       router.replace(dest);
       router.refresh();
     } catch {

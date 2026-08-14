@@ -10,40 +10,69 @@ import prisma from "@/lib/db/prisma";
 
 const gzipAsync = promisify(gzip);
 
-export async function POST(_req: NextRequest) {
+async function requireAdmin() {
   const session = await getServerSession();
   if (!session?.user?.id || session.user.role !== "ADMIN") {
+    return null;
+  }
+  return session;
+}
+
+async function buildDump() {
+  const sql = await generateSqlDump();
+  const sizeRaw = Buffer.byteLength(sql, "utf-8");
+  const compressed = await gzipAsync(Buffer.from(sql, "utf-8"), { level: 9 });
+  const date = new Date().toISOString().slice(0, 10);
+  const filename = `nexcard-backup-${date}.sql.gz`;
+  return { compressed, sizeRaw, filename };
+}
+
+export async function POST(req: NextRequest) {
+  const session = await requireAdmin();
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const download =
+    req.nextUrl.searchParams.get("download") === "1" ||
+    (req.headers.get("accept") ?? "").includes("application/gzip");
+
   try {
-    // 1. Generate SQL dump
-    const sql = await generateSqlDump();
-    const sizeRaw = Buffer.byteLength(sql, "utf-8");
+    const { compressed, sizeRaw, filename } = await buildDump();
 
-    // 2. Compress with gzip
-    const compressed = await gzipAsync(Buffer.from(sql, "utf-8"), { level: 9 });
-    const sizeCompressed = compressed.length;
+    if (download) {
+      return new Response(compressed, {
+        headers: {
+          "Content-Type": "application/gzip",
+          "Content-Disposition": `attachment; filename="${filename}"`,
+          "Cache-Control": "private, no-store",
+        },
+      });
+    }
 
-    // 3. Build filename
-    const date = new Date().toISOString().slice(0, 10);
-    const filename = `nexcard-backup-${date}.sql.gz`;
+    const [users, sessions, categories, templates, profiles, payments] =
+      await Promise.all([
+        prisma.user.count(),
+        prisma.session.count(),
+        prisma.category.count(),
+        prisma.template.count(),
+        prisma.userProfile.count(),
+        prisma.payment.count(),
+      ]);
 
-    // 4. Get row counts for email stats
-    const [users, sessions, categories, templates, profiles, payments] = await Promise.all([
-      prisma.user.count(),
-      prisma.session.count(),
-      prisma.category.count(),
-      prisma.template.count(),
-      prisma.userProfile.count(),
-      prisma.payment.count(),
-    ]);
-
-    // 5. Send email
     const messageId = await sendBackupEmail({
       compressedSql: compressed,
       filename,
-      stats: { users, sessions, categories, templates, profiles, payments, sizeRaw, sizeCompressed },
+      stats: {
+        users,
+        sessions,
+        categories,
+        templates,
+        profiles,
+        payments,
+        sizeRaw,
+        sizeCompressed: compressed.length,
+      },
     });
 
     return NextResponse.json({
@@ -53,38 +82,19 @@ export async function POST(_req: NextRequest) {
       stats: {
         rows: { users, sessions, categories, templates, profiles, payments },
         sizeRaw: `${(sizeRaw / 1024).toFixed(1)} KB`,
-        sizeCompressed: `${(sizeCompressed / 1024).toFixed(1)} KB`,
-        reduction: `${Math.round((1 - sizeCompressed / sizeRaw) * 100)}%`,
+        sizeCompressed: `${(compressed.length / 1024).toFixed(1)} KB`,
+        reduction: `${Math.round((1 - compressed.length / sizeRaw) * 100)}%`,
       },
     });
   } catch (err) {
     console.error("Backup failed:", err);
     return NextResponse.json(
-      { error: "Backup generation or email failed", details: String(err) },
+      { error: "Backup generation or email failed" },
       { status: 500 }
     );
   }
 }
 
-// GET — just generate and download (no email)
-export async function GET(_req: NextRequest) {
-  const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const sql = await generateSqlDump();
-    const compressed = await gzipAsync(Buffer.from(sql, "utf-8"), { level: 9 });
-    const date = new Date().toISOString().slice(0, 10);
-
-    return new Response(compressed, {
-      headers: {
-        "Content-Type": "application/gzip",
-        "Content-Disposition": `attachment; filename="nexcard-backup-${date}.sql.gz"`,
-      },
-    });
-  } catch (err) {
-    return NextResponse.json({ error: "Backup failed", details: String(err) }, { status: 500 });
-  }
+export async function GET() {
+  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
 }

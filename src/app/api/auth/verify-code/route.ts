@@ -4,16 +4,37 @@ import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { verifyCode } from "@/lib/auth/verification-codes";
 import { randomBytes } from "crypto";
+import {
+  clientIp,
+  maybeCleanupRateLimits,
+  rateLimit,
+} from "@/lib/security/rate-limit";
+import { rejectIfMaintenance } from "@/lib/security/maintenance";
 
 const Schema = z.object({
   email: z.string().email().toLowerCase().trim(),
-  code: z.string().length(6),
+  code: z.string().regex(/^\d{6}$/),
 });
 
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
+  const blocked = rejectIfMaintenance(request.nextUrl.pathname);
+  if (blocked) return blocked;
   try {
+    maybeCleanupRateLimits();
+    const ip = clientIp(request);
+    const ipLimit = rateLimit(`auth:verify-code:${ip}`, 8, 15 * 60 * 1000);
+    if (!ipLimit.ok) {
+      return NextResponse.json(
+        { message: "Too many attempts. Please try again later." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(ipLimit.retryAfterSec) },
+        }
+      );
+    }
+
     const body = await request.json();
     const parsed = Schema.safeParse(body);
 
@@ -25,6 +46,13 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, code } = parsed.data;
+    const emailLimit = rateLimit(`auth:verify-code:${email}`, 8, 15 * 60 * 1000);
+    if (!emailLimit.ok) {
+      return NextResponse.json(
+        { message: "Too many attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
 
     const user = await prisma.user.findUnique({
       where: { email },
@@ -45,9 +73,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await verifyCode(code, "register");
+    const result = await verifyCode(code, "register", user.id);
 
-    if (!result || result.userId !== user.id) {
+    if (!result) {
       return NextResponse.json(
         { message: "Invalid or expired verification code." },
         { status: 400 }

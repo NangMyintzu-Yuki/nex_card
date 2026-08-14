@@ -2,32 +2,36 @@
 // Secure password hashing using bcrypt
 
 import bcrypt from "bcryptjs";
-import * as crypto from "crypto";
 
 const SALT_ROUNDS = 12;
 
-/** Returns true if the stored hash is a legacy SHA-256 hex digest (seed data). */
+/** Dummy hash so missing-user login still spends bcrypt time. */
+const DUMMY_BCRYPT =
+  "$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquxi.Ss77VxDEBIVWc7aS";
+
 function isLegacySha256Hash(hash: string): boolean {
   return /^[a-f0-9]{64}$/i.test(hash);
 }
 
-/**
- * Hashes a plaintext password using bcrypt with 12 salt rounds.
- * Never store plaintext passwords — always call this before saving.
- */
 export async function hashPassword(plaintext: string): Promise<string> {
   return bcrypt.hash(plaintext, SALT_ROUNDS);
 }
 
+export async function dummyPasswordCheck(plaintext: string): Promise<void> {
+  await bcrypt.compare(plaintext, DUMMY_BCRYPT);
+}
+
 /**
  * Verifies a plaintext password against a stored hash.
- * Supports bcrypt (production) and legacy SHA-256 hex (seed/demo data).
+ * Production rejects leftover SHA-256 hex hashes (seed/demo only).
  */
 export async function verifyPassword(
   plaintext: string,
   hash: string
 ): Promise<boolean> {
   if (isLegacySha256Hash(hash)) {
+    if (process.env.NODE_ENV === "production") return false;
+    const crypto = await import("crypto");
     const hashedPlaintext = crypto
       .createHash("sha256")
       .update(plaintext)

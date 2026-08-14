@@ -3,15 +3,19 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { createVerificationCode } from "@/lib/auth/verification-codes";
+import { createEmailToken } from "@/lib/auth/email-tokens";
 import { sendMail, isMailConfigured } from "@/lib/mail/mailer";
 import { verifyEmailHtml } from "@/lib/mail/templates";
 import { clientIp, rateLimit } from "@/lib/security/rate-limit";
+import { rejectIfMaintenance } from "@/lib/security/maintenance";
 
 const Schema = z.object({
   email: z.string().email().toLowerCase().trim(),
 });
 
 export async function POST(request: NextRequest) {
+  const blocked = rejectIfMaintenance(request.nextUrl.pathname);
+  if (blocked) return blocked;
   try {
     const ip = clientIp(request);
     const limited = rateLimit(`auth:resend-code:${ip}`, 3, 60 * 1000);
@@ -46,16 +50,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const token = await createEmailToken(
+      user.id,
+      "VERIFY_EMAIL",
+      24 * 60 * 60 * 1000
+    );
     const code = await createVerificationCode(user.id, "register");
 
     if (isMailConfigured()) {
       await sendMail({
         to: email,
         subject: "Your NEX CARD verification code",
-        html: verifyEmailHtml(user.name, "", code),
+        html: verifyEmailHtml(user.name, token ?? "", code),
       });
     } else {
-      console.warn("[Auth/ResendCode] SMTP not configured. Code:", code, "for", email);
+      console.warn("[Auth/ResendCode] SMTP not configured.");
     }
 
     return NextResponse.json(

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   BarChart3, Users, Layers, Settings, Menu, X, ChevronRight, CreditCard,
-  LogOut, TrendingUp,
+  LogOut, TrendingUp, Shield,
 } from "lucide-react";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -21,6 +21,7 @@ const NAV = [
   { href: "/admin/users",      icon: Users,      label: "Users"     },
   { href: "/admin/templates",  icon: Layers,     label: "Templates" },
   { href: "/admin/settings",   icon: Settings,   label: "Settings"  },
+  { href: "/admin/security",   icon: Shield,     label: "Security"  },
 ] as const;
 
 function getInitials(name: string) {

@@ -2,9 +2,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   // ── Image optimization ──────────────────────────────────────────────────
   images: {
-    unoptimized: process.env.NODE_ENV === "production",
+    unoptimized: false,
     remotePatterns: [
       // Local dev uploads
       {
@@ -25,7 +26,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.nexcard.wetechmm.com",
       },
-      // Placeholder / seed images (legacy placehold.co URLs may still exist in DB)
+      {
+        protocol: "https",
+        hostname: "cdn.nexcard.io",
+      },
+      // Seed / onboarding preview images
       {
         protocol: "https",
         hostname: "images.unsplash.com",
@@ -34,37 +39,15 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "placehold.co",
       },
-      {
-        protocol: "https",
-        hostname: "via.placeholder.com",
-      },
-      {
-        protocol: "https",
-        hostname: "avatars.githubusercontent.com",
-      },
-      {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-      },
-      // Cloudinary
+      // Optional storage drivers
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
-      // Supabase Storage
       {
         protocol: "https",
         hostname: "**.supabase.co",
         pathname: "/storage/v1/object/public/**",
-      },
-      // Your own CDN domain in prod
-      {
-        protocol: "https",
-        hostname: "cdn.nexcard.io",
-      },
-      {
-        protocol: "https",
-        hostname: "cdn.presencecard.io",
       },
     ],
     formats: ["image/avif", "image/webp"],
@@ -80,7 +63,7 @@ const nextConfig: NextConfig = {
     const isProd = process.env.NODE_ENV === "production";
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
@@ -99,8 +82,9 @@ const nextConfig: NextConfig = {
         key: "Permissions-Policy",
         value: "camera=(), microphone=(), geolocation=()",
       },
-      // Report-only first — switch to Content-Security-Policy once console is clean
-      { key: "Content-Security-Policy-Report-Only", value: csp },
+      // Enforced CSP. District/Neon fonts are next/font (self-hosted), so Google Fonts
+      // origins are not required. Remaining 'unsafe-inline' is for template <style> CSS.
+      { key: "Content-Security-Policy", value: csp },
     ];
 
     if (isProd) {
@@ -142,9 +126,9 @@ const nextConfig: NextConfig = {
     // ppr: true,
     // cacheComponents: true,
     // Faster server actions
-    // serverActions: {
-    //   bodySizeLimit: "4mb",
-    // },
+    serverActions: {
+      bodySizeLimit: "2mb",
+    },
   },
 };
 

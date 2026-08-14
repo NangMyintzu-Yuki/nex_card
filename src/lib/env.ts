@@ -127,12 +127,13 @@ const ProdEnvSchema = z.object({
   NEXT_PUBLIC_APP_URL: z
     .string()
     .url("NEXT_PUBLIC_APP_URL must be a valid URL")
-    .refine((u) => !u.includes("localhost"), {
-      message: "NEXT_PUBLIC_APP_URL must not be localhost in production",
+    .refine((u) => !u.includes("localhost") || process.env.ALLOW_LOCAL_STORAGE === "true", {
+      message: "NEXT_PUBLIC_APP_URL must not be localhost in production unless ALLOW_LOCAL_STORAGE=true",
     }),
   REVALIDATION_SECRET: z
     .string()
     .min(32, "REVALIDATION_SECRET must be at least 32 characters"),
+  CRON_SECRET: z.string().min(32, "CRON_SECRET must be at least 32 characters"),
 });
 
 let validated = false;
@@ -152,6 +153,7 @@ export function validateEnv(): void {
       DATABASE_URL: process.env.DATABASE_URL,
       NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
       REVALIDATION_SECRET: process.env.REVALIDATION_SECRET,
+      CRON_SECRET: process.env.CRON_SECRET,
     });
     if (!result.success) {
       const msg = result.error.issues.map((i) => i.message).join("; ");
@@ -159,7 +161,10 @@ export function validateEnv(): void {
     }
 
     // Storage must resolve without silent local fallback
-    getStorageDriver();
+    const driver = getStorageDriver();
+    if (driver === "r2" && !isR2Configured()) {
+      throw new Error("[env] STORAGE_DRIVER=r2 requires R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME");
+    }
 
     // If backup email is partially configured, require full SMTP
     const smtpHost = process.env.SMTP_HOST?.trim();

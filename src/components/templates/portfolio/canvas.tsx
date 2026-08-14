@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import type { PortfolioData } from "@/lib/validators/template-schemas";
 import { resolveImageUrl } from "@/lib/utils/image-url";
+import { safeHref } from "@/lib/security/safe-href";
 
 interface PP {
   data: PortfolioData;
@@ -12,7 +13,7 @@ interface PP {
 function cHref(type: string, value: string) {
   if (type === "email") return `mailto:${value}`;
   if (type === "phone") return `tel:${value.replace(/\s/g, "")}`;
-  return value.startsWith("http") ? value : `https://${value}`;
+  return safeHref(value);
 }
 
 const AVAIL_MAP: Record<string, { dot: string; text: string; glow: string }> = {
