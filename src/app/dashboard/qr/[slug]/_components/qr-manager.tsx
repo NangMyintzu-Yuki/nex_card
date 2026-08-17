@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useActionState, useEffect, useRef } from "react";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import {
   QrCode, Lock, Download, Share2, ExternalLink,
   Eye, Smartphone, AlertTriangle, Check, Copy,

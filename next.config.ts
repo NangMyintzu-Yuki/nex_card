@@ -87,7 +87,7 @@ const nextConfig: NextConfig = {
       { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
       {
         key: "Permissions-Policy",
-        value: "camera=(), microphone=(), geolocation=()",
+        value: "camera=(self), microphone=(), geolocation=()",
       },
       // Enforced CSP. District/Neon fonts are next/font (self-hosted), so Google Fonts
       // origins are not required. Remaining 'unsafe-inline' is for template <style> CSS.

@@ -2,8 +2,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { useRouter } from "next/navigation";
+import { maintenancePath } from "@/lib/maintenance-path";
+import { Eye, EyeOff } from "lucide-react";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useTheme } from "@/lib/theme/theme-context";
@@ -16,6 +18,7 @@ export default function LoginPage() {
 
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [totpCode, setTotpCode] = useState("");
   const [needs2fa, setNeeds2fa] = useState(false);
   const [error, setError]       = useState("");
@@ -35,7 +38,7 @@ export default function LoginPage() {
         if (data?.authenticated) {
           const params = new URLSearchParams(window.location.search);
           const fallback = data.user?.role === "ADMIN" ? "/admin" : "/dashboard";
-          router.replace(safeCallbackUrl(params.get("callbackUrl"), fallback));
+          router.replace(maintenancePath(safeCallbackUrl(params.get("callbackUrl"), fallback)));
         }
       })
       .catch(() => {});
@@ -65,7 +68,7 @@ export default function LoginPage() {
           return;
         }
         if (data.requiresVerification) {
-          router.replace(`/verify-email?email=${encodeURIComponent(email)}`);
+          router.replace(maintenancePath(`/verify-email?email=${encodeURIComponent(email)}`));
           return;
         }
         setError(data.message ?? "Login failed.");
@@ -74,7 +77,7 @@ export default function LoginPage() {
       const params = new URLSearchParams(window.location.search);
       const fallback = data.user?.role === "ADMIN" ? "/admin" : "/dashboard";
       const dest = safeCallbackUrl(params.get("callbackUrl"), fallback);
-      router.replace(dest);
+      router.replace(maintenancePath(dest));
       router.refresh();
     } catch {
       setError("An unexpected error occurred. Please try again.");
@@ -106,7 +109,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-3 flex flex-col items-center gap-1 sm:mb-8 sm:gap-3">
-          <NexCardLogoStatic size={64} showText isDark={isDark} className="sm:hidden" />
+          <NexCardLogoStatic size={96} showText isDark={isDark} className="sm:hidden" />
           <NexCardLogoStatic size={120} showText isDark={isDark} className="hidden sm:block" />
           <div className="text-center">
             <h1 className="text-lg font-black sm:text-2xl" style={{ color: "var(--nc-text)" }}>Welcome back</h1>
@@ -154,17 +157,28 @@ export default function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                autoComplete="current-password"
-                style={inputStyle}
-                onFocus={e => (e.target.style.borderColor = brand2)}
-                onBlur={e => (e.target.style.borderColor = "var(--nc-border)")}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  autoComplete="current-password"
+                  style={{ ...inputStyle, paddingRight: "2.5rem" }}
+                  onFocus={e => (e.target.style.borderColor = brand2)}
+                  onBlur={e => (e.target.style.borderColor = "var(--nc-border)")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(p => !p)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: "var(--nc-text-3)" }}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             {needs2fa && (

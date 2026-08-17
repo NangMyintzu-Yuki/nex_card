@@ -3,8 +3,9 @@
 
 import { useState, useEffect, useRef, useActionState, useCallback } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { useRouter } from "next/navigation";
+import { maintenancePath } from "@/lib/maintenance-path";
 import {
   Lock, Check, ArrowRight, ChevronRight,
   AlertTriangle, ExternalLink, Upload, QrCode, Smartphone,
@@ -224,9 +225,9 @@ export function OnboardingClient({
         paymentFormData.append("screenshotUrl", paymentScreenshotUrl);
         submitPayment(paymentFormData);
       } else if (isPremium && preorderMode) {
-        router.push(`/dashboard?reserved=true`);
+        router.push(maintenancePath(`/dashboard?reserved=true`));
       } else {
-        router.push(`/dashboard?new=${formState.slug}`);
+        router.push(maintenancePath(`/dashboard?new=${formState.slug}`));
       }
     }
   }, [formState, router, isPremium, selectedTier, paymentScreenshotUrl, selectedTemplate, profileCreated, submitPayment, preorderMode]);
@@ -234,7 +235,7 @@ export function OnboardingClient({
   // After payment submitted successfully, redirect
   useEffect(() => {
     if (profileCreated && paymentFormState.status === "success") {
-      router.push(`/dashboard?pending=true`);
+      router.push(maintenancePath(`/dashboard?pending=true`));
     }
     if (profileCreated && paymentFormState.status === "error") {
       setPaymentAutoError(paymentFormState.message);

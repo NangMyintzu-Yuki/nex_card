@@ -66,6 +66,42 @@ export function paymentStatusHtml(
     </div>`;
 }
 
+export function twoFactorEnabledHtml(name: string): string {
+  return `
+    <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px">
+      <h2>Two-factor authentication enabled</h2>
+      <p>Hi ${escapeHtml(name)},</p>
+      <p>Two-factor authentication (2FA) has been successfully enabled on your NEX CARD account.</p>
+      <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:16px;margin:20px 0">
+        <p style="color:#166534;font-size:13px;margin:0">
+          <strong>Your account is now more secure.</strong> You will need your authenticator app code each time you sign in.
+        </p>
+      </div>
+      <p style="color:#666;font-size:12px">If you did not enable 2FA, please contact support immediately.</p>
+      <p style="margin:28px 0">
+        <a href="${appBaseUrl()}/dashboard" style="background:#1a3a6b;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">
+          Open dashboard
+        </a>
+      </p>
+    </div>`;
+}
+
+export function twoFactorFailedLoginHtml(name: string, ip?: string): string {
+  return `
+    <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px">
+      <h2>Failed login attempt</h2>
+      <p>Hi ${escapeHtml(name)},</p>
+      <p>We detected a failed login attempt on your NEX CARD account with an invalid 2FA code.</p>
+      <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px;margin:20px 0">
+        <p style="color:#991b1b;font-size:13px;margin:0">
+          <strong>Security alert:</strong> Someone attempted to sign in with your credentials but failed the 2FA verification.
+          ${ip ? `<br/>IP Address: ${escapeHtml(ip)}` : ""}
+        </p>
+      </div>
+      <p style="color:#666;font-size:12px">If this was you, try again with your correct authenticator code. If you suspect unauthorized access, change your password immediately.</p>
+    </div>`;
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

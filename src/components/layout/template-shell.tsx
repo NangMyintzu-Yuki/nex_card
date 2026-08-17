@@ -1,7 +1,7 @@
 // src/components/layout/template-shell.tsx
 // Wraps all public template renders with shared meta, viewport, and print controls
 
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 
 interface TemplateShellProps {
   children: React.ReactNode;

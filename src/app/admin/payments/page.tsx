@@ -3,7 +3,7 @@
 
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { CheckCircle } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";

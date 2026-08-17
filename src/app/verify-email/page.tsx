@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Link from "next/link";
+import { maintenancePath } from "@/lib/maintenance-path";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { ThemeProvider } from "@/lib/theme/theme-context";
 import { NexCardLogo } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -45,7 +46,7 @@ function VerifyEmailContent() {
         const data = await res.json().catch(() => ({}));
         if (cancelled) return;
         if (res.ok) {
-          router.replace("/login?verified=1");
+          router.replace(maintenancePath("/login?verified=1"));
           return;
         }
         setError(data.message ?? "This verification link is invalid or has expired.");
@@ -105,7 +106,7 @@ function VerifyEmailContent() {
         setError(data.message ?? "Verification failed.");
         return;
       }
-      router.replace("/dashboard/onboarding");
+      router.replace(maintenancePath("/dashboard/onboarding"));
       router.refresh();
     } catch {
       setError("An unexpected error occurred.");

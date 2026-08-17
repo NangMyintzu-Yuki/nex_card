@@ -1,5 +1,5 @@
 // src/app/admin/page.tsx — NEX CARD Admin Analytics Overview
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "@/lib/auth/session";

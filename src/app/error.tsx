@@ -4,7 +4,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
 export default function GlobalError({

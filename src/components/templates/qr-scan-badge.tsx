@@ -5,7 +5,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { QrCode, X } from "lucide-react";
 
 interface QRScanBadgeProps {

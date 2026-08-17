@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import LegalLayout from "@/components/legal/legal-layout";
 
 const TOC = [

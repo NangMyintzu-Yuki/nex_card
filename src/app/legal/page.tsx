@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { ThemeProvider } from "@/lib/theme/theme-context";
 import { useScrollRevealChildren } from "@/lib/hooks/use-scroll-reveal";
 

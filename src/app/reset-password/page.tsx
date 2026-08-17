@@ -2,8 +2,10 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { maintenancePath } from "@/lib/maintenance-path";
+import { Eye, EyeOff } from "lucide-react";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useTheme } from "@/lib/theme/theme-context";
@@ -19,6 +21,8 @@ function ResetForm() {
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +49,7 @@ function ResetForm() {
         setError(data.message ?? "Reset failed.");
         return;
       }
-      router.replace("/login?reset=1");
+      router.replace(maintenancePath("/login?reset=1"));
     } catch {
       setError("An unexpected error occurred.");
     } finally {
@@ -84,15 +88,26 @@ function ResetForm() {
           >
             New password
           </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={8}
-            autoComplete="new-password"
-            style={inputStyle}
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              autoComplete="new-password"
+              style={{ ...inputStyle, paddingRight: "2.5rem" }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(p => !p)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+              style={{ color: "var(--nc-text-3)" }}
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
         <div>
           <label
@@ -101,15 +116,26 @@ function ResetForm() {
           >
             Confirm password
           </label>
-          <input
-            type="password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            required
-            minLength={8}
-            autoComplete="new-password"
-            style={inputStyle}
-          />
+          <div className="relative">
+            <input
+              type={showConfirm ? "text" : "password"}
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
+              minLength={8}
+              autoComplete="new-password"
+              style={{ ...inputStyle, paddingRight: "2.5rem" }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirm(p => !p)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+              style={{ color: "var(--nc-text-3)" }}
+              tabIndex={-1}
+            >
+              {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
         {error && (
           <p className="text-sm" style={{ color: "#ef4444" }}>

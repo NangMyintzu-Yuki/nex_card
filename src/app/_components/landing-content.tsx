@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useLayoutEffect, useRef } from "react";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { ThemeProvider, useTheme } from "@/lib/theme/theme-context";
 import { NexCardLogo } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";

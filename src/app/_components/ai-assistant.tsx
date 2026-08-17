@@ -200,11 +200,12 @@ export default function AiAssistant() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setOpen(!open)}
-        className="fixed bottom-20 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full sm:right-6"
+        className="fixed right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full sm:right-6"
         style={{
           background: "var(--nc-brand-grad)",
           color: "var(--nc-brand-text)",
           boxShadow: "var(--nc-glow)",
+          bottom: "calc(5rem + env(safe-area-inset-bottom, 0px))",
         }}
         aria-label="AI Assistant"
       >
@@ -230,11 +231,12 @@ export default function AiAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-36 right-3 z-50 flex w-[min(340px,calc(100%-1.5rem))] flex-col overflow-hidden rounded-2xl"
+            className="fixed right-3 z-50 flex w-[min(340px,calc(100%-1.5rem))] flex-col overflow-hidden rounded-2xl"
             style={{
               background: "var(--nc-bg-card)",
               border: "1px solid var(--nc-border)",
               height: "min(460px, calc(100vh - 10rem))",
+              bottom: "calc(9rem + env(safe-area-inset-bottom, 0px))",
             }}
           >
             <div className="flex items-center gap-3 px-4 py-3"

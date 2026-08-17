@@ -2,7 +2,7 @@
 
 import { redirect, notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { ArrowLeft, Lock } from "lucide-react";
 import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";

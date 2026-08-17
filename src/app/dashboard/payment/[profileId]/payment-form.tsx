@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { maintenancePath } from "@/lib/maintenance-path";
 import { useActionState } from "react";
 import {
   Upload, QrCode, Smartphone, Package, ArrowRight,
@@ -85,7 +86,7 @@ export function PaymentForm({
 
   useEffect(() => {
     if (state.status === "success") {
-      router.push("/dashboard?pending=true");
+      router.push(maintenancePath("/dashboard?pending=true"));
     }
   }, [state, router]);
 

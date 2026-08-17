@@ -5,10 +5,11 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { getServerSession } from "@/lib/auth/session";
-import { MaintenanceGuard } from "./_components/maintenance-guard";
+import { headers } from "next/headers";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import { ThemeRoot } from "./_components/theme-root";
+import { MaintenanceContent } from "./maintenance/maintenance-content";
+import { isMaintenanceMode as isMaintenanceModeEnv } from "@/lib/env";
 import "./globals.css";
 
 const inter = Inter({
@@ -63,9 +64,14 @@ const themeBootScript = `
 })();
 `;
 
+/**
+ * Maintenance mode from:
+ *  1. Environment variable MAINTENANCE_MODE=true  (manual / CI-CD)
+ *  2. data/settings.json maintenance_mode field   (admin panel toggle)
+ */
 function isMaintenanceMode(): boolean {
+  if (isMaintenanceModeEnv()) return true;
   try {
-    // Sync file fallback — DB settings are hydrated via admin PUT into the same file
     const raw = readFileSync(join(process.cwd(), "data", "settings.json"), "utf-8");
     return JSON.parse(raw).maintenance_mode === true;
   } catch {
@@ -75,12 +81,14 @@ function isMaintenanceMode(): boolean {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const maintenanceOn = isMaintenanceMode();
-  let isAdmin = false;
 
+  let isBypassed = false;
   if (maintenanceOn) {
-    const session = await getServerSession();
-    isAdmin = session?.user?.role === "ADMIN";
+    const hdrs = await headers();
+    isBypassed = hdrs.get("x-maintenance-bypass") === "1";
   }
+
+  const showMaintenance = maintenanceOn && !isBypassed;
 
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} nc-dark`} suppressHydrationWarning>
@@ -90,11 +98,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className={`${inter.className} antialiased`} style={{ background: "var(--nc-bg)" }}>
         <RegisterServiceWorker />
         <ThemeRoot>
-          {maintenanceOn && !isAdmin ? (
-            <MaintenanceGuard>{children}</MaintenanceGuard>
-          ) : (
-            children
-          )}
+          {showMaintenance ? <MaintenanceContent /> : children}
         </ThemeRoot>
       </body>
     </html>

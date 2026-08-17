@@ -1,5 +1,5 @@
 // src/app/not-found.tsx — NEX CARD themed 404 page
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { NexCardLogo } from "@/components/ui/nex-card-logo";
 
 export default function NotFound() {

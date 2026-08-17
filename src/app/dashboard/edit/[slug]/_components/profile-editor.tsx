@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useActionState, useCallback } from "react";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import {
   ExternalLink, Lock, Check, AlertCircle, Save,
   Eye, EyeOff, ChevronDown, ChevronUp, Plus, Trash2, QrCode,
@@ -12,6 +12,7 @@ import {
   type UpdateProfileState,
 } from "@/lib/actions/profile-actions";
 import { resolveImageUrl } from "@/lib/utils/image-url";
+import BusinessCardScanner from "@/components/ocr/business-card-scanner";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -347,8 +348,9 @@ function ImageUploadField({
 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string>("");
-  const [tab, setTab] = useState<"upload" | "url">("upload");
+  const [tab, setTab] = useState<"upload" | "camera" | "url">("upload");
   const inputRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
 
   // Delete old image from R2 when uploading a new one or clearing
   function deleteOldImage(url: string) {
@@ -415,14 +417,14 @@ function ImageUploadField({
     <div className="space-y-2">
       {/* Tab switcher */}
       <div className="flex gap-1 nc-card rounded-xl p-1">
-        {(["upload", "url"] as const).map((t) => (
+        {(["upload", "camera", "url"] as const).map((t) => (
           <button key={t} type="button" onClick={() => setTab(t)}
             className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
               tab === t
                 ? "bg-indigo-500 text-white shadow"
                 : "nc-btn-ghost"
             }`}>
-            {t === "upload" ? "📁 Upload File" : "🔗 Paste URL"}
+            {t === "upload" ? "📁 Upload" : t === "camera" ? "📷 Camera" : "🔗 URL"}
           </button>
         ))}
       </div>
@@ -451,6 +453,33 @@ function ImageUploadField({
               </>
             )}
           </label>
+        </div>
+      ) : tab === "camera" ? (
+        <div>
+          <input ref={cameraRef} type="file" accept="image/*" capture="environment"
+            onChange={handleFile} className="hidden" />
+          <button type="button" onClick={() => cameraRef.current?.click()}
+            className={`flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-5 text-sm transition-all ${
+              uploading
+                ? "border-indigo-500/30 bg-indigo-500/5 text-indigo-400"
+                : "nc-btn-ghost border-dashed hover:border-indigo-500/30 hover:text-indigo-400"
+            }`}
+            disabled={uploading}>
+            {uploading ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+                Uploading…
+              </>
+            ) : (
+              <>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+                Take a photo with your camera
+              </>
+            )}
+          </button>
         </div>
       ) : (
         <input type="url" value={value} onChange={(e) => onChange(e.target.value)}
@@ -1145,6 +1174,7 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
   );
 
   const [successVisible, setSuccessVisible] = useState(false);
+  const [showOcrScanner, setShowOcrScanner] = useState(false);
 
   useEffect(() => {
     if (formState.status === "success") {
@@ -1182,6 +1212,41 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
       return next;
     });
   };
+
+  function handleOcrResult(result: { fullName?: string; jobTitle?: string; company?: string; email?: string; phone?: string; website?: string; address?: string }) {
+    if (result.fullName) setFieldValue("fullName", result.fullName);
+    if (result.jobTitle) setFieldValue("jobTitle", result.jobTitle);
+    if (result.company) setFieldValue("company", result.company);
+    if (result.email) {
+      const existingContacts = (getFieldValue("contacts") as Array<Record<string, string>>) ?? [];
+      const hasEmail = existingContacts.some((c) => c.type === "email");
+      if (!hasEmail) {
+        setFieldValue("contacts", [...existingContacts, { type: "email", value: result.email, label: "" }]);
+      }
+    }
+    if (result.phone) {
+      const existingContacts = (getFieldValue("contacts") as Array<Record<string, string>>) ?? [];
+      const hasPhone = existingContacts.some((c) => c.type === "phone");
+      if (!hasPhone) {
+        setFieldValue("contacts", [...existingContacts, { type: "phone", value: result.phone, label: "" }]);
+      }
+    }
+    if (result.website) {
+      const existingContacts = (getFieldValue("contacts") as Array<Record<string, string>>) ?? [];
+      const hasWebsite = existingContacts.some((c) => c.type === "website");
+      if (!hasWebsite) {
+        setFieldValue("contacts", [...existingContacts, { type: "website", value: result.website, label: "" }]);
+      }
+    }
+    if (result.address) {
+      const existingContacts = (getFieldValue("contacts") as Array<Record<string, string>>) ?? [];
+      const hasAddress = existingContacts.some((c) => c.type === "address");
+      if (!hasAddress) {
+        setFieldValue("contacts", [...existingContacts, { type: "address", value: result.address, label: "" }]);
+      }
+    }
+    setShowOcrScanner(false);
+  }
 
   const renderField = (field: FieldDef) => {
     const val = getFieldValue(field.key);
@@ -1354,6 +1419,26 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
       </div>
 
       {/* Dynamic field sections */}
+      {categorySlug === "digital-name-card" && (
+        <div className="mb-4">
+          <button type="button" onClick={() => setShowOcrScanner(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-500/20 bg-indigo-500/5 px-4 py-3 text-sm font-semibold text-indigo-400 transition-all hover:bg-indigo-500/10">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            Scan Business Card to Auto-Fill (OCR)
+          </button>
+        </div>
+      )}
+
+      {showOcrScanner && (
+        <BusinessCardScanner
+          onResult={handleOcrResult}
+          onClose={() => setShowOcrScanner(false)}
+        />
+      )}
+
       <div className="space-y-3">
         {sections.map((section) => {
           const isOpen = openSections.has(section.id);

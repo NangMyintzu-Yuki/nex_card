@@ -2,7 +2,7 @@
 "use client";
 
 import { useActionState } from "react";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { Smartphone, Radio, CheckCircle2, ExternalLink, ArrowLeft } from "lucide-react";
 import {
   markNfcProgrammedAction,

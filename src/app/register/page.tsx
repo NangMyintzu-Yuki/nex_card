@@ -2,8 +2,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { useRouter } from "next/navigation";
+import { maintenancePath } from "@/lib/maintenance-path";
+import { Eye, EyeOff } from "lucide-react";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useTheme } from "@/lib/theme/theme-context";
@@ -35,6 +37,7 @@ export default function RegisterPage() {
   const [name, setName]         = useState("");
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
@@ -46,7 +49,7 @@ export default function RegisterPage() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.authenticated) {
-          router.replace(data.user?.role === "ADMIN" ? "/admin" : "/dashboard");
+          router.replace(maintenancePath(data.user?.role === "ADMIN" ? "/admin" : "/dashboard"));
         }
       })
       .catch(() => {});
@@ -63,7 +66,7 @@ export default function RegisterPage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message ?? "Registration failed."); return; }
-      router.replace(`/verify-email?email=${encodeURIComponent(email)}`);
+      router.replace(maintenancePath(`/verify-email?email=${encodeURIComponent(email)}`));
     } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
@@ -93,7 +96,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-3 flex flex-col items-center gap-1 sm:mb-8 sm:gap-3">
-          <NexCardLogoStatic size={64} showText isDark={isDark} className="sm:hidden" />
+          <NexCardLogoStatic size={96} showText isDark={isDark} className="sm:hidden" />
           <NexCardLogoStatic size={120} showText isDark={isDark} className="hidden sm:block" />
           <div className="text-center">
             <h1 className="text-lg font-black sm:text-2xl" style={{ color: "var(--nc-text)" }}>Create your account</h1>
@@ -138,10 +141,28 @@ export default function RegisterPage() {
               <label className="mb-1 block text-[11px] font-semibold sm:mb-1.5 sm:text-xs" style={{ color: "var(--nc-text-2)" }}>
                 Password
               </label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-                placeholder="Min 8 characters" required autoComplete="new-password" style={inputStyle}
-                onFocus={e => (e.target.style.borderColor = brand2)}
-                onBlur={e => (e.target.style.borderColor = "var(--nc-border)")} />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Min 8 characters"
+                  required
+                  autoComplete="new-password"
+                  style={{ ...inputStyle, paddingRight: "2.5rem" }}
+                  onFocus={e => (e.target.style.borderColor = brand2)}
+                  onBlur={e => (e.target.style.borderColor = "var(--nc-border)")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(p => !p)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: "var(--nc-text-3)" }}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               <PasswordStrength pw={password} />
             </div>
 

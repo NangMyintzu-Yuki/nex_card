@@ -14,6 +14,8 @@ import {
   maybeCleanupRateLimits,
   rateLimit,
 } from "@/lib/security/rate-limit";
+import { sendMail, isMailConfigured } from "@/lib/mail/mailer";
+import { twoFactorEnabledHtml } from "@/lib/mail/templates";
 
 const CodeSchema = z.object({
   code: z.string().regex(/^\d{6}$/),
@@ -88,7 +90,7 @@ export async function POST(req: Request) {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { totpSecret: true },
+    select: { totpSecret: true, email: true, name: true },
   });
   if (!user?.totpSecret || !verifyTotp(user.totpSecret, parsed.data.code)) {
     return NextResponse.json({ error: "Invalid code" }, { status: 400 });
@@ -105,6 +107,17 @@ export async function POST(req: Request) {
     targetType: "User",
     targetId: session.user.id,
   });
+
+  // Send email notification when 2FA is enabled
+  if (isMailConfigured() && user.email) {
+    sendMail({
+      to: user.email,
+      subject: "Two-factor authentication enabled on your NEX CARD account",
+      html: twoFactorEnabledHtml(user.name ?? "User"),
+    }).catch((err) => {
+      console.error("[2fa] Failed to send 2FA enabled notification:", err);
+    });
+  }
 
   return NextResponse.json({ success: true, enabled: true });
 }

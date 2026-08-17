@@ -12,6 +12,8 @@ import {
   maybeCleanupRateLimits,
   rateLimit,
 } from "@/lib/security/rate-limit";
+import { sendMail, isMailConfigured } from "@/lib/mail/mailer";
+import { twoFactorFailedLoginHtml } from "@/lib/mail/templates";
 
 const LoginSchema = z.object({
   email: z.string().email(),
@@ -105,6 +107,16 @@ export async function POST(request: NextRequest) {
         );
       }
       if (!verifyTotp(user.totpSecret, totpCode)) {
+        // Send email notification for failed 2FA attempt
+        if (isMailConfigured() && user.email) {
+          sendMail({
+            to: user.email,
+            subject: "Failed login attempt on your NEX CARD account",
+            html: twoFactorFailedLoginHtml(user.name ?? "User", ip),
+          }).catch((err) => {
+            console.error("[Auth/Login] Failed to send 2FA failure notification:", err);
+          });
+        }
         return NextResponse.json(
           { message: "Invalid two-factor code." },
           { status: 401 }

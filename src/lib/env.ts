@@ -9,6 +9,21 @@ export type { StorageDriver };
 export const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.nexcard.wetechmm.com";
 
+// ── Maintenance mode ────────────────────────────────────────────────────────
+
+/** Whether maintenance mode is active (env-var driven). */
+export function isMaintenanceMode(): boolean {
+  return process.env.MAINTENANCE_MODE === "true";
+}
+
+/**
+ * The developer bypass prefix (e.g. "dev" → /dev/dashboard).
+ * Empty string when maintenance mode is off or var is unset.
+ */
+export function getBypassPrefix(): string {
+  return (process.env.MAINTENANCE_BYPASS_PREFIX ?? "").trim().replace(/^\/+/, "");
+}
+
 const ALL_DRIVERS: StorageDriver[] = ["local", "r2", "cloudinary", "supabase"];
 
 function isValidDriver(value: string): value is StorageDriver {

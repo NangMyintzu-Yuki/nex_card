@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { formatNumber, formatDate } from "@/lib/utils";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 
 export const metadata: Metadata = { title: "Analytics — NEX CARD" };
 export const dynamic = "force-dynamic";

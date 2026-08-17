@@ -2,7 +2,7 @@
 // NFC hub — lists profiles eligible for NFC programming
 
 import { redirect } from "next/navigation";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import type { Metadata } from "next";
 import { Radio, ArrowRight } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";

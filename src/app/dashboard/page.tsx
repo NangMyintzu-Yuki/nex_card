@@ -2,7 +2,7 @@
 // User Workspace Panel — Profile listing
 
 import { redirect } from "next/navigation";
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import type { Metadata } from "next";
 import { Plus, ExternalLink, Eye, Pencil, Lock, QrCode, Clock, XCircle, CheckCircle, Upload } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";

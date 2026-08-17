@@ -42,6 +42,9 @@ function getTransporter(): Transporter {
         user: smtpUser(),
         pass: smtpPass(),
       },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
     });
   }
   return transporter;
@@ -65,15 +68,31 @@ export async function sendMail(input: SendMailInput): Promise<{ messageId: strin
     smtpUser() ||
     "noreply@www.nexcard.wetechmm.com";
 
-  const info = await getTransporter().sendMail({
-    from: `"NEX CARD" <${fromEmail}>`,
-    to: input.to,
-    subject: input.subject,
-    html: input.html,
-    text: input.text,
-  });
+  try {
+    const info = await getTransporter().sendMail({
+      from: `"NEX CARD" <${fromEmail}>`,
+      to: input.to,
+      subject: input.subject,
+      html: input.html,
+      text: input.text,
+    });
 
-  return { messageId: info.messageId };
+    console.log("[mail] Sent:", input.subject, "→", input.to, "(id:", info.messageId, ")");
+    return { messageId: info.messageId };
+  } catch (error) {
+    console.error("[mail] Failed to send:", input.subject, "→", input.to, error);
+    // Reset transporter on connection errors so it reconnects on next attempt
+    if (error instanceof Error && (
+      error.message.includes("ECONNREFUSED") ||
+      error.message.includes("ETIMEDOUT") ||
+      error.message.includes("ESOCKET") ||
+      error.message.includes("ECONNRESET")
+    )) {
+      transporter = null;
+      console.warn("[mail] Transporter reset due to connection error");
+    }
+    throw error;
+  }
 }
 
 export function appBaseUrl(): string {

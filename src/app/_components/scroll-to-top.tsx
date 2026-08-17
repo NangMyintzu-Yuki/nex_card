@@ -24,11 +24,12 @@ export default function ScrollToTop() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 left-1/2 z-40 flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full shadow-lg transition-shadow hover:shadow-xl"
+          className="fixed left-1/2 z-40 flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full shadow-lg transition-shadow hover:shadow-xl"
           style={{
             background: "var(--nc-brand-grad)",
             color: "var(--nc-brand-text)",
             boxShadow: "var(--nc-glow)",
+            bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
           }}
           aria-label="Scroll to top"
         >

@@ -1,7 +1,7 @@
 // src/app/admin/_components/admin-sidebar.tsx
 "use client";
 
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {

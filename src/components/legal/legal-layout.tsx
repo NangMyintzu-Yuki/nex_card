@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { useScrollReveal } from "@/lib/hooks/use-scroll-reveal";
 
 type TocItem = { id: string; label: string };

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { maintenancePath } from "@/lib/maintenance-path";
 import { Loader2, ShieldCheck } from "lucide-react";
 import QRCode from "qrcode";
 
@@ -63,7 +64,7 @@ export default function AdminSecurityPage() {
         return;
       }
       setEnabled(true);
-      router.replace("/admin");
+      router.replace(maintenancePath("/admin"));
       router.refresh();
     } catch {
       setError("Could not enable 2FA.");
