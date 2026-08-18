@@ -3,7 +3,7 @@
 
 import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard, BarChart3, Settings, LogOut,
   QrCode, Menu, X, ChevronRight, Smartphone,
@@ -36,6 +36,12 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const open = () => setMobileOpen(true);
+    window.addEventListener("open-dashboard-sidebar", open);
+    return () => window.removeEventListener("open-dashboard-sidebar", open);
+  }, []);
 
   // Branded colours from CSS vars
   const brand2 = isDark ? "#d4af37" : "#2d6eb5";
@@ -167,17 +173,6 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
           <NavContent />
         </div>
       </aside>
-
-      {/* Mobile toggle button */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-xl lg:hidden"
-        style={{
-          background: `linear-gradient(135deg, ${brand2}, ${brand3})`,
-          bottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
-        }}>
-        <Menu className="h-5 w-5 text-white" />
-      </button>
 
       {/* Mobile drawer overlay */}
       {mobileOpen && (

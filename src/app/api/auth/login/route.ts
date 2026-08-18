@@ -6,23 +6,20 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { verifyPassword, dummyPasswordCheck } from "@/lib/auth/hash";
-import { randomBytes } from "crypto";
 import {
   clientIp,
   maybeCleanupRateLimits,
   rateLimit,
 } from "@/lib/security/rate-limit";
+import { createVerificationCode } from "@/lib/auth/verification-codes";
 import { sendMail, isMailConfigured } from "@/lib/mail/mailer";
-import { twoFactorFailedLoginHtml } from "@/lib/mail/templates";
+import { verifyEmailHtml, twoFactorFailedLoginHtml } from "@/lib/mail/templates";
 
 const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1).max(72),
   totpCode: z.string().regex(/^\d{6}$/).optional(),
 });
-
-// Session expires in 30 days
-const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   try {
@@ -124,36 +121,24 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const sessionToken = randomBytes(32).toString("hex");
-    const expires = new Date(Date.now() + SESSION_DURATION_MS);
+    const code = await createVerificationCode(user.id, "login");
 
-    await prisma.session.create({
-      data: {
-        userId: user.id,
-        sessionToken,
-        expires,
+    if (isMailConfigured() && user.email) {
+      await sendMail({
+        to: user.email,
+        subject: "Your NEX CARD login code",
+        html: verifyEmailHtml(user.name ?? "User", "", code),
+      });
+    }
+
+    return NextResponse.json(
+      {
+        message: "Please verify your email to complete login.",
+        requiresVerification: true,
+        email: user.email,
       },
-    });
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() },
-    });
-
-    const response = NextResponse.json({
-      success: true,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
-    });
-
-    response.cookies.set("session_token", sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      expires,
-      path: "/",
-    });
-
-    return response;
+      { status: 403 }
+    );
   } catch (error) {
     console.error("[Auth/Login]", error);
     return NextResponse.json(

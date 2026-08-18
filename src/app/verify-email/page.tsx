@@ -13,6 +13,7 @@ function VerifyEmailContent() {
   const router = useRouter();
   const email = searchParams.get("email") ?? "";
   const token = searchParams.get("token") ?? "";
+  const purpose = (searchParams.get("purpose") as "register" | "login") || "register";
 
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
@@ -28,6 +29,13 @@ function VerifyEmailContent() {
     const t = setTimeout(() => setResendTimer((s) => s - 1), 1000);
     return () => clearTimeout(t);
   }, [resendTimer]);
+
+  useEffect(() => {
+    if (!token && email) {
+      handleResend();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     inputsRef.current[0]?.focus();
@@ -99,14 +107,20 @@ function VerifyEmailContent() {
       const res = await fetch("/api/auth/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code: fullCode }),
+        body: JSON.stringify({ email, code: fullCode, purpose }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.message ?? "Verification failed.");
         return;
       }
-      router.replace(maintenancePath("/dashboard/onboarding"));
+      if (purpose === "login") {
+        const role = data.role;
+        const dest = role === "ADMIN" ? "/admin" : "/dashboard";
+        router.replace(maintenancePath(dest));
+      } else {
+        router.replace(maintenancePath("/dashboard/onboarding"));
+      }
       router.refresh();
     } catch {
       setError("An unexpected error occurred.");
@@ -121,7 +135,7 @@ function VerifyEmailContent() {
       await fetch("/api/auth/resend-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, purpose }),
       });
       setResendTimer(60);
       setCode(["", "", "", "", "", ""]);

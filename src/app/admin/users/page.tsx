@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { formatDate, getInitials } from "@/lib/utils";
+import { CardExportButton } from "./_components/card-export-button";
 
 export const metadata: Metadata = { title: "Users — Admin · NEX CARD" };
 export const dynamic = "force-dynamic";
@@ -108,7 +109,7 @@ export default async function AdminUsersPage({
           <table className="w-full text-sm">
             <thead style={{ borderBottom: "1px solid var(--nc-border)" }}>
               <tr>
-                {["User", "Email", "Role", "Status", "Profiles", "Joined", "Last Login"].map(
+                {["User", "Email", "Role", "Status", "Profiles", "Joined", "Last Login", "Actions"].map(
                   (col) => (
                     <th
                       key={col}
@@ -170,6 +171,12 @@ export default async function AdminUsersPage({
                   </td>
                   <td className="px-5 py-3.5 text-xs" style={{ color: "var(--nc-text-3)" }}>
                     {user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <CardExportButton
+                      userId={user.id}
+                      profileCount={user._count.profiles}
+                    />
                   </td>
                 </tr>
               ))}

@@ -68,7 +68,7 @@ export default function LoginPage() {
           return;
         }
         if (data.requiresVerification) {
-          router.replace(maintenancePath(`/verify-email?email=${encodeURIComponent(email)}`));
+          router.replace(maintenancePath(`/verify-email?email=${encodeURIComponent(email)}&purpose=login`));
           return;
         }
         setError(data.message ?? "Login failed.");

@@ -100,7 +100,7 @@ function PhysicalCard({
 
   return (
     <div
-      className="nc-float relative aspect-[1.586/1] w-[220px] overflow-hidden rounded-xl sm:w-[320px]"
+      className="nc-float relative aspect-[1.586/1] w-[256px] overflow-hidden rounded-xl sm:w-[320px]"
       style={{
         background: face,
         border: `1px solid ${isDark ? "rgba(212,175,55,0.28)" : "rgba(26,58,107,0.22)"}`,
@@ -183,7 +183,7 @@ function PhonePreview({
 
   return (
     <div
-      className="nc-float-delay relative h-[248px] w-[128px] overflow-hidden rounded-[1.7rem] sm:h-[380px] sm:w-[196px] sm:rounded-[1.85rem]"
+      className="nc-float-delay relative h-[290px] w-[150px] overflow-hidden rounded-[1.7rem] sm:h-[380px] sm:w-[196px] sm:rounded-[1.85rem]"
       style={{
         background: isDark ? "#0a0a0c" : "#dce3ee",
         border: `2px solid ${isDark ? "#2a2a2e" : "#c5d0e0"}`,
@@ -268,14 +268,14 @@ export default function Hero3D({
   };
 
   return (
-    <section className="relative isolate overflow-hidden px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-14 md:pb-24 md:pt-20">
+    <section className="relative isolate overflow-hidden px-4 pb-6 pt-4 sm:px-6 sm:pb-16 sm:pt-14 md:pb-24 md:pt-20">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-px"
         style={{ background: "var(--nc-border)" }}
       />
 
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-4 sm:gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
         <div className="nc-hero-in">
           <p
             className="text-[11px] font-semibold uppercase tracking-[0.32em]"
@@ -285,7 +285,7 @@ export default function Hero3D({
           </p>
 
           <h1
-            className="mt-5 max-w-[14ch] text-[2.6rem] font-semibold leading-[1.08] tracking-tight sm:text-6xl lg:text-[4.25rem]"
+            className="mt-3 max-w-[14ch] text-[2.6rem] font-semibold leading-[1.08] tracking-tight sm:mt-5 sm:text-6xl lg:text-[4.25rem]"
             style={{ color: "var(--nc-text)" }}
           >
             <span className="block">Tap the card.</span>
@@ -295,13 +295,13 @@ export default function Hero3D({
           </h1>
 
           <p
-            className="mt-6 max-w-md text-[15px] leading-relaxed sm:text-base"
+            className="mt-4 max-w-md text-[15px] leading-relaxed sm:mt-6 sm:text-base"
             style={{ color: "var(--nc-text-2)" }}
           >
             One physical card, one URL. Name card, portfolio, business page, or wedding invite — shared by tap, scan, or link.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-3">
+          <div className="mt-6 flex flex-wrap items-center gap-3 sm:mt-9">
             <Link
               href={isLoggedIn ? "/dashboard" : "/register"}
               className="rounded-full px-5 py-3 text-sm font-bold transition-transform hover:scale-[1.02] active:scale-[0.98] sm:px-7"
@@ -322,7 +322,7 @@ export default function Hero3D({
             </Link>
           </div>
 
-          <ul className="mt-10 flex flex-wrap gap-2">
+          <ul className="mt-6 flex flex-nowrap gap-1.5 sm:mt-10 sm:flex-wrap sm:gap-2">
             {SCENES.map((s, i) => {
               const active = i === index;
               return (
@@ -330,7 +330,7 @@ export default function Hero3D({
                   <button
                     type="button"
                     onClick={() => setIndex(i)}
-                    className="rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors"
+                    className="whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors sm:px-3.5 sm:py-1.5 sm:text-xs"
                     style={{
                       color: active ? "var(--nc-text)" : "var(--nc-text-3)",
                       background: active ? "var(--nc-bg-card)" : "transparent",
@@ -354,7 +354,7 @@ export default function Hero3D({
         >
           <div className="nc-hero-stage-scale">
             <div
-              className="relative h-[380px] w-[320px] sm:h-[440px] sm:w-[400px]"
+              className="relative h-[410px] w-[345px] sm:h-[440px] sm:w-[400px]"
               style={{
                 transformStyle: "preserve-3d",
                 transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
@@ -362,11 +362,11 @@ export default function Hero3D({
               }}
             >
               <div key={scene.id} className="nc-scene-swap relative h-full w-full">
-                <div className="absolute right-8 top-2 z-10 sm:right-0">
-                  <PhonePreview scene={scene} isDark={isDark} />
-                </div>
-                <div className="absolute bottom-5 left-0 z-20 sm:bottom-8">
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-[185px] z-10 sm:bottom-[210px]">
                   <PhysicalCard scene={scene} isDark={isDark} />
+                </div>
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-[-40px] sm:bottom-[-50px] z-20">
+                  <PhonePreview scene={scene} isDark={isDark} />
                 </div>
               </div>
             </div>

@@ -11,6 +11,7 @@ import { rejectIfMaintenance } from "@/lib/security/maintenance";
 
 const Schema = z.object({
   email: z.string().email().toLowerCase().trim(),
+  purpose: z.enum(["register", "login"]).default("register"),
 });
 
 export async function POST(request: NextRequest) {
@@ -36,33 +37,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email } = parsed.data;
+    const { email, purpose: requestedPurpose } = parsed.data;
 
     const user = await prisma.user.findUnique({
       where: { email },
       select: { id: true, name: true, status: true },
     });
 
-    if (!user || user.status !== "PENDING_VERIFICATION") {
+    const purpose =
+      user?.status === "ACTIVE" ? "login" :
+      user?.status === "PENDING_VERIFICATION" ? "register" :
+      requestedPurpose;
+
+    if (!user || (purpose === "register" && user.status !== "PENDING_VERIFICATION") ||
+        (purpose === "login" && user.status !== "ACTIVE")) {
       return NextResponse.json(
         { message: "If this email is registered, a new code has been sent." },
         { status: 200 }
       );
     }
 
-    const token = await createEmailToken(
-      user.id,
-      "VERIFY_EMAIL",
-      24 * 60 * 60 * 1000
-    );
-    const code = await createVerificationCode(user.id, "register");
+    const token = purpose === "register"
+      ? await createEmailToken(user.id, "VERIFY_EMAIL", 24 * 60 * 60 * 1000)
+      : null;
+    const code = await createVerificationCode(user.id, purpose);
 
     if (isMailConfigured()) {
-      await sendMail({
-        to: email,
-        subject: "Your NEX CARD verification code",
-        html: verifyEmailHtml(user.name, token ?? "", code),
-      });
+      const subject = purpose === "login"
+        ? "Your NEX CARD login code"
+        : "Your NEX CARD verification code";
+      const html = verifyEmailHtml(user.name ?? "User", token ?? "", code);
+      await sendMail({ to: email, subject, html });
     } else {
       console.warn("[Auth/ResendCode] SMTP not configured.");
     }

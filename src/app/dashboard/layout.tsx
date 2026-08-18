@@ -23,6 +23,11 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
   return (
     <ThemeProvider>
       <DashboardShell
+        user={{
+          name: session.user.name,
+          email: session.user.email,
+          role: session.user.role,
+        }}
         sidebar={
           <DashboardSidebar
             user={{

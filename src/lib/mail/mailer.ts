@@ -91,7 +91,7 @@ export async function sendMail(input: SendMailInput): Promise<{ messageId: strin
       transporter = null;
       console.warn("[mail] Transporter reset due to connection error");
     }
-    throw error;
+    return null;
   }
 }
 

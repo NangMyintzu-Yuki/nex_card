@@ -3,7 +3,7 @@
 
 import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart3, Users, Layers, Settings, Menu, X, ChevronRight, CreditCard,
   LogOut, TrendingUp, Shield,
@@ -34,6 +34,12 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const openSidebar = () => setOpen(true);
+    window.addEventListener("open-admin-sidebar", openSidebar);
+    return () => window.removeEventListener("open-admin-sidebar", openSidebar);
+  }, []);
 
   const brand2 = isDark ? "#d4af37" : "#2d6eb5";
   const brand3 = isDark ? "#f0c050" : "#4a9fd4";
@@ -135,16 +141,6 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
         style={{ background: "var(--nc-sidebar-bg)", borderRight: "1px solid var(--nc-sidebar-border)" }}>
         <div className="flex h-full flex-col"><NavContent /></div>
       </aside>
-
-      {/* Mobile toggle */}
-      <button onClick={() => setOpen(true)}
-        className="fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-xl lg:hidden"
-        style={{
-          background: `linear-gradient(135deg, ${brand2}, ${brand3})`,
-          bottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
-        }}>
-        <Menu className="h-5 w-5 text-white" />
-      </button>
 
       {/* Mobile drawer */}
       {open && (

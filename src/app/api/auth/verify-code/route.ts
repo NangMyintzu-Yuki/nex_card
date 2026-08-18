@@ -14,6 +14,7 @@ import { rejectIfMaintenance } from "@/lib/security/maintenance";
 const Schema = z.object({
   email: z.string().email().toLowerCase().trim(),
   code: z.string().regex(/^\d{6}$/),
+  purpose: z.enum(["register", "login"]).default("register"),
 });
 
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, code } = parsed.data;
+    const { email, code, purpose } = parsed.data;
     const emailLimit = rateLimit(`auth:verify-code:${email}`, 8, 15 * 60 * 1000);
     if (!emailLimit.ok) {
       return NextResponse.json(
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { id: true, status: true },
+      select: { id: true, name: true, email: true, status: true, role: true },
     });
 
     if (!user) {
@@ -66,14 +67,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.status !== "PENDING_VERIFICATION") {
-      return NextResponse.json(
-        { message: "Account is already verified or suspended." },
-        { status: 400 }
-      );
-    }
+    const effectivePurpose =
+      user.status === "ACTIVE" ? "login" :
+      user.status === "PENDING_VERIFICATION" ? "register" :
+      purpose;
 
-    const result = await verifyCode(code, "register", user.id);
+    const result = await verifyCode(code, effectivePurpose, user.id);
 
     if (!result) {
       return NextResponse.json(
@@ -82,12 +81,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (effectivePurpose === "register") {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          status: "ACTIVE",
+          emailVerifiedAt: new Date(),
+        },
+      });
+    }
+
     await prisma.user.update({
       where: { id: user.id },
-      data: {
-        status: "ACTIVE",
-        emailVerifiedAt: new Date(),
-      },
+      data: { lastLoginAt: new Date() },
     });
 
     const sessionToken = randomBytes(32).toString("hex");
@@ -98,7 +104,7 @@ export async function POST(request: NextRequest) {
     });
 
     const response = NextResponse.json(
-      { success: true, message: "Email verified successfully." },
+      { success: true, message: "Email verified successfully.", role: user.role },
       { status: 200 }
     );
 
