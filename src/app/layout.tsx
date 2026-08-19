@@ -93,6 +93,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} nc-light`} suppressHydrationWarning>
       <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
       <body className={`${inter.className} antialiased`} style={{ background: "var(--nc-bg)" }}>

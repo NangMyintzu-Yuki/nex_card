@@ -104,16 +104,19 @@ function VerifyEmailContent() {
     setError("");
     setLoading(true);
     try {
+      let remember = true;
+      try { remember = sessionStorage.getItem("auth_remember") !== "0"; } catch {}
       const res = await fetch("/api/auth/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code: fullCode, purpose }),
+        body: JSON.stringify({ email, code: fullCode, purpose, remember }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.message ?? "Verification failed.");
         return;
       }
+      try { sessionStorage.removeItem("auth_remember"); } catch {}
       if (purpose === "login") {
         const role = data.role;
         const dest = role === "ADMIN" ? "/admin" : "/dashboard";

@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [totpCode, setTotpCode] = useState("");
   const [needs2fa, setNeeds2fa] = useState(false);
   const [error, setError]       = useState("");
@@ -68,6 +69,7 @@ export default function LoginPage() {
           return;
         }
         if (data.requiresVerification) {
+          try { sessionStorage.setItem("auth_remember", rememberMe ? "1" : "0"); } catch {}
           router.replace(maintenancePath(`/verify-email?email=${encodeURIComponent(email)}&purpose=login`));
           return;
         }
@@ -180,6 +182,18 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-[var(--nc-border)] accent-[var(--nc-brand-2)]"
+              />
+              <span className="text-[11px] sm:text-xs" style={{ color: "var(--nc-text-2)" }}>
+                Remember for 30 days
+              </span>
+            </label>
 
             {needs2fa && (
               <div>

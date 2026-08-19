@@ -15,9 +15,11 @@ const Schema = z.object({
   email: z.string().email().toLowerCase().trim(),
   code: z.string().regex(/^\d{6}$/),
   purpose: z.enum(["register", "login"]).default("register"),
+  remember: z.boolean().default(true),
 });
 
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
+const SESSION_SHORT_MS = 24 * 60 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   const blocked = rejectIfMaintenance(request.nextUrl.pathname);
@@ -46,7 +48,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, code, purpose } = parsed.data;
+    const { email, code, purpose, remember } = parsed.data;
     const emailLimit = rateLimit(`auth:verify-code:${email}`, 8, 15 * 60 * 1000);
     if (!emailLimit.ok) {
       return NextResponse.json(
@@ -97,7 +99,8 @@ export async function POST(request: NextRequest) {
     });
 
     const sessionToken = randomBytes(32).toString("hex");
-    const expires = new Date(Date.now() + SESSION_DURATION_MS);
+    const sessionDuration = remember ? SESSION_DURATION_MS : SESSION_SHORT_MS;
+    const expires = new Date(Date.now() + sessionDuration);
 
     await prisma.session.create({
       data: { userId: user.id, sessionToken, expires },
