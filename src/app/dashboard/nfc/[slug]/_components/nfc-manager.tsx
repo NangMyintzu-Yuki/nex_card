@@ -30,7 +30,7 @@ export function NfcManager({ profile, nfcUrl }: NfcManagerProps) {
   const [state, formAction, pending] = useActionState(markNfcProgrammedAction, initialState);
 
   const hasNfcTier =
-    profile.paymentTier === "NFC_CARD" || profile.paymentTier === "PHYSICAL_CARD";
+    profile.paymentTier === "NFC_QR";
   const isApproved = profile.paymentStatus === "APPROVED";
   const programmedAt =
     state.status === "success"
@@ -64,7 +64,7 @@ export function NfcManager({ profile, nfcUrl }: NfcManagerProps) {
       {!hasNfcTier && (
         <div className="mb-6 rounded-2xl px-5 py-4 text-sm"
           style={{ border: "1px solid rgba(245,158,11,0.2)", background: "rgba(245,158,11,0.05)", color: "var(--nc-text-2)" }}>
-          Your current plan is QR-only. Upgrade to <strong>NFC Only</strong> or <strong>NFC + QR</strong> during onboarding or by contacting support.
+          Your current plan is QR-only. Upgrade to <strong>NFC + QR</strong> during onboarding or by contacting support.
         </div>
       )}
 

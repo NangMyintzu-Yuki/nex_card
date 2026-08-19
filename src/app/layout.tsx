@@ -58,8 +58,8 @@ const themeBootScript = `
   try {
     var t = localStorage.getItem('nexcard-theme');
     var root = document.documentElement;
-    if (t === 'light') { root.classList.add('nc-light'); root.classList.remove('nc-dark'); }
-    else { root.classList.add('nc-dark'); root.classList.remove('nc-light'); }
+    if (t === 'dark') { root.classList.add('nc-dark'); root.classList.remove('nc-light'); }
+    else { root.classList.add('nc-light'); root.classList.remove('nc-dark'); }
   } catch (e) {}
 })();
 `;
@@ -91,7 +91,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const showMaintenance = maintenanceOn && !isBypassed;
 
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} nc-dark`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} nc-light`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>

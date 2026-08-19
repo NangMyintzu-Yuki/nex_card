@@ -68,7 +68,6 @@ const TEMPLATES_BY_CATEGORY: Record<
     isPremium: boolean;
     sortOrder: number;
     priceQrOnly?: number;
-    priceNfcCard?: number;
     priceNfcQr?: number;
   }>
 > = {
@@ -287,7 +286,6 @@ const TEMPLATES_BY_CATEGORY: Record<
 
 const DEFAULT_PRICES = {
   priceQrOnly: 10_000,
-  priceNfcCard: 25_000,
   priceNfcQr: 40_000,
 } as const;
 
@@ -371,7 +369,6 @@ async function main() {
     for (const template of templates) {
       const prices = {
         priceQrOnly: template.priceQrOnly ?? DEFAULT_PRICES.priceQrOnly,
-        priceNfcCard: template.priceNfcCard ?? DEFAULT_PRICES.priceNfcCard,
         priceNfcQr: template.priceNfcQr ?? DEFAULT_PRICES.priceNfcQr,
       };
       const record = await prisma.template.upsert({

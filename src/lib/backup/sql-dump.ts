@@ -53,7 +53,7 @@ export async function generateSqlDump(): Promise<string> {
 
   // ── Templates ──
   const templates = await prisma.template.findMany({ orderBy: { name: "asc" } });
-  const tmplCols = ["id", "categoryId", "codeIdentifier", "name", "description", "thumbnailUrl", "previewUrl", "accentColor", "isPremium", "isActive", "sortOrder", "priceQrOnly", "priceNfcCard", "priceNfcQr", "createdAt", "updatedAt"];
+  const tmplCols = ["id", "categoryId", "codeIdentifier", "name", "description", "thumbnailUrl", "previewUrl", "accentColor", "isPremium", "isActive", "sortOrder", "priceQrOnly", "priceNfcQr", "createdAt", "updatedAt"];
   lines.push(`-- Table: templates (${templates.length} rows)`);
   if (templates.length) {
     lines.push(`INSERT INTO templates (${tmplCols.join(", ")}) VALUES`);

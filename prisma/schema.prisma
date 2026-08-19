@@ -1,9 +1,6 @@
-// prisma/schema.prisma
-// Production-optimized schema for Multi-Template Multi-Tenant Platform
-
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+  previewFeatures = ["fullTextIndex", "fullTextSearch"]
 }
 
 datasource db {
@@ -11,9 +8,271 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ENUM DEFINITIONS
-// ─────────────────────────────────────────────────────────────────────────────
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  emailVerifiedAt   DateTime?
+  hashedPassword    String
+  name              String
+  avatarUrl         String?
+  role              UserRole           @default(USER)
+  status            UserStatus         @default(PENDING_VERIFICATION)
+  lastLoginAt       DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  /// Base32 TOTP secret for optional admin 2FA (null = disabled)
+  totpSecret        String?            @db.VarChar(64)
+  totpEnabled       Boolean            @default(false)
+  emailTokens       EmailToken[]
+  payments          Payment[]
+  sessions          Session[]
+  profiles          UserProfile[]
+  verificationCodes VerificationCode[]
+
+  @@index([email])
+  @@index([status])
+  @@index([role])
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  sessionToken String   @unique
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@map("sessions")
+}
+
+model Category {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  slug        String        @unique
+  description String?       @db.Text
+  iconName    String?
+  sortOrder   Int           @default(0)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  templates   Template[]
+  profiles    UserProfile[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([sortOrder])
+  @@map("categories")
+}
+
+model Template {
+  id             String        @id @default(cuid())
+  categoryId     String
+  codeIdentifier String        @unique
+  name           String
+  description    String?       @db.Text
+  thumbnailUrl   String
+  previewUrl     String?
+  accentColor    String?
+  isPremium      Boolean       @default(false)
+  isActive       Boolean       @default(true)
+  sortOrder      Int           @default(0)
+  priceQrOnly    Float?
+  priceNfcQr     Float?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  category       Category      @relation(fields: [categoryId], references: [id])
+  profiles       UserProfile[]
+
+  @@index([categoryId])
+  @@index([codeIdentifier])
+  @@index([isActive])
+  @@index([sortOrder])
+  @@map("templates")
+}
+
+model UserProfile {
+  id               String                  @id @default(cuid())
+  userId           String
+  categoryId       String
+  templateId       String
+  templateLocked   Boolean                 @default(false)
+  slug             String                  @unique
+  isPublished      Boolean                 @default(false)
+  viewCount        BigInt                  @default(0)
+  dynamicJsonData  Json
+  qrLocked         Boolean                 @default(false)
+  qrGeneratedAt    DateTime?
+  qrScanCount      BigInt                  @default(0)
+  nfcWriteCount    BigInt                  @default(0)
+  nfcProgrammedAt  DateTime?
+  paymentStatus    PaymentStatus?
+  metaTitle        String?                 @db.VarChar(160)
+  metaDescription  String?                 @db.VarChar(320)
+  ogImageUrl       String?
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  nfcFulfillment   NfcFulfillmentStatus    @default(NOT_ORDERED)
+  payment          Payment?
+  analyticsEvents  ProfileAnalyticsEvent[]
+  category         Category                @relation(fields: [categoryId], references: [id])
+  template         Template                @relation(fields: [templateId], references: [id])
+  user             User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestbookEntries WeddingGuestbook[]
+  weddingRsvps     WeddingRsvp[]
+
+  @@unique([userId, categoryId])
+  @@index([slug])
+  @@index([userId])
+  @@index([categoryId])
+  @@index([templateId])
+  @@index([isPublished])
+  @@index([createdAt])
+  @@index([qrLocked])
+  @@index([paymentStatus])
+  @@index([nfcFulfillment])
+  @@map("user_profiles")
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  userId         String
+  userProfileId  String        @unique
+  tier           payments_tier
+  amount         Float
+  currency       String        @default("MMK")
+  /// Screenshot proof — still required as fallback for Wave/KBZ manual rails
+  screenshotUrl  String        @db.VarChar(500)
+  status         PaymentStatus @default(PENDING)
+  adminNote      String?       @db.VarChar(500)
+  reviewedAt     DateTime?
+  reviewedBy     String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  method         PaymentMethod @default(KBZPay)
+  /// Optional bank/wallet transaction reference from the payer
+  transactionRef String?       @db.VarChar(120)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userProfile    UserProfile   @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([method])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+model ProfileAnalyticsEvent {
+  id        String             @id @default(cuid())
+  profileId String
+  type      AnalyticsEventType
+  referrer  String?            @db.VarChar(500)
+  userAgent String?            @db.VarChar(500)
+  device    String?            @db.VarChar(40)
+  /// UTC calendar day YYYY-MM-DD for cheap grouping
+  day       String             @db.VarChar(10)
+  createdAt DateTime           @default(now())
+  profile   UserProfile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, type, day])
+  @@index([profileId, createdAt])
+  @@index([day])
+  @@map("profile_analytics_events")
+}
+
+model WeddingRsvp {
+  id          String      @id @default(cuid())
+  profileId   String
+  guestName   String      @db.VarChar(120)
+  email       String?     @db.VarChar(160)
+  phone       String?     @db.VarChar(40)
+  attending   Boolean     @default(true)
+  guestCount  Int         @default(1)
+  mealNote    String?     @db.VarChar(240)
+  message     String?     @db.VarChar(500)
+  createdAt   DateTime    @default(now())
+  dietary     String?     @db.VarChar(240)
+  mealChoice  String?     @db.VarChar(120)
+  plusOneName String?     @db.VarChar(120)
+  songRequest String?     @db.VarChar(120)
+  profile     UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([createdAt])
+  @@map("wedding_rsvps")
+}
+
+model WeddingGuestbook {
+  id        String      @id @default(cuid())
+  profileId String
+  author    String      @db.VarChar(120)
+  message   String      @db.VarChar(1000)
+  isPublic  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  profile   UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([createdAt])
+  @@map("wedding_guestbook")
+}
+
+model EmailToken {
+  id        String         @id @default(cuid())
+  userId    String
+  token     String         @unique
+  type      EmailTokenType
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime       @default(now())
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([type])
+  @@index([expiresAt])
+  @@map("email_tokens")
+}
+
+model VerificationCode {
+  id        String    @id @default(cuid())
+  userId    String
+  code      String
+  purpose   String    @default("register")
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([code])
+  @@index([purpose])
+  @@map("verification_codes")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String   @db.VarChar(80)
+  targetType String?  @db.VarChar(60)
+  targetId   String?  @db.VarChar(64)
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model SystemSetting {
+  key       String   @id @db.VarChar(80)
+  value     Json
+  updatedAt DateTime @updatedAt
+
+  @@map("system_settings")
+}
 
 enum UserStatus {
   ACTIVE
@@ -24,12 +283,6 @@ enum UserStatus {
 enum UserRole {
   ADMIN
   USER
-}
-
-enum PaymentTier {
-  QR_ONLY
-  NFC_CARD
-  PHYSICAL_CARD
 }
 
 enum PaymentStatus {
@@ -59,348 +312,12 @@ enum AnalyticsEventType {
   NFC_TAP
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// USERS TABLE
-// ─────────────────────────────────────────────────────────────────────────────
-
-model User {
-  id                String      @id @default(cuid())
-  email             String      @unique
-  emailVerifiedAt   DateTime?
-  hashedPassword    String
-  name              String
-  avatarUrl         String?
-  role              UserRole    @default(USER)
-  status            UserStatus  @default(PENDING_VERIFICATION)
-  lastLoginAt       DateTime?
-  /// Base32 TOTP secret for optional admin 2FA (null = disabled)
-  totpSecret        String?     @db.VarChar(64)
-  totpEnabled       Boolean     @default(false)
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-
-  // Relations
-  profiles          UserProfile[]
-  sessions          Session[]
-  payments          Payment[]
-  emailTokens       EmailToken[]
-  verificationCodes VerificationCode[]
-
-  @@index([email])
-  @@index([status])
-  @@index([role])
-  @@map("users")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SESSIONS TABLE (NextAuth compatible)
-// ─────────────────────────────────────────────────────────────────────────────
-
-model Session {
-  id           String   @id @default(cuid())
-  userId       String
-  sessionToken String   @unique
-  expires      DateTime
-  createdAt    DateTime @default(now())
-
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([sessionToken])
-  @@map("sessions")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CATEGORIES TABLE
-// ─────────────────────────────────────────────────────────────────────────────
-
-model Category {
-  id          String     @id @default(cuid())
-  name        String     @unique
-  slug        String     @unique
-  description String?    @db.Text
-  iconName    String?
-  sortOrder   Int        @default(0)
-  isActive    Boolean    @default(true)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  // Relations
-  templates   Template[]
-  profiles    UserProfile[]
-
-  @@index([slug])
-  @@index([isActive])
-  @@index([sortOrder])
-  @@map("categories")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// TEMPLATES TABLE
-// ─────────────────────────────────────────────────────────────────────────────
-
-model Template {
-  id               String      @id @default(cuid())
-  categoryId       String
-  codeIdentifier   String      @unique  // e.g. "digital-card-aurora", "wedding-elegance"
-  name             String
-  description      String?     @db.Text
-  thumbnailUrl     String
-  previewUrl       String?
-  accentColor      String?     // Primary brand color hex for preview
-  isPremium        Boolean     @default(false)
-  isActive         Boolean     @default(true)
-  sortOrder        Int         @default(0)
-
-  // Pricing (MMK) — null means not available for this template
-  priceQrOnly      Float?                          // QR code only tier
-  priceNfcCard     Float?                          // NFC card tier
-  priceNfcQr       Float?                          // NFC + QR combo tier
-
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-
-  // Relations
-  category         Category    @relation(fields: [categoryId], references: [id])
-  profiles         UserProfile[]
-
-  @@index([categoryId])
-  @@index([codeIdentifier])
-  @@index([isActive])
-  @@index([sortOrder])
-  @@map("templates")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// USER PROFILES TABLE — Core polymorphic entity
-// ─────────────────────────────────────────────────────────────────────────────
-
-model UserProfile {
-  id              String    @id @default(cuid())
-  userId          String
-  categoryId      String
-  templateId      String                        // LOCKED after first save
-  templateLocked  Boolean   @default(false)     // Flip to true on first save
-  slug            String    @unique             // Public-facing URL slug
-  isPublished     Boolean   @default(false)
-  viewCount       BigInt    @default(0)
-  
-  // The polymorphic data store — typed per template via TypeScript zod schemas
-  dynamicJsonData Json                          // MySQL JSON column
-
-  // QR Code — locked once generated
-  qrLocked        Boolean   @default(false)    // true after first QR generation
-  qrGeneratedAt   DateTime?                    // timestamp of first generation
-  qrScanCount     BigInt    @default(0)        // separate from viewCount
-
-  // NFC tag programming — incremented when user marks tag as programmed
-  nfcWriteCount   BigInt    @default(0)
-  nfcProgrammedAt DateTime?
-  nfcFulfillment  NfcFulfillmentStatus @default(NOT_ORDERED)
-
-  // Payment status — null = not yet submitted, PENDING = awaiting admin, APPROVED = can edit, REJECTED = resubmit
-  paymentStatus   PaymentStatus?
-
-  // SEO overrides (denormalized for fast generateMetadata)
-  metaTitle       String?   @db.VarChar(160)
-  metaDescription String?   @db.VarChar(320)
-  ogImageUrl      String?
-
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  // Relations
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category        Category  @relation(fields: [categoryId], references: [id])
-  template        Template  @relation(fields: [templateId], references: [id])
-  payment         Payment?
-  analyticsEvents ProfileAnalyticsEvent[]
-  weddingRsvps    WeddingRsvp[]
-  guestbookEntries WeddingGuestbook[]
-
-  @@unique([userId, categoryId])              // One profile per user per category
-  @@index([slug])
-  @@index([userId])
-  @@index([categoryId])
-  @@index([templateId])
-  @@index([isPublished])
-  @@index([createdAt])
-  @@index([qrLocked])
-  @@index([paymentStatus])
-  @@index([nfcFulfillment])
-  @@map("user_profiles")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PAYMENTS TABLE — Payment proof submissions for admin approval
-// ─────────────────────────────────────────────────────────────────────────────
-
-model Payment {
-  id              String        @id @default(cuid())
-  userId          String
-  userProfileId   String        @unique  // 1:1 with UserProfile
-  tier            PaymentTier
-  amount          Float         // Price in MMK at time of purchase
-  currency        String        @default("MMK")
-  method          PaymentMethod @default(KBZPay)
-  /// Optional bank/wallet transaction reference from the payer
-  transactionRef  String?       @db.VarChar(120)
-  /// Screenshot proof — still required as fallback for Wave/KBZ manual rails
-  screenshotUrl   String        @db.VarChar(500)
-  status          PaymentStatus @default(PENDING)
-  adminNote       String?       @db.VarChar(500)
-  reviewedAt      DateTime?
-  reviewedBy      String?       // Admin user ID who reviewed
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  // Relations
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userProfile     UserProfile   @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([status])
-  @@index([method])
-  @@index([createdAt])
-  @@map("payments")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PROFILE ANALYTICS EVENTS — daily series, referrers, devices
-// ─────────────────────────────────────────────────────────────────────────────
-
-model ProfileAnalyticsEvent {
-  id         String             @id @default(cuid())
-  profileId  String
-  type       AnalyticsEventType
-  referrer   String?            @db.VarChar(500)
-  userAgent  String?            @db.VarChar(500)
-  device     String?            @db.VarChar(40)  // mobile | tablet | desktop | bot | unknown
-  /// UTC calendar day YYYY-MM-DD for cheap grouping
-  day        String             @db.VarChar(10)
-  createdAt  DateTime           @default(now())
-
-  profile    UserProfile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
-  @@index([profileId, type, day])
-  @@index([profileId, createdAt])
-  @@index([day])
-  @@map("profile_analytics_events")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// WEDDING RSVP + GUESTBOOK
-// ─────────────────────────────────────────────────────────────────────────────
-
-model WeddingRsvp {
-  id           String   @id @default(cuid())
-  profileId    String
-  guestName    String   @db.VarChar(120)
-  email        String?  @db.VarChar(160)
-  phone        String?  @db.VarChar(40)
-  attending    Boolean  @default(true)
-  guestCount   Int      @default(1)
-  plusOneName  String?  @db.VarChar(120)
-  mealChoice   String?  @db.VarChar(120)
-  dietary      String?  @db.VarChar(240)
-  songRequest  String?  @db.VarChar(120)
-  mealNote     String?  @db.VarChar(240)
-  message      String?  @db.VarChar(500)
-  createdAt    DateTime @default(now())
-
-  profile      UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
-  @@index([profileId])
-  @@index([createdAt])
-  @@map("wedding_rsvps")
-}
-
-model WeddingGuestbook {
-  id        String   @id @default(cuid())
-  profileId String
-  author    String   @db.VarChar(120)
-  message   String   @db.VarChar(1000)
-  isPublic  Boolean  @default(true)
-  createdAt DateTime @default(now())
-
-  profile   UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
-  @@index([profileId])
-  @@index([createdAt])
-  @@map("wedding_guestbook")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// EMAIL TOKENS — verify email / reset password
-// ─────────────────────────────────────────────────────────────────────────────
-
 enum EmailTokenType {
   VERIFY_EMAIL
   RESET_PASSWORD
 }
 
-model EmailToken {
-  id        String         @id @default(cuid())
-  userId    String
-  token     String         @unique
-  type      EmailTokenType
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime       @default(now())
-
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([token])
-  @@index([type])
-  @@index([expiresAt])
-  @@map("email_tokens")
-}
-
-model VerificationCode {
-  id        String   @id @default(cuid())
-  userId    String
-  code      String
-  purpose   String   @default("register")
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([code])
-  @@index([purpose])
-  @@map("verification_codes")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AUDIT LOG — admin / security actions
-// ─────────────────────────────────────────────────────────────────────────────
-
-model AuditLog {
-  id         String   @id @default(cuid())
-  actorId    String?
-  action     String   @db.VarChar(80)
-  targetType String?  @db.VarChar(60)
-  targetId   String?  @db.VarChar(64)
-  meta       Json?
-  createdAt  DateTime @default(now())
-
-  @@index([actorId])
-  @@index([action])
-  @@index([createdAt])
-  @@map("audit_logs")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SYSTEM SETTINGS — key/value JSON (multi-instance safe)
-// ─────────────────────────────────────────────────────────────────────────────
-
-model SystemSetting {
-  key       String   @id @db.VarChar(80)
-  value     Json
-  updatedAt DateTime @updatedAt
-
-  @@map("system_settings")
+enum payments_tier {
+  QR_ONLY
+  NFC_QR
 }

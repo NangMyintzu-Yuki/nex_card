@@ -387,10 +387,6 @@ const UpdatePricesInput = z.object({
     (v) => (v === "" || v === null ? null : Number(v)),
     z.number().min(0).max(10_000_000).nullable()
   ),
-  priceNfcCard: z.preprocess(
-    (v) => (v === "" || v === null ? null : Number(v)),
-    z.number().min(0).max(10_000_000).nullable()
-  ),
   priceNfcQr: z.preprocess(
     (v) => (v === "" || v === null ? null : Number(v)),
     z.number().min(0).max(10_000_000).nullable()
@@ -407,7 +403,6 @@ export async function updateTemplatePricesAction(
   const parsed = UpdatePricesInput.safeParse({
     templateId: formData.get("templateId"),
     priceQrOnly: formData.get("priceQrOnly"),
-    priceNfcCard: formData.get("priceNfcCard"),
     priceNfcQr: formData.get("priceNfcQr"),
   });
 
@@ -415,14 +410,13 @@ export async function updateTemplatePricesAction(
     return { status: "error", message: "Invalid price data." };
   }
 
-  const { templateId, priceQrOnly, priceNfcCard, priceNfcQr } = parsed.data;
+  const { templateId, priceQrOnly, priceNfcQr } = parsed.data;
 
   try {
     await prisma.template.update({
       where: { id: templateId },
       data: {
         priceQrOnly,
-        priceNfcCard,
         priceNfcQr,
       },
     });
@@ -432,7 +426,7 @@ export async function updateTemplatePricesAction(
       action: "template.prices",
       targetType: "Template",
       targetId: templateId,
-      meta: { priceQrOnly, priceNfcCard, priceNfcQr },
+      meta: { priceQrOnly, priceNfcQr },
     });
 
     revalidatePath("/admin/templates");

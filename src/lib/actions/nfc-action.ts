@@ -71,10 +71,10 @@ export async function markNfcProgrammedAction(
   }
 
   const tier = profile.payment?.tier;
-  if (tier !== "NFC_CARD" && tier !== "PHYSICAL_CARD") {
+  if (tier !== "NFC_QR") {
     return {
       status: "error",
-      message: "Your payment tier does not include NFC. Upgrade to NFC Only or NFC + QR.",
+      message: "Your payment tier does not include NFC. Upgrade to NFC + QR.",
     };
   }
 

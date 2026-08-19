@@ -128,7 +128,6 @@ export async function getCachedUserProfiles(userId: string) {
               thumbnailUrl: true,
               isPremium: true,
               priceQrOnly: true,
-              priceNfcCard: true,
               priceNfcQr: true,
             },
           },

@@ -9,7 +9,7 @@ import { maintenancePath } from "@/lib/maintenance-path";
 import {
   Lock, Check, ArrowRight, ChevronRight,
   AlertTriangle, ExternalLink, Upload, QrCode, Smartphone,
-  Package, Clock, CheckCircle, XCircle,
+  Package, Clock, CheckCircle, XCircle, Copy,
 } from "lucide-react";
 import {
   selectTemplateAction,
@@ -34,7 +34,6 @@ interface CategoryTemplate {
   accentColor: string | null;
   isPremium: boolean;
   priceQrOnly: number | null;
-  priceNfcCard: number | null;
   priceNfcQr: number | null;
 }
 
@@ -94,19 +93,7 @@ const TIER_INFO = {
       "Share anywhere, anytime",
     ],
   },
-  NFC_CARD: {
-    label: "NFC Only",
-    icon: Smartphone,
-    description:
-      "Physical NFC card — just tap to share. Note: some phones don't support NFC, so it won't work on those devices.",
-    features: [
-      "NFC tap-to-share",
-      "Premium physical card",
-      "Custom design",
-      "Requires an NFC-enabled phone",
-    ],
-  },
-  PHYSICAL_CARD: {
+  NFC_QR: {
     label: "NFC + QR",
     icon: Package,
     description:
@@ -180,6 +167,7 @@ export function OnboardingClient({
   const [paymentScreenshotUrl, setPaymentScreenshotUrl] = useState<string>("");
   const [paymentUploading, setPaymentUploading] = useState(false);
   const [paymentUploadError, setPaymentUploadError] = useState<string>("");
+  const [copiedPhone, setCopiedPhone] = useState(false);
   const [slug, setSlug] = useState<string>("");
   const [slugError, setSlugError] = useState<string>("");
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
@@ -219,7 +207,6 @@ export function OnboardingClient({
         paymentFormData.append("tier", selectedTier);
         paymentFormData.append("amount",
           selectedTier === "QR_ONLY" ? String(selectedTemplate?.priceQrOnly)
-            : selectedTier === "NFC_CARD" ? String(selectedTemplate?.priceNfcCard)
             : String(selectedTemplate?.priceNfcQr)
         );
         paymentFormData.append("screenshotUrl", paymentScreenshotUrl);
@@ -657,12 +644,11 @@ export function OnboardingClient({
                 : <>Select how you&apos;d like to use the <strong style={{ color: "var(--nc-text)" }}>{selectedTemplate.name}</strong> template.</>}
             </p>
 
-            <div className="grid gap-4 sm:grid-cols-3 sm:gap-5">
-              {(["QR_ONLY", "NFC_CARD", "PHYSICAL_CARD"] as const).map((tier) => {
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
+              {(["QR_ONLY", "NFC_QR"] as const).map((tier) => {
                 const info = TIER_INFO[tier];
                 const Icon = info.icon;
                 const price = tier === "QR_ONLY" ? selectedTemplate.priceQrOnly
-                  : tier === "NFC_CARD" ? selectedTemplate.priceNfcCard
                   : selectedTemplate.priceNfcQr;
 
                 const isSelected = selectedTier === tier;
@@ -775,7 +761,6 @@ export function OnboardingClient({
                   <span className="font-bold" style={{ color: "var(--nc-brand-1)" }}>
                     {formatMMK(
                       selectedTier === "QR_ONLY" ? selectedTemplate.priceQrOnly!
-                        : selectedTier === "NFC_CARD" ? selectedTemplate.priceNfcCard!
                         : selectedTemplate.priceNfcQr!
                     )}
                   </span>
@@ -821,13 +806,27 @@ export function OnboardingClient({
                   <span style={{ color: "var(--nc-text-2)" }}>Account Name</span>
                   <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{wallets.accountName}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <span style={{ color: "var(--nc-text-2)" }}>Phone Number</span>
-                  <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "Set in Admin → Settings"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span style={{ color: "var(--nc-text-2)" }}>Account Number</span>
-                  <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "—"}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "09974133003"}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(wallets[paymentMethod] || "09974133003");
+                        setCopiedPhone(true);
+                        setTimeout(() => setCopiedPhone(false), 2000);
+                      }}
+                      className="shrink-0 rounded-lg p-1 transition-colors hover:bg-white/10"
+                      title="Copy phone number"
+                    >
+                      {copiedPhone ? (
+                        <Check className="h-4 w-4 text-emerald-400" />
+                      ) : (
+                        <Copy className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />
+                      )}
+                    </button>
+                  </span>
                 </div>
               </div>
               <p className="mt-3 text-xs" style={{ color: "var(--nc-text-3)" }}>

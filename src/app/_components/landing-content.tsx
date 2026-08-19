@@ -247,6 +247,11 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
                 {l}
               </a>
             ))}
+            <Link href="/user-guide"
+              className="text-sm font-medium transition-colors hover:opacity-80"
+              style={{ color: "var(--nc-text-2)" }}>
+              User Guide
+            </Link>
           </nav>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <ThemeToggle size="md" />
@@ -297,6 +302,11 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
                   {l}
                 </a>
               ))}
+              <Link href="/user-guide" onClick={() => setMenuOpen(false)}
+                className="rounded-xl px-3 py-3 text-sm font-semibold"
+                style={{ color: "var(--nc-text)" }}>
+                User Guide
+              </Link>
               {!isLoggedIn && (
                 <Link href="/login" onClick={() => setMenuOpen(false)}
                   className="rounded-xl px-3 py-3 text-sm font-semibold sm:hidden"
@@ -648,6 +658,12 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
                       </a>
                     </li>
                   ))}
+                  <li>
+                    <Link href="/user-guide" className="text-sm transition-all duration-200 hover:translate-x-1 inline-block"
+                      style={{ color: "var(--nc-text-3)" }}>
+                      User Guide
+                    </Link>
+                  </li>
                 </ul>
               </div>
 

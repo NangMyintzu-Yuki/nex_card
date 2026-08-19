@@ -6,14 +6,13 @@ import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 import {
   Upload, X, QrCode, Smartphone, Package, ArrowRight,
-  CheckCircle, XCircle, Clock, Loader2, Banknote,
+  CheckCircle, XCircle, Clock, Loader2, Banknote, Copy, Check,
 } from "lucide-react";
 import { submitPaymentAction, type SubmitPaymentState } from "@/lib/actions/payment-actions";
 import { usePublicWallets } from "@/lib/payments/use-public-wallets";
 
 interface Prices {
   priceQrOnly: number | null;
-  priceNfcCard: number | null;
   priceNfcQr: number | null;
 }
 
@@ -33,14 +32,13 @@ const PAYMENT_METHODS = {
 };
 
 const TIER_OPTIONS: {
-  value: "QR_ONLY" | "NFC_CARD" | "PHYSICAL_CARD";
+  value: "QR_ONLY" | "NFC_QR";
   label: string;
   icon: typeof QrCode;
   priceKey: keyof Prices;
 }[] = [
   { value: "QR_ONLY", label: "QR Only", icon: QrCode, priceKey: "priceQrOnly" },
-  { value: "NFC_CARD", label: "NFC Only", icon: Smartphone, priceKey: "priceNfcCard" },
-  { value: "PHYSICAL_CARD", label: "NFC + QR", icon: Package, priceKey: "priceNfcQr" },
+  { value: "NFC_QR", label: "NFC + QR", icon: Smartphone, priceKey: "priceNfcQr" },
 ];
 
 function formatMMK(amount: number): string {
@@ -65,13 +63,14 @@ export function ResubmitPayment({
   const [open, setOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<keyof typeof PAYMENT_METHODS>("KBZPay");
   const [selectedTier, setSelectedTier] = useState<
-    "QR_ONLY" | "NFC_CARD" | "PHYSICAL_CARD" | ""
-  >(existingTier && (existingTier === "QR_ONLY" || existingTier === "NFC_CARD" || existingTier === "PHYSICAL_CARD")
+    "QR_ONLY" | "NFC_QR" | ""
+  >(existingTier && (existingTier === "QR_ONLY" || existingTier === "NFC_QR")
       ? existingTier
       : "");
   const [screenshotUrl, setScreenshotUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [copiedPhone, setCopiedPhone] = useState(false);
 
   const [state, submitPayment, pending] = useActionState<
     SubmitPaymentState,
@@ -94,8 +93,7 @@ export function ResubmitPayment({
       setSelectedTier(
         existingTier &&
           (existingTier === "QR_ONLY" ||
-            existingTier === "NFC_CARD" ||
-            existingTier === "PHYSICAL_CARD")
+            existingTier === "NFC_QR")
           ? existingTier
           : ""
       );
@@ -255,13 +253,27 @@ export function ResubmitPayment({
                         <span className="shrink-0" style={{ color: "var(--nc-text-3)" }}>Account</span>
                         <span className="min-w-0 break-all text-right font-semibold" style={{ color: "var(--nc-text)" }}>{wallets.accountName}</span>
                       </div>
-                      <div className="flex justify-between gap-3">
+                      <div className="flex items-center justify-between gap-3">
                         <span className="shrink-0" style={{ color: "var(--nc-text-3)" }}>Phone</span>
-                        <span className="min-w-0 break-all text-right font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "Set in Admin → Settings"}</span>
-                      </div>
-                      <div className="flex justify-between gap-3">
-                        <span className="shrink-0" style={{ color: "var(--nc-text-3)" }}>Number</span>
-                        <span className="min-w-0 break-all text-right font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "—"}</span>
+                        <span className="flex items-center gap-2">
+                          <span className="min-w-0 break-all text-right font-mono font-semibold" style={{ color: "var(--nc-text)" }}>{wallets[paymentMethod] || "09974133003"}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(wallets[paymentMethod] || "09974133003");
+                              setCopiedPhone(true);
+                              setTimeout(() => setCopiedPhone(false), 2000);
+                            }}
+                            className="shrink-0 rounded-lg p-1 transition-colors hover:bg-white/10"
+                            title="Copy phone number"
+                          >
+                            {copiedPhone ? (
+                              <Check className="h-4 w-4 text-emerald-400" />
+                            ) : (
+                              <Copy className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />
+                            )}
+                          </button>
+                        </span>
                       </div>
                     </div>
                   </div>

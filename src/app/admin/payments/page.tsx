@@ -16,8 +16,7 @@ export const metadata: Metadata = {
 
 const TIER_LABELS: Record<string, string> = {
   QR_ONLY: "QR Only",
-  NFC_CARD: "NFC Only",
-  PHYSICAL_CARD: "NFC + QR",
+  NFC_QR: "NFC + QR",
 };
 
 function formatMMK(amount: number): string {

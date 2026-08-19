@@ -34,7 +34,7 @@ export type PaymentInfo = {
 
 const SubmitPaymentInput = z.object({
   profileId: z.string().min(1),
-  tier: z.enum(["QR_ONLY", "NFC_CARD", "PHYSICAL_CARD"]),
+  tier: z.enum(["QR_ONLY", "NFC_QR"]),
   amount: z.number().positive(),
   screenshotUrl: z.string().min(1, "Screenshot is required"),
   method: z.enum(["KBZPay", "WavePay", "AYAPay", "CBPay", "OTHER"]).default("KBZPay"),
@@ -109,8 +109,7 @@ export async function submitPaymentAction(
     const template = profile.template;
     let expectedPrice: number | null = null;
     if (tier === "QR_ONLY") expectedPrice = template.priceQrOnly;
-    else if (tier === "NFC_CARD") expectedPrice = template.priceNfcCard;
-    else if (tier === "PHYSICAL_CARD") expectedPrice = template.priceNfcQr;
+    else if (tier === "NFC_QR") expectedPrice = template.priceNfcQr;
 
     if (expectedPrice === null) {
       return { status: "error", message: "This tier is not available for the selected template." };
@@ -136,7 +135,7 @@ export async function submitPaymentAction(
           data: {
             userId,
             userProfileId: profileId,
-            tier: tier as "QR_ONLY" | "NFC_CARD" | "PHYSICAL_CARD",
+            tier: tier as "QR_ONLY" | "NFC_QR",
             amount,
             method,
             transactionRef: transactionRef || null,
@@ -150,7 +149,7 @@ export async function submitPaymentAction(
           where: { id: profileId },
           data: {
             paymentStatus: "PENDING",
-            ...(tier === "NFC_CARD" || tier === "PHYSICAL_CARD"
+            ...(tier === "NFC_QR"
               ? { nfcFulfillment: "PENDING_WRITE" as const }
               : {}),
           },
@@ -180,7 +179,7 @@ export async function submitPaymentAction(
         where: { id: profileId },
         data: {
           paymentStatus: "PENDING",
-          ...(tier === "NFC_CARD" || tier === "PHYSICAL_CARD"
+          ...(tier === "NFC_QR"
             ? { nfcFulfillment: "PENDING_WRITE" as const }
             : {}),
         },

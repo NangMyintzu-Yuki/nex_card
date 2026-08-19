@@ -38,7 +38,6 @@ export async function toggleTemplateField(
 const PricesSchema = z.object({
   templateId: z.string().min(1),
   priceQrOnly: z.number().min(0).max(10_000_000).nullable(),
-  priceNfcCard: z.number().min(0).max(10_000_000).nullable(),
   priceNfcQr: z.number().min(0).max(10_000_000).nullable(),
 });
 
@@ -55,18 +54,17 @@ export async function saveTemplatePrices(formData: FormData): Promise<void> {
   const parsed = PricesSchema.safeParse({
     templateId: formData.get("templateId"),
     priceQrOnly: parsePrice(formData.get("priceQrOnly")),
-    priceNfcCard: parsePrice(formData.get("priceNfcCard")),
     priceNfcQr: parsePrice(formData.get("priceNfcQr")),
   });
 
   if (!parsed.success) return;
 
-  const { templateId, priceQrOnly, priceNfcCard, priceNfcQr } = parsed.data;
+  const { templateId, priceQrOnly, priceNfcQr } = parsed.data;
 
   try {
     await prisma.template.update({
       where: { id: templateId },
-      data: { priceQrOnly, priceNfcCard, priceNfcQr },
+      data: { priceQrOnly, priceNfcQr },
     });
     revalidatePath("/admin/templates");
     revalidatePath("/dashboard/onboarding");

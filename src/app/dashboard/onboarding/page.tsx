@@ -46,7 +46,6 @@ export default async function OnboardingPage({
           accentColor: true,
           isPremium: true,
           priceQrOnly: true,
-          priceNfcCard: true,
           priceNfcQr: true,
         },
       },

@@ -42,19 +42,16 @@ export function PremiumBadge() {
 export function PriceForm({
   templateId,
   priceQrOnly,
-  priceNfcCard,
   priceNfcQr,
 }: {
   templateId: string;
   priceQrOnly: number | null;
-  priceNfcCard: number | null;
   priceNfcQr: number | null;
 }) {
   return (
     <form action={saveTemplatePrices} className="flex flex-wrap items-end gap-2">
       <input type="hidden" name="templateId" value={templateId} />
       <PriceField name="priceQrOnly" label="QR" defaultValue={priceQrOnly} />
-      <PriceField name="priceNfcCard" label="NFC" defaultValue={priceNfcCard} />
       <PriceField name="priceNfcQr" label="NFC+QR" defaultValue={priceNfcQr} />
       <SubmitButton
         className="nc-btn-brand mb-px rounded-lg px-3 py-1.5 text-xs font-bold transition-opacity hover:opacity-90"

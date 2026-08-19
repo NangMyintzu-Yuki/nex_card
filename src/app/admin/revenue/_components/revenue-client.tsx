@@ -168,7 +168,7 @@ export function RevenueClient({ categories, templates }: Props) {
   const tierIcon = (tier: string) => {
     switch (tier) {
       case "QR_ONLY": return <QrCode className="h-4 w-4" />;
-      case "NFC_CARD": return <Smartphone className="h-4 w-4" />;
+      case "NFC_QR": return <CreditCard className="h-4 w-4" />;
       default: return <CreditCard className="h-4 w-4" />;
     }
   };
@@ -176,8 +176,7 @@ export function RevenueClient({ categories, templates }: Props) {
   const tierLabel = (tier: string) => {
     switch (tier) {
       case "QR_ONLY": return "QR Only";
-      case "NFC_CARD": return "NFC Only";
-      case "PHYSICAL_CARD": return "QR + NFC";
+      case "NFC_QR": return "NFC + QR";
       default: return tier.replace(/_/g, " ");
     }
   };
@@ -296,8 +295,7 @@ export function RevenueClient({ categories, templates }: Props) {
               <select value={tierFilter} onChange={(e) => setTierFilter(e.target.value)} style={selectStyle} className="w-full">
                 <option value="ALL">All Tiers</option>
                 <option value="QR_ONLY">QR Only</option>
-                <option value="NFC_CARD">NFC Only</option>
-                <option value="PHYSICAL_CARD">QR + NFC</option>
+                <option value="NFC_QR">NFC + QR</option>
               </select>
             </div>
 

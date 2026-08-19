@@ -16,7 +16,7 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: "dark",
+  theme: "light",
   setTheme: () => {},
   toggleTheme: () => {},
   mounted: false,
@@ -31,7 +31,7 @@ function applyThemeClass(theme: Theme) {
 }
 
 function readStoredTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
+  if (typeof window === "undefined") return "light";
   try {
     const stored = localStorage.getItem("nexcard-theme");
     if (stored === "light" || stored === "dark") return stored;
@@ -39,14 +39,14 @@ function readStoredTheme(): Theme {
     /* ignore */
   }
   // Prefer whatever class is already on <html> (survives provider remounts)
-  if (document.documentElement.classList.contains("nc-light")) return "light";
-  return "dark";
+  if (document.documentElement.classList.contains("nc-dark")) return "dark";
+  return "light";
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof document === "undefined") return "dark";
-    return document.documentElement.classList.contains("nc-light") ? "light" : "dark";
+    if (typeof document === "undefined") return "light";
+    return document.documentElement.classList.contains("nc-dark") ? "dark" : "light";
   });
   const [mounted, setMounted] = useState(true);
 

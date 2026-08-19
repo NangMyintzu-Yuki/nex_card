@@ -147,7 +147,6 @@ export default async function AdminTemplatesPage() {
                             <PriceForm
                               templateId={template.id}
                               priceQrOnly={template.priceQrOnly}
-                              priceNfcCard={template.priceNfcCard}
                               priceNfcQr={template.priceNfcQr}
                             />
                           </td>

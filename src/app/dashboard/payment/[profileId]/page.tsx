@@ -34,7 +34,6 @@ export default async function PaymentPage({
           name: true,
           isPremium: true,
           priceQrOnly: true,
-          priceNfcCard: true,
           priceNfcQr: true,
         },
       },
@@ -122,7 +121,6 @@ export default async function PaymentPage({
               templateName={profile.template.name}
               prices={{
                 priceQrOnly: profile.template.priceQrOnly,
-                priceNfcCard: profile.template.priceNfcCard,
                 priceNfcQr: profile.template.priceNfcQr,
               }}
               existingTier={existingPayment?.tier}

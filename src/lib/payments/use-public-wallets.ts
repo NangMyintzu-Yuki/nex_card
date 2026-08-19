@@ -10,10 +10,10 @@ export type PublicWallets = {
 };
 
 const FALLBACK: PublicWallets = {
-  accountName: "NEX CARD",
-  KBZPay: "",
+  accountName: "Shwe Yee Win",
+  KBZPay: "09974133003",
   WavePay: "",
-  AYAPay: "",
+  AYAPay: "09974133003",
 };
 
 export function usePublicWallets(): PublicWallets {

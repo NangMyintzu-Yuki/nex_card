@@ -30,7 +30,7 @@ export default async function NfcHubPage() {
   });
 
   const nfcProfiles = profiles.filter(
-    (p) => p.payment?.tier === "NFC_CARD" || p.payment?.tier === "PHYSICAL_CARD"
+    (p) => p.payment?.tier === "NFC_QR"
   );
 
   return (
@@ -42,7 +42,7 @@ export default async function NfcHubPage() {
         </div>
         <h1 className="text-2xl font-black">NFC Setup</h1>
         <p className="mt-1 text-sm" style={{ color: "var(--nc-text-2)" }}>
-          Program physical NFC tags for profiles on an NFC or NFC + QR plan.
+          Program physical NFC tags for profiles on an NFC + QR plan.
         </p>
       </div>
 
@@ -50,7 +50,7 @@ export default async function NfcHubPage() {
         <div className="rounded-2xl px-4 py-12 text-center sm:px-6"
           style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
           <p className="text-sm" style={{ color: "var(--nc-text-2)" }}>
-            No NFC-eligible profiles yet. Choose <strong>NFC Only</strong> or <strong>NFC + QR</strong> during onboarding.
+            No NFC-eligible profiles yet. Choose <strong>NFC + QR</strong> during onboarding.
           </p>
           <Link href="/dashboard/onboarding"
             className="mt-4 inline-block rounded-xl px-5 py-2.5 text-sm font-bold text-white"
