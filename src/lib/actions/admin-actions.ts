@@ -1,13 +1,14 @@
 // src/lib/actions/admin-actions.ts
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
 import { writeAuditLog } from "@/lib/audit";
 import { sendMail } from "@/lib/mail/mailer";
 import { paymentStatusHtml } from "@/lib/mail/templates";
+import { CACHE_TAGS } from "@/lib/cache/profile-cache";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -83,12 +84,17 @@ export async function approvePaymentAction(
   try {
     let userId: string | null = null;
 
+    let profileSlug: string | null = null;
+
     if (isRealDB) {
       await prisma.$transaction(async (tx) => {
         const payment = await tx.payment.findUnique({ where: { id: paymentId } });
         if (!payment) throw new Error("Payment not found");
         if (payment.status !== "PENDING") throw new Error("Payment is not pending");
         userId = payment.userId;
+
+        const profile = await tx.userProfile.findUnique({ where: { id: payment.userProfileId }, select: { slug: true } });
+        profileSlug = profile?.slug ?? null;
 
         await tx.payment.update({
           where: { id: paymentId },
@@ -111,6 +117,9 @@ export async function approvePaymentAction(
         return { status: "error", message: "Payment is not pending." };
       }
       userId = payment.userId;
+
+      const profile = await prisma.userProfile.findUnique({ where: { id: payment.userProfileId }, select: { slug: true } });
+      profileSlug = profile?.slug ?? null;
 
       await prisma.payment.update({
         where: { id: paymentId },
@@ -139,6 +148,8 @@ export async function approvePaymentAction(
     revalidatePath("/admin/payments");
     revalidatePath("/admin");
     revalidatePath("/dashboard");
+    if (userId) revalidateTag(CACHE_TAGS.userProfiles(userId));
+    if (profileSlug) revalidateTag(CACHE_TAGS.profile(profileSlug));
 
     return { status: "success", message: "Payment approved. User can now edit their profile." };
   } catch (err) {
@@ -182,6 +193,8 @@ export async function rejectPaymentAction(
   try {
     let userId: string | null = null;
 
+    let profileSlug: string | null = null;
+
     if (isRealDB) {
       await prisma.$transaction(async (tx) => {
         const payment = await tx.payment.findUnique({ where: { id: paymentId } });
@@ -190,6 +203,9 @@ export async function rejectPaymentAction(
           throw new Error("Only pending payments can be rejected");
         }
         userId = payment.userId;
+
+        const profile = await tx.userProfile.findUnique({ where: { id: payment.userProfileId }, select: { slug: true } });
+        profileSlug = profile?.slug ?? null;
 
         await tx.payment.update({
           where: { id: paymentId },
@@ -213,6 +229,9 @@ export async function rejectPaymentAction(
         return { status: "error", message: "Only pending payments can be rejected." };
       }
       userId = payment.userId;
+
+      const profile = await prisma.userProfile.findUnique({ where: { id: payment.userProfileId }, select: { slug: true } });
+      profileSlug = profile?.slug ?? null;
 
       await prisma.payment.update({
         where: { id: paymentId },
@@ -243,6 +262,8 @@ export async function rejectPaymentAction(
     revalidatePath("/admin/payments");
     revalidatePath("/admin");
     revalidatePath("/dashboard");
+    if (userId) revalidateTag(CACHE_TAGS.userProfiles(userId));
+    if (profileSlug) revalidateTag(CACHE_TAGS.profile(profileSlug));
 
     return { status: "success", message: "Payment rejected." };
   } catch (err) {
