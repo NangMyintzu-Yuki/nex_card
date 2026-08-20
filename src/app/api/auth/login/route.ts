@@ -14,6 +14,7 @@ import {
 import { createVerificationCode } from "@/lib/auth/verification-codes";
 import { sendMail, isMailConfigured } from "@/lib/mail/mailer";
 import { verifyEmailHtml, twoFactorFailedLoginHtml } from "@/lib/mail/templates";
+import { getSettings } from "@/lib/settings";
 
 const LoginSchema = z.object({
   email: z.string().email(),
@@ -77,6 +78,17 @@ export async function POST(request: NextRequest) {
         { message: "This account has been suspended. Please contact support." },
         { status: 403 }
       );
+    }
+
+    const settings = await getSettings();
+
+    if (user.status === "PENDING_VERIFICATION" && !settings.require_email_verify) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { status: "ACTIVE", emailVerifiedAt: new Date() },
+      });
+      user.status = "ACTIVE";
+      user.emailVerifiedAt = new Date();
     }
 
     if (user.status === "PENDING_VERIFICATION") {
@@ -158,7 +170,40 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    // First-time user — require email verification
+    // First-time user — require email verification (if setting enabled)
+    if (!settings.require_email_verify) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { status: "ACTIVE", emailVerifiedAt: new Date(), lastLoginAt: new Date() },
+      });
+
+      const { randomBytes } = await import("crypto");
+      const remember = body.remember !== false;
+      const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
+      const SESSION_SHORT_MS = 24 * 60 * 60 * 1000;
+      const sessionToken = randomBytes(32).toString("hex");
+      const expires = new Date(Date.now() + (remember ? SESSION_DURATION_MS : SESSION_SHORT_MS));
+
+      await prisma.session.create({
+        data: { userId: user.id, sessionToken, expires },
+      });
+
+      const response = NextResponse.json(
+        { success: true, message: "Logged in successfully.", role: user.role },
+        { status: 200 }
+      );
+
+      response.cookies.set("session_token", sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        expires,
+        path: "/",
+      });
+
+      return response;
+    }
+
     const code = await createVerificationCode(user.id, "login");
 
     if (isMailConfigured() && user.email) {

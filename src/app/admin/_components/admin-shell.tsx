@@ -32,7 +32,7 @@ export function AdminShell({
 
         <div className="flex items-center gap-2.5">
           <div className="flex flex-col items-end">
-            <span className="max-w-[100px] truncate text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>
+            <span className="max-w-[100px] truncate text-xs font-semibold hidden sm:block" style={{ color: "var(--nc-text-2)" }}>
               {user.name}
             </span>
             <span

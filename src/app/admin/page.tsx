@@ -46,10 +46,10 @@ export default async function AdminOverviewPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-6xl nc-page" style={{ color: "var(--nc-text)" }}>
+    <div className="mx-auto max-w-6xl nc-page px-3 sm:px-6" style={{ color: "var(--nc-text)" }}>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Admin Overview</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-black" style={{ color: "var(--nc-text)" }}>Admin Overview</h1>
         <p className="mt-1 text-sm" style={{ color: "var(--nc-text-2)" }}>
           NEX CARD platform analytics and management
         </p>

@@ -406,9 +406,9 @@ export function RevenueClient({ categories, templates }: Props) {
                 <tr style={{ borderBottom: "1px solid var(--nc-border)" }}>
                   <th className="px-4 py-3 font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>Date</th>
                   <th className="px-4 py-3 font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>User</th>
-                  <th className="px-4 py-3 font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>Profile</th>
-                  <th className="px-4 py-3 font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>Category</th>
-                  <th className="px-4 py-3 font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>Template</th>
+                  <th className="hidden sm:table-cell px-4 py-3 font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>Profile</th>
+                  <th className="hidden md:table-cell px-4 py-3 font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>Category</th>
+                  <th className="hidden md:table-cell px-4 py-3 font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>Template</th>
                   <th className="px-4 py-3 font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>Tier</th>
                   <th className="px-4 py-3 text-right font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>Amount</th>
                   <th className="px-4 py-3 font-bold uppercase tracking-wider" style={{ color: "var(--nc-text-3)" }}>Status</th>
@@ -429,11 +429,11 @@ export function RevenueClient({ categories, templates }: Props) {
                           <p className="text-[10px]" style={{ color: "var(--nc-text-3)" }}>{p.userEmail}</p>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-mono text-[11px]" style={{ color: "var(--nc-text-2)" }}>
+                      <td className="hidden sm:table-cell px-4 py-3 font-mono text-[11px]" style={{ color: "var(--nc-text-2)" }}>
                         /{p.profileSlug}
                       </td>
-                      <td className="px-4 py-3" style={{ color: "var(--nc-text-2)" }}>{p.categoryName}</td>
-                      <td className="px-4 py-3" style={{ color: "var(--nc-text-2)" }}>{p.templateName}</td>
+                      <td className="hidden md:table-cell px-4 py-3" style={{ color: "var(--nc-text-2)" }}>{p.categoryName}</td>
+                      <td className="hidden md:table-cell px-4 py-3" style={{ color: "var(--nc-text-2)" }}>{p.templateName}</td>
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold"
                           style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text-2)", border: "1px solid var(--nc-border)" }}>

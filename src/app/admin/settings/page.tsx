@@ -153,13 +153,13 @@ export default function AdminSettingsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl nc-page">
+    <div className="mx-auto max-w-3xl nc-page px-3 sm:px-6">
       {/* Header */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 sm:mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <Settings className="h-6 w-6" style={{ color: "var(--nc-text-3)" }} />
+          <Settings className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: "var(--nc-text-3)" }} />
           <div>
-            <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Platform Settings</h1>
+            <h1 className="text-xl sm:text-2xl font-black" style={{ color: "var(--nc-text)" }}>Platform Settings</h1>
             <p className="mt-0.5 text-sm" style={{ color: "var(--nc-text-3)" }}>
               Global configuration for the NEX CARD platform
             </p>
@@ -169,7 +169,7 @@ export default function AdminSettingsPage() {
         <button
           onClick={saveAll}
           disabled={!dirty || saving}
-           className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all hover:opacity-90 disabled:opacity-40"
+           className="nc-btn-brand flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all hover:opacity-90 disabled:opacity-40"
           style={{ background: "var(--nc-brand-grad)" }}>
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {saving ? "Saving…" : "Save Changes"}
@@ -205,7 +205,7 @@ export default function AdminSettingsPage() {
           return (
             <div key={section.section} className="overflow-hidden rounded-2xl"
               style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)" }}>
-              <div className="flex items-center gap-2.5 px-6 py-4"
+              <div className="flex items-center gap-2.5 px-4 py-3 sm:px-6 sm:py-4"
                 style={{ borderBottom: "1px solid var(--nc-border)" }}>
                 <Icon className="h-4 w-4" style={{ color: "var(--nc-text-3)" }} />
                 <h2 className="text-sm font-bold" style={{ color: "var(--nc-text)" }}>{section.section}</h2>

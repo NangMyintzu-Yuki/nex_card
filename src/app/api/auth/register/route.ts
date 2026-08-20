@@ -79,14 +79,16 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await hashPassword(password);
 
+    const skipVerification = !settings.require_email_verify;
+
     const user = await prisma.user.create({
       data: {
         name,
         email,
         hashedPassword,
         role: "USER",
-        status: "PENDING_VERIFICATION",
-        emailVerifiedAt: null,
+        status: skipVerification ? "ACTIVE" : "PENDING_VERIFICATION",
+        emailVerifiedAt: skipVerification ? new Date() : null,
       },
       select: { id: true, name: true, email: true, role: true },
     });
@@ -98,6 +100,17 @@ export async function POST(request: NextRequest) {
         html: `<p>New registration: <strong>${name}</strong> &lt;${email}&gt;</p>`,
         text: `New registration: ${name} <${email}>`,
       }).catch((err) => console.error("[Auth/Register] notify failed", err));
+    }
+
+    if (skipVerification) {
+      return NextResponse.json(
+        {
+          success: true,
+          requiresVerification: false,
+          message: "Account created. You can now sign in.",
+        },
+        { status: 201 }
+      );
     }
 
     const token = await createEmailToken(

@@ -31,21 +31,23 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "NEX CARD";
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://www.nexcard.wetechmm.com"),
   title: {
-    default: "NEX CARD — Your Digital Identity, Elevated",
-    template: "%s — NEX CARD",
+    default: `${SITE_NAME} — Your Digital Identity, Elevated`,
+    template: `%s — ${SITE_NAME}`,
   },
   description:
     "Create stunning digital name cards, portfolios, business pages, and wedding invitations with 20 premium templates. Share via QR code.",
   keywords: ["digital name card", "QR card", "portfolio", "wedding invitation", "business page", "digital presence", "NEX CARD"],
-  authors: [{ name: "NEX CARD" }],
-  creator: "NEX CARD",
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "NEX CARD",
+    siteName: SITE_NAME,
   },
   twitter: {
     card: "summary_large_image",

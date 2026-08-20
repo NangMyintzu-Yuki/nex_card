@@ -41,9 +41,9 @@ export default async function AdminTemplatesPage() {
   const totalTemplates = categories.reduce((acc, c) => acc + c.templates.length, 0);
 
   return (
-    <div className="mx-auto max-w-5xl nc-page">
-      <div className="mb-8">
-        <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>
+    <div className="mx-auto max-w-5xl nc-page px-3 sm:px-6">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-black" style={{ color: "var(--nc-text)" }}>
           Templates
         </h1>
         <p className="mt-1 text-sm" style={{ color: "var(--nc-text-3)" }}>
@@ -67,14 +67,15 @@ export default async function AdminTemplatesPage() {
                 </span>
               </div>
 
+              {/* Desktop Table */}
               <div
-                className="overflow-x-auto rounded-2xl"
+                className="hidden sm:block overflow-x-auto rounded-2xl"
                 style={{
                   background: "var(--nc-bg-card)",
                   border: "1px solid var(--nc-border)",
                 }}
               >
-                <table className="w-full min-w-[640px] text-left">
+                <table className="w-full text-left">
                   <thead>
                     <tr
                       className="border-b text-[10px] font-semibold uppercase tracking-wider"
@@ -155,6 +156,50 @@ export default async function AdminTemplatesPage() {
                     })}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Cards */}
+              <div className="sm:hidden space-y-2" style={{ background: "var(--nc-bg-card)", border: "1px solid var(--nc-border)", borderRadius: "1rem" }}>
+                {category.templates.map((template) => {
+                  const thumb = resolveThumbnailUrl(template.thumbnailUrl, template.name);
+                  return (
+                    <div key={template.id} className="p-3" style={{ borderBottom: "1px solid var(--nc-border)" }}>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div
+                          className="relative h-8 w-12 shrink-0 overflow-hidden rounded-lg"
+                          style={{ background: "var(--nc-bg-2)" }}
+                        >
+                          <img src={thumb} alt={template.name} className="h-full w-full object-cover" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-sm truncate" style={{ color: "var(--nc-text)" }}>
+                              {template.name}
+                            </span>
+                            {template.accentColor && (
+                              <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: template.accentColor }} />
+                            )}
+                          </div>
+                          <p className="text-[11px] truncate" style={{ color: "var(--nc-text-3)" }}>
+                            {template.codeIdentifier}
+                            {template._count.profiles > 0 && ` · ${template._count.profiles} uses`}
+                          </p>
+                        </div>
+                        <ActiveToggle templateId={template.id} isActive={template.isActive} />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <PremiumBadge />
+                        <div className="flex-1">
+                          <PriceForm
+                            templateId={template.id}
+                            priceQrOnly={template.priceQrOnly}
+                            priceNfcQr={template.priceNfcQr}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </section>
           );
