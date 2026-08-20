@@ -21,10 +21,6 @@ const PAYMENT_METHODS = {
     label: "KBZPay",
     details: "KBZPay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
   },
-  WavePay: {
-    label: "WavePay",
-    details: "WavePay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
-  },
   AYAPay: {
     label: "AYA Pay",
     details: "AYA Pay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
@@ -223,7 +219,7 @@ export function ResubmitPayment({
                 {/* Payment method */}
                 <div>
                   <p className="mb-3 text-sm font-bold" style={{ color: "var(--nc-text)" }}>Payment Method</p>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {(Object.keys(PAYMENT_METHODS) as Array<keyof typeof PAYMENT_METHODS>).map((key) => {
                       const pm = PAYMENT_METHODS[key];
                       const active = paymentMethod === key;

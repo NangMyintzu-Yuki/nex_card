@@ -176,7 +176,7 @@ function PhonePreview({
   scene: Scene;
   isDark: boolean;
 }) {
-  const foil = isDark ? "#d4af37" : "#2d6eb5";
+  const foil = isDark ? "#d4af37" : "#1a3a6b";
   const screen = isDark ? scene.phoneBg : "linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)";
   const ink = isDark ? "#f0ece5" : "#0f1a2e";
   const mute = isDark ? "#a09070" : "#3d5a8a";

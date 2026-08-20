@@ -44,7 +44,7 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
   }, []);
 
   // Branded colours from CSS vars
-  const brand2 = isDark ? "#d4af37" : "#2d6eb5";
+  const brand2 = isDark ? "#d4af37" : "#1a3a6b";
   const brand3 = isDark ? "#f0c050" : "#4a9fd4";
 
   function NavContent() {
@@ -55,7 +55,7 @@ export function DashboardSidebar({ user }: { user: SidebarUser }) {
           style={{ borderColor: "var(--nc-sidebar-border)" }}>
           <div className="flex items-center gap-2">
             <NexCardLogoStatic size={32} isDark={isDark} />
-            <span className="text-sm font-black leading-none tracking-wide" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
+            <span className="text-sm font-black leading-none tracking-wide" style={{ color: isDark ? "#d4af37" : "#1a3a6b" }}>NEX CARD</span>
           </div>
           <button onClick={() => setMobileOpen(false)}
             className="flex h-8 w-8 items-center justify-center rounded-lg lg:hidden"

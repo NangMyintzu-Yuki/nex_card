@@ -41,7 +41,7 @@ export default function RegisterPage() {
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
-  const brand2 = isDark ? "#d4af37" : "#2d6eb5";
+  const brand2 = isDark ? "#d4af37" : "#1a3a6b";
   const brand3 = isDark ? "#f0c050" : "#4a9fd4";
 
   useEffect(() => {

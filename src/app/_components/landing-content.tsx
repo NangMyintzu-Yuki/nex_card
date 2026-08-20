@@ -237,7 +237,7 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-4">
           <Link href={homeHref} className="flex min-w-0 items-center gap-2">
             <NexCardLogo size={32} isDark={isDark} />
-            <span className="truncate text-base font-black leading-none sm:text-lg" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
+            <span className="truncate text-base font-black leading-none sm:text-lg" style={{ color: isDark ? "#d4af37" : "#1a3a6b" }}>NEX CARD</span>
           </Link>
           <nav className="hidden items-center gap-8 md:flex">
             {["Features", "Templates", "How it Works"].map((l) => (
@@ -546,7 +546,7 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
           <div className="relative mx-auto max-w-3xl text-center">
             <ScaleIn className="mb-8 flex items-center justify-center gap-3">
               <NexCardLogo size={72} isDark={isDark} />
-              <span className="text-4xl font-black leading-none md:text-5xl lg:text-6xl" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
+              <span className="text-4xl font-black leading-none md:text-5xl lg:text-6xl" style={{ color: isDark ? "#d4af37" : "#1a3a6b" }}>NEX CARD</span>
             </ScaleIn>
             <FadeIn delay={0.1}>
               <h2 className="text-4xl font-black tracking-tight mb-5 md:text-5xl lg:text-6xl" style={{ color: "var(--nc-text)" }}>
@@ -598,7 +598,7 @@ function LandingInner({ isLoggedIn, preorderMode = false }: LandingContentProps)
               <div className="md:col-span-1">
                 <div className="flex items-center gap-2">
                   <NexCardLogo size={32} isDark={isDark} />
-                  <span className="text-base font-black leading-none" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
+                  <span className="text-base font-black leading-none" style={{ color: isDark ? "#d4af37" : "#1a3a6b" }}>NEX CARD</span>
                 </div>
                 <p className="mt-4 max-w-xs text-sm leading-relaxed" style={{ color: "var(--nc-text-3)" }}>
                   Your digital identity, elevated. Create stunning name cards, portfolios, and more.

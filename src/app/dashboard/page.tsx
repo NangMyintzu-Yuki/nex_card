@@ -9,7 +9,6 @@ import { getServerSession } from "@/lib/auth/session";
 import { getCachedUserProfiles } from "@/lib/cache/profile-cache";
 import { resolveThumbnailUrl } from "@/lib/thumbnails";
 import { DeleteProfileButton } from "./_components/delete-profile-button";
-import { DashboardCardExport } from "./_components/card-export-buttons";
 
 export const metadata: Metadata = {
   title: "Dashboard — NEX CARD",
@@ -256,7 +255,6 @@ export default async function DashboardPage({
                       <QrCode className="h-3.5 w-3.5" />
                     </div>
                   )}
-                  <DashboardCardExport profileId={profile.id} slug={profile.slug} />
                   <Link href={`/${profile.slug}`} target="_blank" rel="noopener noreferrer"
                     className="nc-btn-ghost flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs">
                     <ExternalLink className="h-3.5 w-3.5" />

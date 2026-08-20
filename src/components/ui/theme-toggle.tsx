@@ -50,7 +50,7 @@ export function ThemeToggle({ size = "md", showLabel = false, className = "" }: 
             transform: "translateY(-50%)",
             background: isDark
               ? "linear-gradient(135deg, #c9973a, #d4af37)"
-              : "linear-gradient(135deg, #1a3a6b, #2d6eb5)",
+              : "linear-gradient(135deg, #1a3a6b, #1a3a6b)",
             boxShadow: isDark
               ? "0 2px 8px rgba(212,175,55,0.5)"
               : "0 2px 8px rgba(26,58,107,0.4)",

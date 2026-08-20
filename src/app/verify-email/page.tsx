@@ -31,13 +31,6 @@ function VerifyEmailContent() {
   }, [resendTimer]);
 
   useEffect(() => {
-    if (!token && email) {
-      handleResend();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     inputsRef.current[0]?.focus();
   }, []);
 

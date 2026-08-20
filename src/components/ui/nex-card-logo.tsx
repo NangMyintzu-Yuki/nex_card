@@ -4,8 +4,8 @@
 
 /**
  * Image-only logo mark.
- * - Dark mode: gold tint via CSS filter (white bg removed with mix-blend-mode: screen)
- * - Light mode: navy tint via CSS filter (white bg removed with mix-blend-mode: multiply)
+ * - Dark mode: gold tint via CSS filter
+ * - Light mode: exact color via CSS mask (pixel-perfect color match)
  */
 function LogoMark({
   size,
@@ -20,8 +20,27 @@ function LogoMark({
 
   // Gold tint (dark mode): black → gold
   const darkFilter = "invert(68%) sepia(58%) saturate(600%) hue-rotate(8deg) brightness(105%)";
-  // Navy tint (light mode): black → navy
-  const lightFilter = "invert(28%) sepia(90%) saturate(400%) hue-rotate(195deg) brightness(90%)";
+
+  if (!isDark) {
+    return (
+      <div
+        style={{
+          display: "block",
+          width: size,
+          height: size,
+          backgroundColor: "#1a3a6b",
+          WebkitMaskImage: `url(${src})`,
+          maskImage: `url(${src})`,
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
+        }}
+      />
+    );
+  }
 
   return (
     <img
@@ -34,7 +53,7 @@ function LogoMark({
         width: size,
         height: size,
         objectFit: "contain",
-        filter: isDark ? darkFilter : lightFilter,
+        filter: darkFilter,
       }}
     />
   );

@@ -516,7 +516,7 @@ html.nc-light,
 .nc-light {
   /* Brand */
   --nc-brand-1:       #1a3a6b;   /* deep navy */
-  --nc-brand-2:       #2d6eb5;   /* mid blue  */
+  --nc-brand-2:       #1a3a6b;   /* deep navy */
   --nc-brand-3:       #4a9fd4;   /* light blue */
   --nc-brand-grad:    linear-gradient(135deg, #1a3a6b, #4a9fd4);
   --nc-brand-text:    #ffffff;
@@ -554,7 +554,7 @@ html.nc-light,
   --nc-success:       #16a34a;
   --nc-warning:       #d97706;
   --nc-danger:        #dc2626;
-  --nc-info:          #2d6eb5;
+  --nc-info:          #1a3a6b;
 }
 
 /* ── Utility classes that consume CSS vars ───────────────────────────────── */

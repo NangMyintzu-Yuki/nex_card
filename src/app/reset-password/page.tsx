@@ -16,7 +16,7 @@ function ResetForm() {
   const token = params.get("token") ?? "";
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const brand2 = isDark ? "#d4af37" : "#2d6eb5";
+  const brand2 = isDark ? "#d4af37" : "#1a3a6b";
   const brand3 = isDark ? "#f0c050" : "#4a9fd4";
 
   const [password, setPassword] = useState("");
@@ -160,7 +160,7 @@ function ResetForm() {
 export default function ResetPasswordPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const brand2 = isDark ? "#d4af37" : "#2d6eb5";
+  const brand2 = isDark ? "#d4af37" : "#1a3a6b";
 
   return (
     <main className="relative flex min-h-screen items-center justify-center px-4 py-10">

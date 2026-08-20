@@ -294,7 +294,7 @@ function ContactsEditor({ value, onChange }: { value: unknown[]; onChange: (v: u
         const availableTypes = TYPES.filter((t) => !usedTypes.has(t));
         return (
           <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-start">
-            <div className="flex gap-2 sm:flex-1">
+            <div className="flex gap-2 min-w-0 sm:flex-1">
               {c.type ? (
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500/10 px-2.5 py-2 text-xs font-semibold text-indigo-400 shrink-0">
                   {TYPE_LABELS[c.type] ?? c.type}
@@ -310,11 +310,11 @@ function ContactsEditor({ value, onChange }: { value: unknown[]; onChange: (v: u
               )}
               <input value={c.value ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], value: e.target.value }; onChange(n); }}
                 placeholder={c.type === "email" ? "you@example.com" : c.type === "phone" ? "+95 9xxx" : c.type === "website" ? "https://…" : "Full address"}
-                className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+                className="min-w-0 flex-1 nc-input rounded-lg px-3 py-2 text-sm" />
             </div>
             <div className="flex gap-2 items-center">
               <input value={c.label ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
-                placeholder="Label (optional)" className="flex-1 sm:w-28 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
+                placeholder="Label (optional)" className="min-w-0 flex-1 sm:w-28 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
               <button onClick={() => onChange(contacts.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -654,7 +654,7 @@ const PLATFORM_PLACEHOLDERS: Record<string, string> = {
         const availablePlatforms = PLATFORMS.filter((p) => !usedPlatforms.has(p));
         return (
           <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="flex gap-2 sm:flex-1">
+            <div className="flex gap-2 min-w-0 sm:flex-1">
               {l.platform ? (
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500/10 px-2.5 py-2 text-xs font-semibold text-indigo-400 shrink-0">
                   {PLATFORM_ICONS[l.platform] ?? "🔗"} {l.platform}
@@ -663,7 +663,7 @@ const PLATFORM_PLACEHOLDERS: Record<string, string> = {
                 </span>
               ) : (
                 <select value="" onChange={(e) => setPlatform(i, e.target.value)}
-                  className="nc-input rounded-lg px-2 py-2 text-xs w-28 shrink-0">
+                  className="nc-input rounded-lg px-2 py-2 text-xs w-24 shrink-0">
                   <option value="" disabled>Platform…</option>
                   {availablePlatforms.map((p) => <option key={p} value={p}>{p}</option>)}
                 </select>
@@ -675,11 +675,11 @@ const PLATFORM_PLACEHOLDERS: Record<string, string> = {
                     const n = [...links]; n[i] = { ...n[i], url: `https://${v}` }; onChange(n);
                   }
                 }}
-                placeholder={l.platform ? PLATFORM_PLACEHOLDERS[l.platform] ?? "https://..." : "https://..."} className="flex-1 nc-input rounded-lg px-3 py-2 text-sm min-w-0" />
+                placeholder={l.platform ? PLATFORM_PLACEHOLDERS[l.platform] ?? "https://..." : "https://..."} className="min-w-0 flex-1 nc-input rounded-lg px-3 py-2 text-sm" />
             </div>
             <div className="flex gap-2 items-center">
               <input value={l.label ?? ""} onChange={(e) => { const n = [...links]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
-                placeholder="Label" className="flex-1 sm:w-24 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
+                placeholder="Label" className="min-w-0 flex-1 sm:w-24 sm:flex-initial nc-input rounded-lg px-3 py-2 text-sm" />
               <button onClick={() => onChange(links.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -700,17 +700,15 @@ function SkillsEditor({ value, onChange }: { value: unknown[]; onChange: (v: unk
   return (
     <div className="space-y-2">
       {skills.map((s, i) => (
-        <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div key={i} className="flex items-center gap-2">
           <input value={String(s.name ?? "")} onChange={(e) => { const n = [...skills]; n[i] = { ...n[i], name: e.target.value }; onChange(n); }}
-            placeholder="Skill name" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm" />
-          <div className="flex items-center gap-2">
-            <input type="number" min={1} max={100} value={Number(s.level ?? 80)} onChange={(e) => { const n = [...skills]; n[i] = { ...n[i], level: parseInt(e.target.value) }; onChange(n); }}
-              className="nc-input w-16 rounded-lg px-2 py-2 text-sm text-center" />
-            <span className="text-xs w-6" style={{ color: "var(--nc-text-3)" }}>%</span>
-            <button onClick={() => onChange(skills.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
+            placeholder="Skill name" className="min-w-0 flex-1 nc-input rounded-lg px-3 py-2 text-sm" />
+          <input type="number" min={1} max={100} value={Number(s.level ?? 80)} onChange={(e) => { const n = [...skills]; n[i] = { ...n[i], level: parseInt(e.target.value) }; onChange(n); }}
+            className="nc-input w-14 shrink-0 rounded-lg px-2 py-2 text-sm text-center" />
+          <span className="text-xs shrink-0" style={{ color: "var(--nc-text-3)" }}>%</span>
+          <button onClick={() => onChange(skills.filter((_, j) => j !== i))} className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
         </div>
       ))}
       <button onClick={() => onChange([...skills, { name: "", level: 80 }])}
@@ -737,7 +735,7 @@ function CategorySkillsEditor({ value, onChange }: { value: unknown[]; onChange:
             {g.items.map((item, j) => (
               <div key={j} className="flex gap-2 items-center">
                 <input value={item} onChange={(e) => { const n = [...groups]; const items = [...n[i].items]; items[j] = e.target.value; n[i] = { ...n[i], items }; onChange(n); }}
-                  placeholder="Skill name" className="flex-1 nc-input rounded-lg px-3 py-2 text-sm" />
+                  placeholder="Skill name" className="min-w-0 flex-1 nc-input rounded-lg px-3 py-2 text-sm" />
                 <button onClick={() => { const n = [...groups]; n[i] = { ...n[i], items: n[i].items.filter((_, k) => k !== j) }; onChange(n); }}
                   className="flex h-8 w-8 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
                   <Trash2 className="h-3 w-3" />

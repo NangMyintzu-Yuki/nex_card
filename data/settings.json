@@ -12,9 +12,9 @@
   "isr_revalidate_sec": 3600,
   "notify_new_user": true,
   "notify_email": "nangmyintzu89@gmail.com",
-  "wallet_account_name": "NEX CARD",
-  "wallet_kbzpay": "09-259599508",
-  "wallet_wavepay": "09-259599508",
-  "wallet_ayapay": "09-259599508",
+  "wallet_account_name": "Shwe Yee Win",
+  "wallet_kbzpay": "09974133003",
+  "wallet_wavepay": "",
+  "wallet_ayapay": "09974133003",
   "preorder_mode": false
 }

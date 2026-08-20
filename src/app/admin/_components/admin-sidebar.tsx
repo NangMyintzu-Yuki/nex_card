@@ -41,7 +41,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
     return () => window.removeEventListener("open-admin-sidebar", openSidebar);
   }, []);
 
-  const brand2 = isDark ? "#d4af37" : "#2d6eb5";
+  const brand2 = isDark ? "#d4af37" : "#1a3a6b";
   const brand3 = isDark ? "#f0c050" : "#4a9fd4";
 
   function NavContent() {
@@ -54,7 +54,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
             <NexCardLogoStatic size={28} showText={false} isDark={isDark} />
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-sm font-black leading-none" style={{ color: isDark ? "#d4af37" : "#2d6eb5" }}>NEX CARD</span>
+                <span className="text-sm font-black leading-none" style={{ color: isDark ? "#d4af37" : "#1a3a6b" }}>NEX CARD</span>
                 <span className="rounded-full px-1.5 py-0.5 text-[9px] font-black text-white"
                   style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
                   ADMIN

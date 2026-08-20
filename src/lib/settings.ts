@@ -64,10 +64,10 @@ const DEFAULTS: Settings = {
   isr_revalidate_sec: 3600,
   notify_new_user: true,
   notify_email: "admin@www.nexcard.wetechmm.com",
-  wallet_account_name: "NEX CARD",
-  wallet_kbzpay: "09-000000000",
-  wallet_wavepay: "09-000000000",
-  wallet_ayapay: "09-000000000",
+  wallet_account_name: "Shwe Yee Win",
+  wallet_kbzpay: "09974133003",
+  wallet_wavepay: "",
+  wallet_ayapay: "09974133003",
   preorder_mode: true,
 };
 

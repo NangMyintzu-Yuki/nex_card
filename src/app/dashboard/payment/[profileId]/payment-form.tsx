@@ -23,12 +23,6 @@ const PAYMENT_METHODS = {
     details: "KBZPay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
     deepLinkHint: "Open the KBZPay app → Transfer → enter the account above, then upload your screenshot.",
   },
-  WavePay: {
-    label: "WavePay",
-    accountName: "Shwe Yee Win",
-    details: "WavePay အသုံးပြု၍ ငွေလွှဲနိုင်ပါသည်",
-    deepLinkHint: "Open WavePay → Send Money → use the number above, then upload your transfer screenshot.",
-  },
   AYAPay: {
     label: "AYA Pay",
     accountName: "Shwe Yee Win",
@@ -130,7 +124,13 @@ export function PaymentForm({
     submitPayment(fd);
   }
 
-  if (availableTiers.length === 0) return null;
+  if (availableTiers.length === 0) {
+    return (
+      <div className="p-4 sm:p-8 text-center" style={{ color: "var(--nc-text-2)" }}>
+        <p className="text-sm">Pricing is not available for this template yet. Please contact support.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 p-4 sm:p-8">
@@ -172,7 +172,7 @@ export function PaymentForm({
       {/* Payment method */}
       <section>
         <h2 className="mb-4 text-lg font-bold" style={{ color: "var(--nc-text)" }}>2. Payment Method</h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {(Object.keys(PAYMENT_METHODS) as Array<keyof typeof PAYMENT_METHODS>).map((key) => {
             const pm = PAYMENT_METHODS[key];
             const active = paymentMethod === key;

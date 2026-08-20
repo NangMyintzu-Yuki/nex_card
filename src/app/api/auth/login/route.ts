@@ -19,6 +19,7 @@ const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1).max(72),
   totpCode: z.string().regex(/^\d{6}$/).optional(),
+  remember: z.boolean().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -59,6 +60,8 @@ export async function POST(request: NextRequest) {
         role: true,
         totpEnabled: true,
         totpSecret: true,
+        emailVerifiedAt: true,
+        lastLoginAt: true,
       },
     });
 
@@ -121,6 +124,41 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Returning user (already verified email & logged in before) — skip email verification
+    if (user.emailVerifiedAt && user.lastLoginAt) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() },
+      });
+
+      const { randomBytes } = await import("crypto");
+      const remember = body.remember !== false;
+      const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
+      const SESSION_SHORT_MS = 24 * 60 * 60 * 1000;
+      const sessionToken = randomBytes(32).toString("hex");
+      const expires = new Date(Date.now() + (remember ? SESSION_DURATION_MS : SESSION_SHORT_MS));
+
+      await prisma.session.create({
+        data: { userId: user.id, sessionToken, expires },
+      });
+
+      const response = NextResponse.json(
+        { success: true, message: "Logged in successfully.", role: user.role },
+        { status: 200 }
+      );
+
+      response.cookies.set("session_token", sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        expires,
+        path: "/",
+      });
+
+      return response;
+    }
+
+    // First-time user — require email verification
     const code = await createVerificationCode(user.id, "login");
 
     if (isMailConfigured() && user.email) {

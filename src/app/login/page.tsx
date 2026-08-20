@@ -45,7 +45,7 @@ export default function LoginPage() {
       .catch(() => {});
   }, [router]);
 
-  const brand2 = isDark ? "#d4af37" : "#2d6eb5";
+  const brand2 = isDark ? "#d4af37" : "#1a3a6b";
   const brand3 = isDark ? "#f0c050" : "#4a9fd4";
 
   async function handleSubmit(e: React.FormEvent) {
@@ -58,6 +58,7 @@ export default function LoginPage() {
         body: JSON.stringify({
           email,
           password,
+          remember: rememberMe,
           ...(totpCode ? { totpCode } : {}),
         }),
       });
