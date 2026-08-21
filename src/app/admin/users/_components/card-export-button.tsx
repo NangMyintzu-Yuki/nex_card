@@ -1,6 +1,6 @@
 "use client";
 
-import { CreditCard, ChevronDown, Sun, Moon, Loader2 } from "lucide-react";
+import { CreditCard, Sun, Moon, Loader2, AlertCircle, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 interface UserProfile {
@@ -20,10 +20,10 @@ export function CardExportButton({
   const [open, setOpen] = useState(false);
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(false);
-  const [exporting, setExporting] = useState<string | null>(null); // "profileId:theme"
+  const [error, setError] = useState("");
+  const [exporting, setExporting] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -40,12 +40,17 @@ export function CardExportButton({
   async function fetchProfiles() {
     if (profiles.length > 0) return;
     setLoading(true);
+    setError("");
     try {
       const res = await fetch(`/api/admin/users/${userId}/profiles`);
-      if (res.ok) {
-        const data = await res.json();
-        setProfiles(data.profiles ?? []);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `HTTP ${res.status}`);
       }
+      const data = await res.json();
+      setProfiles(data.profiles ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load profiles");
     } finally {
       setLoading(false);
     }
@@ -62,9 +67,8 @@ export function CardExportButton({
     try {
       const res = await fetch(`/api/admin/export-card/${profileId}?theme=${theme}`);
       if (!res.ok) {
-        const body = await res.text().catch(() => "unknown");
-        console.error(`Card export failed: HTTP ${res.status} — ${body}`);
-        throw new Error(`Export failed: ${res.status}`);
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Export failed: HTTP ${res.status}`);
       }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -76,7 +80,8 @@ export function CardExportButton({
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Card export failed:", err);
+      setError(err instanceof Error ? err.message : "Export failed");
+      setTimeout(() => setError(""), 4000);
     } finally {
       setExporting(null);
     }
@@ -94,103 +99,141 @@ export function CardExportButton({
       </button>
 
       {open && (
-        <div
-          className="absolute right-0 top-full z-50 mt-1 w-72 rounded-xl border shadow-xl"
-          style={{
-            background: "var(--nc-bg-card)",
-            borderColor: "var(--nc-border)",
-          }}
-        >
+        <>
+          {/* Mobile backdrop */}
           <div
-            className="border-b px-4 py-3"
-            style={{ borderColor: "var(--nc-border)" }}
-          >
-            <p className="text-xs font-bold" style={{ color: "var(--nc-text)" }}>
-              Export NFC Card
-            </p>
-            <p className="text-[10px]" style={{ color: "var(--nc-text-3)" }}>
-              Select a profile to export
-            </p>
-          </div>
+            className="fixed inset-0 z-40 bg-black/40 sm:hidden"
+            onClick={() => setOpen(false)}
+          />
 
-          <div className="max-h-64 overflow-y-auto">
-            {loading ? (
-              <div className="flex items-center justify-center gap-2 px-4 py-6">
-                <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--nc-text-3)" }} />
-                <span className="text-xs" style={{ color: "var(--nc-text-3)" }}>
-                  Loading profiles…
-                </span>
-              </div>
-            ) : profiles.length === 0 ? (
-              <div className="px-4 py-6 text-center">
-                <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
-                  No profiles found
+          {/* Panel — bottom sheet on mobile, dropdown on desktop */}
+          <div
+            className="
+              fixed bottom-0 left-0 right-0 z-50 max-h-[80vh] overflow-hidden rounded-t-2xl border shadow-2xl
+              sm:absolute sm:bottom-auto sm:left-auto sm:right-0 sm:top-full sm:mt-1 sm:w-80 sm:rounded-2xl sm:rounded-t-2xl
+            "
+            style={{
+              background: "var(--nc-bg-card)",
+              borderColor: "var(--nc-border)",
+            }}
+          >
+            {/* Header */}
+            <div
+              className="flex items-center justify-between border-b px-4 py-3"
+              style={{ borderColor: "var(--nc-border)" }}
+            >
+              <div>
+                <p className="text-xs font-bold" style={{ color: "var(--nc-text)" }}>
+                  Export NFC Card
+                </p>
+                <p className="text-[10px]" style={{ color: "var(--nc-text-3)" }}>
+                  Select a profile to export
                 </p>
               </div>
-            ) : (
-              profiles.map((profile) => (
-                <div
-                  key={profile.id}
-                  className="border-b px-4 py-3 last:border-b-0"
-                  style={{ borderColor: "var(--nc-border)" }}
-                >
-                  <div className="mb-2">
-                    <p
-                      className="text-xs font-semibold truncate"
-                      style={{ color: "var(--nc-text)" }}
-                    >
-                      {profile.slug}
-                    </p>
-                    <p
-                      className="text-[10px]"
-                      style={{ color: "var(--nc-text-3)" }}
-                    >
-                      {profile.category.name} · {profile.template.name}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleExport(profile.id, profile.slug, "dark")}
-                      disabled={exporting !== null}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-bold transition-all"
-                      style={{
-                        background: exporting === `${profile.id}:dark` ? "var(--nc-bg-hover)" : "#1a1a2e",
-                        color: "#d4af37",
-                        border: "1px solid #d4af3730",
-                        opacity: exporting !== null && exporting !== `${profile.id}:dark` ? 0.5 : 1,
-                      }}
-                    >
-                      {exporting === `${profile.id}:dark` ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Moon className="h-3 w-3" />
-                      )}
-                      Dark
-                    </button>
-                    <button
-                      onClick={() => handleExport(profile.id, profile.slug, "light")}
-                      disabled={exporting !== null}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-bold transition-all"
-                      style={{
-                        background: exporting === `${profile.id}:light` ? "var(--nc-bg-hover)" : "#f0f4f8",
-                        color: "#1e3c6e",
-                        border: "1px solid #1e3c6e30",
-                        opacity: exporting !== null && exporting !== `${profile.id}:light` ? 0.5 : 1,
-                      }}
-                    >
-                      {exporting === `${profile.id}:light` ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Sun className="h-3 w-3" />
-                      )}
-                      Light
-                    </button>
-                  </div>
-                </div>
-              ))
+              <button
+                onClick={() => setOpen(false)}
+                className="flex h-7 w-7 items-center justify-center rounded-lg sm:hidden"
+                style={{ color: "var(--nc-text-3)" }}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div
+                className="flex items-center gap-2 border-b px-4 py-2.5 text-xs"
+                style={{
+                  borderColor: "var(--nc-border)",
+                  background: "rgba(239,68,68,0.06)",
+                  color: "#ef4444",
+                }}
+              >
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{error}</span>
+              </div>
             )}
+
+            {/* Content */}
+            <div className="max-h-[60vh] overflow-y-auto sm:max-h-64">
+              {loading ? (
+                <div className="flex items-center justify-center gap-2 px-4 py-8">
+                  <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--nc-text-3)" }} />
+                  <span className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                    Loading profiles…
+                  </span>
+                </div>
+              ) : profiles.length === 0 && !error ? (
+                <div className="px-4 py-8 text-center">
+                  <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                    No profiles found
+                  </p>
+                </div>
+              ) : (
+                profiles.map((profile) => (
+                  <div
+                    key={profile.id}
+                    className="border-b px-4 py-3 last:border-b-0"
+                    style={{ borderColor: "var(--nc-border)" }}
+                  >
+                    <div className="mb-2">
+                      <p
+                        className="text-xs font-semibold truncate"
+                        style={{ color: "var(--nc-text)" }}
+                      >
+                        {profile.slug}
+                      </p>
+                      <p
+                        className="text-[10px]"
+                        style={{ color: "var(--nc-text-3)" }}
+                      >
+                        {profile.category.name} · {profile.template.name}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleExport(profile.id, profile.slug, "dark")}
+                        disabled={exporting !== null}
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[10px] font-bold transition-all sm:py-1.5"
+                        style={{
+                          background: exporting === `${profile.id}:dark` ? "var(--nc-bg-hover)" : "#1a1a2e",
+                          color: "#d4af37",
+                          border: "1px solid #d4af3730",
+                          opacity: exporting !== null && exporting !== `${profile.id}:dark` ? 0.5 : 1,
+                        }}
+                      >
+                        {exporting === `${profile.id}:dark` ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Moon className="h-3 w-3" />
+                        )}
+                        Dark
+                      </button>
+                      <button
+                        onClick={() => handleExport(profile.id, profile.slug, "light")}
+                        disabled={exporting !== null}
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[10px] font-bold transition-all sm:py-1.5"
+                        style={{
+                          background: exporting === `${profile.id}:light` ? "var(--nc-bg-hover)" : "#f0f4f8",
+                          color: "#1e3c6e",
+                          border: "1px solid #1e3c6e30",
+                          opacity: exporting !== null && exporting !== `${profile.id}:light` ? 0.5 : 1,
+                        }}
+                      >
+                        {exporting === `${profile.id}:light` ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Sun className="h-3 w-3" />
+                        )}
+                        Light
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
