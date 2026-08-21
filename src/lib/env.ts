@@ -189,19 +189,17 @@ export function validateEnv(): void {
 
     // If backup email is partially configured, require full SMTP
     const smtpHost =
-      process.env.SMTP_HOST?.trim() || process.env.SYSTEM_MAIL_HOST?.trim();
+      process.env.SMTP_HOST?.trim();
     if (smtpHost) {
       const SmtpSchema = z.object({
-        SMTP_USER: z.string().min(1, "SMTP_USER or SYSTEM_MAIL_USER is required"),
-        SMTP_PASS: z.string().min(1, "SMTP_PASS or SYSTEM_MAIL_PASSWORD is required"),
+        SMTP_USER: z.string().min(1, "SMTP_USER is required"),
+        SMTP_PASS: z.string().min(1, "SMTP_PASS is required"),
       });
       const smtp = SmtpSchema.safeParse({
         SMTP_USER:
-          process.env.SMTP_USER?.trim() || process.env.SYSTEM_MAIL_USER?.trim(),
+          process.env.SMTP_USER?.trim(),
         SMTP_PASS:
-          process.env.SMTP_PASS?.trim() ||
-          process.env.SYSTEM_MAIL_PASS?.trim() ||
-          process.env.SYSTEM_MAIL_PASSWORD?.trim(),
+          process.env.SMTP_PASS?.trim(),
       });
       if (!smtp.success) {
         throw new Error(

@@ -17,15 +17,14 @@ interface SendBackupEmailOpts {
 }
 
 function resolveSmtp() {
-  const host = process.env.SMTP_HOST || process.env.SYSTEM_MAIL_HOST;
-  const port = Number(process.env.SMTP_PORT || process.env.SYSTEM_MAIL_PORT || 587);
-  const user = process.env.SMTP_USER || process.env.SYSTEM_MAIL_USER;
-  const pass = process.env.SMTP_PASS || process.env.SYSTEM_MAIL_PASS;
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
   const from =
     process.env.SMTP_USER ||
-    process.env.SYSTEM_MAIL_FROM ||
     `"NEX CARD Backup" <noreply@www.nexcard.wetechmm.com>`;
-  const to = process.env.BACKUP_EMAIL_TO || process.env.SYSTEM_MAIL_TO;
+  const to = process.env.BACKUP_EMAIL_TO;
   return { host, port, user, pass, from, to };
 }
 
@@ -35,7 +34,7 @@ export async function sendBackupEmail(opts: SendBackupEmailOpts) {
 
   if (!host || !user || !pass || !to) {
     throw new Error(
-      "SMTP is not configured — set SMTP_* (or SYSTEM_MAIL_*) and BACKUP_EMAIL_TO."
+      "SMTP is not configured — set SMTP_HOST, SMTP_USER, SMTP_PASS, and BACKUP_EMAIL_TO."
     );
   }
 
