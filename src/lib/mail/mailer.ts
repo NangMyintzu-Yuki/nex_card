@@ -25,29 +25,47 @@ export function isMailConfigured(): boolean {
 }
 
 let transporter: Transporter | null = null;
+let lastPort: number | null = null;
+
+function createTransporter(port: number): Transporter {
+  return nodemailer.createTransport({
+    host: smtpHost(),
+    port,
+    secure: port === 465,
+    auth: {
+      user: smtpUser(),
+      pass: smtpPass(),
+    },
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+  });
+}
 
 function getTransporter(): Transporter {
   if (!isMailConfigured()) {
     throw new Error("SMTP is not configured (SMTP_HOST + SMTP_USER/PASS or SYSTEM_MAIL_*).");
   }
   if (!transporter) {
-    const port = Number(
+    const port = lastPort ?? Number(
       process.env.SMTP_PORT ?? process.env.SYSTEM_MAIL_PORT ?? 465
     );
-    transporter = nodemailer.createTransport({
-      host: smtpHost(),
-      port,
-      secure: port === 465,
-      auth: {
-        user: smtpUser(),
-        pass: smtpPass(),
-      },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
-    });
+    transporter = createTransporter(port);
   }
   return transporter;
+}
+
+/**
+ * If the primary port (465) fails with a connection error,
+ * reset and try the alternate port (587) on the next attempt.
+ */
+function resetTransporterFallback(): void {
+  const currentPort = lastPort ?? Number(
+    process.env.SMTP_PORT ?? process.env.SYSTEM_MAIL_PORT ?? 465
+  );
+  transporter = null;
+  lastPort = currentPort === 465 ? 587 : 465;
+  console.warn(`[mail] Transporter reset — next attempt will use port ${lastPort}`);
 }
 
 export type SendMailInput = {
@@ -81,15 +99,14 @@ export async function sendMail(input: SendMailInput): Promise<{ messageId: strin
     return { messageId: info.messageId };
   } catch (error) {
     console.error("[mail] Failed to send:", input.subject, "→", input.to, error);
-    // Reset transporter on connection errors so it reconnects on next attempt
+    // Reset transporter on connection errors so it reconnects on next attempt (tries alternate port)
     if (error instanceof Error && (
       error.message.includes("ECONNREFUSED") ||
       error.message.includes("ETIMEDOUT") ||
       error.message.includes("ESOCKET") ||
       error.message.includes("ECONNRESET")
     )) {
-      transporter = null;
-      console.warn("[mail] Transporter reset due to connection error");
+      resetTransporterFallback();
     }
     return null;
   }
