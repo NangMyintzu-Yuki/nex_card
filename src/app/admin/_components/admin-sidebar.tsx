@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   BarChart3, Users, Layers, Settings, Menu, X, ChevronRight, CreditCard,
-  LogOut, TrendingUp, Shield,
+  LogOut, TrendingUp, Shield, Tag,
 } from "lucide-react";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -20,6 +20,7 @@ const NAV = [
   { href: "/admin/revenue",    icon: TrendingUp, label: "Revenue"   },
   { href: "/admin/users",      icon: Users,      label: "Users"     },
   { href: "/admin/templates",  icon: Layers,     label: "Templates" },
+  { href: "/admin/coupons",    icon: Tag,        label: "Coupons"    },
   { href: "/admin/settings",   icon: Settings,   label: "Settings"  },
   { href: "/admin/security",   icon: Shield,     label: "Security"  },
 ] as const;

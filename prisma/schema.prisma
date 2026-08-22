@@ -60,6 +60,7 @@ model Category {
   updatedAt   DateTime      @updatedAt
   templates   Template[]
   profiles    UserProfile[]
+  coupons     Coupon[]
 
   @@index([slug])
   @@index([isActive])
@@ -143,6 +144,12 @@ model Payment {
   tier           payments_tier
   amount         Float
   currency       String        @default("MMK")
+  /// Original price before discount
+  originalPrice  Float?
+  /// Discount percentage applied from coupon
+  discountPct    Float?
+  /// Coupon code used (denormalized for audit)
+  couponCode     String?       @db.VarChar(30)
   /// Screenshot proof — still required as fallback for Wave/KBZ manual rails
   screenshotUrl  String        @db.VarChar(500)
   status         PaymentStatus @default(PENDING)
@@ -156,12 +163,36 @@ model Payment {
   transactionRef String?       @db.VarChar(120)
   user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userProfile    UserProfile   @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  coupon         Coupon?       @relation(fields: [couponId], references: [id])
+  couponId       String?
 
   @@index([userId])
   @@index([status])
   @@index([method])
   @@index([createdAt])
+  @@index([couponId])
   @@map("payments")
+}
+
+model Coupon {
+  id             String    @id @default(cuid())
+  code           String    @unique @db.VarChar(30)
+  categoryId     String
+  discountQrOnly Float     @default(0)
+  discountNfcQr  Float     @default(0)
+  expiresAt      DateTime?
+  isActive       Boolean   @default(true)
+  maxUses        Int?
+  usageCount     Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  category       Category  @relation(fields: [categoryId], references: [id])
+  payments       Payment[]
+
+  @@index([code])
+  @@index([categoryId])
+  @@index([isActive])
+  @@map("coupons")
 }
 
 model ProfileAnalyticsEvent {

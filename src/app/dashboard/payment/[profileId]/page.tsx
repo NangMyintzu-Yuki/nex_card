@@ -28,6 +28,7 @@ export default async function PaymentPage({
     select: {
       id: true,
       slug: true,
+      categoryId: true,
       paymentStatus: true,
       template: {
         select: {
@@ -118,6 +119,7 @@ export default async function PaymentPage({
           <div className="rounded-2xl nc-card overflow-hidden">
             <PaymentForm
               profileId={profile.id}
+              categoryId={profile.categoryId}
               templateName={profile.template.name}
               prices={{
                 priceQrOnly: profile.template.priceQrOnly,

@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { maintenancePath } from "@/lib/maintenance-path";
 import { useActionState } from "react";
 import {
-  Upload, QrCode, Smartphone, Package, ArrowRight,
+  Upload, QrCode, Smartphone, ArrowRight,
   CheckCircle, XCircle, Clock, Loader2, Banknote, Copy, Check,
+  Tag, X, Percent,
 } from "lucide-react";
 import { submitPaymentAction, type SubmitPaymentState } from "@/lib/actions/payment-actions";
 import { usePublicWallets } from "@/lib/payments/use-public-wallets";
@@ -47,11 +48,13 @@ function formatMMK(amount: number): string {
 
 export function PaymentForm({
   profileId,
+  categoryId,
   templateName: _templateName,
   prices,
   existingTier,
 }: {
   profileId: string;
+  categoryId: string;
   templateName: string;
   prices: Prices;
   existingTier?: string | null;
@@ -72,6 +75,12 @@ export function PaymentForm({
   const [uploadError, setUploadError] = useState("");
   const [copiedPhone, setCopiedPhone] = useState(false);
 
+  const [couponCode, setCouponCode] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState<number | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+
   const [state, submitPayment, pending] = useActionState<
     SubmitPaymentState,
     FormData
@@ -86,6 +95,83 @@ export function PaymentForm({
   const availableTiers = TIER_OPTIONS.filter(
     (t) => prices[t.priceKey] != null
   );
+
+  const currentPriceKey = selectedTier ? TIER_OPTIONS.find((t) => t.value === selectedTier)?.priceKey : null;
+  const originalPrice = currentPriceKey ? (prices[currentPriceKey] ?? 0) : 0;
+  const discountAmount = couponDiscount ? Math.round(originalPrice * couponDiscount / 100) : 0;
+  const finalPrice = originalPrice - discountAmount;
+
+  async function handleValidateCoupon() {
+    if (!couponCode.trim() || !selectedTier) return;
+    setCouponLoading(true);
+    setCouponError("");
+    setCouponDiscount(null);
+    setAppliedCoupon(null);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode.trim(), categoryId, tier: selectedTier }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setCouponDiscount(data.discountPct);
+        setAppliedCoupon(data.code);
+      } else {
+        setCouponError(data.error || "Invalid coupon");
+      }
+    } catch {
+      setCouponError("Failed to validate coupon");
+    } finally {
+      setCouponLoading(false);
+    }
+  }
+
+  function handleRemoveCoupon() {
+    setCouponCode("");
+    setCouponDiscount(null);
+    setAppliedCoupon(null);
+    setCouponError("");
+  }
+
+  const couponCodeRef = useRef(couponCode);
+  couponCodeRef.current = couponCode;
+  const appliedCouponRef = useRef(appliedCoupon);
+  appliedCouponRef.current = appliedCoupon;
+  const categoryIdRef = useRef(categoryId);
+  categoryIdRef.current = categoryId;
+
+  useEffect(() => {
+    if (!appliedCouponRef.current || !couponCodeRef.current || !selectedTier) return;
+    let cancelled = false;
+    (async () => {
+      setCouponLoading(true);
+      try {
+        const res = await fetch("/api/coupons/validate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: couponCodeRef.current, categoryId: categoryIdRef.current, tier: selectedTier }),
+        });
+        const data = await res.json();
+        if (!cancelled) {
+          if (data.valid) {
+            setCouponDiscount(data.discountPct);
+            setAppliedCoupon(data.code);
+            setCouponError("");
+          } else {
+            setCouponDiscount(null);
+            setAppliedCoupon(null);
+            setCouponError(data.error || "Coupon no longer valid for this tier");
+          }
+        }
+      } catch {
+        if (!cancelled) setCouponError("Failed to re-validate coupon");
+      } finally {
+        if (!cancelled) setCouponLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [selectedTier]);
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -117,10 +203,15 @@ export function PaymentForm({
     const fd = new FormData();
     fd.append("profileId", profileId);
     fd.append("tier", selectedTier);
-    fd.append("amount", String(price));
+    fd.append("amount", String(finalPrice));
+    fd.append("originalPrice", String(price));
     fd.append("screenshotUrl", screenshotUrl);
     fd.append("method", paymentMethod);
     if (transactionRef.trim()) fd.append("transactionRef", transactionRef.trim());
+    if (appliedCoupon) {
+      fd.append("couponCode", appliedCoupon);
+      fd.append("discountPct", String(couponDiscount));
+    }
     submitPayment(fd);
   }
 
@@ -168,6 +259,91 @@ export function PaymentForm({
           })}
         </div>
       </section>
+
+      {/* Coupon Code */}
+      {selectedTier && (
+        <section>
+          <h2 className="mb-3 text-lg font-bold" style={{ color: "var(--nc-text)" }}>
+            <span className="flex items-center gap-2">
+              <Tag className="h-5 w-5" style={{ color: "var(--nc-brand-1)" }} />
+              Coupon Code
+              {appliedCoupon && <span className="text-sm font-normal text-emerald-400">(Applied!)</span>}
+            </span>
+          </h2>
+          {appliedCoupon ? (
+            <div
+              className="flex items-center justify-between rounded-xl border px-4 py-3"
+              style={{ borderColor: "rgba(34,197,94,0.3)", background: "rgba(34,197,94,0.06)" }}
+            >
+              <div className="flex items-center gap-3">
+                <Percent className="h-5 w-5 text-emerald-400" />
+                <div>
+                  <p className="text-sm font-bold text-emerald-400">{appliedCoupon}</p>
+                  <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                    {couponDiscount}% discount applied
+                  </p>
+                </div>
+              </div>
+              <button type="button" onClick={handleRemoveCoupon}
+                className="rounded-lg p-1.5 transition-colors hover:bg-white/5"
+                style={{ color: "var(--nc-text-3)" }}>
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                value={couponCode}
+                onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(""); }}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleValidateCoupon(); } }}
+                placeholder="Enter coupon code"
+                disabled={couponLoading}
+                className="flex-1 rounded-xl px-4 py-3 text-sm font-mono uppercase"
+                style={{
+                  background: "var(--nc-bg-card)",
+                  border: "1px solid var(--nc-border)",
+                  color: "var(--nc-text)",
+                  outline: "none",
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleValidateCoupon}
+                disabled={!couponCode.trim() || couponLoading}
+                className="shrink-0 rounded-xl px-5 py-3 text-sm font-bold transition-all disabled:opacity-50"
+                style={{ background: "var(--nc-brand-grad)", color: "var(--nc-brand-text)" }}
+              >
+                {couponLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
+              </button>
+            </div>
+          )}
+          {couponError && <p className="mt-2 text-xs text-red-400">{couponError}</p>}
+        </section>
+      )}
+
+      {/* Price Breakdown */}
+      {selectedTier && originalPrice > 0 && (
+        <section>
+          <div className="rounded-xl border p-4 space-y-2"
+            style={{ borderColor: "var(--nc-border)", background: "var(--nc-bg-card)" }}>
+            <div className="flex justify-between text-sm" style={{ color: "var(--nc-text-2)" }}>
+              <span>Original Price</span>
+              <span>{formatMMK(originalPrice)}</span>
+            </div>
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-sm text-emerald-400">
+                <span>Discount ({couponDiscount}%)</span>
+                <span>-{formatMMK(discountAmount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between pt-2 text-base font-bold"
+              style={{ borderTop: "1px solid var(--nc-border)", color: "var(--nc-text)" }}>
+              <span>Total to Pay</span>
+              <span>{formatMMK(finalPrice)}</span>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Payment method */}
       <section>
@@ -228,7 +404,10 @@ export function PaymentForm({
           <p className="mt-3 text-xs" style={{ color: "var(--nc-text-3)" }}>
             {PAYMENT_METHODS[paymentMethod].deepLinkHint}
           </p>
-          <label className="mt-4 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>
+          <p className="mt-2 text-[11px] font-semibold" style={{ color: "var(--nc-text)" }}>
+            Transfer exactly: <span className="text-emerald-400">{formatMMK(finalPrice)}</span>
+          </p>
+          <label className="mt-3 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>
             Transaction reference (optional)
             <input
               value={transactionRef}

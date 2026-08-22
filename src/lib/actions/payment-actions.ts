@@ -66,6 +66,9 @@ export async function submitPaymentAction(
       screenshotUrl: formData.get("screenshotUrl") as string,
       method: (formData.get("method") as string) || "KBZPay",
       transactionRef: (formData.get("transactionRef") as string) || "",
+      originalPrice: formData.get("originalPrice") ? Number(formData.get("originalPrice")) : null,
+      couponCode: (formData.get("couponCode") as string) || null,
+      discountPct: formData.get("discountPct") ? Number(formData.get("discountPct")) : null,
     };
 
     const parsed = SubmitPaymentInput.safeParse(raw);
@@ -78,6 +81,7 @@ export async function submitPaymentAction(
 
     const { profileId, tier, amount, screenshotUrl, method, transactionRef } =
       parsed.data;
+    const { originalPrice, couponCode, discountPct } = raw;
 
     if (!isOwnedPaymentScreenshotUrl(screenshotUrl, userId)) {
       return {
@@ -115,7 +119,40 @@ export async function submitPaymentAction(
       return { status: "error", message: "This tier is not available for the selected template." };
     }
 
-    if (Math.abs(amount - expectedPrice) > 0.01) {
+    // Validate coupon and compute expected discounted price
+    let finalExpectedPrice = expectedPrice;
+    let couponRecord = null;
+
+    if (couponCode && discountPct && discountPct > 0) {
+      couponRecord = await prisma.coupon.findUnique({
+        where: { code: couponCode.toUpperCase().trim() },
+      });
+
+      if (!couponRecord) {
+        return { status: "error", message: "Invalid coupon code." };
+      }
+      if (!couponRecord.isActive) {
+        return { status: "error", message: "This coupon is inactive." };
+      }
+      if (couponRecord.categoryId !== profile.categoryId) {
+        return { status: "error", message: "Coupon is not valid for this category." };
+      }
+      if (couponRecord.expiresAt && couponRecord.expiresAt < new Date()) {
+        return { status: "error", message: "This coupon has expired." };
+      }
+      if (couponRecord.maxUses && couponRecord.usageCount >= couponRecord.maxUses) {
+        return { status: "error", message: "This coupon has reached its usage limit." };
+      }
+
+      const validDiscount = tier === "QR_ONLY" ? couponRecord.discountQrOnly : couponRecord.discountNfcQr;
+      if (validDiscount <= 0) {
+        return { status: "error", message: "No discount available for this tier." };
+      }
+
+      finalExpectedPrice = Math.round(expectedPrice * (1 - validDiscount / 100));
+    }
+
+    if (Math.abs(amount - finalExpectedPrice) > 0.01) {
       return { status: "error", message: "Price mismatch. Please refresh and try again." };
     }
 
@@ -137,12 +174,24 @@ export async function submitPaymentAction(
             userProfileId: profileId,
             tier: tier as "QR_ONLY" | "NFC_QR",
             amount,
+            originalPrice: couponRecord ? expectedPrice : null,
+            discountPct: couponRecord ? discountPct : null,
+            couponCode: couponRecord ? couponRecord.code : null,
+            couponId: couponRecord?.id ?? null,
             method,
             transactionRef: transactionRef || null,
             screenshotUrl,
             status: "PENDING",
           },
         });
+
+        // Increment coupon usage count
+        if (couponRecord) {
+          await tx.coupon.update({
+            where: { id: couponRecord.id },
+            data: { usageCount: { increment: 1 } },
+          });
+        }
 
         // Update profile payment status
         await tx.userProfile.update({
@@ -168,12 +217,23 @@ export async function submitPaymentAction(
           userProfileId: profileId,
           tier,
           amount,
+          originalPrice: couponRecord ? expectedPrice : null,
+          discountPct: couponRecord ? discountPct : null,
+          couponCode: couponRecord ? couponRecord.code : null,
+          couponId: couponRecord?.id ?? null,
           method,
           transactionRef: transactionRef || null,
           screenshotUrl,
           status: "PENDING",
         },
       });
+
+      if (couponRecord) {
+        await prisma.coupon.update({
+          where: { id: couponRecord.id },
+          data: { usageCount: { increment: 1 } },
+        });
+      }
 
       await prisma.userProfile.update({
         where: { id: profileId },

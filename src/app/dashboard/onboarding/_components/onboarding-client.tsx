@@ -10,6 +10,7 @@ import {
   Lock, Check, ArrowRight, ChevronRight,
   AlertTriangle, ExternalLink, Upload, QrCode, Smartphone,
   Package, Clock, CheckCircle, XCircle, Copy,
+  Tag, X, Percent, Loader2,
 } from "lucide-react";
 import {
   selectTemplateAction,
@@ -164,6 +165,11 @@ export function OnboardingClient({
   const [paymentUploading, setPaymentUploading] = useState(false);
   const [paymentUploadError, setPaymentUploadError] = useState<string>("");
   const [copiedPhone, setCopiedPhone] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState<number | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [slug, setSlug] = useState<string>("");
   const [slugError, setSlugError] = useState<string>("");
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
@@ -191,6 +197,12 @@ export function OnboardingClient({
   );
   const isPremium = selectedTemplate?.isPremium ?? false;
 
+  const originalPrice = selectedTier === "QR_ONLY"
+    ? (selectedTemplate?.priceQrOnly ?? 0)
+    : (selectedTemplate?.priceNfcQr ?? 0);
+  const discountAmount = couponDiscount ? Math.round(originalPrice * couponDiscount / 100) : 0;
+  const finalPrice = originalPrice - discountAmount;
+
   // Redirect after successful creation — also auto-submit payment for premium templates
   const [profileCreated, setProfileCreated] = useState(false);
   const [paymentAutoError, setPaymentAutoError] = useState<string>("");
@@ -201,11 +213,14 @@ export function OnboardingClient({
         const paymentFormData = new FormData();
         paymentFormData.append("profileId", formState.profileId);
         paymentFormData.append("tier", selectedTier);
-        paymentFormData.append("amount",
-          selectedTier === "QR_ONLY" ? String(selectedTemplate?.priceQrOnly)
-            : String(selectedTemplate?.priceNfcQr)
-        );
+        paymentFormData.append("amount", String(finalPrice));
+        paymentFormData.append("originalPrice", String(originalPrice));
         paymentFormData.append("screenshotUrl", paymentScreenshotUrl);
+        paymentFormData.append("method", paymentMethod);
+        if (appliedCoupon) {
+          paymentFormData.append("couponCode", appliedCoupon);
+          paymentFormData.append("discountPct", String(couponDiscount));
+        }
         submitPayment(paymentFormData);
       } else if (isPremium && preorderMode) {
         router.push(maintenancePath(`/dashboard?reserved=true`));
@@ -213,7 +228,7 @@ export function OnboardingClient({
         router.push(maintenancePath(`/dashboard?new=${formState.slug}`));
       }
     }
-  }, [formState, router, isPremium, selectedTier, paymentScreenshotUrl, selectedTemplate, profileCreated, submitPayment, preorderMode]);
+  }, [formState, router, isPremium, selectedTier, paymentScreenshotUrl, selectedTemplate, profileCreated, submitPayment, preorderMode, finalPrice, originalPrice, paymentMethod, appliedCoupon, couponDiscount]);
 
   // After payment submitted successfully, redirect
   useEffect(() => {
@@ -339,6 +354,82 @@ export function OnboardingClient({
     }
     setStep("confirm");
   };
+
+  async function handleValidateCoupon() {
+    if (!couponCode.trim() || !selectedTier || !selectedCategoryId) return;
+    setCouponLoading(true);
+    setCouponError("");
+    setCouponDiscount(null);
+    setAppliedCoupon(null);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponCode.trim(),
+          categoryId: selectedCategoryId,
+          tier: selectedTier,
+        }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setCouponDiscount(data.discountPct);
+        setAppliedCoupon(data.code);
+      } else {
+        setCouponError(data.error || "Invalid coupon");
+      }
+    } catch {
+      setCouponError("Failed to validate coupon");
+    } finally {
+      setCouponLoading(false);
+    }
+  }
+
+  function handleRemoveCoupon() {
+    setCouponCode("");
+    setCouponDiscount(null);
+    setAppliedCoupon(null);
+    setCouponError("");
+  }
+
+  const couponCodeRef = useRef(couponCode);
+  couponCodeRef.current = couponCode;
+  const appliedCouponRef = useRef(appliedCoupon);
+  appliedCouponRef.current = appliedCoupon;
+  const selectedCategoryIdRef = useRef(selectedCategoryId);
+  selectedCategoryIdRef.current = selectedCategoryId;
+
+  useEffect(() => {
+    if (!appliedCouponRef.current || !couponCodeRef.current || !selectedTier) return;
+    let cancelled = false;
+    (async () => {
+      setCouponLoading(true);
+      try {
+        const res = await fetch("/api/coupons/validate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: couponCodeRef.current, categoryId: selectedCategoryIdRef.current, tier: selectedTier }),
+        });
+        const data = await res.json();
+        if (!cancelled) {
+          if (data.valid) {
+            setCouponDiscount(data.discountPct);
+            setAppliedCoupon(data.code);
+            setCouponError("");
+          } else {
+            setCouponDiscount(null);
+            setAppliedCoupon(null);
+            setCouponError(data.error || "Coupon no longer valid for this tier");
+          }
+        }
+      } catch {
+        if (!cancelled) setCouponError("Failed to re-validate coupon");
+      } finally {
+        if (!cancelled) setCouponLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [selectedTier]);
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -751,17 +842,81 @@ export function OnboardingClient({
                   <span style={{ color: "var(--nc-text-2)" }}>Plan</span>
                   <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{TIER_INFO[selectedTier as keyof typeof TIER_INFO]?.label}</span>
                 </div>
+                {discountAmount > 0 && (
+                  <>
+                    <div className="flex justify-between">
+                      <span style={{ color: "var(--nc-text-2)" }}>Original Price</span>
+                      <span style={{ color: "var(--nc-text-2)" }}>{formatMMK(originalPrice)}</span>
+                    </div>
+                    <div className="flex justify-between text-emerald-400">
+                      <span>Discount ({appliedCoupon} — {couponDiscount}%)</span>
+                      <span>-{formatMMK(discountAmount)}</span>
+                    </div>
+                  </>
+                )}
                 <div className="my-2 h-px" style={{ background: "var(--nc-border)" }} />
                 <div className="flex justify-between">
                   <span className="font-bold" style={{ color: "var(--nc-text)" }}>Total</span>
                   <span className="font-bold" style={{ color: "var(--nc-brand-1)" }}>
-                    {formatMMK(
-                      selectedTier === "QR_ONLY" ? selectedTemplate.priceQrOnly!
-                        : selectedTemplate.priceNfcQr!
-                    )}
+                    {formatMMK(finalPrice)}
                   </span>
                 </div>
               </div>
+            </div>
+
+            {/* Coupon code */}
+            <div className="mb-6">
+              <p className="mb-3 text-sm font-semibold flex items-center gap-2" style={{ color: "var(--nc-text)" }}>
+                <Tag className="h-4 w-4" style={{ color: "var(--nc-brand-1)" }} />
+                Coupon Code
+                {appliedCoupon && <span className="text-xs font-normal text-emerald-400">(Applied!)</span>}
+              </p>
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between rounded-xl border px-4 py-3"
+                  style={{ borderColor: "rgba(34,197,94,0.3)", background: "rgba(34,197,94,0.06)" }}>
+                  <div className="flex items-center gap-3">
+                    <Percent className="h-5 w-5 text-emerald-400" />
+                    <div>
+                      <p className="text-sm font-bold text-emerald-400">{appliedCoupon}</p>
+                      <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                        {couponDiscount}% discount applied
+                      </p>
+                    </div>
+                  </div>
+                  <button type="button" onClick={handleRemoveCoupon}
+                    className="rounded-lg p-1.5 transition-colors hover:bg-white/5"
+                    style={{ color: "var(--nc-text-3)" }}>
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    value={couponCode}
+                    onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(""); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleValidateCoupon(); } }}
+                    placeholder="Enter coupon code"
+                    disabled={couponLoading}
+                    className="flex-1 rounded-xl px-4 py-3 text-sm font-mono uppercase"
+                    style={{
+                      background: "var(--nc-bg-card)",
+                      border: "1px solid var(--nc-border)",
+                      color: "var(--nc-text)",
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleValidateCoupon}
+                    disabled={!couponCode.trim() || couponLoading}
+                    className="shrink-0 rounded-xl px-5 py-3 text-sm font-bold transition-all disabled:opacity-50"
+                    style={{ background: "var(--nc-brand-grad)", color: "var(--nc-brand-text)" }}
+                  >
+                    {couponLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
+                  </button>
+                </div>
+              )}
+              {couponError && <p className="mt-2 text-xs text-red-400">{couponError}</p>}
             </div>
 
             {/* Payment method selection */}
@@ -827,6 +982,9 @@ export function OnboardingClient({
               </div>
               <p className="mt-3 text-xs" style={{ color: "var(--nc-text-3)" }}>
                 {PAYMENT_METHODS[paymentMethod].details} ကျေးဇူးပြု၍ ငွေလွှဲပြီးပါက အောက်တွင် Screenshot တင်ပေးပါ။
+              </p>
+              <p className="mt-2 text-[11px] font-semibold" style={{ color: "var(--nc-text)" }}>
+                Transfer exactly: <span className="text-emerald-400">{formatMMK(finalPrice)}</span>
               </p>
             </div>
 
