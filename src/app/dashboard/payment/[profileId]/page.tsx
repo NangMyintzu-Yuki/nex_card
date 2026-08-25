@@ -126,6 +126,7 @@ export default async function PaymentPage({
                 priceNfcQr: profile.template.priceNfcQr,
               }}
               existingTier={existingPayment?.tier}
+              userId={session.user.id}
             />
           </div>
         )}

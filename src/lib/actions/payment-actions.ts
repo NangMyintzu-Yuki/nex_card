@@ -4,6 +4,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db/prisma";
+import { Prisma } from "@prisma/client";
 import { getServerSession } from "@/lib/auth/session";
 import { isOwnedPaymentScreenshotUrl } from "@/lib/security/payment-url";
 import { isMaintenanceMode, MAINTENANCE_MESSAGE } from "@/lib/security/maintenance";
@@ -67,8 +68,14 @@ export async function submitPaymentAction(
       method: (formData.get("method") as string) || "KBZPay",
       transactionRef: (formData.get("transactionRef") as string) || "",
       originalPrice: formData.get("originalPrice") ? Number(formData.get("originalPrice")) : null,
+      // Coupon
       couponCode: (formData.get("couponCode") as string) || null,
-      discountPct: formData.get("discountPct") ? Number(formData.get("discountPct")) : null,
+      couponDiscountPct: formData.get("couponDiscountPct") ? Number(formData.get("couponDiscountPct")) : null,
+      // Automatic discounts
+      companyName: (formData.get("companyName") as string) || null,
+      companyDiscountPct: formData.get("companyDiscountPct") ? Number(formData.get("companyDiscountPct")) : 0,
+      bulkDiscountPct: formData.get("bulkDiscountPct") ? Number(formData.get("bulkDiscountPct")) : 0,
+      totalDiscountPct: formData.get("totalDiscountPct") ? Number(formData.get("totalDiscountPct")) : 0,
     };
 
     const parsed = SubmitPaymentInput.safeParse(raw);
@@ -81,7 +88,16 @@ export async function submitPaymentAction(
 
     const { profileId, tier, amount, screenshotUrl, method, transactionRef } =
       parsed.data;
-    const { originalPrice, couponCode, discountPct } = raw;
+    const { originalPrice, couponCode, companyName } = raw;
+    const clientCompanyDiscountPct = raw.companyDiscountPct;
+    const clientBulkDiscountPct = raw.bulkDiscountPct;
+    const clientCouponDiscountPct = raw.couponDiscountPct;
+    const clientTotalDiscountPct = raw.totalDiscountPct;
+
+    // Mutual exclusivity: company and coupon cannot both be applied
+    if (companyName && companyName.trim().length > 0 && couponCode) {
+      return { status: "error", message: "You can only use either a Company discount or a Coupon, not both." };
+    }
 
     if (!isOwnedPaymentScreenshotUrl(screenshotUrl, userId)) {
       return {
@@ -122,8 +138,35 @@ export async function submitPaymentAction(
     // Validate coupon and compute expected discounted price
     let finalExpectedPrice = expectedPrice;
     let couponRecord = null;
+    let serverCouponPct = 0;
+    let serverCompanyPct = 0;
+    let serverBulkPct = 0;
+    const discountRuleIds: string[] = [];
 
-    if (couponCode && discountPct && discountPct > 0) {
+    // --- Validate automatic discount rules server-side ---
+    const discountRules = await prisma.discountRule.findMany({
+      where: { isActive: true },
+    });
+
+    for (const rule of discountRules) {
+      // Company discount: apply if user provided a company name (admin verifies later)
+      if (rule.type === "COMPANY" && companyName && companyName.trim().length > 0) {
+        serverCompanyPct += rule.percentage;
+        discountRuleIds.push(rule.id);
+      }
+      if (rule.type === "BULK" && rule.minQuantity) {
+        const profileCount = await prisma.userProfile.count({
+          where: { userId, categoryId: profile.categoryId },
+        });
+        if (profileCount >= rule.minQuantity) {
+          serverBulkPct += rule.percentage;
+          discountRuleIds.push(rule.id);
+        }
+      }
+    }
+
+    // --- Validate coupon server-side ---
+    if (couponCode && clientCouponDiscountPct && clientCouponDiscountPct > 0) {
       couponRecord = await prisma.coupon.findUnique({
         where: { code: couponCode.toUpperCase().trim() },
       });
@@ -148,13 +191,23 @@ export async function submitPaymentAction(
       if (validDiscount <= 0) {
         return { status: "error", message: "No discount available for this tier." };
       }
-
-      finalExpectedPrice = Math.round(expectedPrice * (1 - validDiscount / 100));
+      serverCouponPct = validDiscount;
     }
+
+    // --- Compute final expected price ---
+    const serverTotalDiscountPct = Math.min(serverCompanyPct + serverBulkPct + serverCouponPct, 50);
+    finalExpectedPrice = Math.round(expectedPrice * (1 - serverTotalDiscountPct / 100));
 
     if (Math.abs(amount - finalExpectedPrice) > 0.01) {
       return { status: "error", message: "Price mismatch. Please refresh and try again." };
     }
+
+    const discountBreakdown = {
+      company: serverCompanyPct,
+      bulk: serverBulkPct,
+      coupon: serverCouponPct,
+      totalPct: serverTotalDiscountPct,
+    } as Record<string, number>;
 
     // Create payment record and update profile in a transaction
     // For mock DB, we do sequential writes (mock doesn't support $transaction)
@@ -174,10 +227,12 @@ export async function submitPaymentAction(
             userProfileId: profileId,
             tier: tier as "QR_ONLY" | "NFC_QR",
             amount,
-            originalPrice: couponRecord ? expectedPrice : null,
-            discountPct: couponRecord ? discountPct : null,
+            originalPrice: serverTotalDiscountPct > 0 ? expectedPrice : null,
+            discountPct: serverTotalDiscountPct > 0 ? serverTotalDiscountPct : null,
             couponCode: couponRecord ? couponRecord.code : null,
             couponId: couponRecord?.id ?? null,
+            companyName: companyName?.trim() || null,
+            discountBreakdown: serverTotalDiscountPct > 0 ? (discountBreakdown as unknown as Prisma.InputJsonValue) : Prisma.JsonNull,
             method,
             transactionRef: transactionRef || null,
             screenshotUrl,
@@ -190,6 +245,14 @@ export async function submitPaymentAction(
           await tx.coupon.update({
             where: { id: couponRecord.id },
             data: { usageCount: { increment: 1 } },
+          });
+        }
+
+        // Increment discount rule applied counts
+        if (discountRuleIds.length > 0) {
+          await tx.discountRule.updateMany({
+            where: { id: { in: discountRuleIds } },
+            data: { appliedCount: { increment: 1 } },
           });
         }
 
@@ -217,10 +280,12 @@ export async function submitPaymentAction(
           userProfileId: profileId,
           tier,
           amount,
-          originalPrice: couponRecord ? expectedPrice : null,
-          discountPct: couponRecord ? discountPct : null,
+          originalPrice: serverTotalDiscountPct > 0 ? expectedPrice : null,
+          discountPct: serverTotalDiscountPct > 0 ? serverTotalDiscountPct : null,
           couponCode: couponRecord ? couponRecord.code : null,
           couponId: couponRecord?.id ?? null,
+          companyName: companyName?.trim() || null,
+          discountBreakdown: serverTotalDiscountPct > 0 ? (discountBreakdown as unknown as Prisma.InputJsonValue) : Prisma.JsonNull,
           method,
           transactionRef: transactionRef || null,
           screenshotUrl,
@@ -232,6 +297,13 @@ export async function submitPaymentAction(
         await prisma.coupon.update({
           where: { id: couponRecord.id },
           data: { usageCount: { increment: 1 } },
+        });
+      }
+
+      if (discountRuleIds.length > 0) {
+        await prisma.discountRule.updateMany({
+          where: { id: { in: discountRuleIds } },
+          data: { appliedCount: { increment: 1 } },
         });
       }
 

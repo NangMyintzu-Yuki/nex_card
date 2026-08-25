@@ -10,7 +10,7 @@ import {
   Lock, Check, ArrowRight, ChevronRight,
   AlertTriangle, ExternalLink, Upload, QrCode, Smartphone,
   Package, Clock, CheckCircle, XCircle, Copy,
-  Tag, X, Percent, Loader2,
+  Tag, X, Percent, Loader2, BuildingIcon, UsersIcon, Sparkles,
 } from "lucide-react";
 import {
   selectTemplateAction,
@@ -170,6 +170,17 @@ export function OnboardingClient({
   const [couponError, setCouponError] = useState("");
   const [couponDiscount, setCouponDiscount] = useState<number | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [companyName, setCompanyName] = useState("");
+  const [companyDiscountPct, setCompanyDiscountPct] = useState(0);
+  const [bulkDiscountPct, setBulkDiscountPct] = useState(0);
+  const [companyRulePct, setCompanyRulePct] = useState(0);
+  const [bulkRulePct, setBulkRulePct] = useState(0);
+  const [companyDocUrl, setCompanyDocUrl] = useState("");
+  const [companyDocUploading, setCompanyDocUploading] = useState(false);
+  const [companyDocError, setCompanyDocError] = useState("");
+  const companyDocInputRef = useRef<HTMLInputElement>(null);
+  const hasCompany = companyName.trim().length > 0;
+  const hasCoupon = !!appliedCoupon;
   const [slug, setSlug] = useState<string>("");
   const [slugError, setSlugError] = useState<string>("");
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
@@ -200,8 +211,47 @@ export function OnboardingClient({
   const originalPrice = selectedTier === "QR_ONLY"
     ? (selectedTemplate?.priceQrOnly ?? 0)
     : (selectedTemplate?.priceNfcQr ?? 0);
-  const discountAmount = couponDiscount ? Math.round(originalPrice * couponDiscount / 100) : 0;
+  const couponPct = couponDiscount ?? 0;
+  const totalDiscountPct = Math.min(companyDiscountPct + bulkDiscountPct + couponPct, 50);
+  const discountAmount = totalDiscountPct > 0 ? Math.round(originalPrice * totalDiscountPct / 100) : 0;
   const finalPrice = originalPrice - discountAmount;
+
+  // Fetch applicable discount rules
+  useEffect(() => {
+    if (!selectedTier || !selectedCategoryId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const params = new URLSearchParams({ categoryId: selectedCategoryId });
+        if (userId) params.set("userId", userId);
+        const res = await fetch(`/api/discounts?${params}`);
+        const data = await res.json();
+        if (!cancelled) {
+          const applied: Array<{ type: string; percentage: number }> = data.applied ?? [];
+          let company = 0;
+          let bulk = 0;
+          for (const r of applied) {
+            if (r.type === "COMPANY") company += r.percentage;
+            if (r.type === "BULK") bulk += r.percentage;
+          }
+          setCompanyRulePct(company);
+          setBulkRulePct(bulk);
+          setBulkDiscountPct(bulk);
+          if (companyName.trim().length > 0 && company > 0) {
+            setCompanyDiscountPct(company);
+          }
+        }
+      } catch {
+        // silently ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [selectedTier, selectedCategoryId, userId]);
+
+  // Recalculate company discount when company name changes
+  useEffect(() => {
+    setCompanyDiscountPct(companyName.trim().length > 0 ? companyRulePct : 0);
+  }, [companyName, companyRulePct]);
 
   // Redirect after successful creation — also auto-submit payment for premium templates
   const [profileCreated, setProfileCreated] = useState(false);
@@ -217,9 +267,13 @@ export function OnboardingClient({
         paymentFormData.append("originalPrice", String(originalPrice));
         paymentFormData.append("screenshotUrl", paymentScreenshotUrl);
         paymentFormData.append("method", paymentMethod);
+        if (companyName.trim()) paymentFormData.append("companyName", companyName.trim());
+        paymentFormData.append("companyDiscountPct", String(companyDiscountPct));
+        paymentFormData.append("bulkDiscountPct", String(bulkDiscountPct));
+        paymentFormData.append("totalDiscountPct", String(totalDiscountPct));
         if (appliedCoupon) {
           paymentFormData.append("couponCode", appliedCoupon);
-          paymentFormData.append("discountPct", String(couponDiscount));
+          paymentFormData.append("couponDiscountPct", String(couponDiscount));
         }
         submitPayment(paymentFormData);
       } else if (isPremium && preorderMode) {
@@ -357,6 +411,8 @@ export function OnboardingClient({
 
   async function handleValidateCoupon() {
     if (!couponCode.trim() || !selectedTier || !selectedCategoryId) return;
+    // Clear company when coupon is applied
+    setCompanyName("");
     setCouponLoading(true);
     setCouponError("");
     setCouponDiscount(null);
@@ -842,16 +898,30 @@ export function OnboardingClient({
                   <span style={{ color: "var(--nc-text-2)" }}>Plan</span>
                   <span className="font-semibold" style={{ color: "var(--nc-text)" }}>{TIER_INFO[selectedTier as keyof typeof TIER_INFO]?.label}</span>
                 </div>
-                {discountAmount > 0 && (
+                {totalDiscountPct > 0 && (
                   <>
                     <div className="flex justify-between">
                       <span style={{ color: "var(--nc-text-2)" }}>Original Price</span>
                       <span style={{ color: "var(--nc-text-2)" }}>{formatMMK(originalPrice)}</span>
                     </div>
-                    <div className="flex justify-between text-emerald-400">
-                      <span>Discount ({appliedCoupon} — {couponDiscount}%)</span>
-                      <span>-{formatMMK(discountAmount)}</span>
-                    </div>
+                    {companyDiscountPct > 0 && (
+                      <div className="flex justify-between text-emerald-400">
+                        <span className="flex items-center gap-1"><BuildingIcon className="h-3 w-3" /> Company ({companyDiscountPct}%)</span>
+                        <span>-{formatMMK(Math.round(originalPrice * companyDiscountPct / 100))}</span>
+                      </div>
+                    )}
+                    {bulkDiscountPct > 0 && (
+                      <div className="flex justify-between text-emerald-400">
+                        <span className="flex items-center gap-1"><UsersIcon className="h-3 w-3" /> Bulk ({bulkDiscountPct}%)</span>
+                        <span>-{formatMMK(Math.round(originalPrice * bulkDiscountPct / 100))}</span>
+                      </div>
+                    )}
+                    {couponPct > 0 && (
+                      <div className="flex justify-between text-emerald-400">
+                        <span className="flex items-center gap-1"><Tag className="h-3 w-3" /> Coupon {appliedCoupon ? `(${appliedCoupon})` : ""} ({couponPct}%)</span>
+                        <span>-{formatMMK(Math.round(originalPrice * couponPct / 100))}</span>
+                      </div>
+                    )}
                   </>
                 )}
                 <div className="my-2 h-px" style={{ background: "var(--nc-border)" }} />
@@ -864,7 +934,42 @@ export function OnboardingClient({
               </div>
             </div>
 
-            {/* Coupon code */}
+            {/* Company name — hidden when coupon is applied */}
+            {!appliedCoupon && (
+            <div className="mb-6">
+              <p className="mb-3 text-sm font-semibold flex items-center gap-2" style={{ color: "var(--nc-text)" }}>
+                <BuildingIcon className="h-4 w-4" style={{ color: "var(--nc-brand-1)" }} />
+                Company / Organization
+                {companyDiscountPct > 0 && <span className="text-xs font-normal text-emerald-400">({companyDiscountPct}% OFF)</span>}
+              </p>
+              <input
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Enter company or organization name (optional)"
+                className="w-full rounded-xl px-4 py-3 text-sm"
+                style={{
+                  background: "var(--nc-bg-card)",
+                  border: "1px solid var(--nc-border)",
+                  color: "var(--nc-text)",
+                  outline: "none",
+                }}
+              />
+              {hasCompany && companyDiscountPct > 0 && (
+                <p className="mt-2 text-xs text-emerald-400 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" />
+                  {companyDiscountPct}% company discount applied
+                </p>
+              )}
+              {hasCompany && companyDiscountPct === 0 && companyRulePct === 0 && (
+                <p className="mt-2 text-xs" style={{ color: "var(--nc-text-3)" }}>
+                  No active company discount rule.
+                </p>
+              )}
+            </div>
+            )}
+
+            {/* Coupon code — hidden when company name is filled */}
+            {!companyName.trim() && (
             <div className="mb-6">
               <p className="mb-3 text-sm font-semibold flex items-center gap-2" style={{ color: "var(--nc-text)" }}>
                 <Tag className="h-4 w-4" style={{ color: "var(--nc-brand-1)" }} />
@@ -918,6 +1023,7 @@ export function OnboardingClient({
               )}
               {couponError && <p className="mt-2 text-xs text-red-400">{couponError}</p>}
             </div>
+            )}
 
             {/* Payment method selection */}
             <div className="mb-6">

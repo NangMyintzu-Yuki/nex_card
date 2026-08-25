@@ -7,7 +7,7 @@ import { useActionState } from "react";
 import {
   Upload, QrCode, Smartphone, ArrowRight,
   CheckCircle, XCircle, Clock, Loader2, Banknote, Copy, Check,
-  Tag, X, Percent,
+  Tag, X, Percent, BuildingIcon, UsersIcon, Sparkles,
 } from "lucide-react";
 import { submitPaymentAction, type SubmitPaymentState } from "@/lib/actions/payment-actions";
 import { usePublicWallets } from "@/lib/payments/use-public-wallets";
@@ -52,12 +52,14 @@ export function PaymentForm({
   templateName: _templateName,
   prices,
   existingTier,
+  userId,
 }: {
   profileId: string;
   categoryId: string;
   templateName: string;
   prices: Prices;
   existingTier?: string | null;
+  userId: string;
 }) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -81,6 +83,15 @@ export function PaymentForm({
   const [couponDiscount, setCouponDiscount] = useState<number | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 
+  const [companyName, setCompanyName] = useState("");
+  const [companyDiscountPct, setCompanyDiscountPct] = useState(0);
+  const [bulkDiscountPct, setBulkDiscountPct] = useState(0);
+  const [companyRulePct, setCompanyRulePct] = useState(0);
+  const [bulkRulePct, setBulkRulePct] = useState(0);
+
+  const hasCompany = companyName.trim().length > 0;
+  const hasCoupon = !!appliedCoupon;
+
   const [state, submitPayment, pending] = useActionState<
     SubmitPaymentState,
     FormData
@@ -92,17 +103,59 @@ export function PaymentForm({
     }
   }, [state, router]);
 
+  // Fetch applicable discount rules
+  useEffect(() => {
+    if (!selectedTier) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const params = new URLSearchParams({ categoryId });
+        if (userId) params.set("userId", userId);
+        const res = await fetch(`/api/discounts?${params}`);
+        const data = await res.json();
+        if (!cancelled) {
+          const applied: Array<{ type: string; percentage: number }> = data.applied ?? [];
+          let company = 0;
+          let bulk = 0;
+          for (const r of applied) {
+            if (r.type === "COMPANY") company += r.percentage;
+            if (r.type === "BULK") bulk += r.percentage;
+          }
+          setCompanyRulePct(company);
+          setBulkRulePct(bulk);
+          setBulkDiscountPct(bulk);
+          // Company discount applies if user enters a company name
+          if (companyName.trim().length > 0 && company > 0) {
+            setCompanyDiscountPct(company);
+          }
+        }
+      } catch {
+        // silently ignore — no discount
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [selectedTier, categoryId, userId]);
+
+  // Recalculate company discount when company name changes
+  useEffect(() => {
+    setCompanyDiscountPct(companyName.trim().length > 0 ? companyRulePct : 0);
+  }, [companyName, companyRulePct]);
+
   const availableTiers = TIER_OPTIONS.filter(
     (t) => prices[t.priceKey] != null
   );
 
   const currentPriceKey = selectedTier ? TIER_OPTIONS.find((t) => t.value === selectedTier)?.priceKey : null;
   const originalPrice = currentPriceKey ? (prices[currentPriceKey] ?? 0) : 0;
-  const discountAmount = couponDiscount ? Math.round(originalPrice * couponDiscount / 100) : 0;
+  const couponPct = couponDiscount ?? 0;
+  const totalDiscountPct = Math.min(companyDiscountPct + bulkDiscountPct + couponPct, 50);
+  const discountAmount = totalDiscountPct > 0 ? Math.round(originalPrice * totalDiscountPct / 100) : 0;
   const finalPrice = originalPrice - discountAmount;
 
   async function handleValidateCoupon() {
     if (!couponCode.trim() || !selectedTier) return;
+    // Clear company when coupon is applied
+    setCompanyName("");
     setCouponLoading(true);
     setCouponError("");
     setCouponDiscount(null);
@@ -208,10 +261,17 @@ export function PaymentForm({
     fd.append("screenshotUrl", screenshotUrl);
     fd.append("method", paymentMethod);
     if (transactionRef.trim()) fd.append("transactionRef", transactionRef.trim());
+    if (companyName.trim()) fd.append("companyName", companyName.trim());
+    // Automatic discounts
+    fd.append("companyDiscountPct", String(companyDiscountPct));
+    fd.append("bulkDiscountPct", String(bulkDiscountPct));
+    // Coupon
     if (appliedCoupon) {
       fd.append("couponCode", appliedCoupon);
-      fd.append("discountPct", String(couponDiscount));
+      fd.append("couponDiscountPct", String(couponDiscount));
     }
+    // Combined breakdown
+    fd.append("totalDiscountPct", String(totalDiscountPct));
     submitPayment(fd);
   }
 
@@ -260,8 +320,8 @@ export function PaymentForm({
         </div>
       </section>
 
-      {/* Coupon Code */}
-      {selectedTier && (
+      {/* Coupon Code — hidden when company name is filled */}
+      {selectedTier && !companyName.trim() && (
         <section>
           <h2 className="mb-3 text-lg font-bold" style={{ color: "var(--nc-text)" }}>
             <span className="flex items-center gap-2">
@@ -321,6 +381,62 @@ export function PaymentForm({
         </section>
       )}
 
+      {/* Company Name — hidden when coupon is applied */}
+      {selectedTier && !appliedCoupon && (
+        <section>
+          <h2 className="mb-3 text-lg font-bold" style={{ color: "var(--nc-text)" }}>
+            <span className="flex items-center gap-2">
+              <BuildingIcon className="h-5 w-5" style={{ color: "var(--nc-brand-1)" }} />
+              Company / Organization
+              {companyDiscountPct > 0 && (
+                <span className="text-sm font-normal text-emerald-400">
+                  ({companyDiscountPct}% OFF)
+                </span>
+              )}
+            </span>
+          </h2>
+          <input
+            value={companyName}
+            onChange={(e) => {
+              setCompanyName(e.target.value);
+              if (e.target.value.trim().length > 0 && hasCoupon) {
+                setCouponCode("");
+                setCouponDiscount(null);
+                setAppliedCoupon(null);
+                setCouponError("");
+              }
+            }}
+            placeholder="Enter company or organization name (optional)"
+            disabled={hasCoupon}
+            className="w-full rounded-xl px-4 py-3 text-sm disabled:opacity-50"
+            style={{
+              background: "var(--nc-bg-card)",
+              border: "1px solid var(--nc-border)",
+              color: "var(--nc-text)",
+              outline: "none",
+            }}
+          />
+          {hasCoupon && !hasCompany && (
+            <p className="mt-1.5 text-xs" style={{ color: "var(--nc-text-3)" }}>
+              Coupon is active. Clear coupon to use company discount instead.
+            </p>
+          )}
+
+          {/* Discount status */}
+          {hasCompany && companyDiscountPct > 0 && (
+            <p className="mt-2 text-xs text-emerald-400 flex items-center gap-1">
+              <Sparkles className="h-3 w-3" />
+              {companyDiscountPct}% company discount applied
+            </p>
+          )}
+          {hasCompany && companyDiscountPct === 0 && companyRulePct === 0 && (
+            <p className="mt-2 text-xs" style={{ color: "var(--nc-text-3)" }}>
+              No active company discount rule. Company name will be saved for admin review.
+            </p>
+          )}
+        </section>
+      )}
+
       {/* Price Breakdown */}
       {selectedTier && originalPrice > 0 && (
         <section>
@@ -330,10 +446,28 @@ export function PaymentForm({
               <span>Original Price</span>
               <span>{formatMMK(originalPrice)}</span>
             </div>
-            {discountAmount > 0 && (
+            {companyDiscountPct > 0 && (
               <div className="flex justify-between text-sm text-emerald-400">
-                <span>Discount ({couponDiscount}%)</span>
-                <span>-{formatMMK(discountAmount)}</span>
+                <span className="flex items-center gap-1"><BuildingIcon className="h-3 w-3" /> Company ({companyDiscountPct}%)</span>
+                <span>-{formatMMK(Math.round(originalPrice * companyDiscountPct / 100))}</span>
+              </div>
+            )}
+            {bulkDiscountPct > 0 && (
+              <div className="flex justify-between text-sm text-emerald-400">
+                <span className="flex items-center gap-1"><UsersIcon className="h-3 w-3" /> Bulk ({bulkDiscountPct}%)</span>
+                <span>-{formatMMK(Math.round(originalPrice * bulkDiscountPct / 100))}</span>
+              </div>
+            )}
+            {couponPct > 0 && (
+              <div className="flex justify-between text-sm text-emerald-400">
+                <span className="flex items-center gap-1"><Tag className="h-3 w-3" /> Coupon ({couponPct}%)</span>
+                <span>-{formatMMK(Math.round(originalPrice * couponPct / 100))}</span>
+              </div>
+            )}
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-sm font-semibold pt-1" style={{ borderTop: "1px dashed var(--nc-border)", color: "var(--nc-text-2)" }}>
+                <span>Total Discount ({totalDiscountPct}%)</span>
+                <span className="text-emerald-400">-{formatMMK(discountAmount)}</span>
               </div>
             )}
             <div className="flex justify-between pt-2 text-base font-bold"

@@ -110,6 +110,9 @@ model UserProfile {
   nfcWriteCount    BigInt                  @default(0)
   nfcProgrammedAt  DateTime?
   paymentStatus    PaymentStatus?
+  companyName      String?                   @db.VarChar(120)
+  companyVerified  CompanyVerificationStatus @default(NOT_SUBMITTED)
+  companyVerifiedAt DateTime?
   metaTitle        String?                 @db.VarChar(160)
   metaDescription  String?                 @db.VarChar(320)
   ogImageUrl       String?
@@ -150,6 +153,10 @@ model Payment {
   discountPct    Float?
   /// Coupon code used (denormalized for audit)
   couponCode     String?       @db.VarChar(30)
+  /// Company/org name for automatic discount
+  companyName     String?       @db.VarChar(120)
+  /// Discount breakdown JSON: { company: 5, bulk: 10, coupon: 5 }
+  discountBreakdown Json?
   /// Screenshot proof — still required as fallback for Wave/KBZ manual rails
   screenshotUrl  String        @db.VarChar(500)
   status         PaymentStatus @default(PENDING)
@@ -193,6 +200,22 @@ model Coupon {
   @@index([categoryId])
   @@index([isActive])
   @@map("coupons")
+}
+
+model DiscountRule {
+  id             String            @id @default(cuid())
+  name           String            @db.VarChar(100)
+  type           DiscountRuleType
+  percentage     Float
+  minQuantity    Int?
+  isActive       Boolean           @default(true)
+  appliedCount   Int               @default(0)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([type])
+  @@index([isActive])
+  @@map("discount_rules")
 }
 
 model ProfileAnalyticsEvent {
@@ -351,4 +374,16 @@ enum EmailTokenType {
 enum payments_tier {
   QR_ONLY
   NFC_QR
+}
+
+enum DiscountRuleType {
+  COMPANY
+  BULK
+}
+
+enum CompanyVerificationStatus {
+  NOT_SUBMITTED
+  PENDING
+  VERIFIED
+  REJECTED
 }

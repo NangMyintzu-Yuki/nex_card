@@ -4,11 +4,12 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { MaintenanceLink as Link } from "@/components/ui/maintenance-link";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, BuildingIcon } from "lucide-react";
 import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { formatDate } from "@/lib/utils";
 import { ApproveRejectButtons } from "./_components/approve-reject-buttons";
+import { CompanyVerifier } from "./_components/company-verifier";
 
 export const metadata: Metadata = {
   title: "Payment Approvals — Admin — NEX CARD",
@@ -49,6 +50,10 @@ export default async function AdminPaymentsPage({
       id: true,
       tier: true,
       amount: true,
+      originalPrice: true,
+      discountPct: true,
+      companyName: true,
+      discountBreakdown: true,
       currency: true,
       screenshotUrl: true,
       status: true,
@@ -83,6 +88,28 @@ export default async function AdminPaymentsPage({
 
   const pendingCount = await prisma.payment.count({ where: { status: "PENDING" } });
 
+  // Fetch companies pending verification
+  const companyProfiles = await prisma.userProfile.findMany({
+    where: { companyName: { not: null } },
+    select: {
+      userId: true,
+      companyName: true,
+      companyVerified: true,
+      user: { select: { id: true, name: true, email: true } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  const companyData = companyProfiles.map(p => ({
+    userId: p.userId,
+    userName: p.user.name,
+    userEmail: p.user.email,
+    companyName: p.companyName || "",
+    companyVerified: p.companyVerified,
+  }));
+
+  const pendingCompanies = companyData.filter(c => c.companyVerified === "PENDING");
+
   return (
     <div className="mx-auto max-w-6xl nc-page">
       {/* Header */}
@@ -90,8 +117,20 @@ export default async function AdminPaymentsPage({
         <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Payment Approvals</h1>
         <p className="mt-1 text-sm" style={{ color: "var(--nc-text-3)" }}>
           {pendingCount} pending payment{pendingCount !== 1 ? "s" : ""} awaiting review
+          {pendingCompanies.length > 0 && ` · ${pendingCompanies.length} company verification${pendingCompanies.length !== 1 ? "s" : ""}`}
         </p>
       </div>
+
+      {/* Company Verification Section */}
+      {companyData.length > 0 && (
+        <div className="mb-8 rounded-2xl nc-card p-5">
+          <h3 className="mb-4 text-lg font-bold flex items-center gap-2" style={{ color: "var(--nc-text)" }}>
+            <BuildingIcon className="h-5 w-5" style={{ color: "var(--nc-brand-1)" }} />
+            Company Verifications
+          </h3>
+          <CompanyVerifier companies={companyData} />
+        </div>
+      )}
 
       {/* Filter tabs */}
       <div className="mb-6 flex flex-wrap gap-2">
@@ -207,6 +246,23 @@ export default async function AdminPaymentsPage({
                       </p>
                     </div>
                   </div>
+
+                  {/* Company & Discount Info */}
+                  {(payment.companyName || payment.discountPct) && (
+                    <div className="mt-3 rounded-lg px-3 py-2 text-xs space-y-1" style={{ background: "var(--nc-bg-2)" }}>
+                      {payment.companyName && (
+                        <div className="flex items-center gap-1.5">
+                          <BuildingIcon className="h-3 w-3" style={{ color: "var(--nc-brand-1)" }} />
+                          <span style={{ color: "var(--nc-text-2)" }}>Company: <strong style={{ color: "var(--nc-text)" }}>{payment.companyName}</strong></span>
+                        </div>
+                      )}
+                      {payment.originalPrice && payment.discountPct && (
+                        <div className="flex items-center gap-1.5 text-emerald-400">
+                          <span>Discount: {payment.discountPct}% ({formatMMK(payment.originalPrice - payment.amount)} off)</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {payment.adminNote && (
                     <div className="mt-3 rounded-lg px-3 py-2 text-xs" style={{ background: "var(--nc-bg-2)", color: "var(--nc-text-2)" }}>
