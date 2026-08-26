@@ -15,7 +15,7 @@ const createCouponSchema = z.object({
 
 export async function createCouponAction(formData: FormData) {
   const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  if (!session?.user?.id || session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { error: "Unauthorized" };
   }
 
@@ -51,7 +51,7 @@ export async function createCouponAction(formData: FormData) {
 
 export async function updateCouponAction(couponId: string, formData: FormData) {
   const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  if (!session?.user?.id || session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { error: "Unauthorized" };
   }
 
@@ -85,7 +85,7 @@ export async function updateCouponAction(couponId: string, formData: FormData) {
 
 export async function deleteCouponAction(couponId: string) {
   const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  if (!session?.user?.id || session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { error: "Unauthorized" };
   }
 
@@ -95,7 +95,7 @@ export async function deleteCouponAction(couponId: string) {
 
 export async function toggleCouponActive(couponId: string) {
   const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  if (!session?.user?.id || session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { error: "Unauthorized" };
   }
 

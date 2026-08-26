@@ -406,6 +406,9 @@ async function main() {
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "nangmyintzu89@gmail.com";
   const adminPassword =
     process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe-Admin-NexCard-2026!";
+  const superAdminEmail = process.env.SUPER_ADMIN_EMAIL ?? "nangmyintzu89@gmail.com";
+  const isSuperAdmin = adminEmail === superAdminEmail;
+  const adminRole = isSuperAdmin ? "SUPER_ADMIN" : "ADMIN";
   const existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail },
     select: { id: true },
@@ -414,8 +417,8 @@ async function main() {
     ? await prisma.user.update({
         where: { email: adminEmail },
         data: {
-          name: "Admin",
-          role: "ADMIN",
+          name: isSuperAdmin ? "Super Admin" : "Admin",
+          role: adminRole,
           status: "ACTIVE",
           emailVerifiedAt: new Date(),
         },
@@ -424,15 +427,15 @@ async function main() {
     : await prisma.user.create({
         data: {
           email: adminEmail,
-          name: "Admin",
+          name: isSuperAdmin ? "Super Admin" : "Admin",
           hashedPassword: hashPassword(adminPassword),
-          role: "ADMIN",
+          role: adminRole,
           status: "ACTIVE",
           emailVerifiedAt: new Date(),
         },
         select: { id: true },
       });
-  console.log(`  ✓ ${adminEmail} (${adminUser.id})${existingAdmin ? " [password unchanged]" : " [created]"}`);
+  console.log(`  ✓ ${adminEmail} (${adminUser.id}) [role: ${adminRole}]${existingAdmin ? " [password unchanged]" : " [created]"}`);
 
   // ── 4. Demo user ────────────────────────────────────────────────────────
   console.log("\n👤 Seeding demo user…");

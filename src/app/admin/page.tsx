@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminOverviewPage() {
   const session = await getServerSession();
   if (!session?.user?.id) redirect("/login");
-  if (session.user.role !== "ADMIN") redirect("/dashboard");
+  if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") redirect("/dashboard");
 
   const [totalUsers, totalProfiles, publishedProfiles, totalScans] = await Promise.all([
     prisma.user.count(),

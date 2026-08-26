@@ -335,6 +335,7 @@ enum UserStatus {
 }
 
 enum UserRole {
+  SUPER_ADMIN
   ADMIN
   USER
 }

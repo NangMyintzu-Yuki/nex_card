@@ -13,7 +13,7 @@ const createRuleSchema = z.object({
 
 export async function createDiscountRuleAction(formData: FormData) {
   const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  if (!session?.user?.id || session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { error: "Unauthorized" };
   }
 
@@ -34,7 +34,7 @@ export async function createDiscountRuleAction(formData: FormData) {
 
 export async function updateDiscountRuleAction(ruleId: string, formData: FormData) {
   const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  if (!session?.user?.id || session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { error: "Unauthorized" };
   }
 
@@ -54,7 +54,7 @@ export async function updateDiscountRuleAction(ruleId: string, formData: FormDat
 
 export async function deleteDiscountRuleAction(ruleId: string) {
   const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  if (!session?.user?.id || session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { error: "Unauthorized" };
   }
   await prisma.discountRule.delete({ where: { id: ruleId } });
@@ -63,7 +63,7 @@ export async function deleteDiscountRuleAction(ruleId: string) {
 
 export async function toggleDiscountRuleActive(ruleId: string) {
   const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  if (!session?.user?.id || session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { error: "Unauthorized" };
   }
   const rule = await prisma.discountRule.findUnique({ where: { id: ruleId } });

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   BarChart3, Users, Layers, Settings, Menu, X, ChevronRight, CreditCard,
-  LogOut, TrendingUp, Shield, Tag, Percent,
+  LogOut, TrendingUp, Shield, Tag, Percent, Crown,
 } from "lucide-react";
 import { NexCardLogoStatic } from "@/components/ui/nex-card-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -14,16 +14,26 @@ import { useTheme } from "@/lib/theme/theme-context";
 
 interface AdminUser { id: string; name: string; email: string; role: string; }
 
-const NAV = [
-  { href: "/admin",            icon: BarChart3,  label: "Overview"  },
-  { href: "/admin/payments",   icon: CreditCard, label: "Payments"  },
-  { href: "/admin/revenue",    icon: TrendingUp, label: "Revenue"   },
-  { href: "/admin/users",      icon: Users,      label: "Users"     },
-  { href: "/admin/templates",  icon: Layers,     label: "Templates" },
-  { href: "/admin/coupons",    icon: Tag,        label: "Coupons"    },
-  { href: "/admin/discount-rules", icon: Percent, label: "Discounts" },
-  { href: "/admin/settings",   icon: Settings,   label: "Settings"  },
-  { href: "/admin/security",   icon: Shield,     label: "Security"  },
+const NAV_SUPER_ADMIN = [
+  { href: "/admin",              icon: BarChart3,  label: "Overview"  },
+  { href: "/admin/payments",     icon: CreditCard, label: "Payments"  },
+  { href: "/admin/revenue",      icon: TrendingUp, label: "Revenue"   },
+  { href: "/admin/users",        icon: Users,      label: "Users"     },
+  { href: "/admin/admins",       icon: Crown,      label: "Admins"    },
+  { href: "/admin/templates",    icon: Layers,     label: "Templates" },
+  { href: "/admin/coupons",      icon: Tag,        label: "Coupons"   },
+  { href: "/admin/discount-rules", icon: Percent,  label: "Discounts" },
+  { href: "/admin/settings",     icon: Settings,   label: "Settings"  },
+  { href: "/admin/security",     icon: Shield,     label: "Security"  },
+] as const;
+
+const NAV_ADMIN = [
+  { href: "/admin",              icon: BarChart3,  label: "Overview"  },
+  { href: "/admin/users",        icon: Users,      label: "Users"     },
+  { href: "/admin/templates",    icon: Layers,     label: "Templates" },
+  { href: "/admin/coupons",      icon: Tag,        label: "Coupons"   },
+  { href: "/admin/discount-rules", icon: Percent,  label: "Discounts" },
+  { href: "/admin/settings",     icon: Settings,   label: "Settings"  },
 ] as const;
 
 function getInitials(name: string) {
@@ -37,19 +47,22 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
   const isDark = theme === "dark";
   const [open, setOpen] = useState(false);
 
+  const isSuperAdmin = user.role === "SUPER_ADMIN";
+  const NAV_ITEMS = isSuperAdmin ? NAV_SUPER_ADMIN : NAV_ADMIN;
+
+  const brand2 = isDark ? "#d4af37" : "#1a3a6b";
+  const brand3 = isDark ? "#f0c050" : "#4a9fd4";
+
   useEffect(() => {
     const openSidebar = () => setOpen(true);
     window.addEventListener("open-admin-sidebar", openSidebar);
     return () => window.removeEventListener("open-admin-sidebar", openSidebar);
   }, []);
 
-  const brand2 = isDark ? "#d4af37" : "#1a3a6b";
-  const brand3 = isDark ? "#f0c050" : "#4a9fd4";
-
   function NavContent() {
     return (
       <>
-        {/* Logo + ADMIN badge */}
+        {/* Logo + role badge */}
         <div className="flex items-center justify-between px-4 py-5 border-b"
           style={{ borderColor: "var(--nc-sidebar-border)" }}>
           <div className="flex items-center gap-2">
@@ -58,8 +71,10 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-black leading-none" style={{ color: isDark ? "#d4af37" : "#1a3a6b" }}>NEX CARD</span>
                 <span className="rounded-full px-1.5 py-0.5 text-[9px] font-black text-white"
-                  style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
-                  ADMIN
+                  style={{ background: isSuperAdmin
+                    ? "linear-gradient(135deg, #dc2626, #f97316)"
+                    : `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
+                  {isSuperAdmin ? "SUPER ADMIN" : "ADMIN"}
                 </span>
               </div>
               <p className="text-[10px]" style={{ color: "var(--nc-text-3)" }}>Control Panel</p>
@@ -72,14 +87,14 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
           </button>
         </div>
 
-       
-
         {/* Nav items */}
         <nav className="flex-1 space-y-1 px-3 pt-5">
           <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-widest"
-            style={{ color: "var(--nc-text-3)" }}>Admin Menu</p>
-            
-          {NAV.map(({ href, icon: Icon, label }) => {
+            style={{ color: "var(--nc-text-3)" }}>
+            {isSuperAdmin ? "Super Admin Menu" : "Admin Menu"}
+          </p>
+
+          {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
             const active = pathname === href || (href !== "/admin" && pathname.startsWith(href));
             return (
               <Link key={href} href={href} onClick={() => setOpen(false)}
@@ -91,7 +106,6 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
               </Link>
             );
           })}
-          
         </nav>
 
         {/* Bottom */}
@@ -109,28 +123,29 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
             </div>
             <ThemeToggle size="sm" />
           </div>
-           {/* Admin user card */}
-        <div className=" mt-4 rounded-xl p-3"
-          style={{ background: `${brand2}12`, border: `1px solid ${brand2}25` }}>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-black text-white"
-              style={{ background: `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
-              {getInitials(user.name)}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-bold" style={{ color: "var(--nc-text)" }}>{user.name}</p>
-              <p className="truncate text-[10px]" style={{ color: "var(--nc-text-3)" }}>{user.email}</p>
-            </div>
-             <form action="/api/auth/logout" method="POST">
-                        <button type="submit"
-                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all nc-nav-item">
-                          <LogOut className="h-4 w-4 shrink-0" style={{ color: "var(--nc-text-3)" }} />
-                        </button>
-                      </form>
-          </div>
-        </div>
 
-         
+          {/* Admin user card */}
+          <div className="mt-4 rounded-xl p-3"
+            style={{ background: `${brand2}12`, border: `1px solid ${brand2}25` }}>
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-black text-white"
+                style={{ background: isSuperAdmin
+                  ? "linear-gradient(135deg, #dc2626, #f97316)"
+                  : `linear-gradient(135deg, ${brand2}, ${brand3})` }}>
+                {getInitials(user.name)}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-bold" style={{ color: "var(--nc-text)" }}>{user.name}</p>
+                <p className="truncate text-[10px]" style={{ color: "var(--nc-text-3)" }}>{user.email}</p>
+              </div>
+              <form action="/api/auth/logout" method="POST">
+                <button type="submit"
+                  className="flex items-center gap-3 rounded-xl px-2 py-2.5 text-sm font-semibold transition-all nc-nav-item">
+                  <LogOut className="h-4 w-4 shrink-0" style={{ color: "var(--nc-text-3)" }} />
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       </>
     );

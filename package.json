@@ -20,7 +20,11 @@
     "test:coverage": "vitest run --coverage",
     "ci": "npm run type-check && npm run lint && npm test",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "demo": "playwright test --config=playwright.demo.config.ts --headed",
+    "demo:desktop": "playwright test --config=playwright.demo.config.ts --project desktop --headed",
+    "demo:mobile": "playwright test --config=playwright.demo.config.ts --project mobile --headed",
+    "demo:frame": "npx tsx scripts/add-mobile-frame.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.600.0",

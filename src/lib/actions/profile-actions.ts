@@ -43,7 +43,7 @@ export async function selectTemplateAction(
   if (!session?.user?.id) {
     return { status: "error", message: "You must be logged in." };
   }
-  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+  if (isMaintenanceMode() && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
@@ -197,7 +197,7 @@ export async function updateProfileAction(
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
   }
-  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+  if (isMaintenanceMode() && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
@@ -322,7 +322,7 @@ export async function deleteProfileAction(
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
   }
-  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+  if (isMaintenanceMode() && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 

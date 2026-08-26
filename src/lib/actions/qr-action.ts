@@ -34,7 +34,7 @@ export async function generateQRAction(
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
   }
-  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+  if (isMaintenanceMode() && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 

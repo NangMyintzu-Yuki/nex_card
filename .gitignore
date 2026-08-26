@@ -8,8 +8,14 @@ node_modules/
 # Build output
 .next/
 out/
+demo-videos/
 dist/
 build/
+scripts/demo.spec.ts
+scripts/demo-recording.ts
+scripts/add-mobile-frame.ts
+google-forms-scripts/
+
 
 # Environment files — NEVER commit these
 .env
@@ -55,6 +61,14 @@ playwright/.cache/
 # Misc
 *.pem
 .vercel
+
+# Demo video recording
+demo-videos/
+playwright.demo.config.ts
+scripts/demo.spec.ts
+scripts/demo-recording.ts
+scripts/add-mobile-frame.ts
+src/app/api/dev/
 
 # User uploads (stored on server when STORAGE_DRIVER=local)
 public/uploads/**

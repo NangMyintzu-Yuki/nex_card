@@ -25,7 +25,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default async function AdminTemplatesPage() {
   const session = await getServerSession();
   if (!session?.user?.id) redirect("/login");
-  if (session.user.role !== "ADMIN") redirect("/dashboard");
+  if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") redirect("/dashboard");
 
   const categories = await prisma.category.findMany({
     orderBy: { sortOrder: "asc" },

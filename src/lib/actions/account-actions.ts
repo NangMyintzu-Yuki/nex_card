@@ -34,7 +34,7 @@ export async function changePasswordAction(
 ): Promise<ChangePasswordState> {
   const session = await getServerSession();
   if (!session?.user?.id) return { status: "error", message: "Unauthorized." };
-  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+  if (isMaintenanceMode() && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
@@ -114,7 +114,7 @@ export async function updateProfileInfoAction(
 ): Promise<UpdateProfileInfoState> {
   const session = await getServerSession();
   if (!session?.user?.id) return { status: "error", message: "Unauthorized." };
-  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+  if (isMaintenanceMode() && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
@@ -176,7 +176,7 @@ export async function deleteAccountAction(
 ): Promise<DeleteAccountState> {
   const session = await getServerSession();
   if (!session?.user?.id) return { status: "error", message: "Unauthorized." };
-  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+  if (isMaintenanceMode() && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
@@ -186,7 +186,7 @@ export async function deleteAccountAction(
     select: { role: true },
   });
 
-  if (user?.role === "ADMIN") {
+  if (user?.role === "ADMIN" || user?.role === "SUPER_ADMIN") {
     return {
       status: "error",
       message: "Admin accounts cannot be deleted through the settings panel. Contact your system administrator.",

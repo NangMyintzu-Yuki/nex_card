@@ -182,7 +182,7 @@ export async function GET(
     }
 
     // Only admin or owner can export
-    if (session.user.role !== "ADMIN" && session.user.id !== profile.user.id) {
+    if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN" && session.user.id !== profile.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

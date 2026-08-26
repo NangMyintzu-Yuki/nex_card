@@ -28,8 +28,19 @@ async function requireAdmin(): Promise<string | AdminActionState> {
   if (!session?.user?.id) {
     return { status: "error", message: "You must be logged in." };
   }
-  if (session.user.role !== "ADMIN") {
+  if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: "Unauthorized." };
+  }
+  return session.user.id;
+}
+
+async function requireSuperAdmin(): Promise<string | AdminActionState> {
+  const session = await getServerSession();
+  if (!session?.user?.id) {
+    return { status: "error", message: "You must be logged in." };
+  }
+  if (session.user.role !== "SUPER_ADMIN") {
+    return { status: "error", message: "Super Admin access required." };
   }
   return session.user.id;
 }
@@ -67,7 +78,7 @@ export async function approvePaymentAction(
   _prevState: AdminActionState,
   formData: FormData
 ): Promise<AdminActionState> {
-  const adminId = await requireAdmin();
+  const adminId = await requireSuperAdmin();
   if (typeof adminId !== "string") return adminId;
 
   const parsed = ApproveInput.safeParse({
@@ -175,7 +186,7 @@ export async function rejectPaymentAction(
   _prevState: AdminActionState,
   formData: FormData
 ): Promise<AdminActionState> {
-  const adminId = await requireAdmin();
+  const adminId = await requireSuperAdmin();
   if (typeof adminId !== "string") return adminId;
 
   const parsed = RejectInput.safeParse({

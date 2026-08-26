@@ -31,7 +31,7 @@ export async function markNfcProgrammedAction(
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
   }
-  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+  if (isMaintenanceMode() && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
@@ -125,7 +125,7 @@ export async function updateNfcFulfillmentAction(
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
   }
-  if (isMaintenanceMode() && session.user.role !== "ADMIN") {
+  if (isMaintenanceMode() && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: MAINTENANCE_MESSAGE };
   }
 
@@ -137,13 +137,13 @@ export async function updateNfcFulfillmentAction(
     return { status: "error", message: "Invalid input." };
   }
 
-  if (parsed.data.status === "SHIPPED" && session.user.role !== "ADMIN") {
+  if (parsed.data.status === "SHIPPED" && session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { status: "error", message: "Only admins can mark an NFC card as shipped." };
   }
 
   const profile = await prisma.userProfile.findFirst({
     where:
-      session.user.role === "ADMIN"
+      session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN"
         ? { id: parsed.data.profileId }
         : { id: parsed.data.profileId, userId: session.user.id },
     select: { id: true, slug: true },

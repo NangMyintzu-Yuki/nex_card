@@ -9,7 +9,7 @@ import { getServerSession } from "@/lib/auth/session";
 async function requireAdmin(): Promise<{ ok: true; adminId: string } | { ok: false; message: string }> {
   const session = await getServerSession();
   if (!session?.user?.id) return { ok: false, message: "You must be logged in." };
-  if (session.user.role !== "ADMIN") return { ok: false, message: "Unauthorized." };
+  if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") return { ok: false, message: "Unauthorized." };
   return { ok: true, adminId: session.user.id };
 }
 

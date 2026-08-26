@@ -121,7 +121,7 @@ export async function verifyCompanyAction(params: {
   status: "VERIFIED" | "REJECTED";
 }) {
   const session = await import("@/lib/auth/session").then(m => m.getServerSession());
-  if (!session?.user?.id || session.user.role !== "ADMIN") {
+  if (!session?.user?.id || session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
     return { error: "Unauthorized" };
   }
 
