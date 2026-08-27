@@ -33,7 +33,7 @@ const NAV_ADMIN = [
   { href: "/admin/templates",    icon: Layers,     label: "Templates" },
   { href: "/admin/coupons",      icon: Tag,        label: "Coupons"   },
   { href: "/admin/discount-rules", icon: Percent,  label: "Discounts" },
-  { href: "/admin/settings",     icon: Settings,   label: "Settings"  },
+  { href: "/admin/security",     icon: Shield,     label: "Security"  },
 ] as const;
 
 function getInitials(name: string) {

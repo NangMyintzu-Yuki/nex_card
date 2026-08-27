@@ -23,7 +23,7 @@ const CodeSchema = z.object({
 
 async function requireAdmin() {
   const session = await getServerSession();
-  if (!session?.user?.id || session.user.role !== "ADMIN") return null;
+  if (!session?.user?.id || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) return null;
   return session;
 }
 

@@ -23,14 +23,14 @@ export default async function AdminOverviewPage() {
 
   const recentUsers = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
-    take: 8,
+    take: 10,
     select: { id: true, name: true, email: true, createdAt: true, status: true, role: true },
   });
 
   const topProfiles = await prisma.userProfile.findMany({
     where: { isPublished: true },
     orderBy: { viewCount: "desc" },
-    take: 8,
+    take: 10,
     select: {
       id: true, slug: true, viewCount: true, qrScanCount: true,
       category: { select: { name: true } },

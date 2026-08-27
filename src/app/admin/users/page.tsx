@@ -22,7 +22,7 @@ export default async function AdminUsersPage({
 
   const { q, status, page: pageParam } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1"));
-  const perPage = 25;
+  const perPage = 10;
 
   const where = {
     ...(q

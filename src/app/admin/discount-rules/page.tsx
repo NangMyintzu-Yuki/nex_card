@@ -1,9 +1,15 @@
+import { redirect } from "next/navigation";
+import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import DiscountRuleManager from "./_components/discount-rule-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function DiscountRulesPage() {
+  const session = await getServerSession();
+  if (!session?.user?.id) redirect("/login");
+  if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") redirect("/dashboard");
+
   const rules = await prisma.discountRule.findMany({
     orderBy: { createdAt: "desc" },
   });

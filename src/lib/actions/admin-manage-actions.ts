@@ -5,7 +5,7 @@
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
-import { hashPassword } from "@/lib/auth/password";
+import { hashPassword } from "@/lib/auth/hash";
 import { writeAuditLog } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 

@@ -13,15 +13,15 @@ export const dynamic = "force-dynamic";
 export default async function AdminsPage() {
   const session = await getServerSession();
   if (!session?.user?.id) redirect("/login");
-  if (session.user.role !== "SUPER_ADMIN") redirect("/admin");
+  if (session.user.role !== "SUPER_ADMIN") redirect("/admin/security");
 
   const admins = await getAdmins();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-black" style={{ color: "var(--nc-text)" }}>Admin Management</h1>
-        <p className="text-sm" style={{ color: "var(--nc-text-3)" }}>
+    <div className="mx-auto max-w-5xl nc-page px-3 sm:px-6">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-black" style={{ color: "var(--nc-text)" }}>Admin Management</h1>
+        <p className="mt-1 text-sm" style={{ color: "var(--nc-text-3)" }}>
           Add or remove admin users. Only Super Admins can manage this.
         </p>
       </div>

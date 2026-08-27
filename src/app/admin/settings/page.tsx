@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Settings, Globe, Zap, Shield, Bell, Wallet, Save, Loader2,
   CheckCircle, AlertCircle, AlertTriangle,
@@ -91,6 +92,7 @@ const SECTIONS: Section[] = [
 ];
 
 export default function AdminSettingsPage() {
+  const router = useRouter();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -100,8 +102,12 @@ export default function AdminSettingsPage() {
   useEffect(() => {
     fetch("/api/admin/settings")
       .then((r) => r.json())
-      .then((data) => { setSettings(data); setLoading(false); });
-  }, []);
+      .then((data) => {
+        if (data.error) { router.push("/admin/security"); return; }
+        setSettings(data);
+        setLoading(false);
+      });
+  }, [router]);
 
   function update<K extends keyof Settings>(key: K, value: Settings[K]) {
     if (!settings) return;
