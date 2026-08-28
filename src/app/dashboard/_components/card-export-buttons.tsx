@@ -3,131 +3,43 @@
 import { Moon, Sun, Loader2 } from "lucide-react";
 import { useState } from "react";
 
-const CARD_W = 856;
-const CARD_H = 540;
+const CARD_W = 2000;
+const CARD_H = 1271;
 
 const THEMES = {
   dark: {
-    bg: "#000000",
-    qr: "#d4af37",
-    text: "#d4af37",
-    accent: "#d4af37",
-    accentDark: "#b8941f",
-    wave: "#d4af37",
-    waveAlpha: 0.4,
-    qrBg: "#000000",
-    frameBorder: "#d4af37",
+    border: "/brand/dark_border.png",
+    qr: "#000000",
+    qrX: 1000,
+    qrY: 565,
+    qrSize: 280,
   },
   light: {
-    bg: "#ffffff",
-    qr: "#1a1a2e",
-    text: "#1a1a2e",
-    accent: "#1e3a6b",
-    accentDark: "#152c52",
-    wave: "#1e3a6b",
-    waveAlpha: 0.25,
-    qrBg: "#ffffff",
-    frameBorder: "#1e3a6b",
+    border: "/brand/white_border.png",
+    qr: "#1a3a6b",
+    qrX: 1034,
+    qrY: 555,
+    qrSize: 280,
   },
 } as const;
 
-function drawCard(
-  ctx: CanvasRenderingContext2D,
-  qrImage: HTMLImageElement,
-  theme: "dark" | "light"
-) {
-  const c = THEMES[theme];
-  const S = 3;
-  const W = CARD_W * S;
-  const H = CARD_H * S;
-
-  ctx.clearRect(0, 0, W, H);
-
-  // ── Background ──
-  ctx.fillStyle = c.bg;
-  ctx.fillRect(0, 0, W, H);
-
-  const cx = W / 2;
-  const cy = H / 2 - 20 * S;
-
-  // ── QR frame (rounded rect with gold border) ──
-  const frameSize = 220 * S;
-  const frameX = cx - frameSize / 2;
-  const frameY = cy - frameSize / 2;
-  const frameR = 28 * S;
-
-  // Frame fill
-  ctx.fillStyle = c.bg;
-  roundRect(ctx, frameX, frameY, frameSize, frameSize, frameR);
-  ctx.fill();
-
-  // Frame border (thick gold)
-  ctx.strokeStyle = c.frameBorder;
-  ctx.lineWidth = 6 * S;
-  roundRect(ctx, frameX, frameY, frameSize, frameSize, frameR);
-  ctx.stroke();
-
-  // ── QR code inside frame ──
-  const qrSize = 170 * S;
-  const qrX = cx - qrSize / 2;
-  const qrY = cy - qrSize / 2;
-  ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize);
-
-  // ── NFC wave arcs (left side) ──
-  ctx.strokeStyle = c.wave;
-  ctx.globalAlpha = c.waveAlpha;
-  ctx.lineWidth = 4 * S;
-  ctx.lineCap = "round";
-
-  const waveOffsetX = 38 * S;
-
-  for (let i = 1; i <= 3; i++) {
-    const r = (28 + i * 18) * S;
-
-    // Left arcs
-    ctx.beginPath();
-    ctx.arc(cx - waveOffsetX, cy, r, -130 * (Math.PI / 180), 130 * (Math.PI / 180));
-    ctx.stroke();
-  }
-
-  for (let i = 1; i <= 3; i++) {
-    const r = (28 + i * 18) * S;
-
-    // Right arcs
-    ctx.beginPath();
-    ctx.arc(cx + waveOffsetX, cy, r, -50 * (Math.PI / 180), 50 * (Math.PI / 180));
-    ctx.stroke();
-  }
-
-  ctx.globalAlpha = 1;
-
-  // ── "NEX CARD" text ──
-  ctx.fillStyle = c.text;
-  ctx.font = `bold ${36 * S}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  ctx.fillText("NEX CARD", cx, cy + frameSize / 2 + 30 * S);
-}
-
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.arcTo(x + w, y, x + w, y + r, r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-  ctx.lineTo(x + r, y + h);
-  ctx.arcTo(x, y + h, x, y + h - r, r);
-  ctx.lineTo(x, y + r);
-  ctx.arcTo(x, y, x + r, y, r);
-  ctx.closePath();
+async function generateQR(url: string, color: string): Promise<HTMLCanvasElement> {
+  const QRCode = (await import("qrcode")).default;
+  const canvas = document.createElement("canvas");
+  await QRCode.toCanvas(canvas, url, {
+    width: 400,
+    margin: 0,
+    color: { dark: color, light: "#ffffff00" },
+    errorCorrectionLevel: "H",
+  });
+  return canvas;
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+    img.onerror = () => reject(new Error(`Failed to load: ${src}`));
     img.src = src;
   });
 }
@@ -144,23 +56,29 @@ export function DashboardCardExport({
   async function handleExport(theme: "dark" | "light") {
     setExporting(theme);
     try {
-      const qrUrl = `/api/qr/${slug}?format=png&size=400&t=${Date.now()}`;
-      let qrImage: HTMLImageElement;
-      try {
-        qrImage = await loadImage(qrUrl);
-      } catch {
-        throw new Error("Failed to load QR code. Is the profile published?");
-      }
+      const c = THEMES[theme];
+      const profileUrl = `${window.location.origin}/p/${slug}`;
 
-      const S = 3;
+      // Generate QR with themed color
+      const qrCanvas = await generateQR(profileUrl, c.qr);
+
+      // Load border image
+      const borderImg = await loadImage(c.border);
+
+      // Create final canvas
       const canvas = document.createElement("canvas");
-      canvas.width = CARD_W * S;
-      canvas.height = CARD_H * S;
+      canvas.width = CARD_W;
+      canvas.height = CARD_H;
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Canvas not supported");
 
-      drawCard(ctx, qrImage, theme);
+      // Draw border
+      ctx.drawImage(borderImg, 0, 0, CARD_W, CARD_H);
 
+      // Overlay QR at theme-specific center
+      ctx.drawImage(qrCanvas, c.qrX - c.qrSize / 2, c.qrY - c.qrSize / 2, c.qrSize, c.qrSize);
+
+      // Export as PNG
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("PNG export failed"))), "image/png");
       });

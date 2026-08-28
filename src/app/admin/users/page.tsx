@@ -7,6 +7,8 @@ import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { formatDate, getInitials } from "@/lib/utils";
 import { CardExportButton } from "./_components/card-export-button";
+import { UserEditModal } from "./_components/user-edit-modal";
+import { UserDeleteButton } from "./_components/user-delete-button";
 
 export const metadata: Metadata = { title: "Users — Admin · NEX CARD" };
 export const dynamic = "force-dynamic";
@@ -173,10 +175,20 @@ export default async function AdminUsersPage({
                     {user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}
                   </td>
                   <td className="px-4 py-3">
-                    <CardExportButton
-                      userId={user.id}
-                      profileCount={user._count.profiles}
-                    />
+                    <div className="flex items-center gap-1">
+                      {session.user.role === "SUPER_ADMIN" && (
+                        <>
+                          <UserEditModal user={user} />
+                          {user.role !== "SUPER_ADMIN" && (
+                            <UserDeleteButton userId={user.id} userName={user.name} />
+                          )}
+                          <CardExportButton
+                            userId={user.id}
+                            profileCount={user._count.profiles}
+                          />
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -219,7 +231,15 @@ export default async function AdminUsersPage({
               <span className="text-[11px]" style={{ color: "var(--nc-text-3)" }}>
                 Last login: {user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}
               </span>
-              <CardExportButton userId={user.id} profileCount={user._count.profiles} />
+              {session.user.role === "SUPER_ADMIN" && (
+                <div className="flex items-center gap-1">
+                  <UserEditModal user={user} />
+                  {user.role !== "SUPER_ADMIN" && (
+                    <UserDeleteButton userId={user.id} userName={user.name} />
+                  )}
+                  <CardExportButton userId={user.id} profileCount={user._count.profiles} />
+                </div>
+              )}
             </div>
           </div>
         ))}

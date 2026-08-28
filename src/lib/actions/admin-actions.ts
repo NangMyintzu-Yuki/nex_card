@@ -352,6 +352,142 @@ export async function toggleUserStatusAction(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ACTION: EDIT USER (SUPER_ADMIN only)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type EditUserState =
+  | { status: "idle" }
+  | { status: "success"; message: string }
+  | { status: "error"; message: string };
+
+const EditUserInput = z.object({
+  userId: z.string().min(1),
+  name: z.string().min(1).max(100),
+  email: z.string().email(),
+  role: z.enum(["USER", "ADMIN", "SUPER_ADMIN"]),
+});
+
+export async function adminEditUserAction(
+  _prevState: EditUserState,
+  formData: FormData
+): Promise<EditUserState> {
+  const adminId = await requireSuperAdmin();
+  if (typeof adminId !== "string") return adminId;
+
+  const parsed = EditUserInput.safeParse({
+    userId: formData.get("userId"),
+    name: formData.get("name"),
+    email: formData.get("email"),
+    role: formData.get("role"),
+  });
+
+  if (!parsed.success) {
+    return { status: "error", message: "Invalid input. Check all fields." };
+  }
+
+  const { userId, name, email, role } = parsed.data;
+
+  if (userId === adminId) {
+    return { status: "error", message: "You cannot edit your own account here." };
+  }
+
+  try {
+    const existing = await prisma.user.findFirst({
+      where: { email, NOT: { id: userId } },
+    });
+    if (existing) {
+      return { status: "error", message: "Email is already in use by another user." };
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { name, email, role },
+    });
+
+    await writeAuditLog({
+      actorId: adminId,
+      action: "user.edit",
+      targetType: "User",
+      targetId: userId,
+      meta: { name, email, role },
+    });
+
+    revalidatePath("/admin/users");
+    revalidatePath("/admin/admins");
+
+    return { status: "success", message: "User updated." };
+  } catch (err) {
+    console.error("adminEditUserAction error:", err);
+    return { status: "error", message: "Failed to update user." };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACTION: DELETE USER (SUPER_ADMIN only)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type DeleteUserState =
+  | { status: "idle" }
+  | { status: "success"; message: string }
+  | { status: "error"; message: string };
+
+const DeleteUserInput = z.object({
+  userId: z.string().min(1),
+  confirm: z.literal("DELETE"),
+});
+
+export async function adminDeleteUserAction(
+  _prevState: DeleteUserState,
+  formData: FormData
+): Promise<DeleteUserState> {
+  const adminId = await requireSuperAdmin();
+  if (typeof adminId !== "string") return adminId;
+
+  const parsed = DeleteUserInput.safeParse({
+    userId: formData.get("userId"),
+    confirm: formData.get("confirm"),
+  });
+
+  if (!parsed.success) {
+    return { status: "error", message: 'Type DELETE to confirm.' };
+  }
+
+  const { userId } = parsed.data;
+
+  if (userId === adminId) {
+    return { status: "error", message: "You cannot delete your own account." };
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    if (!user) return { status: "error", message: "User not found." };
+    if (user.role === "SUPER_ADMIN") {
+      return { status: "error", message: "Cannot delete another super admin." };
+    }
+
+    await prisma.user.delete({ where: { id: userId } });
+
+    await writeAuditLog({
+      actorId: adminId,
+      action: "user.delete",
+      targetType: "User",
+      targetId: userId,
+    });
+
+    revalidatePath("/admin/users");
+    revalidatePath("/admin");
+
+    return { status: "success", message: "User deleted." };
+  } catch (err) {
+    console.error("adminDeleteUserAction error:", err);
+    return { status: "error", message: "Failed to delete user." };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ACTION: TOGGLE TEMPLATE ACTIVE/PREMIUM
 // ─────────────────────────────────────────────────────────────────────────────
 
