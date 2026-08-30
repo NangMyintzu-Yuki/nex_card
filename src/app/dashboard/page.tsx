@@ -21,7 +21,7 @@ export default async function DashboardPage({
 }) {
   const session = await getServerSession();
   if (!session?.user?.id) redirect("/login");
-  if (session.user.role === "ADMIN") redirect("/admin");
+  if (session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN") redirect("/admin");
 
   const { new: newSlug, pending, paymentFailed, reserved } = await searchParams;
   const profiles = await getCachedUserProfiles(session.user.id);

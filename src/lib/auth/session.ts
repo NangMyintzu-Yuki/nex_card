@@ -19,8 +19,12 @@ export interface Session {
 
 /** Remove stale session cookie (e.g. after DB reset or expired session). */
 export async function clearSessionCookie(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete("session_token");
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete("session_token");
+  } catch {
+    // In Route Handler contexts cookies may be read-only; ignore.
+  }
 }
 
 /**
