@@ -189,6 +189,15 @@ export function OnboardingClient({
     initialCategoryId ? "template" : "category"
   );
 
+  // Auto-scroll to top when step changes so user always sees the new content
+  const stepRef = useRef(step);
+  useEffect(() => {
+    if (stepRef.current !== step) {
+      stepRef.current = step;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [step]);
+
   const slugTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -402,10 +411,6 @@ export function OnboardingClient({
 
   const handleProceedToConfirm = () => {
     if (!selectedTemplateId) return;
-    if (!slug) {
-      const cat = categories.find((c) => c.id === selectedCategoryId);
-      setSlug(generateSlugSuggestion(userId, cat?.slug.slice(0, 4) ?? "card"));
-    }
     setStep("confirm");
   };
 
@@ -746,13 +751,14 @@ export function OnboardingClient({
               })}
             </div>
 
-            {/* Continue CTA */}
+            {/* Continue CTA — sticky at bottom so it's always visible */}
             {selectedTemplateId && (
-              <div className="mt-6 sm:mt-8 flex justify-end">
+              <div className="sticky bottom-0 z-10 -mx-3 sm:-mx-6 mt-6 flex justify-end rounded-t-xl border-t px-3 sm:px-6 py-3 sm:py-4"
+                style={{ background: "var(--nc-bg)", borderColor: "var(--nc-border)" }}>
                 <button
                   type="button"
                   onClick={handleProceedToPricing}
-                  className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
+                  className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold shadow-lg"
                 >
                   {isPremium ? (preorderMode ? "Choose Plan" : "Choose Pricing") : "Continue"}
                   <ArrowRight className="h-4 w-4" />
@@ -853,11 +859,12 @@ export function OnboardingClient({
             </div>
 
             {selectedTier && (
-              <div className="mt-6 sm:mt-8 flex justify-end">
+              <div className="sticky bottom-0 z-10 -mx-3 sm:-mx-6 mt-6 flex justify-end rounded-t-xl border-t px-3 sm:px-6 py-3 sm:py-4"
+                style={{ background: "var(--nc-bg)", borderColor: "var(--nc-border)" }}>
                 <button
                   type="button"
                   onClick={handleProceedToPayment}
-                  className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
+                  className="nc-btn-brand flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold shadow-lg"
                 >
                   {preorderMode ? "Reserve this plan" : "Continue to Payment"}
                   <ArrowRight className="h-4 w-4" />

@@ -301,6 +301,104 @@ export async function updateProfileAction(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ACTION: ADMIN UPDATE PROFILE (bypasses ownership + premium check)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function adminUpdateProfileAction(
+  _prevState: UpdateProfileState,
+  formData: FormData
+): Promise<UpdateProfileState> {
+  const session = await getServerSession();
+  if (!session?.user?.id) {
+    return { status: "error", message: "Unauthorized." };
+  }
+  if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
+    return { status: "error", message: "Admin access required." };
+  }
+
+  const parsed = UpdateProfileInput.safeParse({
+    profileId: formData.get("profileId"),
+    dynamicJsonData: formData.get("dynamicJsonData"),
+    metaTitle: formData.get("metaTitle") || undefined,
+    metaDescription: formData.get("metaDescription") || undefined,
+    ogImageUrl: formData.get("ogImageUrl") || undefined,
+    isPublished: formData.get("isPublished"),
+  });
+
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message: "Validation failed.",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  // Admin can edit any profile — no ownership check
+  const profile = await prisma.userProfile.findFirst({
+    where: { id: parsed.data.profileId },
+    select: {
+      id: true,
+      slug: true,
+      dynamicJsonData: true,
+      ogImageUrl: true,
+      category: { select: { slug: true } },
+      userId: true,
+    },
+  });
+
+  if (!profile) {
+    return { status: "error", message: "Profile not found." };
+  }
+
+  // Capture old data for R2 cleanup
+  const oldDynamicJson = profile.dynamicJsonData as Record<string, unknown>;
+  const oldOgImageUrl = profile.ogImageUrl;
+
+  let rawData: unknown;
+  try {
+    rawData = JSON.parse(parsed.data.dynamicJsonData);
+  } catch {
+    return { status: "error", message: "Invalid JSON data submitted." };
+  }
+
+  const validation = safeParseTemplateData(
+    profile.category.slug as CategorySlug,
+    rawData
+  );
+
+  if (!validation.success) {
+    const fieldList = validation.error.issues.map((i) => {
+      const path = i.path.join(".");
+      return path ? `${path}: ${i.message}` : i.message;
+    }).join("; ");
+    return {
+      status: "error",
+      message: `Validation failed: ${fieldList}`,
+      fieldErrors: validation.error.flatten().fieldErrors,
+    };
+  }
+
+  await prisma.userProfile.update({
+    where: { id: profile.id },
+    data: {
+      dynamicJsonData: validation.data,
+      metaTitle: parsed.data.metaTitle || null,
+      metaDescription: parsed.data.metaDescription || null,
+      ogImageUrl: parsed.data.ogImageUrl || null,
+      isPublished: parsed.data.isPublished,
+      updatedAt: new Date(),
+    },
+  });
+
+  await cleanupOldImages(oldDynamicJson, validation.data as Record<string, unknown>, oldOgImageUrl, parsed.data.ogImageUrl);
+  await purgeProfileCache(profile.slug, profile.userId);
+  revalidatePath("/admin/users");
+  revalidatePath(`/admin/users/${profile.userId}/profiles/${profile.id}`);
+
+  return { status: "success" };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ACTION: DELETE PROFILE (frees slug + category slot for reclaim)
 // ─────────────────────────────────────────────────────────────────────────────
 

@@ -1,13 +1,13 @@
 "use client";
 
-import { CreditCard, Sun, Moon, Loader2, AlertCircle, X } from "lucide-react";
+import { CreditCard, Sun, Moon, Loader2, AlertCircle, X, Pencil } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 interface UserProfile {
   id: string;
   slug: string;
   template: { name: string };
-  category: { name: string };
+  category: { name: string; slug: string };
 }
 
 const CARD_W = 2000;
@@ -185,9 +185,19 @@ export function CardExportButton({ userId, profileCount }: { userId: string; pro
               ) : (
                 profiles.map((profile) => (
                   <div key={profile.id} className="border-b px-4 py-3 last:border-b-0" style={{ borderColor: "var(--nc-border)" }}>
-                    <div className="mb-2">
-                      <p className="text-xs font-semibold truncate" style={{ color: "var(--nc-text)" }}>{profile.slug}</p>
-                      <p className="text-[10px]" style={{ color: "var(--nc-text-3)" }}>{profile.category.name} · {profile.template.name}</p>
+                    <div className="mb-2 flex items-center justify-between">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold truncate" style={{ color: "var(--nc-text)" }}>{profile.slug}</p>
+                        <p className="text-[10px]" style={{ color: "var(--nc-text-3)" }}>{profile.category.name} · {profile.template.name}</p>
+                      </div>
+                      <a
+                        href={`/admin/users/${userId}/profiles/${profile.id}`}
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-blue-500/10"
+                        style={{ color: "var(--nc-brand)" }}
+                        title="Edit profile content"
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </a>
                     </div>
                     <div className="flex gap-2">
                       <button

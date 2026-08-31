@@ -66,6 +66,34 @@ export function paymentStatusHtml(
     </div>`;
 }
 
+export function paymentPendingApprovalHtml(
+  adminName: string,
+  userName: string,
+  userEmail: string,
+  tier: string,
+  amount: number,
+  currency: string,
+  profileSlug: string
+): string {
+  return `
+    <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px">
+      <h2>New payment pending approval</h2>
+      <p>Hi ${escapeHtml(adminName)},</p>
+      <p>A new payment has been submitted and requires your review.</p>
+      <div style="background:#fffbeb;border:1px solid #fbbf24;border-radius:12px;padding:16px;margin:20px 0">
+        <p style="margin:0 0 8px"><strong>User:</strong> ${escapeHtml(userName)} (${escapeHtml(userEmail)})</p>
+        <p style="margin:0 0 8px"><strong>Tier:</strong> ${tier === "NFC_QR" ? "NFC + QR" : "QR Only"}</p>
+        <p style="margin:0 0 8px"><strong>Amount:</strong> ${amount.toLocaleString()} ${currency}</p>
+        <p style="margin:0"><strong>Profile:</strong> /${escapeHtml(profileSlug)}</p>
+      </div>
+      <p style="margin:28px 0">
+        <a href="${appBaseUrl()}/admin/payments" style="background:#1a3a6b;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">
+          Review payment
+        </a>
+      </p>
+    </div>`;
+}
+
 export function twoFactorEnabledHtml(name: string): string {
   return `
     <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px">

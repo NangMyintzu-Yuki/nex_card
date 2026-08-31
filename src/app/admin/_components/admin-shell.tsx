@@ -1,6 +1,7 @@
 "use client";
 
 import { Menu } from "lucide-react";
+import { AdminNotificationListener } from "./admin-notification-listener";
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -15,6 +16,8 @@ export function AdminShell({
   children: React.ReactNode;
   user: { name: string; email: string; role: string };
 }) {
+  const isSuperAdmin = user.role === "SUPER_ADMIN";
+
   return (
     <>
       <nav
@@ -31,6 +34,7 @@ export function AdminShell({
         </button>
 
         <div className="flex items-center gap-2.5">
+          {isSuperAdmin && <AdminNotificationListener />}
           <div className="flex flex-col items-end">
             <span className="max-w-[100px] truncate text-xs font-semibold hidden sm:block" style={{ color: "var(--nc-text-2)" }}>
               {user.name}
@@ -39,7 +43,7 @@ export function AdminShell({
               className="rounded-full px-1.5 py-0.5 text-[9px] font-bold text-white"
               style={{ background: "var(--nc-brand-grad)" }}
             >
-              ADMIN
+              {isSuperAdmin ? "SUPER ADMIN" : "ADMIN"}
             </span>
           </div>
           <div

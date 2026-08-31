@@ -8,6 +8,9 @@ import { Prisma } from "@prisma/client";
 import { getServerSession } from "@/lib/auth/session";
 import { isOwnedPaymentScreenshotUrl } from "@/lib/security/payment-url";
 import { isMaintenanceMode, MAINTENANCE_MESSAGE } from "@/lib/security/maintenance";
+import { sendMail } from "@/lib/mail/mailer";
+import { paymentPendingApprovalHtml } from "@/lib/mail/templates";
+import { notifySuperAdmin } from "@/lib/notify/pusher";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -320,6 +323,11 @@ export async function submitPaymentAction(
 
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/onboarding");
+    revalidatePath("/admin/payments");
+    revalidatePath("/admin");
+
+    // ── Notify super admin (push + email) ────────────────────────────────
+    void notifySuperAdminPayment(session.user.name, session.user.email, tier, amount, profile.slug);
 
     return {
       status: "success",
@@ -364,5 +372,45 @@ export async function getPaymentForProfile(
     };
   } catch {
     return null;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPER: Notify super admin of new payment (push + email)
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function notifySuperAdminPayment(
+  userName: string,
+  userEmail: string,
+  tier: string,
+  amount: number,
+  profileSlug: string
+) {
+  const currency = "MMK";
+
+  // 1. Push notification
+  await notifySuperAdmin("payment:pending", {
+    userName,
+    userEmail,
+    tier,
+    amount,
+    currency,
+    profileSlug,
+    timestamp: Date.now(),
+  });
+
+  // 2. Email to super admin(s)
+  try {
+    const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
+    if (!superAdminEmail) return;
+
+    const adminName = "Super Admin";
+    await sendMail({
+      to: superAdminEmail,
+      subject: `[NEX CARD] New payment pending approval — ${userName}`,
+      html: paymentPendingApprovalHtml(adminName, userName, userEmail, tier, amount, currency, profileSlug),
+    });
+  } catch (err) {
+    console.error("[payment] super admin notify error:", err);
   }
 }
