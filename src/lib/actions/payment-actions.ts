@@ -10,7 +10,7 @@ import { isOwnedPaymentScreenshotUrl } from "@/lib/security/payment-url";
 import { isMaintenanceMode, MAINTENANCE_MESSAGE } from "@/lib/security/maintenance";
 import { sendMail } from "@/lib/mail/mailer";
 import { paymentPendingApprovalHtml } from "@/lib/mail/templates";
-import { notifySuperAdmin } from "@/lib/notify/pusher";
+import { notifySuperAdmin } from "@/lib/notify/pusher-server";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES

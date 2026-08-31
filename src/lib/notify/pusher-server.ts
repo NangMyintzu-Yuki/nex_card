@@ -1,4 +1,4 @@
-// src/lib/notify/pusher.ts
+// src/lib/notify/pusher-server.ts
 import Pusher from "pusher";
 
 let _pusher: Pusher | null = null;
