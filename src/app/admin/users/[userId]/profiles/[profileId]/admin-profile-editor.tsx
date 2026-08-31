@@ -6,7 +6,7 @@
 import { useActionState, useState, useEffect, useRef } from "react";
 import {
   ExternalLink, Lock, Check, AlertCircle, Save,
-  Eye, EyeOff, ChevronDown, ChevronUp,
+  Eye, EyeOff, ChevronDown, ChevronUp, CreditCard, Moon, Sun, Loader2,
 } from "lucide-react";
 import {
   adminUpdateProfileAction,
@@ -134,7 +134,93 @@ function AudioUploadField({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// COMPONENT
+// INLINE CARD EXPORT (for admin profile editor)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CARD_W = 2000;
+const CARD_H = 1271;
+const THEMES = {
+  dark: { border: "/brand/dark_border.png", qr: "#000000", qrX: 993, qrY: 515, qrSize: 310 },
+  light: { border: "/brand/white_border.png", qr: "#1a3a6b", qrX: 1034, qrY: 550, qrSize: 320 },
+} as const;
+
+async function generateQR(url: string, color: string): Promise<HTMLCanvasElement> {
+  const QRCode = (await import("qrcode")).default;
+  const canvas = document.createElement("canvas");
+  await QRCode.toCanvas(canvas, url, { width: 400, margin: 0, color: { dark: color, light: "#ffffff00" }, errorCorrectionLevel: "H" });
+  return canvas;
+}
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`Failed to load: ${src}`));
+    img.src = src;
+  });
+}
+
+function CardExportInline({ slug, profileId }: { slug: string; profileId: string }) {
+  const [exporting, setExporting] = useState<string | null>(null);
+
+  async function handleExport(theme: "dark" | "light") {
+    setExporting(theme);
+    try {
+      const c = THEMES[theme];
+      const profileUrl = `${window.location.origin}/p/${slug}`;
+      const qrCanvas = await generateQR(profileUrl, c.qr);
+      const borderImg = await loadImage(c.border);
+      const canvas = document.createElement("canvas");
+      canvas.width = CARD_W;
+      canvas.height = CARD_H;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas not supported");
+      ctx.drawImage(borderImg, 0, 0, CARD_W, CARD_H);
+      ctx.drawImage(qrCanvas, c.qrX - c.qrSize / 2, c.qrY - c.qrSize / 2, c.qrSize, c.qrSize);
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("PNG export failed"))), "image/png");
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `nex-card-${slug}-${theme}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      // silent fail — user can retry
+    } finally {
+      setExporting(null);
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        onClick={() => handleExport("dark")}
+        disabled={exporting !== null}
+        className="flex items-center gap-1 rounded-lg px-2 py-2 text-[10px] font-bold transition-all sm:px-3 sm:text-xs"
+        style={{ background: "#1a1a2e", color: "#d4af37", border: "1px solid #d4af3730", opacity: exporting !== null && exporting !== "dark" ? 0.5 : 1 }}
+      >
+        {exporting === "dark" ? <Loader2 className="h-3 w-3 animate-spin" /> : <Moon className="h-3 w-3" />}
+        <span className="hidden sm:inline">Dark</span>
+      </button>
+      <button
+        onClick={() => handleExport("light")}
+        disabled={exporting !== null}
+        className="flex items-center gap-1 rounded-lg px-2 py-2 text-[10px] font-bold transition-all sm:px-3 sm:text-xs"
+        style={{ background: "#f0f4f8", color: "#1e3c6e", border: "1px solid #1e3c6e30", opacity: exporting !== null && exporting !== "light" ? 0.5 : 1 }}
+      >
+        {exporting === "light" ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sun className="h-3 w-3" />}
+        <span className="hidden sm:inline">Light</span>
+      </button>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface AdminProfileEditorProps {
@@ -353,27 +439,31 @@ export function AdminProfileEditor({ profile, categorySlug }: AdminProfileEditor
       <input type="hidden" name="ogImageUrl" value={ogImageUrl} />
       <input type="hidden" name="isPublished" value={String(isPublished)} />
 
-      {/* Status toggle */}
-      <div className="flex items-center gap-3">
+      {/* Status toggle + Card Export */}
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <button
           type="button"
           onClick={() => setIsPublished(!isPublished)}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
+          className={`flex items-center gap-2 rounded-xl px-3 py-2 sm:px-4 text-xs sm:text-sm font-semibold transition-colors ${
             isPublished ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-gray-400"
           }`}
         >
           {isPublished ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-          {isPublished ? "Published" : "Draft"}
+          <span className="hidden sm:inline">{isPublished ? "Published" : "Draft"}</span>
+          <span className="sm:hidden">{isPublished ? "Live" : "Draft"}</span>
         </button>
         <a
           href={`/${profile.slug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1 text-xs font-semibold"
+          className="flex items-center gap-1 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold transition-colors nc-btn-ghost"
           style={{ color: "var(--nc-brand)" }}
         >
-          View live <ExternalLink className="h-3 w-3" />
+          <ExternalLink className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">View live</span>
+          <span className="sm:hidden">Preview</span>
         </a>
+        <CardExportInline slug={profile.slug} profileId={profile.id} />
       </div>
 
       {/* Field sections */}
@@ -396,7 +486,7 @@ export function AdminProfileEditor({ profile, categorySlug }: AdminProfileEditor
               {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>
             {isOpen && (
-              <div className="space-y-3 p-4">
+              <div className="space-y-3 p-3 sm:p-4">
                 {section.fields.map((field) => {
                   if (section.id === "rsvp" && field.key !== "rsvp._enabled") {
                     const rsvpEnabled = getNestedValue(formData, "rsvp._enabled");
@@ -455,7 +545,7 @@ export function AdminProfileEditor({ profile, categorySlug }: AdminProfileEditor
         <button
           type="submit"
           disabled={isPending}
-          className="nc-btn-brand flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold shadow-lg"
+          className="nc-btn-brand flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold shadow-lg sm:w-auto"
         >
           {isPending ? (
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />

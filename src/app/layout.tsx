@@ -97,7 +97,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.png" type="image/png" />
-        <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>

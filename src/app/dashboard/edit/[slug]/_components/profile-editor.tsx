@@ -106,6 +106,7 @@ const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
       title: "Style",
       fields: [
         { key: "accentColor",      label: "Accent Color",      type: "color" },
+        { key: "backgroundStyle",  label: "Background Style",  type: "select", options: ["gradient", "solid", "mesh", "noise"], hint: "Visual style applied to the page background" },
         { key: "featuredQuote",    label: "Featured Quote",    type: "textarea", placeholder: "An inspiring quote…", maxLength: 300 },
       ],
     },
