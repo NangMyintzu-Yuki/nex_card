@@ -136,6 +136,7 @@ export interface TemplateRendererProps {
   templateCode: string;
   dynamicJsonData: unknown;
   accentColor?: string | null;
+  backgroundStyle?: "gradient" | "solid" | "mesh" | "noise";
   /** Public profile slug — enables in-page RSVP/guestbook for wedding templates */
   publicSlug?: string;
 }
@@ -145,6 +146,7 @@ export function TemplateRenderer({
   templateCode,
   dynamicJsonData,
   accentColor,
+  backgroundStyle,
   publicSlug,
 }: TemplateRendererProps) {
   const accent = accentColor ?? undefined;
@@ -162,6 +164,7 @@ export function TemplateRenderer({
           templateCode={templateCode}
           data={parsedData as DigitalNameCardData}
           accentColor={accent}
+          backgroundStyle={backgroundStyle}
         />
       );
     case "portfolio":
@@ -199,14 +202,16 @@ interface SwitchProps<T> {
   data: T;
   accentColor?: string;
   publicSlug?: string;
+  backgroundStyle?: "gradient" | "solid" | "mesh" | "noise";
 }
 
 function DigitalNameCardSwitch({
   templateCode,
   data,
   accentColor,
+  backgroundStyle,
 }: SwitchProps<DigitalNameCardData>) {
-  const props = { data, accentColor };
+  const props = { data, accentColor, backgroundStyle };
 
   switch (templateCode) {
     case TEMPLATE_IDS.DIGITAL_NAME_CARD.AURORA:

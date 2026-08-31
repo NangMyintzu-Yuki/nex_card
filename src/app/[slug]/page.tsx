@@ -171,7 +171,8 @@ export default async function PublicProfilePage({ params }: PageProps) {
           categorySlug={categorySlug}
           templateCode={profile.template.codeIdentifier}
           dynamicJsonData={profile.dynamicJsonData}
-          accentColor={profile.template.accentColor}
+          accentColor={typeof data.accentColor === "string" && data.accentColor ? data.accentColor : profile.template.accentColor}
+          backgroundStyle={typeof data.backgroundStyle === "string" ? data.backgroundStyle as "gradient" | "solid" | "mesh" | "noise" : undefined}
           publicSlug={slug}
         />
       </Suspense>

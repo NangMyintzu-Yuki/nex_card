@@ -5,10 +5,12 @@
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
 import { AvatarZoom } from "@/components/templates/avatar-zoom";
 import { safeHref } from "@/lib/security/safe-href";
+import { getBackground, type BackgroundStyle } from "@/components/templates/background-styles";
 
 interface Props {
   data: DigitalNameCardData;
   accentColor?: string;
+  backgroundStyle?: BackgroundStyle;
 }
 
 function buildVCard(d: DigitalNameCardData) {
@@ -89,7 +91,7 @@ const SP: Record<string, string> = {
 
 const PRIORITY = ["phone", "email", "whatsapp", "viber", "telegram", "website", "address"];
 
-export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
+export function ObsidianNameCard({ data, accentColor = "#f59e0b", backgroundStyle }: Props) {
   const {
     fullName,
     jobTitle,
@@ -111,8 +113,8 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b" }: Props) {
 
   return (
     <main
-      className="min-h-screen bg-black text-white"
-      style={{ fontFamily: "'Space Grotesk',system-ui,sans-serif" }}
+      className="min-h-screen text-white"
+      style={{ background: getBackground(accentColor, backgroundStyle), fontFamily: "'Space Grotesk',system-ui,sans-serif" }}
     >
       <div className="mx-auto max-w-sm px-4 py-10">
         {/* Accent rule */}

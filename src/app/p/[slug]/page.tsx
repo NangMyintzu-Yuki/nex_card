@@ -112,7 +112,8 @@ export default async function QRProfilePage({ params }: PageProps) {
   }
 
   const categorySlug = profile.category.slug as CategorySlug;
-  const accentColor = profile.template.accentColor ?? undefined;
+  const data = profile.dynamicJsonData as Record<string, unknown>;
+  const accentColor = (typeof data.accentColor === "string" && data.accentColor) ? data.accentColor : (profile.template.accentColor ?? undefined);
 
   return (
     <Suspense fallback={<QRLoadingSkeleton />}>
@@ -121,6 +122,7 @@ export default async function QRProfilePage({ params }: PageProps) {
         templateCode={profile.template.codeIdentifier}
         dynamicJsonData={profile.dynamicJsonData}
         accentColor={accentColor}
+        backgroundStyle={typeof data.backgroundStyle === "string" ? data.backgroundStyle as "gradient" | "solid" | "mesh" | "noise" : undefined}
         publicSlug={slug}
       />
     </Suspense>

@@ -6,8 +6,9 @@ import { useState } from "react";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
 import { AvatarZoom } from "@/components/templates/avatar-zoom";
 import { safeHref } from "@/lib/security/safe-href";
+import { getBackground, type BackgroundStyle } from "@/components/templates/background-styles";
 
-interface Props { data: DigitalNameCardData; accentColor?: string; }
+interface Props { data: DigitalNameCardData; accentColor?: string; backgroundStyle?: BackgroundStyle; }
 
 // ── vCard builder (RFC 6350) — #1 feature per industry research ────────────
 function buildVCard(d: DigitalNameCardData): string {
@@ -73,7 +74,7 @@ const CT: Record<string, { label: string; emoji: string; href: (v: string) => st
 
 const CONTACT_PRIORITY = ["phone","email","whatsapp","viber","telegram","website","skype","address"];
 
-export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
+export function AuroraNameCard({ data, accentColor = "#6366f1", backgroundStyle }: Props) {
   const [copied, setCopied] = useState(false);
   const { fullName, jobTitle, company, companyLogoUrl,
     tagline, bio, avatarUrl, contacts, socialLinks, skills, featuredQuote } = data;
@@ -85,9 +86,7 @@ export function AuroraNameCard({ data, accentColor = "#6366f1" }: Props) {
 
   return (
     <main className="min-h-screen w-full" style={{
-      background: `radial-gradient(ellipse 80% 55% at 50% -5%, ${accentColor}35 0%, transparent 60%),
-                   radial-gradient(ellipse 50% 40% at 90% 90%, #06b6d420 0%, transparent 50%),
-                   linear-gradient(160deg, #050508 0%, #080812 100%)`,
+      background: getBackground(accentColor, backgroundStyle),
     }}>
       <div className="mx-auto max-w-sm px-4 py-8">
 

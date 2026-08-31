@@ -3,8 +3,9 @@
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
 import { AvatarZoom } from "@/components/templates/avatar-zoom";
 import { safeHref } from "@/lib/security/safe-href";
+import { getBackground, type BackgroundStyle } from "@/components/templates/background-styles";
 
-interface Props { data: DigitalNameCardData; accentColor?: string; }
+interface Props { data: DigitalNameCardData; accentColor?: string; backgroundStyle?: BackgroundStyle; }
 
 function buildVCard(d: DigitalNameCardData) {
   return ["BEGIN:VCARD","VERSION:3.0",`FN:${d.fullName}`,
@@ -33,12 +34,12 @@ const CT: Record<string,{emoji:string;href:(v:string)=>string}> = {
 const SP_COLORS: Record<string,string>={linkedin:"#0077b5",twitter:"#ffffff",instagram:"#e1306c",facebook:"#1877f2",youtube:"#ff5555",tiktok:"#69c9d0",whatsapp:"#25d366",telegram:"#2aabee",viber:"#7360f2",discord:"#5865f2",website:"#a78bfa",behance:"#1769ff",dribbble:"#ea4c89",medium:"#ffffff"};
 const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address"];
 
-export function PrismNameCard({ data, accentColor="#a855f7" }: Props) {
+export function PrismNameCard({ data, accentColor="#a855f7", backgroundStyle }: Props) {
   const {fullName,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
 
   return (
-    <main className="min-h-screen" style={{background:"linear-gradient(160deg,#05001a,#000d1a 50%,#0a0005)"}}>
+    <main className="min-h-screen" style={{background:getBackground(accentColor, backgroundStyle)}}>
       {/* Spectrum bar */}
       <div className="h-1" style={{background:`linear-gradient(90deg,${SPECTRUM.join(",")})`}} />
 

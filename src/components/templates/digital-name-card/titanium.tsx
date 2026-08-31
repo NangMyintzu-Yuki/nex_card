@@ -3,8 +3,9 @@
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
 import { AvatarZoom } from "@/components/templates/avatar-zoom";
 import { safeHref } from "@/lib/security/safe-href";
+import { getBackground, type BackgroundStyle } from "@/components/templates/background-styles";
 
-interface Props { data: DigitalNameCardData; accentColor?: string; }
+interface Props { data: DigitalNameCardData; accentColor?: string; backgroundStyle?: BackgroundStyle; }
 
 function buildVCard(d: DigitalNameCardData) {
   return ["BEGIN:VCARD","VERSION:3.0",`FN:${d.fullName}`,
@@ -31,14 +32,14 @@ const CT: Record<string,{emoji:string;label:string;href:(v:string)=>string}> = {
 };
 const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address"];
 
-export function TitaniumNameCard({ data, accentColor="#94a3b8" }: Props) {
+export function TitaniumNameCard({ data, accentColor="#94a3b8", backgroundStyle }: Props) {
   const {fullName,jobTitle,company,companyLogoUrl,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
   const s=accentColor;
 
   return (
     <main className="min-h-screen" style={{
-      background:"linear-gradient(160deg,#09090f,#06060b 60%,#080810)",
+      background:getBackground(accentColor, backgroundStyle),
       backgroundImage:`linear-gradient(rgba(148,163,184,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,0.025) 1px,transparent 1px)`,
       backgroundSize:"40px 40px,40px 40px",
     }}>

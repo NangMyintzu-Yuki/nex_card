@@ -1,143 +1,136 @@
 // src/app/admin/users/[userId]/profiles/[profileId]/admin-profile-editor.tsx
-// Admin wrapper around ProfileEditor — uses adminUpdateProfileAction instead of user action
+// Admin profile editor — full CRUD matching user dashboard capabilities
 
 "use client";
 
-import { useActionState, useState, useRef, useEffect } from "react";
+import { useActionState, useState, useEffect, useRef } from "react";
 import {
   ExternalLink, Lock, Check, AlertCircle, Save,
-  Eye, EyeOff, ChevronDown, ChevronUp, Plus, Trash2, QrCode,
+  Eye, EyeOff, ChevronDown, ChevronUp,
 } from "lucide-react";
 import {
   adminUpdateProfileAction,
   type UpdateProfileState,
 } from "@/lib/actions/profile-actions";
-import { resolveImageUrl } from "@/lib/utils/image-url";
+import {
+  CATEGORY_FIELD_SECTIONS,
+  getNestedValue,
+  setNestedValue,
+  type FieldDef,
+} from "@/components/profile-editors/field-configs";
+import {
+  ContactsEditor,
+  SocialLinksEditor,
+  SkillsEditor,
+  CategorySkillsEditor,
+  GalleryEditor,
+  MilestonesEditor,
+  EventsEditor,
+  ServicesEditor,
+  ProjectsEditor,
+  ExperienceEditor,
+  ImageUploadField,
+} from "@/components/profile-editors/field-editors";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FIELD CONFIGS PER CATEGORY
+// AUDIO UPLOAD FIELD (admin-specific, simpler version)
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface FieldSection {
-  label: string;
-  fields: FieldConfig[];
-}
-
-interface FieldConfig {
-  key: string;
-  label: string;
-  type: "text" | "textarea" | "url" | "email" | "tel" | "color" | "select" | "image-upload" | "datetime-local";
+function AudioUploadField({
+  value,
+  onChange,
+  placeholder = "https://...",
+  hint,
+}: {
+  value: string;
+  onChange: (url: string) => void;
   placeholder?: string;
-  maxLength?: number;
-  required?: boolean;
   hint?: string;
-  options?: string[];
-}
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string>("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
-const CATEGORY_FIELD_SECTIONS: Record<string, FieldSection[]> = {
-  "digital-name-card": [
-    {
-      label: "Identity",
-      fields: [
-        { key: "fullName", label: "Full Name", type: "text", required: true, maxLength: 30 },
-        { key: "jobTitle", label: "Job Title", type: "text", required: true, maxLength: 120 },
-        { key: "company", label: "Company", type: "text", maxLength: 30 },
-        { key: "companyLogoUrl", label: "Company Logo URL", type: "url" },
-        { key: "tagline", label: "Tagline", type: "text", maxLength: 150 },
-        { key: "bio", label: "Bio", type: "textarea", maxLength: 1000 },
-        { key: "avatarUrl", label: "Avatar URL", type: "url" },
-      ],
-    },
-    {
-      label: "Styling",
-      fields: [
-        { key: "accentColor", label: "Accent Color", type: "color" },
-        { key: "backgroundStyle", label: "Background Style", type: "select", options: ["gradient", "solid", "mesh", "noise"] },
-        { key: "featuredQuote", label: "Featured Quote", type: "textarea", maxLength: 300 },
-      ],
-    },
-  ],
-  "portfolio": [
-    {
-      label: "Identity",
-      fields: [
-        { key: "fullName", label: "Full Name", type: "text", required: true, maxLength: 50 },
-        { key: "headline", label: "Headline", type: "text", required: true, maxLength: 200 },
-        { key: "bio", label: "Bio", type: "textarea", required: true, maxLength: 2000 },
-        { key: "avatarUrl", label: "Avatar URL", type: "url" },
-        { key: "resumeUrl", label: "Resume URL", type: "url" },
-      ],
-    },
-  ],
-  "business-ad": [
-    {
-      label: "Business Info",
-      fields: [
-        { key: "businessName", label: "Business Name", type: "text", required: true, maxLength: 60 },
-        { key: "tagline", label: "Tagline", type: "text", required: true, maxLength: 120 },
-        { key: "description", label: "Description", type: "textarea", required: true, maxLength: 2000 },
-        { key: "logoUrl", label: "Logo URL", type: "url" },
-        { key: "heroImageUrl", label: "Hero Image URL", type: "url" },
-        { key: "primaryCtaLabel", label: "CTA Button Text", type: "text", required: true, maxLength: 30 },
-        { key: "primaryCtaUrl", label: "CTA Button URL", type: "url", required: true },
-      ],
-    },
-  ],
-  "wedding-invitation": [
-    {
-      label: "Couple",
-      fields: [
-        { key: "partner1.name", label: "Partner 1 Name", type: "text", required: true, maxLength: 40 },
-        { key: "partner1.nickname", label: "Partner 1 Nickname", type: "text", maxLength: 20 },
-        { key: "partner1.photoUrl", label: "Partner 1 Photo URL", type: "url" },
-        { key: "partner2.name", label: "Partner 2 Name", type: "text", required: true, maxLength: 40 },
-        { key: "partner2.nickname", label: "Partner 2 Nickname", type: "text", maxLength: 20 },
-        { key: "partner2.photoUrl", label: "Partner 2 Photo URL", type: "url" },
-      ],
-    },
-    {
-      label: "Wedding Details",
-      fields: [
-        { key: "weddingDate", label: "Wedding Date", type: "datetime-local", required: true },
-        { key: "headline", label: "Headline", type: "text", maxLength: 100 },
-        { key: "coupleMessage", label: "Couple's Message", type: "textarea", maxLength: 500 },
-        { key: "hashtag", label: "Hashtag", type: "text", maxLength: 40 },
-      ],
-    },
-  ],
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPER: get nested value from object
-// ─────────────────────────────────────────────────────────────────────────────
-
-function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-  return path.split(".").reduce<unknown>((acc, key) => {
-    if (acc && typeof acc === "object") return (acc as Record<string, unknown>)[key];
-    return undefined;
-  }, obj);
-}
-
-function setNestedValue(obj: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
-  const keys = path.split(".");
-  const result = { ...obj };
-  let current: Record<string, unknown> = result;
-  for (let i = 0; i < keys.length - 1; i++) {
-    const key = keys[i]!;
-    const next = keys[i + 1]!;
-    const isNextIndex = /^\d+$/.test(next);
-    if (current[key] && typeof current[key] === "object") {
-      current[key] = Array.isArray(current[key])
-        ? [...(current[key] as unknown[])]
-        : { ...(current[key] as Record<string, unknown>) };
-    } else {
-      current[key] = isNextIndex ? [] : {};
-    }
-    current = current[key] as Record<string, unknown>;
+  function deleteOldAudio(url: string) {
+    if (!url || !url.startsWith("http")) return;
+    fetch("/api/upload", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    }).catch(() => {});
   }
-  const lastKey = keys[keys.length - 1]!;
-  current[lastKey] = value;
-  return result;
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const ALLOWED = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/aac", "audio/flac", "audio/x-m4a", "audio/mp4"];
+    if (!ALLOWED.includes(file.type) && !file.name.match(/\.(mp3|wav|ogg|aac|flac|m4a)$/i)) {
+      setUploadError("Only MP3, WAV, OGG, AAC, FLAC, or M4A files are accepted.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError("File must be under 10 MB.");
+      return;
+    }
+
+    setUploading(true);
+    setUploadError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "gallery");
+
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Upload failed" }));
+        throw new Error(err.error ?? "Upload failed");
+      }
+
+      const data = await res.json();
+      const newUrl = data.publicUrl ?? data.url;
+      if (value && value !== newUrl) deleteOldAudio(value);
+      onChange(newUrl);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <input ref={inputRef} type="file" accept="audio/*,.mp3,.wav,.ogg,.aac,.flac,.m4a" onChange={handleFile} className="hidden" />
+        <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading}
+          className="nc-btn-ghost flex items-center gap-2 rounded-lg border-dashed px-2 py-1.5 sm:px-3 sm:py-2 text-xs hover:border-indigo-500/30 hover:text-indigo-400 transition-colors disabled:opacity-50">
+          {uploading ? (
+            <><div className="h-3 w-3 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" /> Uploading...</>
+          ) : (
+            <>Upload Audio</>
+          )}
+        </button>
+        <input type="url" value={value} onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder} className="flex-1 nc-input rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 text-sm min-w-0" />
+      </div>
+      {hint && <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>{hint}</p>}
+      {value && (
+        <div className="nc-card flex items-center gap-3 rounded-xl p-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs" style={{ color: "var(--nc-text-2)" }}>{value}</p>
+            <p className="text-xs text-emerald-400 mt-0.5">Audio set</p>
+          </div>
+          <button type="button" onClick={() => { deleteOldAudio(value); onChange(""); }}
+            className="nc-btn-ghost shrink-0 rounded-lg px-2 py-1 text-xs hover:border-red-500/30 hover:text-red-400 transition-colors">
+            Clear
+          </button>
+        </div>
+      )}
+      {uploadError && <p className="text-xs text-red-400">{uploadError}</p>}
+    </div>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -170,13 +163,19 @@ interface AdminProfileEditorProps {
 
 export function AdminProfileEditor({ profile, categorySlug }: AdminProfileEditorProps) {
   const [formData, setFormData] = useState<Record<string, unknown>>(
-    () => (profile.dynamicJsonData as Record<string, unknown>) ?? {}
+    () => {
+      const data = (profile.dynamicJsonData as Record<string, unknown>) ?? {};
+      if (data.rsvp && typeof data.rsvp === "object" && !(data.rsvp as Record<string, unknown>)._enabled) {
+        return { ...data, rsvp: { ...(data.rsvp as Record<string, unknown>), _enabled: "true" } };
+      }
+      return data;
+    }
   );
   const [metaTitle, setMetaTitle] = useState(profile.metaTitle ?? "");
   const [metaDescription, setMetaDescription] = useState(profile.metaDescription ?? "");
   const [ogImageUrl, setOgImageUrl] = useState(profile.ogImageUrl ?? "");
   const [isPublished, setIsPublished] = useState(profile.isPublished);
-  const [openSections, setOpenSections] = useState(new Set(["Identity", "Business Info", "Couple", "Wedding Details", "Styling"]));
+  const [openSections, setOpenSections] = useState(new Set(["identity", "contacts", "couple", "wedding", "style"]));
   const [saveMessage, setSaveMessage] = useState("");
 
   const [state, dispatch, isPending] = useActionState<UpdateProfileState, FormData>(
@@ -206,9 +205,18 @@ export function AdminProfileEditor({ profile, categorySlug }: AdminProfileEditor
     });
   }
 
-  function renderField(field: FieldConfig) {
+  function renderField(field: FieldDef) {
     const value = getNestedValue(formData, field.key);
     const strValue = typeof value === "string" ? value : "";
+    const base = "nc-input w-full px-2 py-1.5 sm:px-3 sm:py-2.5 text-sm transition-colors";
+    const charCount = typeof value === "string" ? value.length : 0;
+    const nearLimit = field.maxLength && charCount > field.maxLength * 0.9;
+
+    const charCounter = field.maxLength ? (
+      <p className="mt-1 text-right text-xs tabular-nums" style={{ color: nearLimit ? "var(--nc-danger)" : "var(--nc-text-3)" }}>
+        {charCount}/{field.maxLength}
+      </p>
+    ) : null;
 
     switch (field.type) {
       case "text":
@@ -216,34 +224,40 @@ export function AdminProfileEditor({ profile, categorySlug }: AdminProfileEditor
       case "email":
       case "tel":
         return (
-          <input
-            type={field.type}
-            value={strValue}
-            onChange={(e) => updateField(field.key, e.target.value)}
-            placeholder={field.placeholder ?? field.label}
-            maxLength={field.maxLength}
-            className="nc-input w-full rounded-xl px-3 py-2 text-sm"
-          />
+          <div>
+            <input
+              type={field.type}
+              value={strValue}
+              onChange={(e) => updateField(field.key, e.target.value)}
+              placeholder={field.placeholder ?? field.label}
+              maxLength={field.maxLength}
+              className={base}
+            />
+            {charCounter}
+          </div>
         );
       case "textarea":
         return (
-          <textarea
-            value={strValue}
-            onChange={(e) => updateField(field.key, e.target.value)}
-            placeholder={field.placeholder ?? field.label}
-            maxLength={field.maxLength}
-            rows={3}
-            className="nc-input w-full rounded-xl px-3 py-2 text-sm resize-y"
-          />
+          <div>
+            <textarea
+              value={strValue}
+              onChange={(e) => updateField(field.key, e.target.value)}
+              placeholder={field.placeholder ?? field.label}
+              maxLength={field.maxLength}
+              rows={3}
+              className={`${base} resize-y`}
+            />
+            {charCounter}
+          </div>
         );
       case "color":
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <input
               type="color"
               value={strValue || "#000000"}
               onChange={(e) => updateField(field.key, e.target.value)}
-              className="h-9 w-9 rounded-lg border cursor-pointer"
+              className="nc-input h-10 w-16 cursor-pointer rounded-lg p-1"
             />
             <input
               type="text"
@@ -259,33 +273,60 @@ export function AdminProfileEditor({ profile, categorySlug }: AdminProfileEditor
           <select
             value={strValue}
             onChange={(e) => updateField(field.key, e.target.value)}
-            className="nc-input w-full rounded-xl px-3 py-2 text-sm"
+            className={base}
           >
             <option value="">Select...</option>
             {field.options?.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
+              <option key={opt} value={opt}>{opt.charAt(0).toUpperCase() + opt.slice(1)}</option>
             ))}
           </select>
         );
+      case "array-contacts":
+        return <ContactsEditor value={(value as unknown[]) ?? []} onChange={(v) => updateField(field.key, v)} />;
+      case "array-social":
+        return <SocialLinksEditor value={(value as unknown[]) ?? []} onChange={(v) => updateField(field.key, v)} />;
+      case "array-skills":
+        return <SkillsEditor value={(value as unknown[]) ?? []} onChange={(v) => updateField(field.key, v)} />;
+      case "array-category-skills":
+        return <CategorySkillsEditor value={(value as unknown[]) ?? []} onChange={(v) => updateField(field.key, v)} />;
+      case "array-gallery":
+        return <GalleryEditor value={(value as unknown[]) ?? []} onChange={(v) => updateField(field.key, v)} />;
+      case "array-milestones":
+        return <MilestonesEditor value={(value as unknown[]) ?? []} onChange={(v) => updateField(field.key, v)} />;
+      case "array-events":
+        return <EventsEditor value={(value as unknown[]) ?? []} onChange={(v) => updateField(field.key, v)} />;
+      case "array-services":
+        return <ServicesEditor value={(value as unknown[]) ?? []} onChange={(v) => updateField(field.key, v)} />;
+      case "array-projects":
+        return <ProjectsEditor value={(value as unknown[]) ?? []} onChange={(v) => updateField(field.key, v)} />;
+      case "array-experience":
+        return <ExperienceEditor value={(value as unknown[]) ?? []} onChange={(v) => updateField(field.key, v)} />;
+      case "image-upload":
+        return <ImageUploadField value={strValue} onChange={(v) => updateField(field.key, v)} placeholder={field.placeholder} />;
+      case "audio-upload":
+        return <AudioUploadField value={strValue} onChange={(v) => updateField(field.key, v)} placeholder={field.placeholder} hint={field.hint} />;
       case "datetime-local":
         return (
           <input
             type="datetime-local"
-            value={strValue}
-            onChange={(e) => updateField(field.key, e.target.value)}
-            className="nc-input w-full rounded-xl px-3 py-2 text-sm"
+            value={strValue.slice(0, 16)}
+            onChange={(e) => updateField(field.key, e.target.value ? new Date(e.target.value).toISOString() : "")}
+            className={base}
           />
         );
       default:
         return (
-          <input
-            type="text"
-            value={strValue}
-            onChange={(e) => updateField(field.key, e.target.value)}
-            placeholder={field.placeholder ?? field.label}
-            maxLength={field.maxLength}
-            className="nc-input w-full rounded-xl px-3 py-2 text-sm"
-          />
+          <div>
+            <input
+              type="text"
+              value={strValue}
+              onChange={(e) => updateField(field.key, e.target.value)}
+              placeholder={field.placeholder ?? field.label}
+              maxLength={field.maxLength}
+              className={base}
+            />
+            {charCounter}
+          </div>
         );
     }
   }
@@ -293,7 +334,20 @@ export function AdminProfileEditor({ profile, categorySlug }: AdminProfileEditor
   return (
     <form action={dispatch} className="space-y-6">
       <input type="hidden" name="profileId" value={profile.id} />
-      <input type="hidden" name="dynamicJsonData" value={JSON.stringify(formData)} />
+      <input type="hidden" name="dynamicJsonData" value={(() => {
+        const clean = { ...formData };
+        if (clean.rsvp && typeof clean.rsvp === "object") {
+          const r = { ...clean.rsvp } as Record<string, unknown>;
+          const enabled = r._enabled;
+          delete r._enabled;
+          if (enabled === "true" && Object.keys(r).length > 0) {
+            clean.rsvp = r;
+          } else {
+            delete clean.rsvp;
+          }
+        }
+        return JSON.stringify(clean);
+      })()} />
       <input type="hidden" name="metaTitle" value={metaTitle} />
       <input type="hidden" name="metaDescription" value={metaDescription} />
       <input type="hidden" name="ogImageUrl" value={ogImageUrl} />
@@ -323,36 +377,48 @@ export function AdminProfileEditor({ profile, categorySlug }: AdminProfileEditor
       </div>
 
       {/* Field sections */}
-      {sections.map((section) => (
-        <div key={section.label} className="rounded-xl border overflow-hidden" style={{ borderColor: "var(--nc-border)" }}>
-          <button
-            type="button"
-            onClick={() => toggleSection(section.label)}
-            className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold"
-            style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text)" }}
-          >
-            {section.label}
-            {openSections.has(section.label) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
-          {openSections.has(section.label) && (
-            <div className="space-y-3 p-4">
-              {section.fields.map((field) => (
-                <div key={field.key}>
-                  <label className="mb-1 block text-xs font-semibold" style={{ color: "var(--nc-text-3)" }}>
-                    {field.label} {field.required && <span className="text-red-400">*</span>}
-                  </label>
-                  {renderField(field)}
-                  {field.maxLength && (
-                    <p className="mt-0.5 text-[10px]" style={{ color: "var(--nc-text-3)" }}>
-                      Max {field.maxLength} characters
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+      {sections.map((section) => {
+        const isOpen = openSections.has(section.id);
+        return (
+          <div key={section.id} className="rounded-xl border overflow-hidden" style={{ borderColor: "var(--nc-border)" }}>
+            <button
+              type="button"
+              onClick={() => toggleSection(section.id)}
+              className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold"
+              style={{ background: "var(--nc-bg-hover)", color: "var(--nc-text)" }}
+            >
+              <div>
+                {section.title}
+                {section.description && (
+                  <p className="mt-0.5 text-xs font-normal" style={{ color: "var(--nc-text-3)" }}>{section.description}</p>
+                )}
+              </div>
+              {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+            {isOpen && (
+              <div className="space-y-3 p-4">
+                {section.fields.map((field) => {
+                  if (section.id === "rsvp" && field.key !== "rsvp._enabled") {
+                    const rsvpEnabled = getNestedValue(formData, "rsvp._enabled");
+                    if (rsvpEnabled !== "true") return null;
+                  }
+                  return (
+                    <div key={field.key}>
+                      <label className="mb-1 block text-xs font-semibold" style={{ color: "var(--nc-text-3)" }}>
+                        {field.label} {field.required && <span className="text-red-400">*</span>}
+                      </label>
+                      {renderField(field)}
+                      {field.hint && (
+                        <p className="mt-0.5 text-[10px]" style={{ color: "var(--nc-text-3)" }}>{field.hint}</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
 
       {/* SEO */}
       <div className="rounded-xl border p-4 space-y-3" style={{ borderColor: "var(--nc-border)" }}>

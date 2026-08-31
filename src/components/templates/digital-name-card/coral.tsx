@@ -4,8 +4,9 @@ import { useState } from "react";
 import type { DigitalNameCardData } from "@/lib/validators/template-schemas";
 import { AvatarZoom } from "@/components/templates/avatar-zoom";
 import { safeHref } from "@/lib/security/safe-href";
+import { getBackground, type BackgroundStyle } from "@/components/templates/background-styles";
 
-interface Props { data: DigitalNameCardData; accentColor?: string; }
+interface Props { data: DigitalNameCardData; accentColor?: string; backgroundStyle?: BackgroundStyle; }
 
 function buildVCard(d: DigitalNameCardData) {
   return ["BEGIN:VCARD","VERSION:3.0",`FN:${d.fullName}`,
@@ -33,14 +34,14 @@ const CT: Record<string,{emoji:string;label:string;href:(v:string)=>string}> = {
 const SOCIAL_EMOJI: Record<string,string>={linkedin:"💼",twitter:"𝕏",instagram:"📸",facebook:"👥",youtube:"▶️",tiktok:"🎵",whatsapp:"💬",telegram:"✈️",viber:"📲",discord:"🎮",website:"🌐",behance:"🎨",dribbble:"🏀",medium:"📝",snapchat:"👻",pinterest:"📌"};
 const PRIORITY=["phone","email","whatsapp","viber","telegram","website","address"];
 
-export function CoralNameCard({ data, accentColor="#f97316" }: Props) {
+export function CoralNameCard({ data, accentColor="#f97316", backgroundStyle }: Props) {
   const [copied,setCopied]=useState(false);
   const {fullName,jobTitle,company,avatarUrl,bio,tagline,contacts,socialLinks,skills,featuredQuote}=data;
   const sorted=[...contacts].sort((a,b)=>{const ai=PRIORITY.indexOf(a.type),bi=PRIORITY.indexOf(b.type);return(ai<0?99:ai)-(bi<0?99:bi);});
   const w1=accentColor,w2="#dc2626";
 
   return (
-    <main className="min-h-screen" style={{background:`radial-gradient(ellipse 100% 60% at 50% 0%,${w1}20,transparent 60%),linear-gradient(180deg,#120500,#0a0200)`}}>
+    <main className="min-h-screen" style={{background:getBackground(accentColor, backgroundStyle)}}>
       <div className="mx-auto max-w-sm px-4 py-10">
         {/* Avatar centred */}
         <div className="mb-5 flex flex-col items-center text-center">
