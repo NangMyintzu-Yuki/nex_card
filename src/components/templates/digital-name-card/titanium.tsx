@@ -143,7 +143,7 @@ export function TitaniumNameCard({ data, accentColor="#94a3b8", backgroundStyle 
           {featuredQuote&&<div className="px-5 py-4" style={{borderBottom:"1px solid rgba(148,163,184,0.08)"}}><p className="text-xs leading-relaxed text-slate-600 italic">&ldquo;{featuredQuote}&rdquo;</p></div>}
 
           <div className="flex items-center justify-between px-5 py-3" style={{background:"rgba(148,163,184,0.03)",borderTop:"1px solid rgba(148,163,184,0.08)"}}>
-            <span className="font-mono text-[10px] text-slate-800">PRESENCECARD</span>
+            <span className="font-mono text-[10px] text-slate-800">NEXCARD</span>
             <span className="font-mono text-[10px] text-slate-800">v2.0</span>
           </div>
         </div>

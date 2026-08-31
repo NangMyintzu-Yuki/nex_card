@@ -15,7 +15,7 @@
 //     icon: Globe,
 //     title: "Custom Slug URL",
 //     description:
-//       "Claim your personal URL like presencecard.io/yourname. Share it anywhere, forever.",
+//       "Claim your personal URL like www.nexcard.wetechmm.com/yourname. Share it anywhere, forever.",
 //   },
 //   {
 //     icon: Share2,
@@ -114,7 +114,7 @@
 //       "Advanced analytics dashboard",
 //       "Priority cache (< 100ms load)",
 //       "Dynamic OG image generation",
-//       "Remove PresenceCard branding",
+//       "Remove NexCard branding",
 //       "Email support",
 //     ],
 //     cta: "Start Pro — $9/mo",
@@ -148,14 +148,14 @@
 //   {
 //     name: "Aisha Tan",
 //     role: "UX Designer at Grab",
-//     text: "I replaced my old PDF resume with a PresenceCard link. My interview callback rate literally doubled. The Aurora template is stunning.",
+//     text: "I replaced my old PDF resume with a NexCard link. My interview callback rate literally doubled. The Aurora template is stunning.",
 //     avatar: "AT",
 //     stars: 5,
 //   },
 //   {
 //     name: "Marcus Chen",
 //     role: "Founder, TechBridge Ventures",
-//     text: "We use PresenceCard for our entire team's digital name cards. The ISR performance is insane — pages load in under 200ms globally.",
+//     text: "We use NexCard for our entire team's digital name cards. The ISR performance is insane — pages load in under 200ms globally.",
 //     avatar: "MC",
 //     stars: 5,
 //   },

@@ -55,7 +55,7 @@ NEX CARD is a **well-structured, production-oriented** multi-tenant digital pres
 | 7 | Duplicate dead auth route files in `lib/auth/` | **LOW** | ✅ Removed |
 | 8 | Seed used SHA-256 instead of bcrypt | **MEDIUM** | ✅ Fixed |
 | 9 | Missing `.env.example` | **LOW** | ✅ Added |
-| 10 | Inconsistent branding (PresenceCard vs NEX CARD) in SEO | **LOW** | ✅ Partially fixed |
+| 10 | Inconsistent branding (NEX CARD) in SEO | **LOW** | ✅ Partially fixed |
 
 ---
 
@@ -201,7 +201,7 @@ Register → Onboarding (category → template → slug) → Editor → Publish 
 | **No rate limiting on auth APIs** | `/api/auth/login`, `/api/auth/register` | Brute force attacks |
 | **No email verification** | Register flow | Spam accounts |
 | **Missing `public/` folder** | Favicon, OG default image | Broken icons in browser/tab |
-| **Branding inconsistency** | 50+ files reference "PresenceCard" | SEO confusion, brand dilution |
+| **Branding inconsistency** | 50+ files reference "NexCard" | SEO confusion, brand dilution |
 | **No Content-Security-Policy header** | `next.config.ts` | XSS vulnerability surface |
 | **`fileSize` validated but not enforced on upload** | `/api/upload` | Storage abuse via direct R2 PUT |
 | **Admin has no audit log** | Admin actions | No accountability trail |
@@ -430,7 +430,7 @@ Phase 3 (Post-launch):
 | No `hreflang` for i18n | Limits international reach | LOW (if English-only) |
 | `/p/[slug]` creates duplicate content with `/[slug]` | SEO cannibalization | MEDIUM |
 | Missing favicon files (`public/` folder empty) | Broken tab icons | HIGH |
-| Inconsistent brand in metadata (PresenceCard remnants) | Brand confusion | MEDIUM |
+| Inconsistent brand in metadata (NexCard remnants) | Brand confusion | MEDIUM |
 | No blog/content pages | No organic traffic funnel | MEDIUM (long-term) |
 | Landing page has no structured data (Organization) | Missing knowledge panel | MEDIUM |
 
@@ -755,8 +755,8 @@ After running `npm run db:seed`:
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | `admin@presencecard.io` | `admin-change-me-in-prod` |
-| User | `demo@presencecard.io` | `demo-password-123` |
+| Admin | `admin@nexcard.wetechmm.com` | `admin-change-me-in-prod` |
+| User | `demo@nexcard.wetechmm.com` | `demo-password-123` |
 | Demo Profile | — | `http://localhost:3000/alex-rivera` |
 
 > ⚠️ Change all passwords before production deployment.

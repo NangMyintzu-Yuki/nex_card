@@ -155,8 +155,8 @@ src/
 | `NEXT_PUBLIC_APP_URL` | Yes | App URL (e.g., `http://localhost:3000`) |
 
 ## Default Accounts (Mock DB)
-- **Admin:** `admin@presencecard.io` / `admin-change-me-in-prod`
-- **Demo:** `demo@presencecard.io` / `demo-password-123`
+- **Admin:** `admin@nexcard.wetechmm.com` / `admin-change-me-in-prod`
+- **Demo:** `demo@nexcard.wetechmm.com` / `demo-password-123`
 
 ## Development
 

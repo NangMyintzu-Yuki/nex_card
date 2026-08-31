@@ -333,7 +333,7 @@ const DEMO_NAME_CARD_DATA = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log("🌱 Seeding PresenceCard database…\n");
+  console.log("🌱 Seeding NexCard database…\n");
 
   // ── 1. Upsert categories ────────────────────────────────────────────────
   console.log("📂 Seeding categories…");
