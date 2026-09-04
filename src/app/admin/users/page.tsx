@@ -78,6 +78,8 @@ export default async function AdminUsersPage({
             description: true,
             thumbnailUrl: true,
             isPremium: true,
+            priceQrOnly: true,
+            priceNfcQr: true,
           },
         },
       },

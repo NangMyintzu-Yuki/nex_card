@@ -59,17 +59,15 @@ export async function calculateAutomaticDiscounts(params: {
 }
 
 /**
- * Combine automatic + coupon discounts. Total capped at 50%.
+ * Combine automatic + coupon discounts. Auto-discounts capped at 50%, total up to 100% with coupon.
  */
 export async function combineDiscounts(params: {
   companyPct: number;
   bulkPct: number;
   couponPct: number;
 }): Promise<DiscountBreakdown> {
-  const totalPct = Math.min(
-    params.companyPct + params.bulkPct + params.couponPct,
-    50
-  );
+  const autoDiscountPct = Math.min(params.companyPct + params.bulkPct, 50);
+  const totalPct = Math.min(autoDiscountPct + params.couponPct, 100);
 
   return {
     company: params.companyPct,

@@ -17,6 +17,8 @@ type Template = {
   description: string | null;
   thumbnailUrl: string | null;
   isPremium: boolean;
+  priceQrOnly: number | null;
+  priceNfcQr: number | null;
 };
 
 type Category = {
@@ -39,9 +41,11 @@ const CATEGORY_ICONS: Record<string, string> = {
   "wedding-invitation": "💒",
 };
 
+type Step = "user" | "category" | "template" | "pricing" | "confirm";
+
 export function AdminCreateUser({ categories }: Props) {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<"user" | "category" | "template" | "confirm">("user");
+  const [step, setStep] = useState<Step>("user");
 
   // User fields
   const [name, setName] = useState("");
@@ -52,12 +56,14 @@ export function AdminCreateUser({ categories }: Props) {
   // Profile fields
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [selectedTier, setSelectedTier] = useState<"QR_ONLY" | "NFC_QR" | null>(null);
   const [slug, setSlug] = useState("");
   const [slugError, setSlugError] = useState("");
   const [createProfile, setCreateProfile] = useState(true);
 
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
   const selectedTemplate = selectedCategory?.templates.find((t) => t.id === selectedTemplateId);
+  const showPricing = selectedTemplate?.isPremium && createProfile;
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: AdminCreateUserWithProfileState, formData: FormData) => {
@@ -90,6 +96,7 @@ export function AdminCreateUser({ categories }: Props) {
     setRole("USER");
     setSelectedCategoryId(null);
     setSelectedTemplateId(null);
+    setSelectedTier(null);
     setSlug("");
     setSlugError("");
     setCreateProfile(true);
@@ -98,6 +105,19 @@ export function AdminCreateUser({ categories }: Props) {
   function handleClose() {
     setOpen(false);
     reset();
+  }
+
+  const allSteps: Step[] = showPricing
+    ? ["user", "category", "template", "pricing", "confirm"]
+    : ["user", "category", "template", "confirm"];
+  const stepIdx = allSteps.indexOf(step);
+
+  function goNext() {
+    setStep(allSteps[stepIdx + 1]);
+  }
+
+  function goBack() {
+    setStep(allSteps[stepIdx - 1]);
   }
 
   // Success state
@@ -159,6 +179,7 @@ export function AdminCreateUser({ categories }: Props) {
                   {step === "user" && "Enter account details"}
                   {step === "category" && "Choose a profile category"}
                   {step === "template" && "Pick a template"}
+                  {step === "pricing" && "Choose pricing tier"}
                   {step === "confirm" && "Set a unique slug & confirm"}
                 </p>
               </div>
@@ -167,18 +188,18 @@ export function AdminCreateUser({ categories }: Props) {
 
             {/* Step indicators */}
             <div className="flex items-center justify-center gap-1 px-4 py-3">
-              {(["user", "category", "template", "confirm"] as const).map((s, i) => (
+              {allSteps.map((s, i) => (
                 <div key={s} className="flex items-center gap-1">
                   <div
                     className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold"
                     style={{
-                      background: step === s ? "var(--nc-brand)" : "var(--nc-bg-hover)",
-                      color: step === s ? "#fff" : "var(--nc-text-3)",
+                      background: i <= stepIdx ? "var(--nc-brand)" : "var(--nc-bg-hover)",
+                      color: i <= stepIdx ? "#fff" : "var(--nc-text-3)",
                     }}
                   >
                     {i + 1}
                   </div>
-                  {i < 3 && <div className="w-4 h-px" style={{ background: "var(--nc-border)" }} />}
+                  {i < allSteps.length - 1 && <div className="w-4 h-px" style={{ background: "var(--nc-border)" }} />}
                 </div>
               ))}
             </div>
@@ -243,7 +264,7 @@ export function AdminCreateUser({ categories }: Props) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => setStep("category")}
+                        onClick={goNext}
                         disabled={!name || !email || password.length < 8}
                         className="nc-btn-brand flex-1 rounded-xl py-2.5 text-sm font-bold disabled:opacity-50"
                       >
@@ -256,7 +277,7 @@ export function AdminCreateUser({ categories }: Props) {
                 {/* Step 2: Category */}
                 {step === "category" && (
                   <div className="space-y-3">
-                    <button type="button" onClick={() => setStep("user")} className="text-xs font-bold" style={{ color: "var(--nc-brand)" }}>
+                    <button type="button" onClick={goBack} className="text-xs font-bold" style={{ color: "var(--nc-brand)" }}>
                       ← Back
                     </button>
 
@@ -276,7 +297,7 @@ export function AdminCreateUser({ categories }: Props) {
                           <button
                             key={cat.id}
                             type="button"
-                            onClick={() => { setSelectedCategoryId(cat.id); setSelectedTemplateId(null); setStep("template"); }}
+                            onClick={() => { setSelectedCategoryId(cat.id); setSelectedTemplateId(null); setSelectedTier(null); setStep("template"); }}
                             className="rounded-xl p-4 text-left transition-all hover:scale-[1.02]"
                             style={{ background: "var(--nc-bg-hover)", border: "2px solid transparent" }}
                           >
@@ -292,7 +313,7 @@ export function AdminCreateUser({ categories }: Props) {
 
                     {!createProfile && (
                       <div className="flex gap-2 pt-2">
-                        <button type="button" onClick={() => setStep("user")} className="nc-btn-ghost flex-1 rounded-xl py-2.5 text-sm">
+                        <button type="button" onClick={goBack} className="nc-btn-ghost flex-1 rounded-xl py-2.5 text-sm">
                           ← Back
                         </button>
                         <button type="submit" disabled={isPending} className="nc-btn-brand flex-1 rounded-xl py-2.5 text-sm font-bold disabled:opacity-50">
@@ -303,7 +324,7 @@ export function AdminCreateUser({ categories }: Props) {
 
                     {createProfile && (
                       <div className="flex gap-2 pt-2">
-                        <button type="button" onClick={() => setStep("user")} className="nc-btn-ghost flex-1 rounded-xl py-2.5 text-sm">
+                        <button type="button" onClick={goBack} className="nc-btn-ghost flex-1 rounded-xl py-2.5 text-sm">
                           ← Back
                         </button>
                       </div>
@@ -314,7 +335,7 @@ export function AdminCreateUser({ categories }: Props) {
                 {/* Step 3: Template */}
                 {step === "template" && selectedCategory && (
                   <div className="space-y-3">
-                    <button type="button" onClick={() => setStep("category")} className="text-xs font-bold" style={{ color: "var(--nc-brand)" }}>
+                    <button type="button" onClick={goBack} className="text-xs font-bold" style={{ color: "var(--nc-brand)" }}>
                       ← Back to categories
                     </button>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[40vh] overflow-y-auto pr-1">
@@ -322,7 +343,13 @@ export function AdminCreateUser({ categories }: Props) {
                         <button
                           key={tpl.id}
                           type="button"
-                          onClick={() => { setSelectedTemplateId(tpl.id); setSlug(""); setSlugError(""); setStep("confirm"); }}
+                          onClick={() => {
+                            setSelectedTemplateId(tpl.id);
+                            setSelectedTier(null);
+                            setSlug("");
+                            setSlugError("");
+                            setStep(tpl.isPremium ? "pricing" : "confirm");
+                          }}
                           className="flex items-center gap-3 rounded-xl p-3 text-left transition-all hover:scale-[1.01]"
                           style={{ background: "var(--nc-bg-hover)", border: "2px solid transparent" }}
                         >
@@ -350,11 +377,67 @@ export function AdminCreateUser({ categories }: Props) {
                   </div>
                 )}
 
-                {/* Step 4: Slug + Confirm */}
+                {/* Step 4: Pricing Tier (only for premium templates) */}
+                {step === "pricing" && selectedTemplate && (
+                  <div className="space-y-3">
+                    <button type="button" onClick={goBack} className="text-xs font-bold" style={{ color: "var(--nc-brand)" }}>
+                      ← Back to templates
+                    </button>
+                    <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
+                      This is a premium template. Choose a pricing tier:
+                    </p>
+                    <div className="grid grid-cols-1 gap-3">
+                      {selectedTemplate.priceQrOnly != null && (
+                        <button
+                          type="button"
+                          onClick={() => { setSelectedTier("QR_ONLY"); setStep("confirm"); }}
+                          className="rounded-xl p-4 text-left transition-all hover:scale-[1.01] flex items-center justify-between"
+                          style={{
+                            background: "var(--nc-bg-hover)",
+                            border: selectedTier === "QR_ONLY" ? "2px solid var(--nc-brand)" : "2px solid transparent",
+                          }}
+                        >
+                          <div>
+                            <div className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>QR Only</div>
+                            <div className="text-[11px] mt-0.5" style={{ color: "var(--nc-text-3)" }}>
+                              Digital QR code card
+                            </div>
+                          </div>
+                          <div className="text-lg font-black" style={{ color: "var(--nc-brand)" }}>
+                            ${selectedTemplate.priceQrOnly}
+                          </div>
+                        </button>
+                      )}
+                      {selectedTemplate.priceNfcQr != null && (
+                        <button
+                          type="button"
+                          onClick={() => { setSelectedTier("NFC_QR"); setStep("confirm"); }}
+                          className="rounded-xl p-4 text-left transition-all hover:scale-[1.01] flex items-center justify-between"
+                          style={{
+                            background: "var(--nc-bg-hover)",
+                            border: selectedTier === "NFC_QR" ? "2px solid var(--nc-brand)" : "2px solid transparent",
+                          }}
+                        >
+                          <div>
+                            <div className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>NFC + QR</div>
+                            <div className="text-[11px] mt-0.5" style={{ color: "var(--nc-text-3)" }}>
+                              Physical NFC card + digital QR
+                            </div>
+                          </div>
+                          <div className="text-lg font-black" style={{ color: "var(--nc-brand)" }}>
+                            ${selectedTemplate.priceNfcQr}
+                          </div>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Step: Slug + Confirm */}
                 {step === "confirm" && selectedCategory && selectedTemplate && (
                   <div className="space-y-4">
-                    <button type="button" onClick={() => setStep("template")} className="text-xs font-bold" style={{ color: "var(--nc-brand)" }}>
-                      ← Back to templates
+                    <button type="button" onClick={goBack} className="text-xs font-bold" style={{ color: "var(--nc-brand)" }}>
+                      ← Back
                     </button>
 
                     {/* User summary */}
@@ -364,7 +447,7 @@ export function AdminCreateUser({ categories }: Props) {
                       <div className="text-xs font-mono" style={{ color: "var(--nc-text-3)" }}>{email} · {role}</div>
                     </div>
 
-                    {/* Template summary */}
+                    {/* Template + Tier summary */}
                     <div className="flex items-center gap-3 rounded-xl p-3" style={{ background: "var(--nc-bg-hover)" }}>
                       {selectedTemplate.thumbnailUrl ? (
                         <img src={selectedTemplate.thumbnailUrl} alt={selectedTemplate.name} className="h-10 w-10 shrink-0 rounded-lg object-cover" />
@@ -377,6 +460,14 @@ export function AdminCreateUser({ categories }: Props) {
                         <div className="text-xs" style={{ color: "var(--nc-text-3)" }}>{selectedCategory.name}</div>
                         <div className="font-bold text-sm" style={{ color: "var(--nc-text)" }}>{selectedTemplate.name}</div>
                       </div>
+                      {selectedTier && (
+                        <div className="text-right shrink-0">
+                          <div className="text-xs" style={{ color: "var(--nc-text-3)" }}>{selectedTier === "QR_ONLY" ? "QR Only" : "NFC + QR"}</div>
+                          <div className="font-bold text-sm" style={{ color: "var(--nc-brand)" }}>
+                            ${selectedTier === "QR_ONLY" ? selectedTemplate.priceQrOnly : selectedTemplate.priceNfcQr}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Slug */}
@@ -387,6 +478,7 @@ export function AdminCreateUser({ categories }: Props) {
                     <input type="hidden" name="categoryId" value={selectedCategoryId!} />
                     <input type="hidden" name="templateId" value={selectedTemplateId!} />
                     <input type="hidden" name="createProfile" value={createProfile ? "true" : "false"} />
+                    <input type="hidden" name="tier" value={selectedTier ?? ""} />
 
                     <div>
                       <label className="mb-1.5 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>
@@ -416,7 +508,7 @@ export function AdminCreateUser({ categories }: Props) {
                     )}
 
                     <div className="flex gap-2 pt-2">
-                      <button type="button" onClick={() => setStep("template")} className="nc-btn-ghost flex-1 rounded-xl py-2.5 text-sm">
+                      <button type="button" onClick={goBack} className="nc-btn-ghost flex-1 rounded-xl py-2.5 text-sm">
                         ← Back
                       </button>
                       <button

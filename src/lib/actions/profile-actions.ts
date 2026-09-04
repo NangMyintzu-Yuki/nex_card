@@ -571,6 +571,7 @@ const AdminCreateUserWithProfileInput = z.object({
   createProfile: z.enum(["true", "false"]),
   categoryId: z.string().cuid().optional(),
   templateId: z.string().cuid().optional(),
+  tier: z.enum(["QR_ONLY", "NFC_QR"]).optional(),
   slug: z
     .string()
     .min(3)
@@ -604,6 +605,7 @@ export async function adminCreateUserWithProfileAction(
     createProfile: formData.get("createProfile"),
     categoryId: formData.get("categoryId"),
     templateId: formData.get("templateId"),
+    tier: formData.get("tier"),
     slug: formData.get("slug"),
   });
 
@@ -614,7 +616,7 @@ export async function adminCreateUserWithProfileAction(
     };
   }
 
-  const { name, email, password, role, createProfile, categoryId, templateId, slug } = parsed.data;
+  const { name, email, password, role, createProfile, categoryId, templateId, slug, tier } = parsed.data;
   const shouldCreateProfile = createProfile === "true";
 
   // Check email uniqueness
@@ -646,10 +648,21 @@ export async function adminCreateUserWithProfileAction(
 
     const template = await prisma.template.findFirst({
       where: { id: templateId, categoryId, isActive: true },
-      select: { id: true },
+      select: { id: true, isPremium: true, priceQrOnly: true, priceNfcQr: true },
     });
     if (!template) {
       return { status: "error", message: "Invalid template selection." };
+    }
+
+    // Require tier for premium templates
+    if (template.isPremium && !tier) {
+      return { status: "error", message: "Pricing tier is required for premium templates." };
+    }
+    if (template.isPremium) {
+      const price = tier === "QR_ONLY" ? template.priceQrOnly : template.priceNfcQr;
+      if (price == null || price <= 0) {
+        return { status: "error", message: `No price set for ${tier} on this template.` };
+      }
     }
 
     const category = await prisma.category.findUnique({
@@ -685,6 +698,16 @@ export async function adminCreateUserWithProfileAction(
         select: { slug: true },
       });
 
+      // Fetch template to check if premium
+      const tpl = await tx.template.findUnique({
+        where: { id: templateId },
+        select: { isPremium: true, priceQrOnly: true, priceNfcQr: true },
+      });
+
+      const isPremium = tpl?.isPremium ?? false;
+      const paymentStatus = isPremium ? "APPROVED" : null;
+      const price = tier === "QR_ONLY" ? tpl?.priceQrOnly : tpl?.priceNfcQr;
+
       const profile = await tx.userProfile.create({
         data: {
           userId: user.id,
@@ -693,12 +716,31 @@ export async function adminCreateUserWithProfileAction(
           slug,
           templateLocked: true,
           isPublished: false,
+          paymentStatus: paymentStatus as any,
           dynamicJsonData: getEmptyDataForCategory(category!.slug as CategorySlug),
         },
-        select: { slug: true },
+        select: { id: true, slug: true },
       });
 
       profileSlug = profile.slug;
+
+      // Auto-create approved payment for premium templates (admin-created, no screenshot needed)
+      if (isPremium && price != null && price > 0 && tier) {
+        await tx.payment.create({
+          data: {
+            userId: user.id,
+            userProfileId: profile.id,
+            tier,
+            amount: price,
+            originalPrice: price,
+            screenshotUrl: "admin-created",
+            status: "APPROVED",
+            reviewedAt: new Date(),
+            reviewedBy: session.user.id,
+            adminNote: "Auto-approved: admin-created user",
+          },
+        });
+      }
     }
 
     return { user, profileSlug };
@@ -709,6 +751,7 @@ export async function adminCreateUserWithProfileAction(
   }
 
   revalidatePath("/admin/users");
+  revalidatePath("/admin/revenue");
 
   return {
     status: "success",

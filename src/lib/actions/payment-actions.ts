@@ -198,7 +198,8 @@ export async function submitPaymentAction(
     }
 
     // --- Compute final expected price ---
-    const serverTotalDiscountPct = Math.min(serverCompanyPct + serverBulkPct + serverCouponPct, 50);
+    const serverAutoDiscountPct = Math.min(serverCompanyPct + serverBulkPct, 50);
+    const serverTotalDiscountPct = Math.min(serverAutoDiscountPct + serverCouponPct, 100);
     finalExpectedPrice = Math.round(expectedPrice * (1 - serverTotalDiscountPct / 100));
 
     if (Math.abs(amount - finalExpectedPrice) > 0.01) {

@@ -221,7 +221,8 @@ export function OnboardingClient({
     ? (selectedTemplate?.priceQrOnly ?? 0)
     : (selectedTemplate?.priceNfcQr ?? 0);
   const couponPct = couponDiscount ?? 0;
-  const totalDiscountPct = Math.min(companyDiscountPct + bulkDiscountPct + couponPct, 50);
+  const autoDiscountPct = Math.min(companyDiscountPct + bulkDiscountPct, 50);
+  const totalDiscountPct = Math.min(autoDiscountPct + couponPct, 100);
   const discountAmount = totalDiscountPct > 0 ? Math.round(originalPrice * totalDiscountPct / 100) : 0;
   const finalPrice = originalPrice - discountAmount;
 
