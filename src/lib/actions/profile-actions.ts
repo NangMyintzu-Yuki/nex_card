@@ -15,6 +15,7 @@ import { getServerSession } from "@/lib/auth/session";
 import { isMaintenanceMode, MAINTENANCE_MESSAGE } from "@/lib/security/maintenance";
 import { isReservedSlug } from "@/lib/slugs/reserved";
 import { deleteFile } from "@/lib/storage";
+import { hashPassword } from "@/lib/auth/hash";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION: SELECT TEMPLATE DURING ONBOARDING (one-time lock)
@@ -559,29 +560,34 @@ async function cleanupOldImages(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ACTION: ADMIN CREATE PROFILE FOR ANY USER
+// ACTION: ADMIN CREATE USER + PROFILE IN ONE FLOW
 // ─────────────────────────────────────────────────────────────────────────────
 
-const AdminCreateProfileInput = z.object({
-  userId: z.string().cuid(),
-  categoryId: z.string().cuid(),
-  templateId: z.string().cuid(),
+const AdminCreateUserWithProfileInput = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  role: z.enum(["USER", "ADMIN"]),
+  createProfile: z.enum(["true", "false"]),
+  categoryId: z.string().cuid().optional(),
+  templateId: z.string().cuid().optional(),
   slug: z
     .string()
     .min(3)
     .max(60)
-    .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens"),
+    .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens")
+    .optional(),
 });
 
-export type AdminCreateProfileState =
+export type AdminCreateUserWithProfileState =
   | { status: "idle" }
-  | { status: "success"; slug: string; profileId: string }
+  | { status: "success"; userId: string; userName: string; userEmail: string; profileSlug: string | null }
   | { status: "error"; message: string };
 
-export async function adminCreateProfileAction(
-  _prevState: AdminCreateProfileState,
+export async function adminCreateUserWithProfileAction(
+  _prevState: AdminCreateUserWithProfileState,
   formData: FormData
-): Promise<AdminCreateProfileState> {
+): Promise<AdminCreateUserWithProfileState> {
   const session = await getServerSession();
   if (!session?.user?.id) {
     return { status: "error", message: "Unauthorized." };
@@ -590,8 +596,12 @@ export async function adminCreateProfileAction(
     return { status: "error", message: "Admin access required." };
   }
 
-  const parsed = AdminCreateProfileInput.safeParse({
-    userId: formData.get("userId"),
+  const parsed = AdminCreateUserWithProfileInput.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+    role: formData.get("role"),
+    createProfile: formData.get("createProfile"),
     categoryId: formData.get("categoryId"),
     templateId: formData.get("templateId"),
     slug: formData.get("slug"),
@@ -604,77 +614,107 @@ export async function adminCreateProfileAction(
     };
   }
 
-  const { userId, categoryId, templateId, slug } = parsed.data;
+  const { name, email, password, role, createProfile, categoryId, templateId, slug } = parsed.data;
+  const shouldCreateProfile = createProfile === "true";
 
-  if (isReservedSlug(slug)) {
-    return { status: "error", message: "That slug is reserved. Please choose a different one." };
-  }
-
-  // Check slug uniqueness
-  const slugExists = await prisma.userProfile.findUnique({
-    where: { slug },
+  // Check email uniqueness
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
     select: { id: true },
   });
-  if (slugExists) {
-    return { status: "error", message: "That slug is already taken." };
+  if (existingUser) {
+    return { status: "error", message: "An account with this email already exists." };
   }
 
-  // Verify target user exists
-  const targetUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { id: true, name: true },
-  });
-  if (!targetUser) {
-    return { status: "error", message: "User not found." };
+  // Validate profile fields if creating profile
+  if (shouldCreateProfile) {
+    if (!categoryId || !templateId || !slug) {
+      return { status: "error", message: "Category, template, and slug are required when creating a profile." };
+    }
+
+    if (isReservedSlug(slug)) {
+      return { status: "error", message: "That slug is reserved. Please choose a different one." };
+    }
+
+    const slugExists = await prisma.userProfile.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+    if (slugExists) {
+      return { status: "error", message: "That slug is already taken." };
+    }
+
+    const template = await prisma.template.findFirst({
+      where: { id: templateId, categoryId, isActive: true },
+      select: { id: true },
+    });
+    if (!template) {
+      return { status: "error", message: "Invalid template selection." };
+    }
+
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: { id: true, slug: true },
+    });
+    if (!category) {
+      return { status: "error", message: "Category not found." };
+    }
   }
 
-  // Verify template belongs to category and is active
-  const template = await prisma.template.findFirst({
-    where: { id: templateId, categoryId, isActive: true },
-    select: { id: true, isPremium: true },
+  const hashedPassword = await hashPassword(password);
+
+  // Create user + profile in a transaction
+  const result = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: {
+        name,
+        email,
+        hashedPassword,
+        role,
+        status: "ACTIVE",
+        emailVerifiedAt: new Date(),
+      },
+      select: { id: true, name: true, email: true },
+    });
+
+    let profileSlug: string | null = null;
+
+    if (shouldCreateProfile && categoryId && templateId && slug) {
+      const category = await tx.category.findUnique({
+        where: { id: categoryId },
+        select: { slug: true },
+      });
+
+      const profile = await tx.userProfile.create({
+        data: {
+          userId: user.id,
+          categoryId,
+          templateId,
+          slug,
+          templateLocked: true,
+          isPublished: false,
+          dynamicJsonData: getEmptyDataForCategory(category!.slug as CategorySlug),
+        },
+        select: { slug: true },
+      });
+
+      profileSlug = profile.slug;
+    }
+
+    return { user, profileSlug };
   });
-  if (!template) {
-    return { status: "error", message: "Invalid template selection." };
+
+  if (result.profileSlug) {
+    purgeProfileCache(result.profileSlug, result.user.id);
   }
-
-  // Check if user already has a profile for this category
-  const existing = await prisma.userProfile.findUnique({
-    where: { userId_categoryId: { userId, categoryId } },
-    select: { id: true },
-  });
-  if (existing) {
-    return {
-      status: "error",
-      message: `${targetUser.name} already has a profile in this category. Delete it first or choose a different category.`,
-    };
-  }
-
-  // Get category slug for empty data skeleton
-  const category = await prisma.category.findUnique({
-    where: { id: categoryId },
-    select: { slug: true },
-  });
-  if (!category) {
-    return { status: "error", message: "Category not found." };
-  }
-
-  const profile = await prisma.userProfile.create({
-    data: {
-      userId,
-      categoryId,
-      templateId,
-      slug,
-      templateLocked: true,
-      isPublished: false,
-      dynamicJsonData: getEmptyDataForCategory(category.slug as CategorySlug),
-    },
-    select: { id: true, slug: true },
-  });
-
-  purgeProfileCache(profile.slug, userId);
 
   revalidatePath("/admin/users");
-  revalidatePath(`/admin/users/${userId}`);
 
-  return { status: "success", slug: profile.slug, profileId: profile.id };
+  return {
+    status: "success",
+    userId: result.user.id,
+    userName: result.user.name,
+    userEmail: result.user.email,
+    profileSlug: result.profileSlug,
+  };
 }

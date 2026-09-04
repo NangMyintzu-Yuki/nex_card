@@ -7,7 +7,7 @@ import { getServerSession } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { formatDate, getInitials } from "@/lib/utils";
 import { CardExportButton } from "./_components/card-export-button";
-import { AdminCreateProfile } from "./_components/admin-create-profile";
+import { AdminCreateUser } from "./_components/admin-create-user";
 import { UserEditModal } from "./_components/user-edit-modal";
 import { UserDeleteButton } from "./_components/user-delete-button";
 
@@ -94,11 +94,16 @@ export default async function AdminUsersPage({
 
   return (
     <div className="mx-auto max-w-6xl nc-page px-3 sm:px-6">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl font-black" style={{ color: "var(--nc-text)" }}>Users</h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--nc-text-3)" }}>
-          {totalCount.toLocaleString()} total accounts
-        </p>
+      <div className="mb-6 sm:mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black" style={{ color: "var(--nc-text)" }}>Users</h1>
+          <p className="mt-1 text-sm" style={{ color: "var(--nc-text-3)" }}>
+            {totalCount.toLocaleString()} total accounts
+          </p>
+        </div>
+        {session.user.role === "SUPER_ADMIN" && (
+          <AdminCreateUser categories={categories} />
+        )}
       </div>
 
       {/* Filters */}
@@ -202,7 +207,6 @@ export default async function AdminUsersPage({
                     <div className="flex items-center gap-1">
                       {session.user.role === "SUPER_ADMIN" && (
                         <>
-                          <AdminCreateProfile userId={user.id} userName={user.name} categories={categories} />
                           <UserEditModal user={user} />
                           {user.role !== "SUPER_ADMIN" && (
                             <UserDeleteButton userId={user.id} userName={user.name} />
@@ -258,7 +262,6 @@ export default async function AdminUsersPage({
               </span>
               {session.user.role === "SUPER_ADMIN" && (
                 <div className="flex items-center gap-1">
-                  <AdminCreateProfile userId={user.id} userName={user.name} categories={categories} />
                   <UserEditModal user={user} />
                   {user.role !== "SUPER_ADMIN" && (
                     <UserDeleteButton userId={user.id} userName={user.name} />
