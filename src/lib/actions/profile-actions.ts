@@ -557,3 +557,124 @@ async function cleanupOldImages(
   // Delete removed images from R2 (fire-and-forget, don't block the response)
   Promise.allSettled(removedUrls.map((url) => deleteFile(url))).catch(() => {});
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACTION: ADMIN CREATE PROFILE FOR ANY USER
+// ─────────────────────────────────────────────────────────────────────────────
+
+const AdminCreateProfileInput = z.object({
+  userId: z.string().cuid(),
+  categoryId: z.string().cuid(),
+  templateId: z.string().cuid(),
+  slug: z
+    .string()
+    .min(3)
+    .max(60)
+    .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens"),
+});
+
+export type AdminCreateProfileState =
+  | { status: "idle" }
+  | { status: "success"; slug: string; profileId: string }
+  | { status: "error"; message: string };
+
+export async function adminCreateProfileAction(
+  _prevState: AdminCreateProfileState,
+  formData: FormData
+): Promise<AdminCreateProfileState> {
+  const session = await getServerSession();
+  if (!session?.user?.id) {
+    return { status: "error", message: "Unauthorized." };
+  }
+  if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
+    return { status: "error", message: "Admin access required." };
+  }
+
+  const parsed = AdminCreateProfileInput.safeParse({
+    userId: formData.get("userId"),
+    categoryId: formData.get("categoryId"),
+    templateId: formData.get("templateId"),
+    slug: formData.get("slug"),
+  });
+
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message: parsed.error.issues.map((i) => i.message).join(". "),
+    };
+  }
+
+  const { userId, categoryId, templateId, slug } = parsed.data;
+
+  if (isReservedSlug(slug)) {
+    return { status: "error", message: "That slug is reserved. Please choose a different one." };
+  }
+
+  // Check slug uniqueness
+  const slugExists = await prisma.userProfile.findUnique({
+    where: { slug },
+    select: { id: true },
+  });
+  if (slugExists) {
+    return { status: "error", message: "That slug is already taken." };
+  }
+
+  // Verify target user exists
+  const targetUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, name: true },
+  });
+  if (!targetUser) {
+    return { status: "error", message: "User not found." };
+  }
+
+  // Verify template belongs to category and is active
+  const template = await prisma.template.findFirst({
+    where: { id: templateId, categoryId, isActive: true },
+    select: { id: true, isPremium: true },
+  });
+  if (!template) {
+    return { status: "error", message: "Invalid template selection." };
+  }
+
+  // Check if user already has a profile for this category
+  const existing = await prisma.userProfile.findUnique({
+    where: { userId_categoryId: { userId, categoryId } },
+    select: { id: true },
+  });
+  if (existing) {
+    return {
+      status: "error",
+      message: `${targetUser.name} already has a profile in this category. Delete it first or choose a different category.`,
+    };
+  }
+
+  // Get category slug for empty data skeleton
+  const category = await prisma.category.findUnique({
+    where: { id: categoryId },
+    select: { slug: true },
+  });
+  if (!category) {
+    return { status: "error", message: "Category not found." };
+  }
+
+  const profile = await prisma.userProfile.create({
+    data: {
+      userId,
+      categoryId,
+      templateId,
+      slug,
+      templateLocked: true,
+      isPublished: false,
+      dynamicJsonData: getEmptyDataForCategory(category.slug as CategorySlug),
+    },
+    select: { id: true, slug: true },
+  });
+
+  purgeProfileCache(profile.slug, userId);
+
+  revalidatePath("/admin/users");
+  revalidatePath(`/admin/users/${userId}`);
+
+  return { status: "success", slug: profile.slug, profileId: profile.id };
+}
