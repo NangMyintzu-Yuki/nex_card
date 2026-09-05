@@ -5,6 +5,9 @@ import bcrypt from "bcryptjs";
 
 const SALT_ROUNDS = 12;
 
+/** Default password for admin-created accounts — users change it after first login. */
+export const DEFAULT_PASSWORD = "nexcard123";
+
 /** Dummy hash so missing-user login still spends bcrypt time. */
 const DUMMY_BCRYPT =
   "$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquxi.Ss77VxDEBIVWc7aS";

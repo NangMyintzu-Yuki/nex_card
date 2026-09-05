@@ -15,7 +15,7 @@ import { getServerSession } from "@/lib/auth/session";
 import { isMaintenanceMode, MAINTENANCE_MESSAGE } from "@/lib/security/maintenance";
 import { isReservedSlug } from "@/lib/slugs/reserved";
 import { deleteFile } from "@/lib/storage";
-import { hashPassword } from "@/lib/auth/hash";
+import { hashPassword, DEFAULT_PASSWORD } from "@/lib/auth/hash";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION: SELECT TEMPLATE DURING ONBOARDING (one-time lock)
@@ -566,7 +566,7 @@ async function cleanupOldImages(
 const AdminCreateUserWithProfileInput = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().optional(),
   role: z.enum(["USER", "ADMIN"]),
   createProfile: z.enum(["true", "false"]),
   categoryId: z.string().cuid().optional(),
@@ -582,7 +582,7 @@ const AdminCreateUserWithProfileInput = z.object({
 
 export type AdminCreateUserWithProfileState =
   | { status: "idle" }
-  | { status: "success"; userId: string; userName: string; userEmail: string; profileSlug: string | null }
+  | { status: "success"; userId: string; userName: string; userEmail: string; profileSlug: string | null; defaultPassword: string }
   | { status: "error"; message: string };
 
 export async function adminCreateUserWithProfileAction(
@@ -618,6 +618,7 @@ export async function adminCreateUserWithProfileAction(
 
   const { name, email, password, role, createProfile, categoryId, templateId, slug, tier } = parsed.data;
   const shouldCreateProfile = createProfile === "true";
+  const actualPassword = password || DEFAULT_PASSWORD;
 
   // Check email uniqueness
   const existingUser = await prisma.user.findUnique({
@@ -674,7 +675,7 @@ export async function adminCreateUserWithProfileAction(
     }
   }
 
-  const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashPassword(actualPassword);
 
   // Create user + profile in a transaction
   const result = await prisma.$transaction(async (tx) => {
@@ -759,5 +760,6 @@ export async function adminCreateUserWithProfileAction(
     userName: result.user.name,
     userEmail: result.user.email,
     profileSlug: result.profileSlug,
+    defaultPassword: actualPassword,
   };
 }

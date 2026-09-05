@@ -9,6 +9,7 @@ import {
   adminCreateUserWithProfileAction,
   type AdminCreateUserWithProfileState,
 } from "@/lib/actions/profile-actions";
+import { DEFAULT_PASSWORD } from "@/lib/auth/hash";
 
 type Template = {
   id: string;
@@ -71,6 +72,8 @@ export function AdminCreateUser({ categories }: Props) {
     },
     { status: "idle" } as AdminCreateUserWithProfileState
   );
+
+  const displayPassword = state.status === "success" ? state.defaultPassword : password || DEFAULT_PASSWORD;
 
   function handleSlugChange(value: string) {
     const clean = value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-");
@@ -142,6 +145,12 @@ export function AdminCreateUser({ categories }: Props) {
                   <> has a profile at <code className="rounded bg-[var(--nc-bg-hover)] px-1.5 py-0.5 font-mono text-xs">/{state.profileSlug}</code></>
                 )}
               </p>
+              <div className="rounded-lg p-3 text-xs" style={{ background: "var(--nc-bg-hover)" }}>
+                <div style={{ color: "var(--nc-text-3)" }}>Login credentials</div>
+                <div className="mt-1 font-mono font-bold" style={{ color: "var(--nc-text)" }}>
+                  {state.userEmail} / {state.defaultPassword}
+                </div>
+              </div>
               <div className="flex gap-2 justify-center">
                 <button onClick={handleClose} className="nc-btn-ghost rounded-xl px-4 py-2 text-sm">Close</button>
                 <a href={`/admin/users/${state.userId}`} className="nc-btn-brand rounded-xl px-4 py-2 text-sm font-bold">
@@ -233,14 +242,14 @@ export function AdminCreateUser({ categories }: Props) {
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>Password</label>
+                      <label className="mb-1 block text-xs font-semibold" style={{ color: "var(--nc-text-2)" }}>
+                        Password <span className="font-normal opacity-60">(optional — defaults to {DEFAULT_PASSWORD})</span>
+                      </label>
                       <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Min 8 characters"
-                        required
-                        minLength={8}
+                        placeholder={`Leave empty for default: ${DEFAULT_PASSWORD}`}
                         className="nc-input w-full rounded-xl px-3 py-2.5 text-sm"
                       />
                     </div>
@@ -265,7 +274,7 @@ export function AdminCreateUser({ categories }: Props) {
                       <button
                         type="button"
                         onClick={goNext}
-                        disabled={!name || !email || password.length < 8}
+                        disabled={!name || !email}
                         className="nc-btn-brand flex-1 rounded-xl py-2.5 text-sm font-bold disabled:opacity-50"
                       >
                         Next →
