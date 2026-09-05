@@ -13,6 +13,7 @@ import { DeleteProfileButton } from "./_components/delete-profile-button";
 export const metadata: Metadata = {
   title: "Dashboard — NEX CARD",
 };
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage({
   searchParams,

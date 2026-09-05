@@ -716,7 +716,7 @@ export async function adminCreateUserWithProfileAction(
           templateId,
           slug,
           templateLocked: true,
-          isPublished: false,
+          isPublished: true,
           paymentStatus: paymentStatus as any,
           dynamicJsonData: getEmptyDataForCategory(category!.slug as CategorySlug),
         },

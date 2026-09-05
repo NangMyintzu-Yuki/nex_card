@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: "Choose Your Template — NEX CARD",
   description: "Select your category and template. This is a one-time choice.",
 };
+export const dynamic = "force-dynamic";
 
 export default async function OnboardingPage({
   searchParams,

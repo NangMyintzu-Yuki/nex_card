@@ -14,6 +14,7 @@ import { CompanyVerifier } from "./_components/company-verifier";
 export const metadata: Metadata = {
   title: "Payment Approvals — Admin — NEX CARD",
 };
+export const dynamic = "force-dynamic";
 
 const TIER_LABELS: Record<string, string> = {
   QR_ONLY: "QR Only",
