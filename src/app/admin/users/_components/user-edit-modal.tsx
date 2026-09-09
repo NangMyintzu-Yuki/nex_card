@@ -56,7 +56,7 @@ export function UserEditModal({ user }: UserEditModalProps) {
           </button>
         </form>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <h2
             className="mb-4 text-lg font-bold"
             style={{ color: "var(--nc-text)" }}
@@ -123,18 +123,18 @@ export function UserEditModal({ user }: UserEditModalProps) {
               <p className="text-xs text-emerald-400">{state.message}</p>
             )}
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-2">
               <button
                 type="button"
                 onClick={() => dialogRef.current?.close()}
-                className="nc-btn-ghost rounded-xl px-4 py-2 text-sm"
+                className="nc-btn-ghost rounded-xl px-4 py-2.5 text-sm w-full sm:w-auto"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={pending}
-                className="nc-btn-brand flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold"
+                className="nc-btn-brand flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold w-full sm:w-auto"
               >
                 {pending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Save

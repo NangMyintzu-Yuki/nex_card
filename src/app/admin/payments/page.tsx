@@ -115,7 +115,7 @@ export default async function AdminPaymentsPage({
     <div className="mx-auto max-w-6xl nc-page">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-black" style={{ color: "var(--nc-text)" }}>Payment Approvals</h1>
+        <h1 className="text-xl sm:text-2xl font-black" style={{ color: "var(--nc-text)" }}>Payment Approvals</h1>
         <p className="mt-1 text-sm" style={{ color: "var(--nc-text-3)" }}>
           {pendingCount} pending payment{pendingCount !== 1 ? "s" : ""} awaiting review
           {pendingCompanies.length > 0 && ` · ${pendingCompanies.length} company verification${pendingCompanies.length !== 1 ? "s" : ""}`}

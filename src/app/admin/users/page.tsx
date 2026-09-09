@@ -232,38 +232,36 @@ export default async function AdminUsersPage({
       <div className="md:hidden space-y-3">
         {users.map((user) => (
           <div key={user.id} className="nc-card rounded-xl p-4 space-y-3">
-            <div className="flex items-center gap-3">
+            <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
                 style={{ background: "var(--nc-sidebar-active)", color: "var(--nc-brand-2)" }}>
                 {getInitials(user.name)}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold truncate text-sm" style={{ color: "var(--nc-text)" }}>{user.name}</p>
-                <p className="text-xs font-mono truncate" style={{ color: "var(--nc-text-3)" }}>{user.email}</p>
+                <p className="font-semibold text-sm" style={{ color: "var(--nc-text)" }}>{user.name}</p>
+                <p className="text-[11px] font-mono mt-0.5 break-all" style={{ color: "var(--nc-text-3)" }}>{user.email}</p>
               </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 text-[11px]" style={{ color: "var(--nc-text-3)" }}>
+              <span className="rounded-full px-2 py-0.5 font-bold shrink-0"
+                style={user.role === "ADMIN" ? { background: "rgba(245,158,11,0.1)", color: "#f59e0b" } : { background: "var(--nc-bg-hover)", color: "var(--nc-text-3)" }}>
+                {user.role}
+              </span>
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-bold shrink-0 ${
-                  STATUS_STYLES[user.status] ?? ""
-                }`}
+                className={`rounded-full px-2 py-0.5 font-bold shrink-0 ${STATUS_STYLES[user.status] ?? ""}`}
                 style={!STATUS_STYLES[user.status] ? { background: "var(--nc-bg-hover)", color: "var(--nc-text-3)" } : undefined}
               >
                 {user.status.replace("_", " ")}
-              </span>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 text-xs" style={{ color: "var(--nc-text-3)" }}>
-              <span className="rounded-full px-2 py-0.5 font-bold"
-                style={user.role === "ADMIN" ? { background: "rgba(245,158,11,0.1)", color: "#f59e0b" } : { background: "var(--nc-bg-hover)", color: "var(--nc-text-3)" }}>
-                {user.role}
               </span>
               <span>{user._count.profiles} profiles</span>
               <span>· {formatDate(user.createdAt)}</span>
             </div>
             <div className="flex items-center justify-between pt-2" style={{ borderTop: "1px solid var(--nc-border)" }}>
-              <span className="text-[11px]" style={{ color: "var(--nc-text-3)" }}>
+              <span className="text-[10px]" style={{ color: "var(--nc-text-3)" }}>
                 Last login: {user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}
               </span>
               {session.user.role === "SUPER_ADMIN" && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5">
                   <UserEditModal user={user} />
                   {user.role !== "SUPER_ADMIN" && (
                     <UserDeleteButton userId={user.id} userName={user.name} />

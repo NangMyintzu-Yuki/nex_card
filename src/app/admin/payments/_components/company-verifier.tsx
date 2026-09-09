@@ -54,7 +54,7 @@ export function CompanyVerifier({ companies, onVerified }: Props) {
           <div className="space-y-3">
             {pending.map(c => (
               <div key={c.userId} className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <p className="font-semibold text-sm" style={{ color: "var(--nc-text)" }}>{c.companyName}</p>
                     <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>{c.userName} ({c.userEmail})</p>

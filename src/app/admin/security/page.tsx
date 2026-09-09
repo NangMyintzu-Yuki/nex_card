@@ -126,7 +126,7 @@ export default function AdminSecurityPage() {
                 {secret ? (
                   <div className="rounded-xl p-3" style={{ background: "var(--nc-bg)" }}>
                     <p className="text-[10px] font-semibold mb-1" style={{ color: "var(--nc-text-3)" }}>Manual entry key</p>
-                    <p className="font-mono text-sm font-bold tracking-wider" style={{ color: "var(--nc-text)" }}>{secret}</p>
+                    <p className="font-mono text-sm font-bold tracking-wider break-all" style={{ color: "var(--nc-text)" }}>{secret}</p>
                   </div>
                 ) : null}
                 {otpauthUrl ? (
@@ -152,7 +152,7 @@ export default function AdminSecurityPage() {
                 <button
                   type="button" onClick={enable}
                   disabled={code.length !== 6 || saving}
-                  className="nc-btn-brand flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold disabled:opacity-50"
+                  className="nc-btn-brand flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold disabled:opacity-50"
                 >
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
                   {saving ? "Verifying…" : "Enable 2FA"}

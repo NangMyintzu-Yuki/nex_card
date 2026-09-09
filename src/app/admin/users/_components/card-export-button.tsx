@@ -149,10 +149,9 @@ export function CardExportButton({ userId, profileCount }: { userId: string; pro
 
       {open && (
         <>
-          <div className="fixed inset-0 z-40 bg-black/40 sm:hidden" onClick={() => setOpen(false)} />
+          <div className="fixed inset-0 z-40 sm:hidden" onClick={() => setOpen(false)} />
           <div
-            className="fixed bottom-0 left-0 right-0 z-50 max-h-[80vh] overflow-hidden rounded-t-2xl border shadow-2xl
-              sm:absolute sm:bottom-auto sm:left-auto sm:right-0 sm:top-full sm:mt-1 sm:w-80 sm:rounded-2xl"
+            className="absolute right-0 top-full z-50 mt-1 w-72 max-h-80 overflow-hidden rounded-2xl border shadow-2xl"
             style={{ background: "var(--nc-bg-card)", borderColor: "var(--nc-border)" }}
           >
             <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: "var(--nc-border)" }}>
@@ -160,7 +159,7 @@ export function CardExportButton({ userId, profileCount }: { userId: string; pro
                 <p className="text-xs font-bold" style={{ color: "var(--nc-text)" }}>Export Card</p>
                 <p className="text-[10px]" style={{ color: "var(--nc-text-3)" }}>PNG · Dynamic QR · Dark / Light</p>
               </div>
-              <button onClick={() => setOpen(false)} className="flex h-7 w-7 items-center justify-center rounded-lg sm:hidden" style={{ color: "var(--nc-text-3)" }}>
+              <button onClick={() => setOpen(false)} className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ color: "var(--nc-text-3)" }}>
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -172,7 +171,7 @@ export function CardExportButton({ userId, profileCount }: { userId: string; pro
               </div>
             )}
 
-            <div className="max-h-[60vh] overflow-y-auto sm:max-h-64">
+            <div className="max-h-64 overflow-y-auto">
               {loading ? (
                 <div className="flex items-center justify-center gap-2 px-4 py-8">
                   <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--nc-text-3)" }} />

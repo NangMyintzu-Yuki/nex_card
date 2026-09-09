@@ -82,7 +82,7 @@ export default function DiscountRuleManager({ initialRules }: Props) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Discount Rules
@@ -161,7 +161,7 @@ export default function DiscountRuleManager({ initialRules }: Props) {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="submit"
               disabled={isPending}

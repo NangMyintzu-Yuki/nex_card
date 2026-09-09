@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/db/prisma";
 import { verifyPassword, dummyPasswordCheck } from "@/lib/auth/hash";
+import { createTwoFactorToken } from "@/lib/auth/two-factor-token";
 import {
   clientIp,
   maybeCleanupRateLimits,
@@ -110,10 +111,12 @@ export async function POST(request: NextRequest) {
     if (user.totpEnabled && user.totpSecret) {
       const { verifyTotp } = await import("@/lib/auth/totp");
       if (!totpCode) {
+        const twoFactorToken = createTwoFactorToken(user.id, user.email);
         return NextResponse.json(
           {
             message: "Two-factor code required.",
             requires2fa: true,
+            twoFactorToken,
           },
           { status: 403 }
         );

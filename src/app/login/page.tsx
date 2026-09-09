@@ -20,8 +20,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
-  const [totpCode, setTotpCode] = useState("");
-  const [needs2fa, setNeeds2fa] = useState(false);
   const [error, setError]       = useState("");
   const [info, setInfo]         = useState("");
   const [loading, setLoading]   = useState(false);
@@ -59,14 +57,12 @@ export default function LoginPage() {
           email,
           password,
           remember: rememberMe,
-          ...(totpCode ? { totpCode } : {}),
         }),
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.requires2fa) {
-          setNeeds2fa(true);
-          setError("Enter the 6-digit code from your authenticator app.");
+        if (data.requires2fa && data.twoFactorToken) {
+          router.push(`/verify-2fa?token=${encodeURIComponent(data.twoFactorToken)}`);
           return;
         }
         if (data.requiresVerification) {
@@ -78,7 +74,7 @@ export default function LoginPage() {
         return;
       }
       const params = new URLSearchParams(window.location.search);
-      const fallback = data.user?.role === "ADMIN" ? "/admin" : "/dashboard";
+      const fallback = data.role === "ADMIN" ? "/admin" : "/dashboard";
       const dest = safeCallbackUrl(params.get("callbackUrl"), fallback);
       router.replace(maintenancePath(dest));
       router.refresh();
@@ -195,26 +191,6 @@ export default function LoginPage() {
                 Remember for 30 days
               </span>
             </label>
-
-            {needs2fa && (
-              <div>
-                <label className="mb-1 block text-[11px] font-semibold sm:text-xs" style={{ color: "var(--nc-text-2)" }}>
-                  Authenticator code
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="\d{6}"
-                  maxLength={6}
-                  value={totpCode}
-                  onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                  placeholder="123456"
-                  required
-                  autoComplete="one-time-code"
-                  style={inputStyle}
-                />
-              </div>
-            )}
 
             <button
               type="submit"

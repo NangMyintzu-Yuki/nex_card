@@ -49,7 +49,7 @@ export function UserDeleteButton({ userId, userName }: UserDeleteButtonProps) {
           </button>
         </form>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <h2 className="mb-2 text-lg font-bold text-red-400">Delete User</h2>
           <p className="mb-4 text-sm" style={{ color: "var(--nc-text-2)" }}>
             Are you sure you want to delete <strong>{userName}</strong>? This will
@@ -83,18 +83,18 @@ export function UserDeleteButton({ userId, userName }: UserDeleteButtonProps) {
               <p className="text-xs text-emerald-400">{state.message}</p>
             )}
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-2">
               <button
                 type="button"
                 onClick={() => dialogRef.current?.close()}
-                className="nc-btn-ghost rounded-xl px-4 py-2 text-sm"
+                className="nc-btn-ghost rounded-xl px-4 py-2.5 text-sm w-full sm:w-auto"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={pending || confirmText !== "DELETE"}
-                className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold bg-red-500/20 text-red-400 hover:bg-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold bg-red-500/20 text-red-400 hover:bg-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto"
               >
                 {pending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Delete

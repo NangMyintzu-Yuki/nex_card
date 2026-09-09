@@ -51,7 +51,7 @@ export function ApproveRejectButtons({ paymentId }: ApproveRejectButtonsProps) {
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-      <div className="flex gap-2">
+      <div className="flex flex-1 gap-2 sm:flex-none">
         <form action={approveAction}>
           <input type="hidden" name="paymentId" value={paymentId} />
           <button

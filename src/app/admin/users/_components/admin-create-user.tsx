@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import {
   adminCreateUserWithProfileAction,
@@ -110,6 +110,13 @@ export function AdminCreateUser({ categories }: Props) {
     reset();
   }
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = ""; };
+    }
+  }, [open]);
+
   const allSteps: Step[] = showPricing
     ? ["user", "category", "template", "pricing", "confirm"]
     : ["user", "category", "template", "confirm"];
@@ -135,8 +142,8 @@ export function AdminCreateUser({ categories }: Props) {
           Create User
         </button>
         {open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.5)" }}>
-            <div className="nc-card w-full max-w-md rounded-2xl p-6 text-center space-y-4">
+          <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4" style={{ background: "rgba(0,0,0,0.5)" }}>
+            <div className="nc-card w-full h-full sm:h-auto sm:max-w-md sm:rounded-2xl p-6 text-center space-y-4">
               <div className="text-3xl">✅</div>
               <h3 className="text-lg font-bold" style={{ color: "var(--nc-text)" }}>User Created</h3>
               <p className="text-sm" style={{ color: "var(--nc-text-3)" }}>
@@ -151,9 +158,9 @@ export function AdminCreateUser({ categories }: Props) {
                   {state.userEmail} / {state.defaultPassword}
                 </div>
               </div>
-              <div className="flex gap-2 justify-center">
-                <button onClick={handleClose} className="nc-btn-ghost rounded-xl px-4 py-2 text-sm">Close</button>
-                <a href={`/admin/users/${state.userId}`} className="nc-btn-brand rounded-xl px-4 py-2 text-sm font-bold">
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-center">
+                <button onClick={handleClose} className="nc-btn-ghost rounded-xl px-4 py-2.5 text-sm w-full sm:w-auto">Close</button>
+                <a href={`/admin/users/${state.userId}`} className="nc-btn-brand rounded-xl px-4 py-2.5 text-sm font-bold text-center w-full sm:w-auto">
                   View User
                 </a>
               </div>
@@ -175,13 +182,16 @@ export function AdminCreateUser({ categories }: Props) {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.5)" }}>
+        <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4" style={{ background: "rgba(0,0,0,0.5)" }}>
           <div
-            className="nc-card w-full max-w-lg rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+            className="nc-card w-full h-full sm:h-auto sm:max-w-lg sm:rounded-2xl overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4" style={{ borderBottom: "1px solid var(--nc-border)" }}>
+            <div className="flex justify-center pt-2 sm:hidden">
+              <div className="h-1 w-8 rounded-full" style={{ background: "var(--nc-border)" }} />
+            </div>
+            <div className="flex items-center justify-between p-4 sm:p-4 sm:rounded-t-2xl" style={{ background: "var(--nc-bg-card)", borderBottom: "1px solid var(--nc-border)" }}>
               <div>
                 <h3 className="font-bold" style={{ color: "var(--nc-text)" }}>Create New User</h3>
                 <p className="text-xs" style={{ color: "var(--nc-text-3)" }}>
@@ -301,7 +311,7 @@ export function AdminCreateUser({ categories }: Props) {
                     </label>
 
                     {createProfile && (
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {categories.map((cat) => (
                           <button
                             key={cat.id}
@@ -347,7 +357,7 @@ export function AdminCreateUser({ categories }: Props) {
                     <button type="button" onClick={goBack} className="text-xs font-bold" style={{ color: "var(--nc-brand)" }}>
                       ← Back to categories
                     </button>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[40vh] overflow-y-auto pr-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {selectedCategory.templates.map((tpl) => (
                         <button
                           key={tpl.id}
