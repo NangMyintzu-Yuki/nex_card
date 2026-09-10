@@ -13,6 +13,14 @@ interface Props {
   backgroundStyle?: BackgroundStyle;
 }
 
+function phoneVCardType(label?: string): string {
+  const l = (label ?? "").toLowerCase();
+  if (l.includes("work")) return "WORK";
+  if (l.includes("home")) return "HOME";
+  if (l.includes("fax")) return "FAX";
+  return "CELL";
+}
+
 function buildVCard(d: DigitalNameCardData) {
   return [
     "BEGIN:VCARD",
@@ -24,10 +32,18 @@ function buildVCard(d: DigitalNameCardData) {
       c.type === "email"
         ? `EMAIL:${c.value}`
         : c.type === "phone"
-          ? `TEL;TYPE=CELL:${c.value}`
+          ? `TEL;TYPE=${phoneVCardType(c.label)}:${c.value}`
           : c.type === "website"
             ? `URL:${c.value.startsWith("http") ? c.value : "https://" + c.value}`
-            : null
+            : c.type === "whatsapp"
+              ? `TEL;TYPE=WHATSAPP:${c.value}`
+              : c.type === "viber"
+                ? `TEL;TYPE=VIBER:${c.value}`
+                : c.type === "telegram"
+                  ? `TEL;TYPE=TELEGRAM:${c.value}`
+                  : c.type === "skype"
+                    ? `TEL;TYPE=SKYPE:${c.value}`
+                    : null
     ),
     ...d.socialLinks.map((s) => `URL;TYPE=${s.platform.toUpperCase()}:${s.url}`),
     "END:VCARD",

@@ -273,31 +273,38 @@ function setNestedValue(obj: Record<string, unknown>, path: string, value: unkno
 
 function ContactsEditor({ value, onChange }: { value: unknown[]; onChange: (v: unknown[]) => void }) {
   const contacts = (value as Array<Record<string, string>>) ?? [];
-  const TYPES = ["email", "phone", "website", "address"];
+  const TYPES = ["phone", "email", "website", "address"];
   const TYPE_LABELS: Record<string, string> = { email: "✉ Email", phone: "📱 Phone", website: "🌐 Website", address: "📍 Address" };
+  const PHONE_LABELS = ["Mobile", "Work", "Home", "Fax"];
 
   function setType(index: number, type: string) {
     const n = [...contacts];
     n[index] = { ...n[index], type };
+    if (type === "phone" && !n[index].label) n[index].label = "Mobile";
     onChange(n);
   }
 
   function clearType(index: number) {
     const n = [...contacts];
-    n[index] = { ...n[index], type: "", value: "" };
+    n[index] = { ...n[index], type: "", value: "", label: "" };
     onChange(n);
+  }
+
+  function getPhoneLabel(c: Record<string, string>, idx: number): string {
+    const phoneIndex = contacts.slice(0, idx + 1).filter((x) => x.type === "phone").length;
+    if (c.label && PHONE_LABELS.includes(c.label)) return c.label;
+    if (c.label) return c.label;
+    return PHONE_LABELS[phoneIndex - 1] ?? `Phone ${phoneIndex}`;
   }
 
   return (
     <div className="space-y-1.5">
       {contacts.map((c, i) => {
-        const usedTypes = new Set(contacts.filter((_, j) => j !== i).map((x) => x.type).filter(Boolean));
-        const availableTypes = TYPES.filter((t) => !usedTypes.has(t));
         return (
           <div key={i} className="flex items-center gap-1.5 rounded-xl border px-2 py-1.5" style={{ borderColor: "var(--nc-border)", background: "var(--nc-surface)" }}>
             {c.type ? (
               <span className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[10px] font-semibold text-indigo-400 bg-indigo-500/10 shrink-0">
-                {TYPE_LABELS[c.type] ?? c.type}
+                {c.type === "phone" ? getPhoneLabel(c, i) : TYPE_LABELS[c.type] ?? c.type}
                 <button type="button" onClick={() => clearType(i)}
                   className="text-indigo-400/50 hover:text-red-400 transition-colors">&times;</button>
               </span>
@@ -305,13 +312,19 @@ function ContactsEditor({ value, onChange }: { value: unknown[]; onChange: (v: u
               <select value="" onChange={(e) => setType(i, e.target.value)}
                 className="rounded-lg px-1.5 py-1.5 text-xs w-20 shrink-0 nc-input">
                 <option value="" disabled>Type…</option>
-                {availableTypes.map((t) => <option key={t} value={t}>{TYPE_LABELS[t] ?? t}</option>)}
+                {TYPES.map((t) => <option key={t} value={t}>{TYPE_LABELS[t] ?? t}</option>)}
+              </select>
+            )}
+            {c.type === "phone" && (
+              <select value={c.label ?? "Mobile"} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
+                className="rounded-lg px-1.5 py-1.5 text-[10px] w-16 shrink-0 nc-input">
+                {PHONE_LABELS.map((l) => <option key={l} value={l}>{l}</option>)}
               </select>
             )}
             <input value={c.value ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], value: e.target.value }; onChange(n); }}
               placeholder={c.type === "email" ? "you@example.com" : c.type === "phone" ? "+95 9xxx" : c.type === "website" ? "https://…" : "Address"}
               className="min-w-0 flex-1 nc-input rounded-lg px-2 py-1.5 text-xs" />
-            <input value={c.label ?? ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
+            <input value={c.type !== "phone" ? (c.label ?? "") : ""} onChange={(e) => { const n = [...contacts]; n[i] = { ...n[i], label: e.target.value }; onChange(n); }}
               placeholder="Label" className="w-16 shrink-0 nc-input rounded-lg px-2 py-1.5 text-xs hidden sm:block" />
             <button onClick={() => onChange(contacts.filter((_, j) => j !== i))} className="flex h-6 w-6 shrink-0 items-center justify-center nc-btn-ghost rounded-lg hover:border-red-500/30 hover:text-red-400 transition-colors">
               <Trash2 className="h-3 w-3" />
@@ -1219,7 +1232,7 @@ export function ProfileEditor({ profile, categorySlug }: ProfileEditorProps) {
       const existingContacts = (getFieldValue("contacts") as Array<Record<string, string>>) ?? [];
       const hasPhone = existingContacts.some((c) => c.type === "phone");
       if (!hasPhone) {
-        setFieldValue("contacts", [...existingContacts, { type: "phone", value: result.phone, label: "" }]);
+        setFieldValue("contacts", [...existingContacts, { type: "phone", value: result.phone, label: "Mobile" }]);
       }
     }
     if (result.website) {

@@ -19,7 +19,7 @@ export interface GalleryImage {
 }
 
 export interface ContactField {
-  type: "email" | "phone" | "address" | "website";
+  type: "email" | "phone" | "address" | "website" | "whatsapp" | "viber" | "telegram" | "skype";
   value: string;
   label?: string;
   isPrimary?: boolean;

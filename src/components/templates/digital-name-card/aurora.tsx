@@ -11,6 +11,14 @@ import { getBackground, type BackgroundStyle } from "@/components/templates/back
 interface Props { data: DigitalNameCardData; accentColor?: string; backgroundStyle?: BackgroundStyle; }
 
 // ── vCard builder (RFC 6350) — #1 feature per industry research ────────────
+function phoneVCardType(label?: string): string {
+  const l = (label ?? "").toLowerCase();
+  if (l.includes("work")) return "WORK";
+  if (l.includes("home")) return "HOME";
+  if (l.includes("fax")) return "FAX";
+  return "CELL";
+}
+
 function buildVCard(d: DigitalNameCardData): string {
   return [
     "BEGIN:VCARD", "VERSION:3.0",
@@ -19,9 +27,13 @@ function buildVCard(d: DigitalNameCardData): string {
     d.company   ? `ORG:${d.company}` : null,
     ...d.contacts.map(c => {
       if (c.type === "email")   return `EMAIL;TYPE=INTERNET:${c.value}`;
-      if (c.type === "phone")   return `TEL;TYPE=CELL:${c.value}`;
+      if (c.type === "phone")   return `TEL;TYPE=${phoneVCardType(c.label)}:${c.value}`;
       if (c.type === "website") return `URL:${c.value.startsWith("http") ? c.value : "https://" + c.value}`;
       if (c.type === "address") return `ADR:;;${c.value};;;;`;
+      if (c.type === "whatsapp") return `TEL;TYPE=WHATSAPP:${c.value}`;
+      if (c.type === "viber") return `TEL;TYPE=VIBER:${c.value}`;
+      if (c.type === "telegram") return `TEL;TYPE=TELEGRAM:${c.value}`;
+      if (c.type === "skype") return `TEL;TYPE=SKYPE:${c.value}`;
       return null;
     }),
     ...d.socialLinks.map(s => `URL;TYPE=${s.platform.toUpperCase()}:${s.url}`),

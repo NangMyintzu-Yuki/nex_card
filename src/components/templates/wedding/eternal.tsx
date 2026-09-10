@@ -283,7 +283,7 @@ export function EternalWedding({ data, accentColor = "#c9a96e", slug }: WeddingP
                 </a>
               )}
               {rsvp.contactPhone && (
-                <a href={`tel:${rsvp.contactPhone}`} className="text-sm" style={{ color: "#7a5c3a" }}>
+                <a href={`tel:${rsvp.contactPhone.replace(/\s/g, "")}`} className="text-sm" style={{ color: "#7a5c3a" }}>
                   {rsvp.contactPhone}
                 </a>
               )}
