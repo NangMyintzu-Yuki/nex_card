@@ -124,14 +124,14 @@ export function ObsidianNameCard({ data, accentColor = "#f59e0b", backgroundStyl
         <div className="mb-6 flex items-start gap-4">
           {avatarUrl && (
             <div
-              className="contrast-110 h-20 w-20 shrink-0 overflow-hidden grayscale"
+              className="contrast-110 h-20 w-20 shrink-0 overflow-hidden "
               style={{ outline: `2px solid ${accentColor}` }}
             >
               <AvatarZoom
                 src={avatarUrl}
                 alt={fullName}
                 className="h-full w-full"
-                imageClassName="contrast-110 grayscale"
+                imageClassName="contrast-110 "
               />
             </div>
           )}
